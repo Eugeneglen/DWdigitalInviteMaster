@@ -87,75 +87,58 @@ export default function SchedulePage() {
               <span className="font-utility-mono text-utility-mono leading-utility-mono font-medium text-charcoal-ink/60 italic tracking-wider uppercase">June 22, 2024</span>
             </div>
 
-            <div className="relative border-l-2 border-champagne-silk/30 ml-4 md:ml-8 pl-8 md:pl-16 flex flex-col gap-16">
+            <div className="relative border-l border-champagne-silk/40 ml-4 md:ml-8 pl-8 md:pl-16 flex flex-col gap-16">
               {/* Ceremony */}
               <div className="relative group">
-                <div className="absolute -left-[37px] md:-left-[69px] top-2 w-4 h-4 rounded-full gold-leaf-dot outline outline-4 outline-paper-cream" />
-                <div className="flex flex-col md:flex-row gap-4 md:gap-12">
-                  <div className="md:w-1/4 shrink-0">
-                    <span className="font-utility-mono text-utility-mono leading-utility-mono text-charcoal-ink font-semibold tracking-tighter">4:00 PM</span>
-                  </div>
-                  <div className="flex-1">
-                    {/* Original: text-headline-md-mobile is NOT defined in schedule config → no-op on mobile. md:text-headline-md = 32px/40px/500 */}
-                    <h3 className="font-display-hero text-headline-md-mobile md:text-headline-lg-mobile md:leading-headline-lg-mobile md:font-semibold text-charcoal-ink mb-3">The Ceremony</h3>
-                    <p className="text-body-md leading-body-md text-charcoal-ink/70 mb-4 leading-relaxed">Join us as we exchange our vows and start our new chapter together.</p>
-                    <div className="flex flex-wrap gap-2 mb-6">
-                      {/* Original: font-label-sm text-[10px] tracking-widest font-bold */}
-                      <span className="inline-flex items-center px-3 py-1 rounded-full bg-champagne-silk/30 text-charcoal-ink text-[10px] tracking-widest uppercase font-bold">Formal Attire</span>
-                    </div>
+                <div className="absolute -left-[calc(2px+7px)] md:-left-[calc(2px+7px)] top-2.5 w-[6px] h-[6px] rounded-full bg-cinematic-gold" />
+                <div className="flex flex-col gap-2">
+                  <span className="inline-block self-start px-2.5 py-1 rounded bg-champagne-silk/40 text-[11px] font-medium uppercase tracking-widest text-charcoal-ink/70 mb-1">4:00 PM</span>
+                  <h3 className="font-display-hero text-headline-md-mobile md:text-headline-lg-mobile md:leading-headline-lg-mobile md:font-semibold text-charcoal-ink">The Ceremony</h3>
+                  <p className="text-body-md leading-body-md text-charcoal-ink/70 leading-relaxed">Join us as we exchange our vows and start our new chapter together.</p>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full bg-champagne-silk/30 text-charcoal-ink text-[10px] tracking-widest uppercase font-bold">Formal Attire</span>
                   </div>
                 </div>
               </div>
 
               {/* Cocktail Hour */}
               <div className="relative group">
-                <div className="absolute -left-[37px] md:-left-[69px] top-2 w-4 h-4 rounded-full gold-leaf-dot outline outline-4 outline-paper-cream" />
-                <div className="flex flex-col md:flex-row gap-4 md:gap-12">
-                  <div className="md:w-1/4 shrink-0">
-                    <span className="font-utility-mono text-utility-mono leading-utility-mono text-charcoal-ink font-semibold tracking-tighter">5:30 PM</span>
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-display-hero text-headline-md-mobile md:text-headline-lg-mobile md:leading-headline-lg-mobile md:font-semibold text-charcoal-ink mb-3">Cocktail Hour</h3>
-                    <p className="text-body-md leading-body-md text-charcoal-ink/70 mb-4 leading-relaxed">Enjoy signature drinks and light hors d&apos;oeuvres in the garden courtyard.</p>
-                  </div>
+                <div className="absolute -left-[calc(2px+7px)] md:-left-[calc(2px+7px)] top-2.5 w-[6px] h-[6px] rounded-full bg-cinematic-gold" />
+                <div className="flex flex-col gap-2">
+                  <span className="inline-block self-start px-2.5 py-1 rounded bg-champagne-silk/40 text-[11px] font-medium uppercase tracking-widest text-charcoal-ink/70 mb-1">5:30 PM</span>
+                  <h3 className="font-display-hero text-headline-md-mobile md:text-headline-lg-mobile md:leading-headline-lg-mobile md:font-semibold text-charcoal-ink">Cocktail Hour</h3>
+                  <p className="text-body-md leading-body-md text-charcoal-ink/70 leading-relaxed">Enjoy signature drinks and light hors d&apos;oeuvres in the garden courtyard.</p>
                 </div>
               </div>
 
               {/* Dinner & Dancing */}
               <div className="relative group">
-                <div className="absolute -left-[37px] md:-left-[69px] top-2 w-4 h-4 rounded-full gold-leaf-dot outline outline-4 outline-paper-cream" />
-                <div className="flex flex-col md:flex-row gap-4 md:gap-12">
-                  <div className="md:w-1/4 shrink-0">
-                    <span className="font-utility-mono text-utility-mono leading-utility-mono text-charcoal-ink font-semibold tracking-tighter">7:00 PM</span>
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-display-hero text-headline-md-mobile md:text-headline-lg-mobile md:leading-headline-lg-mobile md:font-semibold text-charcoal-ink mb-3">Dinner &amp; Dancing</h3>
-                    <p className="text-body-md leading-body-md text-charcoal-ink/70 mb-4 leading-relaxed">A seated dinner followed by a night of celebration, music, and joy on the dance floor.</p>
-                  </div>
+                <div className="absolute -left-[calc(2px+7px)] md:-left-[calc(2px+7px)] top-2.5 w-[6px] h-[6px] rounded-full bg-cinematic-gold" />
+                <div className="flex flex-col gap-2">
+                  <span className="inline-block self-start px-2.5 py-1 rounded bg-champagne-silk/40 text-[11px] font-medium uppercase tracking-widest text-charcoal-ink/70 mb-1">7:00 PM</span>
+                  <h3 className="font-display-hero text-headline-md-mobile md:text-headline-lg-mobile md:leading-headline-lg-mobile md:font-semibold text-charcoal-ink">Dinner &amp; Dancing</h3>
+                  <p className="text-body-md leading-body-md text-charcoal-ink/70 leading-relaxed">A seated dinner followed by a night of celebration, music, and joy on the dance floor.</p>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Action Cards — original: stagger-4 */}
-        {/* Original card label: <span class="font-label-sm uppercase tracking-[0.15em] text-charcoal-ink"> */}
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-24 stagger-4">
+        {/* Action Buttons — flat bordered style matching reference design */}
+        <section className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-24 stagger-4">
           <button
             type="button"
             onClick={handleAddToCalendar}
-            className="group relative overflow-hidden bg-surface-container-low border border-champagne-silk/20 p-8 flex flex-col items-center justify-center text-center h-48 hover:border-cinematic-gold transition-colors duration-500 shadow-[0_-4px_20px_rgba(26,26,26,0.04)]"
+            className="w-full sm:w-auto border border-charcoal-ink/15 bg-white rounded px-8 py-3 text-[13px] font-medium uppercase tracking-[0.08em] text-charcoal-ink hover:border-cinematic-gold hover:text-cinematic-gold transition-colors duration-300"
           >
-            <span className="material-symbols-outlined text-3xl mb-4 text-charcoal-ink group-hover:text-cinematic-gold transition-colors">calendar_add_on</span>
-            <span className="text-label-sm leading-label-sm font-semibold uppercase tracking-[0.15em] text-charcoal-ink">Add to Calendar</span>
+            Add to Calendar
           </button>
           <button
             type="button"
             onClick={() => setSection('getting-there')}
-            className="group relative overflow-hidden bg-surface-container-low border border-champagne-silk/20 p-8 flex flex-col items-center justify-center text-center h-48 hover:border-cinematic-gold transition-colors duration-500 shadow-[0_-4px_20px_rgba(26,26,26,0.04)]"
+            className="w-full sm:w-auto border border-charcoal-ink/15 bg-white rounded px-8 py-3 text-[13px] font-medium uppercase tracking-[0.08em] text-charcoal-ink hover:border-cinematic-gold hover:text-cinematic-gold transition-colors duration-300"
           >
-            <span className="material-symbols-outlined text-3xl mb-4 text-charcoal-ink group-hover:text-cinematic-gold transition-colors">map</span>
-            <span className="text-label-sm leading-label-sm font-semibold uppercase tracking-[0.15em] text-charcoal-ink">Directions</span>
+            Directions
           </button>
         </section>
       </main>
