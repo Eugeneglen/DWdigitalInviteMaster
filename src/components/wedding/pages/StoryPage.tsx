@@ -161,10 +161,10 @@ export default function StoryPage() {
                 We are planning our first adventure as a married couple. Cast a vote or share a hidden gem you think we should explore.
               </p>
               <div className="flex flex-col md:flex-row gap-4 justify-center mb-10">
-                <button className="px-8 py-4 border border-champagne-silk rounded-full text-charcoal-ink hover:bg-cinematic-gold hover:text-white hover:border-cinematic-gold transition-colors duration-300 uppercase tracking-widest text-[11px]" style={{ fontWeight: 600 }}>
+                <button className="px-6 py-3 border border-charcoal-ink/15 bg-transparent rounded text-sm font-medium uppercase tracking-[0.08em] text-charcoal-ink hover:border-charcoal-ink/40 transition-colors duration-300">
                   Amalfi Coast
                 </button>
-                <button className="px-8 py-4 border border-champagne-silk rounded-full text-charcoal-ink hover:bg-cinematic-gold hover:text-white hover:border-cinematic-gold transition-colors duration-300 uppercase tracking-widest text-[11px]" style={{ fontWeight: 600 }}>
+                <button className="px-6 py-3 border border-charcoal-ink/15 bg-transparent rounded text-sm font-medium uppercase tracking-[0.08em] text-charcoal-ink hover:border-charcoal-ink/40 transition-colors duration-300">
                   Kyoto
                 </button>
               </div>
@@ -175,7 +175,7 @@ export default function StoryPage() {
                   type="text"
                   style={{ fontSize: '16px', lineHeight: '24px' }}
                 />
-                <button className="w-full bg-charcoal-ink text-paper-cream py-5 hover:opacity-90 transition-opacity tracking-[0.25em] text-[12px] font-semibold uppercase">
+                <button className="w-full bg-charcoal-ink text-paper-cream rounded py-3 text-sm font-medium uppercase tracking-[0.08em] hover:opacity-90 transition-opacity duration-300">
                   Submit Recommendation
                 </button>
               </div>

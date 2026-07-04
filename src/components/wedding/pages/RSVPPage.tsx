@@ -175,7 +175,7 @@ export default function RSVPPage() {
               </div>
             </div>
             <button
-              className="w-full bg-charcoal-ink text-paper-cream py-4 mt-4 text-[12px] tracking-[0.25em] uppercase font-semibold hover:bg-black transition-colors"
+              className="w-full bg-charcoal-ink text-paper-cream rounded py-3 text-sm font-medium uppercase tracking-[0.08em] hover:opacity-90 transition-opacity duration-300"
               onClick={submitStep1}
             >
               Next
@@ -192,7 +192,7 @@ export default function RSVPPage() {
           </div>
           <div className="flex items-center justify-center gap-3 mb-4">
             <button
-              className="w-12 h-12 border border-charcoal-ink/30 flex items-center justify-center hover:border-charcoal-ink transition-colors text-2xl"
+              className="w-12 h-12 border border-charcoal-ink/15 rounded flex items-center justify-center hover:border-charcoal-ink/40 transition-colors text-2xl bg-transparent"
               onClick={() => changeParty(-1)}
             >
               −
@@ -201,7 +201,7 @@ export default function RSVPPage() {
               {partySize}
             </div>
             <button
-              className="w-12 h-12 border border-charcoal-ink/30 flex items-center justify-center hover:border-charcoal-ink transition-colors text-2xl"
+              className="w-12 h-12 border border-charcoal-ink/15 rounded flex items-center justify-center hover:border-charcoal-ink/40 transition-colors text-2xl bg-transparent"
               onClick={() => changeParty(1)}
             >
               +
@@ -212,13 +212,13 @@ export default function RSVPPage() {
           </p>
           <div className="flex gap-3">
             <button
-              className="flex-1 border border-charcoal-ink/30 py-4 text-[12px] tracking-[0.25em] uppercase font-semibold hover:border-charcoal-ink transition-colors"
+              className="flex-1 border border-charcoal-ink/15 bg-transparent rounded py-3 text-sm font-medium uppercase tracking-[0.08em] text-charcoal-ink hover:border-charcoal-ink/40 transition-colors duration-300"
               onClick={() => setStep(1)}
             >
               Back
             </button>
             <button
-              className="flex-[2] bg-charcoal-ink text-paper-cream py-4 text-[12px] tracking-[0.25em] uppercase font-semibold hover:bg-black transition-colors"
+              className="flex-[2] bg-charcoal-ink text-paper-cream rounded py-3 text-sm font-medium uppercase tracking-[0.08em] hover:opacity-90 transition-opacity duration-300"
               onClick={submitStep2}
             >
               Next
@@ -246,7 +246,7 @@ export default function RSVPPage() {
                   )}
                 </div>
                 <button
-                  className={`border px-5 py-2 text-[11px] tracking-[0.2em] uppercase font-semibold hover:border-charcoal-ink transition-colors ${
+                  className={`border border-charcoal-ink/15 bg-transparent rounded px-5 py-2.5 text-sm font-medium uppercase tracking-[0.08em] hover:border-charcoal-ink/40 transition-colors ${
                     g.responded
                       ? 'border-cinematic-gold text-cinematic-gold'
                       : 'border-charcoal-ink/40 text-charcoal-ink'
@@ -267,13 +267,13 @@ export default function RSVPPage() {
           </button>
           <div className="flex gap-3">
             <button
-              className="flex-1 border border-charcoal-ink/30 py-4 text-[12px] tracking-[0.25em] uppercase font-semibold hover:border-charcoal-ink transition-colors"
+              className="flex-1 border border-charcoal-ink/15 bg-transparent rounded py-3 text-sm font-medium uppercase tracking-[0.08em] text-charcoal-ink hover:border-charcoal-ink/40 transition-colors duration-300"
               onClick={() => setStep(2)}
             >
               Back
             </button>
             <button
-              className={`flex-[2] bg-charcoal-ink text-paper-cream py-4 text-[12px] tracking-[0.25em] uppercase font-semibold hover:bg-black transition-colors ${
+              className={`flex-[2] bg-charcoal-ink text-paper-cream rounded py-3 text-sm font-medium uppercase tracking-[0.08em] hover:opacity-90 transition-opacity duration-300 ${
                 !allDone ? 'opacity-40' : ''
               }`}
               disabled={!allDone}
@@ -331,13 +331,13 @@ export default function RSVPPage() {
           </div>
           <div className="flex gap-3 mt-10">
             <button
-              className="flex-1 border border-charcoal-ink/30 py-4 text-[12px] tracking-[0.25em] uppercase font-semibold hover:border-charcoal-ink transition-colors"
+              className="flex-1 border border-charcoal-ink/15 bg-transparent rounded py-3 text-sm font-medium uppercase tracking-[0.08em] text-charcoal-ink hover:border-charcoal-ink/40 transition-colors duration-300"
               onClick={() => setStep(3)}
             >
               Back
             </button>
             <button
-              className={`flex-[2] bg-charcoal-ink text-paper-cream py-4 text-[12px] tracking-[0.25em] uppercase font-semibold hover:bg-black transition-colors ${
+              className={`flex-[2] bg-charcoal-ink text-paper-cream rounded py-3 text-sm font-medium uppercase tracking-[0.08em] hover:opacity-90 transition-opacity duration-300 ${
                 !attendance ? 'opacity-40' : ''
               }`}
               disabled={!attendance}

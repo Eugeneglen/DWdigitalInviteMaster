@@ -237,20 +237,13 @@ export default function WishesPage() {
               <div className="flex justify-center pt-8">
                 <button
                   type="submit"
-                  className={`text-paper-cream px-16 py-6 group/btn flex items-center gap-4 uppercase transition-all duration-700 ${
+                  className={`text-paper-cream rounded px-6 py-3 group/btn flex items-center gap-4 text-sm font-medium uppercase tracking-[0.08em] transition-all duration-300 ${
                     submitting
-                      ? 'opacity-50 pointer-events-none'
+                      ? 'opacity-50 pointer-events-none bg-charcoal-ink'
                       : submitted
-                      ? ''
-                      : 'hover:bg-cinematic-gold'
+                      ? 'bg-emerald-600'
+                      : 'bg-charcoal-ink hover:opacity-90'
                   }`}
-                  style={{
-                    fontSize: '12px',
-                    fontWeight: 700,
-                    letterSpacing: '0.3em',
-                    fontFamily: "'Inter', sans-serif",
-                    backgroundColor: submitted ? '#10B981' : '#1A1A1A',
-                  }}
                   disabled={submitting}
                 >
                   {submitting ? (

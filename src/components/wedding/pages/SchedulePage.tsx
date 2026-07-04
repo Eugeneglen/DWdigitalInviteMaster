@@ -107,14 +107,14 @@ export default function SchedulePage() {
           <button
             type="button"
             onClick={handleAddToCalendar}
-            className="w-full sm:w-auto border border-charcoal-ink/15 bg-white rounded px-8 py-3 text-[13px] font-medium uppercase tracking-[0.08em] text-charcoal-ink hover:border-cinematic-gold hover:text-cinematic-gold transition-colors duration-300"
+            className="w-full sm:w-auto border border-charcoal-ink/15 bg-transparent rounded px-6 py-3 text-sm font-medium uppercase tracking-[0.08em] text-charcoal-ink hover:border-charcoal-ink/40 transition-colors duration-300"
           >
             Add to Calendar
           </button>
           <button
             type="button"
             onClick={() => setSection('getting-there')}
-            className="w-full sm:w-auto border border-charcoal-ink/15 bg-white rounded px-8 py-3 text-[13px] font-medium uppercase tracking-[0.08em] text-charcoal-ink hover:border-cinematic-gold hover:text-cinematic-gold transition-colors duration-300"
+            className="w-full sm:w-auto border border-charcoal-ink/15 bg-transparent rounded px-6 py-3 text-sm font-medium uppercase tracking-[0.08em] text-charcoal-ink hover:border-charcoal-ink/40 transition-colors duration-300"
           >
             Directions
           </button>
