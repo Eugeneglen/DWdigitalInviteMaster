@@ -169,86 +169,76 @@ export default function WishesPage() {
 
         {/* Contribution Form */}
         <section className="max-w-[1440px] mx-auto px-8 md:px-canvas-margin mb-32">
-          <div className="bg-white border border-champagne-silk/20 p-12 md:p-24 max-w-4xl mx-auto shadow-sm">
-            <div className="text-center mb-20">
-              <span className="text-cinematic-gold uppercase tracking-[0.5em] mb-6 block" style={{ fontSize: '12px', lineHeight: '16px', letterSpacing: '0.1em', fontWeight: 600, fontFamily: "'Inter', sans-serif" }}>
-                Archive
-              </span>
-              <h2 className="text-4xl md:text-5xl font-bold text-charcoal-ink mb-6" style={{ fontFamily: "'Playfair Display', serif" }}>
+          <div className="max-w-2xl mx-auto">
+            {/* Section header */}
+            <div className="text-center mb-12">
+              <p
+                className="text-cinematic-gold uppercase tracking-[0.2em] mb-3"
+                style={{ fontSize: '12px', lineHeight: '16px', letterSpacing: '0.1em', fontWeight: 600 }}
+              >
+                YOUR TURN
+              </p>
+              <h2
+                className="text-charcoal-ink italic"
+                style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: '32px', lineHeight: '40px' }}
+              >
                 Contribute to the Heirloom
               </h2>
-              <p className="text-charcoal-ink/60 italic">Share a wish, a memory, or a blessing for our journey together.</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-16">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                <div className="relative group">
-                  <input
-                    className="peer w-full bg-transparent border-0 border-b border-charcoal-ink/10 py-4 focus:ring-0 focus:border-cinematic-gold transition-colors placeholder-transparent"
-                    placeholder=" "
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    style={{ fontFamily: "'Inter', sans-serif" }}
-                  />
-                  <label className="absolute left-0 top-4 text-xs font-semibold text-cinematic-gold transition-all peer-focus:-top-4 peer-[:not(:placeholder-shown)]:-top-4 uppercase tracking-widest" style={{ fontFamily: "'Inter', sans-serif" }}>
-                    Full Name
-                  </label>
-                </div>
-                <div className="relative group">
-                  <input
-                    className="peer w-full bg-transparent border-0 border-b border-charcoal-ink/10 py-4 focus:ring-0 focus:border-cinematic-gold transition-colors placeholder-transparent"
-                    placeholder=" "
-                    type="text"
-                    value={relationship}
-                    onChange={(e) => setRelationship(e.target.value)}
-                    style={{ fontFamily: "'Inter', sans-serif" }}
-                  />
-                  <label className="absolute left-0 top-4 text-xs font-semibold text-cinematic-gold transition-all peer-focus:-top-4 peer-[:not(:placeholder-shown)]:-top-4 uppercase tracking-widest" style={{ fontFamily: "'Inter', sans-serif" }}>
-                    Relationship
-                  </label>
-                </div>
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {/* Full Name */}
+              <input
+                type="text"
+                placeholder="Full Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full border border-charcoal-ink/15 rounded px-4 py-3 text-[14px] text-charcoal-ink placeholder:text-charcoal-ink/40 focus:outline-none focus:border-cinematic-gold/50 transition-colors bg-white"
+              />
+
+              {/* Relationship */}
+              <input
+                type="text"
+                placeholder="Relationship"
+                value={relationship}
+                onChange={(e) => setRelationship(e.target.value)}
+                className="w-full border border-charcoal-ink/15 rounded px-4 py-3 text-[14px] text-charcoal-ink placeholder:text-charcoal-ink/40 focus:outline-none focus:border-cinematic-gold/50 transition-colors bg-white"
+              />
+
+              {/* Your Message */}
+              <textarea
+                placeholder="Your Message"
+                rows={4}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                className="w-full border border-charcoal-ink/15 rounded px-4 py-3 text-[14px] text-charcoal-ink placeholder:text-charcoal-ink/40 focus:outline-none focus:border-cinematic-gold/50 transition-colors resize-none bg-white"
+              />
+
+              {/* Upload area */}
+              <div className="border-2 border-dashed border-charcoal-ink/15 rounded bg-paper-cream/40 py-8 text-center cursor-pointer hover:bg-paper-cream/70 transition-colors">
+                <span className="material-symbols-outlined text-charcoal-ink/30 text-[32px] mb-2 block">cloud_upload</span>
+                <p className="text-[14px] text-charcoal-ink/40">
+                  Attach a photo or memento
+                </p>
+                <p className="text-[12px] text-charcoal-ink/25 mt-1">
+                  JPG, PNG up to 10MB
+                </p>
               </div>
 
-              <div className="relative group">
-                <textarea
-                  className="peer w-full bg-transparent border-0 border-b border-charcoal-ink/10 py-4 focus:ring-0 focus:border-cinematic-gold transition-colors placeholder-transparent resize-none"
-                  placeholder=" "
-                  rows={4}
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  style={{ fontFamily: "'Inter', sans-serif" }}
-                />
-                <label className="absolute left-0 top-4 text-xs font-semibold text-cinematic-gold transition-all peer-focus:-top-4 peer-[:not(:placeholder-shown)]:-top-4 uppercase tracking-widest" style={{ fontFamily: "'Inter', sans-serif" }}>
-                  Your Message
-                </label>
-              </div>
-
-              <div className="group">
-                <div className="border border-dashed border-champagne-silk/60 p-16 text-center hover:bg-paper-cream/50 transition-all cursor-pointer relative">
-                  <span className="material-symbols-outlined text-cinematic-gold mb-4 text-4xl">upload_file</span>
-                  <p className="text-xs font-semibold text-charcoal-ink/60 uppercase tracking-[0.2em]" style={{ fontFamily: "'Inter', sans-serif" }}>
-                    Upload a moment or portrait
-                  </p>
-                  <p className="text-[10px] mt-3 text-charcoal-ink/30 uppercase tracking-widest">JPG, PNG UP TO 10MB</p>
-                </div>
-              </div>
-
-              <div className="flex justify-center pt-8">
-                <button
-                  type="submit"
-                  className={`text-paper-cream rounded px-8 py-3 text-[13px] font-medium uppercase tracking-[0.08em] transition-all duration-300 ${
-                    submitting
-                      ? 'opacity-50 pointer-events-none bg-charcoal-ink'
-                      : submitted
-                      ? 'bg-emerald-600'
-                      : 'bg-charcoal-ink hover:opacity-90'
-                  }`}
-                  disabled={submitting}
-                >
-                  {submitting ? 'Submitting...' : submitted ? 'Woven' : 'Weave into Archive'}
-                </button>
-              </div>
+              {/* Submit button */}
+              <button
+                type="submit"
+                disabled={submitting}
+                className={`w-full rounded py-3.5 text-[13px] font-semibold uppercase tracking-[0.08em] transition-all duration-300 ${
+                  submitting
+                    ? 'bg-charcoal-ink/60 text-paper-cream/60 cursor-default'
+                    : submitted
+                    ? 'bg-charcoal-ink/60 text-paper-cream/60 cursor-default'
+                    : 'bg-charcoal-ink text-paper-cream hover:opacity-90 cursor-pointer'
+                }`}
+              >
+                {submitting ? 'Submitting...' : submitted ? 'Woven' : 'Weave into Archive'}
+              </button>
             </form>
           </div>
         </section>
