@@ -137,3 +137,29 @@ Stage Summary:
 - All icons removed from action buttons
 - Consistent sizing: px-8 py-3, text-[13px], tracking-[0.08em]
 - Zero lint errors, zero console errors, all verified visually
+
+---
+Task ID: 5
+Agent: Main Agent
+Task: Redesign RSVP Step 3 with dietary preference pills per reference image
+
+Work Log:
+- Analyzed reference image via VLM: guest cards with number, name input, dietary pills (Halal, Vegetarian, No Seafood), dashed "Add Another Guest", Back/Continue
+- Rewrote RSVPPage.tsx: simplified from 4-step to 3-step flow
+  - Removed Step 4 (per-guest attendance + dietary textarea)
+  - Redesigned Step 3: each guest has numbered row + name input + 3 toggleable dietary pills
+  - Updated Guest interface: removed responded/attendance/dietary string, added dietary: string[]
+  - Dietary pills: rounded-full toggle buttons with gold highlight on selection
+  - "Add Another Guest" changed to dashed border button matching reference
+  - Progress dots reduced from 4 to 3
+  - Continue button submits directly (no per-guest response gating)
+- Ran lint: 0 errors
+- Verified full flow via Agent Browser: auto-fill → Step 1 → Step 2 → Step 3 (2 guests, dietary pills, toggle) → Thank You page
+- Verified dietary toggle visual: gold background on selected state, white/gray on unselected
+
+Stage Summary:
+- RSVP flow simplified to 3 steps: Name → Party Size → Confirm Guests + Dietary
+- Each guest row shows: gold number, name input, 3 dietary preference pills (Halal, Vegetarian, No Seafood)
+- Dietary pills are toggleable per guest with gold highlight
+- Dashed "Add Another Guest" button
+- Zero lint errors, zero console errors
