@@ -356,3 +356,247 @@ export const termsOfServiceDocument: LegalDocument = {
     },
   ],
 };
+
+export const privacyPolicyDocument: LegalDocument = {
+  title: 'Privacy Policy',
+  subtitle: 'DW Digital Invite CMS — Personal Data Protection Act (Singapore) Compliant Draft',
+  version: 'Document version: 0.1 (Draft) | Prepared: 16 June 2026 | Applies to: DW Digital Invite CMS',
+  sections: [
+    {
+      number: '1',
+      title: 'Introduction',
+      content: (
+        <>
+          <p>
+            Dreamweavers Pte. Ltd. (&ldquo;DW Digital Invite,&rdquo; &ldquo;we,&rdquo; &ldquo;us&rdquo; or &ldquo;our&rdquo;) operates DW Digital Invite CMS, a software-as-a-service platform that lets users create digital invitations, build event microsites, manage guest lists and RSVPs, and share invitations by link, email, QR code, or messaging platform (the &ldquo;Service&rdquo;).
+          </p>
+          <p className="mt-3">
+            This Policy explains how we collect, use, disclose, and protect personal data in connection with the Service, in accordance with the Personal Data Protection Act 2012 of Singapore (the &ldquo;PDPA&rdquo;). It applies to visitors to our website, registered users who create an account (&ldquo;Organisers&rdquo;), and individuals whose data is uploaded, collected, or processed through the Service (&ldquo;Guests&rdquo; or &ldquo;Invitees&rdquo;).
+          </p>
+          <p className="mt-3 text-xs italic text-charcoal-ink/50">
+            Drafting note: this Policy assumes the operating entity is Dreamweavers Pte. Ltd., UEN [UEN / company registration number — to be inserted], of Tahir Building, Level 4, 140 Robinson Road, Singapore 068907. Confirm the correct entity, UEN, and whether DW Digital Invite is operated by the same company as the Dreamweavers retail business before publication.
+          </p>
+        </>
+      ),
+    },
+    {
+      number: '2',
+      title: 'Scope of This Policy',
+      content: (
+        <p>
+          This Policy does not apply to the separate Dreamweavers e-commerce website or retail operations, except to the extent both share the same back-office systems or contact channels. Where a Guest is invited to an event through the Service, their personal data is handled as described in Section 3.2 below.
+        </p>
+      ),
+    },
+    {
+      number: '3',
+      title: 'Two Categories of Personal Data We Handle',
+      content: (
+        <>
+          <p>
+            Because the Service is used by Organisers to collect information about their own Guests, we process personal data in two distinct capacities. This distinction matters under the PDPA and should be reviewed carefully by counsel.
+          </p>
+          <div className="mt-4">
+            <h4 className="font-heading text-sm text-charcoal-ink mb-2">
+              <span className="text-cinematic-gold mr-1">3.1</span> Account and Organiser Data
+            </h4>
+            <p>
+              When you register for an account, subscribe to updates, or contact us, we act as the data controller (the organisation determining the purposes and means of processing) in respect of your own personal data as an Organiser, team member, or website visitor.
+            </p>
+          </div>
+          <div className="mt-4">
+            <h4 className="font-heading text-sm text-charcoal-ink mb-2">
+              <span className="text-cinematic-gold mr-1">3.2</span> Guest and Invitee Data You Upload or Collect
+            </h4>
+            <p>
+              When an Organiser uploads a guest list, builds an RSVP form, or otherwise collects information about Guests through the Service, the Organiser is the data controller for that Guest data, and DW Digital Invite acts as a data intermediary processing that data solely on the Organiser&apos;s instructions. Organisers are responsible for ensuring they have a lawful basis (typically consent or another basis recognised under the PDPA) to collect and share their Guests&apos; personal data with us, and for responding to Guest requests regarding that data in the first instance. We remain bound by the Protection Obligation under the PDPA in respect of Guest data even while acting as an intermediary.
+            </p>
+            <p className="mt-3 text-xs italic text-charcoal-ink/50">
+              Drafting note: confirm whether DW Digital Invite will offer any direct-to-Guest features (for example, Guests creating their own accounts) that would make us a controller for Guest data in additional circumstances.
+            </p>
+          </div>
+        </>
+      ),
+    },
+    {
+      number: '4',
+      title: 'Personal Data We Collect',
+      content: (
+        <>
+          <p className="mb-3">We may collect the following categories of personal data, depending on how the Service is used:</p>
+          <ul className="list-disc pl-6 space-y-2">
+            <li><strong>Identity and contact data:</strong> name, email address, phone number, mailing address, and similar details provided by Organisers or entered by Guests through RSVP and registration forms.</li>
+            <li><strong>Event and guest list data:</strong> guest names, RSVP responses, dietary preferences, seating preferences, plus-one details, and other information Organisers choose to collect from Guests.</li>
+            <li><strong>Account data:</strong> login credentials, account preferences, subscription tier, and communications with our support team.</li>
+            <li><strong>User-generated content:</strong> images, videos, logos, text, and other content uploaded to build invitations or event microsites.</li>
+            <li><strong>Technical and usage data:</strong> IP address, device and browser type, operating system, pages viewed, and similar analytics collected automatically when the Service is used.</li>
+            <li><strong>Cookie data:</strong> as described in our separate Cookie Policy.</li>
+            <li><strong>Payment data:</strong> the Service is currently offered free of charge and does not collect payment card data directly; if paid plans are introduced, payment details will be processed by a third-party payment processor and this Policy will be updated accordingly.</li>
+          </ul>
+        </>
+      ),
+    },
+    {
+      number: '5',
+      title: 'How We Use Personal Data',
+      content: (
+        <>
+          <p className="mb-3">We use personal data to:</p>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>create and administer Organiser accounts and provide the Service;</li>
+            <li>generate, host, and deliver digital invitations and event microsites;</li>
+            <li>collect and display RSVP responses and guest list data to the relevant Organiser;</li>
+            <li>send transactional communications, including automated reminders and notifications relating to an event;</li>
+            <li>provide customer support and respond to enquiries;</li>
+            <li>maintain the security, integrity, and performance of the Service;</li>
+            <li>analyse aggregated usage trends to improve the Service; and</li>
+            <li>send marketing communications where you have consented, as described in Section 11.</li>
+          </ul>
+          <p className="mt-3">We do not use Guest data collected on behalf of an Organiser for our own independent marketing purposes.</p>
+        </>
+      ),
+    },
+    {
+      number: '6',
+      title: 'Cookies and Similar Technologies',
+      content: (
+        <p>
+          We use cookies and similar technologies to operate the Service, remember preferences, and understand usage patterns. Full details, including how to manage cookie preferences, are set out in our Cookie Policy, which forms part of this Policy by reference.
+        </p>
+      ),
+    },
+    {
+      number: '7',
+      title: 'Sharing and Disclosure of Personal Data',
+      content: (
+        <>
+          <p className="mb-3">We may disclose personal data to:</p>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>cloud hosting and infrastructure providers that store data on our behalf;</li>
+            <li>email and messaging delivery providers used to send invitations, reminders, and notifications;</li>
+            <li>analytics providers that help us understand Service usage on an aggregated basis;</li>
+            <li>professional advisers, including auditors, lawyers, and insurers, where reasonably necessary;</li>
+            <li>regulators, courts, or law enforcement agencies, where required by law or to establish, exercise, or defend legal rights; and</li>
+            <li>a successor entity in connection with a merger, acquisition, financing, or sale of assets, subject to equivalent protections being maintained.</li>
+          </ul>
+          <p className="mt-3">We do not sell personal data. Third-party processors are engaged under contractual terms requiring them to protect personal data to a standard consistent with the PDPA.</p>
+          <p className="mt-3 text-xs italic text-charcoal-ink/50">
+            Drafting note: list the specific named subprocessors (hosting provider, email/SMS gateway, analytics tool) once finalised, as transparency about specific vendors strengthens user trust and may be expected by enterprise customers.
+          </p>
+        </>
+      ),
+    },
+    {
+      number: '8',
+      title: 'Overseas Transfer of Personal Data',
+      content: (
+        <p>
+          Personal data may be stored or processed on servers located outside Singapore, including where our hosting or subprocessors operate regional or global infrastructure. Where this occurs, we take steps required under the PDPA&apos;s Transfer Limitation Obligation to ensure recipients provide a standard of protection comparable to the PDPA, including through contractual clauses, before transferring personal data overseas.
+        </p>
+      ),
+    },
+    {
+      number: '9',
+      title: 'Data Retention',
+      content: (
+        <>
+          <p className="mb-3">We retain personal data only for as long as reasonably necessary for the purposes described in this Policy, or as required by law. As a general approach:</p>
+          <ul className="list-disc pl-6 space-y-2">
+            <li><strong>Account data</strong> is retained for the duration of the account plus a limited period afterward to address legal, accounting, or dispute-resolution needs.</li>
+            <li><strong>Guest and event data</strong> is retained based on the Organiser&apos;s settings and event timeline, and may be deleted by the Organiser or automatically archived after the event date.</li>
+            <li><strong>Backup copies</strong> may persist for a limited additional period in line with our backup cycle, described in the Data Protection &amp; Information Security Statement.</li>
+          </ul>
+          <p className="mt-3 text-xs italic text-charcoal-ink/50">
+            Drafting note: finalise specific retention periods (for example, &ldquo;12 months after event date&rdquo; or &ldquo;30 days after account closure&rdquo;) with the business before publication; the PDPA&apos;s Retention Limitation Obligation requires retention periods to be tied to genuine business or legal purposes.
+          </p>
+        </>
+      ),
+    },
+    {
+      number: '10',
+      title: 'How We Protect Your Personal Data',
+      content: (
+        <p>
+          We apply technical and organisational measures appropriate to the sensitivity of the data involved, including encryption, access controls, and monitoring. Full detail is set out in our Data Protection &amp; Information Security Statement.
+        </p>
+      ),
+    },
+    {
+      number: '11',
+      title: 'Marketing Communications',
+      content: (
+        <p>
+          Where you have consented to receive marketing communications, you may withdraw that consent at any time by using the unsubscribe link in any email or by contacting us using the details in Section 16. Transactional and service-related communications (such as RSVP confirmations or security notices) are not considered marketing and cannot be opted out of while your account remains active.
+        </p>
+      ),
+    },
+    {
+      number: '12',
+      title: 'Your Rights Under the PDPA',
+      content: (
+        <>
+          <p className="mb-3">Subject to the exceptions permitted under the PDPA, you may:</p>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>request access to the personal data we hold about you;</li>
+            <li>request correction of inaccurate or incomplete personal data;</li>
+            <li>withdraw consent for the collection, use, or disclosure of your personal data, subject to legal or contractual restrictions;</li>
+            <li>request information about how your personal data has been or may have been used or disclosed in the past year; and</li>
+            <li>lodge a complaint with the Personal Data Protection Commission of Singapore (PDPC) if you believe we have not complied with the PDPA.</li>
+          </ul>
+          <p className="mt-3">
+            Where you are a Guest and wish to exercise these rights in respect of data an Organiser has collected about you, we will direct your request to the relevant Organiser where they remain the data controller, and assist as reasonably required.
+          </p>
+        </>
+      ),
+    },
+    {
+      number: '13',
+      title: 'Minors and Event Guests Who Are Minors',
+      content: (
+        <p>
+          The Service is intended for use by adults creating event invitations. Where an Organiser&apos;s guest list includes minors (for example, children attending a wedding or family event), the Organiser is responsible for ensuring there is an appropriate basis for collecting that minor&apos;s personal data, typically through consent of a parent or guardian.
+        </p>
+      ),
+    },
+    {
+      number: '14',
+      title: 'AI Features',
+      content: (
+        <p>
+          DW Digital Invite CMS does not currently offer AI-powered content generation, wording suggestions, translation, layout recommendation, or image-enhancement features. If such features are introduced in future, we will update this Policy, describe how any related data is processed, and provide a dedicated AI Usage &amp; Transparency Policy before those features go live.
+        </p>
+      ),
+    },
+    {
+      number: '15',
+      title: 'Changes to This Policy',
+      content: (
+        <p>
+          We may update this Policy from time to time to reflect changes in our practices or legal requirements. We will indicate the date this Policy was last updated and, for material changes, provide additional notice such as an in-app notification or email.
+        </p>
+      ),
+    },
+    {
+      number: '16',
+      title: 'Contact Us',
+      content: (
+        <>
+          <p className="mb-3">For questions about this Policy or to exercise your rights under the PDPA, please contact our Data Protection Officer:</p>
+          <ul className="list-none space-y-1.5 pl-2">
+            <li><strong>Email:</strong>{' '}
+              <a href="mailto:privacy@dreamweavers.com.sg" className="text-cinematic-gold hover:underline underline-offset-2">privacy@dreamweavers.com.sg</a>
+            </li>
+            <li><strong>Mailing address:</strong> Tahir Building, Level 4, 140 Robinson Road, Singapore 068907</li>
+            <li><strong>General enquiries:</strong>{' '}
+              <a href="mailto:enquiry@dreamweavers.com.sg" className="text-cinematic-gold hover:underline underline-offset-2">enquiry@dreamweavers.com.sg</a>{' '}
+              / +65 6336 2505
+            </li>
+          </ul>
+          <p className="mt-3">
+            We aim to respond to privacy-related requests within a reasonable time, and in any event consistent with the timelines expected under the PDPA.
+          </p>
+        </>
+      ),
+    },
+  ],
+};

@@ -257,3 +257,21 @@ Stage Summary:
 - Both legal documents render in styled popups matching the wedding theme (paper-cream bg, cinematic-gold section numbers, Playfair Display headings)
 - Lint passes clean (0 errors)
 
+
+---
+Task ID: footer-privacy-policy
+Agent: Main Agent
+Task: Replace "Technical Support" with "Privacy Policy" popup in footer
+
+Work Log:
+- Read uploaded Privacy Policy.docx and extracted full 16-section document text
+- Added privacyPolicyDocument to /home/z/my-project/src/lib/legal-content.tsx with all 16 sections including subsections 3.1/3.2
+- Updated Footer.tsx: replaced Technical Support mailto link with Privacy Policy button + popup state
+- Footer link order: Contact Concierge (mailto) | Privacy Policy (popup) | Data Protection (popup) | Terms of Service (popup)
+- Verified via Agent Browser: all 4 links present, Privacy Policy modal opens with 16 sections + 2 subsections, Technical Support fully removed, no errors
+
+Stage Summary:
+- Footer now shows: Contact Concierge, Privacy Policy, Data Protection, Terms of Service
+- All three legal documents accessible via popup modals
+- Lint clean, no errors
+

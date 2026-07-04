@@ -2,11 +2,12 @@
 
 import { useState } from 'react';
 import LegalDocumentModal from '@/components/wedding/LegalDocumentModal';
-import { dataProtectionDocument, termsOfServiceDocument } from '@/lib/legal-content';
+import { dataProtectionDocument, termsOfServiceDocument, privacyPolicyDocument } from '@/lib/legal-content';
 
 export default function Footer() {
   const [dataProtectionOpen, setDataProtectionOpen] = useState(false);
   const [termsOfServiceOpen, setTermsOfServiceOpen] = useState(false);
+  const [privacyPolicyOpen, setPrivacyPolicyOpen] = useState(false);
 
   const footerLinkClass =
     'font-body-md text-body-md leading-body-md text-charcoal-ink/60 hover:text-cinematic-gold underline-offset-4 hover:underline transition-colors cursor-pointer';
@@ -24,6 +25,12 @@ export default function Footer() {
             </a>
             <button
               className={footerLinkClass}
+              onClick={() => setPrivacyPolicyOpen(true)}
+            >
+              Privacy Policy
+            </button>
+            <button
+              className={footerLinkClass}
               onClick={() => setDataProtectionOpen(true)}
             >
               Data Protection
@@ -34,12 +41,6 @@ export default function Footer() {
             >
               Terms of Service
             </button>
-            <a
-              className={footerLinkClass}
-              href="mailto:support@dwdigitalinvite.com"
-            >
-              Technical Support
-            </a>
           </div>
 
           <p className="font-label-sm text-label-sm leading-label-sm text-charcoal-ink/40 uppercase tracking-wider font-semibold">
@@ -47,6 +48,12 @@ export default function Footer() {
           </p>
         </div>
       </footer>
+
+      <LegalDocumentModal
+        open={privacyPolicyOpen}
+        onOpenChange={setPrivacyPolicyOpen}
+        document={privacyPolicyDocument}
+      />
 
       <LegalDocumentModal
         open={dataProtectionOpen}
