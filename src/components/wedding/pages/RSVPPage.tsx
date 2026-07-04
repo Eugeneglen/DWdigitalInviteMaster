@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 interface Guest {
   name: string;
@@ -14,15 +15,53 @@ const INITIAL_GUESTS: Guest[] = [
 ];
 
 export default function RSVPPage() {
+  return (
+    <Suspense>
+      <RSVPPageInner />
+    </Suspense>
+  );
+}
+
+function RSVPPageInner() {
+  const searchParams = useSearchParams();
+
+  // Parse URL params for auto-fill
+  const autoFill = useMemo(() => {
+    const paramFirst = searchParams.get('first');
+    const paramLast = searchParams.get('last');
+    const paramName = searchParams.get('name');
+    const paramParty = searchParams.get('party');
+
+    let first = '';
+    let last = '';
+    let party = 1;
+
+    if (paramFirst && paramLast) {
+      first = paramFirst;
+      last = paramLast;
+    } else if (paramName) {
+      const parts = paramName.trim().split(/\s+/);
+      first = parts[0] || '';
+      last = parts.slice(1).join(' ') || '';
+    }
+
+    if (paramParty) {
+      const n = parseInt(paramParty, 10);
+      if (!isNaN(n) && n >= 1 && n <= 10) party = n;
+    }
+
+    return { first, last, party };
+  }, [searchParams]);
+
   const [step, setStep] = useState(1);
-  const [partySize, setPartySize] = useState(1);
+  const [partySize, setPartySize] = useState(autoFill.party);
   const [guests, setGuests] = useState<Guest[]>([{ name: '', responded: false }]);
   const [currentGuestIndex, setCurrentGuestIndex] = useState(0);
   const [attendance, setAttendance] = useState<string>('');
   const [dietary, setDietary] = useState('');
   const [done, setDone] = useState(false);
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const [firstName, setFirstName] = useState(autoFill.first);
+  const [lastName, setLastName] = useState(autoFill.last);
 
   const submitStep1 = () => {
     if (!firstName.trim() || !lastName.trim()) return;
@@ -160,6 +199,7 @@ export default function RSVPPage() {
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                   type="text"
+                  autoComplete="given-name"
                 />
               </div>
               <div>
@@ -171,6 +211,7 @@ export default function RSVPPage() {
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
                   type="text"
+                  autoComplete="family-name"
                 />
               </div>
             </div>
