@@ -18,6 +18,8 @@ const ATTENDANCE_OPTIONS = [
   { val: 'no', label: "I'm sorry, I won't be able to make it" },
 ];
 
+type RSVPResult = 'all-attending' | 'all-declined' | 'mixed';
+
 export default function RSVPPage() {
   return (
     <Suspense>
@@ -62,7 +64,7 @@ function RSVPPageInner() {
   const [guests, setGuests] = useState<Guest[]>([{ name: '', dietary: [], responded: false }]);
   const [currentGuestIndex, setCurrentGuestIndex] = useState(0);
   const [attendance, setAttendance] = useState('');
-  const [done, setDone] = useState(false);
+  const [result, setResult] = useState<RSVPResult | null>(null);
   const [firstName, setFirstName] = useState(autoFill.first);
   const [lastName, setLastName] = useState(autoFill.last);
 
@@ -132,31 +134,41 @@ function RSVPPageInner() {
 
   const submitGuestResponse = () => {
     if (!attendance) return;
-    setGuests((g) => {
-      const updated = [...g];
-      updated[currentGuestIndex] = {
-        ...updated[currentGuestIndex],
-        attendance,
-        responded: true,
-      };
-      return updated;
-    });
+
+    // Build the updated guests array immediately for computation
+    const updatedGuests = guests.map((g, idx) =>
+      idx === currentGuestIndex
+        ? { ...g, attendance, responded: true }
+        : g
+    );
+    setGuests(updatedGuests);
+
     // Find next unresponded guest
-    const next = guests.findIndex((g2, idx) => idx !== currentGuestIndex && !g2.responded);
+    const next = updatedGuests.findIndex((g2, idx) => idx !== currentGuestIndex && !g2.responded);
     if (next !== -1) {
       setTimeout(() => {
         setCurrentGuestIndex(next);
-        setAttendance(guests[next].attendance || '');
+        setAttendance(updatedGuests[next].attendance || '');
       }, 50);
     } else {
-      // All responded — submit
-      const validGuests = guests.filter((g) => g.name.trim());
+      // All responded — compute result and submit
+      const validGuests = updatedGuests.filter((g) => g.name.trim());
+      const attending = validGuests.filter((g) => g.attendance === 'yes' || g.attendance === 'partial');
+      const declined = validGuests.filter((g) => g.attendance === 'no');
+
+      let rsvpResult: RSVPResult = 'all-attending';
+      if (attending.length === 0 && declined.length > 0) {
+        rsvpResult = 'all-declined';
+      } else if (declined.length > 0 && attending.length > 0) {
+        rsvpResult = 'mixed';
+      }
+
       fetch('/api/rsvp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ guests: validGuests }),
       }).catch(() => {});
-      setDone(true);
+      setResult(rsvpResult);
     }
   };
 
@@ -165,14 +177,53 @@ function RSVPPageInner() {
     setAttendance(guests[idx].attendance || '');
   };
 
-  if (done) {
+  if (result) {
+    const validGuests = guests.filter((g) => g.name.trim());
+    const attending = validGuests.filter((g) => g.attendance === 'yes' || g.attendance === 'partial');
+    const declined = validGuests.filter((g) => g.attendance === 'no');
+    const attendingCount = attending.length;
+    const totalCount = validGuests.length;
+
+    // Determine which name to personalize the message with
+    const primaryGuest = validGuests[0]?.name?.trim().split(' ')[0] || 'there';
+    const declinedNames = declined.map((g) => g.name.trim().split(' ')[0]).filter(Boolean);
+    const attendingNames = attending.map((g) => g.name.trim().split(' ')[0]).filter(Boolean);
+
+    // Build personalized message based on result
+    let title = 'Thank you';
+    let icon = 'favorite';
+    let message = '';
+
+    if (result === 'all-declined') {
+      title = 'We\'ll Miss You';
+      icon = 'mail';
+      if (totalCount === 1) {
+        message = `We\'re sorry you can\'t make it, ${primaryGuest}. Your kind response means a lot to us \u2014 we\'ll keep you in our thoughts and share the joy of the day with you in spirit.`;
+      } else {
+        const nameList = declinedNames.join(' & ');
+        message = `We\'re sorry ${nameList} can\'t make it. Your kind responses mean a lot to us \u2014 we\'ll keep you in our thoughts and share the joy of the day with you in spirit.`;
+      }
+    } else if (result === 'mixed') {
+      title = 'Thank you';
+      icon = 'favorite';
+      const dList = declinedNames.join(' & ');
+      const aList = attendingNames.join(' & ');
+      message = `We\'re sorry ${dList} can\'t make it, but we\'re so glad ${aList} will be joining us! We\'ll keep everyone in our thoughts on our special day.`;
+    } else {
+      // all-attending
+      message = `Your RSVP has been received. We can\'t wait to celebrate with you.`;
+    }
+
     return (
       <main className="flex-1 w-full max-w-xl mx-auto px-6 pt-32 pb-20 flex flex-col">
         <div className="text-center py-12">
-          <span className="material-symbols-outlined text-cinematic-gold text-[64px]">favorite</span>
-          <h2 className="italic text-[36px] mt-4" style={{ fontFamily: "'Playfair Display', serif" }}>Thank you</h2>
-          <p className="text-[14px] text-charcoal-ink/70 mt-3 italic">
-            Your RSVP has been received.<br />We can&apos;t wait to celebrate with you.
+          <span className="material-symbols-outlined text-cinematic-gold text-[64px]">{icon}</span>
+          <h2 className="italic text-[36px] mt-4" style={{ fontFamily: "'Playfair Display', serif" }}>{title}</h2>
+          <p className="text-[14px] text-charcoal-ink/70 mt-5 leading-relaxed max-w-xs mx-auto">
+            {message}
+          </p>
+          <p className="text-[12px] text-charcoal-ink/40 mt-6 tracking-wide">
+            {attendingCount} of {totalCount} guest{totalCount !== 1 ? 's' : ''} attending
           </p>
         </div>
       </main>

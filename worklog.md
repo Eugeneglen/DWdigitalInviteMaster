@@ -183,3 +183,26 @@ Stage Summary:
 - 4-step RSVP flow restored: Name → Party Size → Dietary → Attendance → Thank You
 - Step 4 matches reference: "Responding for {name}" header, "Guest X of Y", 3 attendance radio options, Save & Continue
 - Auto-advances through guests, submits on last response
+
+---
+Task ID: 7
+Agent: Main Agent
+Task: Add "We'll Miss You" result page for declined RSVP guests, with mixed-attendance handling
+
+Work Log:
+- Analyzed reference image via VLM: "We'll Miss You" title, mail icon, personalized message, "0 of 1 guest attending" counter
+- Replaced `done: boolean` state with `result: RSVPResult | null` (types: 'all-attending' | 'all-declined' | 'mixed')
+- Built 3 conditional result pages based on attendance outcomes
+- Fixed stale-state bug: `submitGuestResponse` was computing result from pre-update `guests` array (React async setState). Refactored to compute `updatedGuests` synchronously before calling `setGuests()`
+- All 3 scenarios verified via Agent Browser + VLM:
+  - All declined (1 guest, "no"): Shows "We'll Miss You" + mail icon + personalized message + "0 of 1 guest attending"
+  - Mixed (2 guests, "yes" + "no"): Shows "Thank you" + heart icon + "We're sorry Sarah can't make it, but we're so glad Eugene will be joining us! We'll keep everyone in our thoughts on our special day." + "1 of 2 guests attending"
+  - All attending (1 guest, "yes"): Shows "Thank you" + heart icon + "Your RSVP has been received. We can't wait to celebrate with you." + "1 of 1 guest attending"
+- For the mixed attendance case (user's question): title stays "Thank you" (positive tone since someone IS coming), body acknowledges the declined guest by name, celebrates the attending guest by name, and ends with "We'll keep everyone in our thoughts on our special day."
+- Zero lint errors, zero runtime errors
+
+Stage Summary:
+- 3 RSVP result page variants implemented: all-attending, all-declined, mixed
+- "We'll Miss You" page matches reference image design (mail icon, personalized message, guest count)
+- Mixed attendance message gracefully handles both attending and declined guests by first name
+- Guest attendance counter shown on all result pages (e.g., "1 of 2 guests attending")
