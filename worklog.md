@@ -163,3 +163,23 @@ Stage Summary:
 - Dietary pills are toggleable per guest with gold highlight
 - Dashed "Add Another Guest" button
 - Zero lint errors, zero console errors
+
+---
+Task ID: 6
+Agent: Main Agent
+Task: Re-add per-guest attendance step (Step 4) before thank-you page
+
+Work Log:
+- Analyzed reference image: per-guest attendance with "Responding for {name}", "Guest X of Y", 3 attendance options, Back/Save & Continue
+- Re-added Step 4 to RSVPPage: per-guest attendance question after dietary step
+- Updated Guest interface: added `attendance?: string` and `responded: boolean`
+- Updated progress dots from 3 back to 4
+- Flow: Step 3 Continue → Step 4 (Guest 1) → Save → Step 4 (Guest 2) → Save → Thank You
+- Attendance auto-advances to next unresponded guest, then submits and shows thank you
+- Verified full 4-step flow via Agent Browser with 2 guests
+- Zero lint errors, zero console errors
+
+Stage Summary:
+- 4-step RSVP flow restored: Name → Party Size → Dietary → Attendance → Thank You
+- Step 4 matches reference: "Responding for {name}" header, "Guest X of Y", 3 attendance radio options, Save & Continue
+- Auto-advances through guests, submits on last response

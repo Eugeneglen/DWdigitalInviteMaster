@@ -6,9 +6,17 @@ import { useSearchParams } from 'next/navigation';
 interface Guest {
   name: string;
   dietary: string[];
+  attendance?: string;
+  responded: boolean;
 }
 
 const DIETARY_OPTIONS = ['Halal', 'Vegetarian', 'No Seafood'];
+
+const ATTENDANCE_OPTIONS = [
+  { val: 'yes', label: 'Yes!' },
+  { val: 'partial', label: "Yes, but I won't be staying for the lunch reception" },
+  { val: 'no', label: "I'm sorry, I won't be able to make it" },
+];
 
 export default function RSVPPage() {
   return (
@@ -51,7 +59,9 @@ function RSVPPageInner() {
 
   const [step, setStep] = useState(1);
   const [partySize, setPartySize] = useState(autoFill.party);
-  const [guests, setGuests] = useState<Guest[]>([{ name: '', dietary: [] }]);
+  const [guests, setGuests] = useState<Guest[]>([{ name: '', dietary: [], responded: false }]);
+  const [currentGuestIndex, setCurrentGuestIndex] = useState(0);
+  const [attendance, setAttendance] = useState('');
   const [done, setDone] = useState(false);
   const [firstName, setFirstName] = useState(autoFill.first);
   const [lastName, setLastName] = useState(autoFill.last);
@@ -61,7 +71,7 @@ function RSVPPageInner() {
     const fullName = firstName.trim() + ' ' + lastName.trim();
     const updated = [...guests];
     if (updated.length === 0) {
-      updated.push({ name: fullName, dietary: [] });
+      updated.push({ name: fullName, dietary: [], responded: false });
     } else {
       updated[0] = { ...updated[0], name: fullName };
     }
@@ -72,7 +82,7 @@ function RSVPPageInner() {
   const submitStep2 = () => {
     let updated = [...guests];
     while (updated.length < partySize) {
-      updated.push({ name: 'Guest ' + (updated.length + 1), dietary: [] });
+      updated.push({ name: 'Guest ' + (updated.length + 1), dietary: [], responded: false });
     }
     updated = updated.slice(0, partySize);
     setGuests(updated);
@@ -106,20 +116,53 @@ function RSVPPageInner() {
   };
 
   const addGuest = () => {
-    setGuests((g) => [...g, { name: '', dietary: [] }]);
+    setGuests((g) => [...g, { name: '', dietary: [], responded: false }]);
     setPartySize((p) => p + 1);
   };
 
-  const handleFinalContinue = () => {
-    const validGuests = guests.filter((g) => g.name.trim());
-    if (validGuests.length === 0) return;
-    // POST to API
-    fetch('/api/rsvp', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ guests: validGuests }),
-    }).catch(() => {});
-    setDone(true);
+  // Step 3 → Step 4: start per-guest attendance flow
+  const goToStep4 = () => {
+    const firstUnresponded = guests.findIndex((g) => !g.responded);
+    if (firstUnresponded !== -1) {
+      setCurrentGuestIndex(firstUnresponded);
+      setAttendance(guests[firstUnresponded].attendance || '');
+      setStep(4);
+    }
+  };
+
+  const submitGuestResponse = () => {
+    if (!attendance) return;
+    setGuests((g) => {
+      const updated = [...g];
+      updated[currentGuestIndex] = {
+        ...updated[currentGuestIndex],
+        attendance,
+        responded: true,
+      };
+      return updated;
+    });
+    // Find next unresponded guest
+    const next = guests.findIndex((g2, idx) => idx !== currentGuestIndex && !g2.responded);
+    if (next !== -1) {
+      setTimeout(() => {
+        setCurrentGuestIndex(next);
+        setAttendance(guests[next].attendance || '');
+      }, 50);
+    } else {
+      // All responded — submit
+      const validGuests = guests.filter((g) => g.name.trim());
+      fetch('/api/rsvp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ guests: validGuests }),
+      }).catch(() => {});
+      setDone(true);
+    }
+  };
+
+  const goBackToStep4Guest = (idx: number) => {
+    setCurrentGuestIndex(idx);
+    setAttendance(guests[idx].attendance || '');
   };
 
   if (done) {
@@ -145,9 +188,9 @@ function RSVPPageInner() {
         <p className="text-[15px] text-charcoal-ink/80">Singapore 249731</p>
       </div>
 
-      {/* Progress dots — 3 steps now */}
+      {/* Progress dots — 4 steps */}
       <div className="flex items-center justify-center gap-2 mb-10">
-        {[1, 2, 3].map((n) => (
+        {[1, 2, 3, 4].map((n) => (
           <span key={n} className={`step-dot ${n <= step ? 'active' : ''}`} />
         ))}
       </div>
@@ -310,9 +353,62 @@ function RSVPPageInner() {
             </button>
             <button
               className="flex-[2] bg-charcoal-ink text-paper-cream rounded px-8 py-3 text-[13px] font-medium uppercase tracking-[0.08em] hover:opacity-90 transition-opacity duration-300"
-              onClick={handleFinalContinue}
+              onClick={goToStep4}
             >
               Continue
+            </button>
+          </div>
+        </section>
+      )}
+
+      {/* STEP 4 — Per-guest attendance response */}
+      {step === 4 && (
+        <section className="staggered-fade-in" style={{ animationDelay: '0s', opacity: 1 }}>
+          {/* Guest header */}
+          <div className="text-center mb-6 pb-4 border-b border-charcoal-ink/20">
+            <p className="font-semibold text-[16px]">
+              Responding for {guests[currentGuestIndex]?.name}.
+            </p>
+            <p className="text-[12px] text-charcoal-ink/50 mt-1">
+              Guest {currentGuestIndex + 1} of {guests.length}
+            </p>
+          </div>
+
+          {/* Attendance question */}
+          <div>
+            <p className="text-[14px] mb-4">
+              Will you be able to join us for our Wedding Solemnisation?<span className="text-cinematic-gold">*</span>
+            </p>
+            <div className="space-y-3">
+              {ATTENDANCE_OPTIONS.map((opt) => (
+                <button
+                  key={opt.val}
+                  type="button"
+                  className={`opt-btn rounded-full w-full text-left ${attendance === opt.val ? 'selected' : ''}`}
+                  onClick={() => setAttendance(opt.val)}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Navigation */}
+          <div className="flex gap-3 mt-10">
+            <button
+              className="flex-1 border border-charcoal-ink/15 bg-white rounded py-3 text-[13px] font-medium uppercase tracking-[0.08em] text-charcoal-ink hover:border-cinematic-gold hover:text-cinematic-gold transition-colors duration-300"
+              onClick={() => setStep(3)}
+            >
+              Back
+            </button>
+            <button
+              className={`flex-[2] bg-charcoal-ink text-paper-cream rounded px-8 py-3 text-[13px] font-medium uppercase tracking-[0.08em] hover:opacity-90 transition-opacity duration-300 ${
+                !attendance ? 'opacity-40' : ''
+              }`}
+              disabled={!attendance}
+              onClick={submitGuestResponse}
+            >
+              Save &amp; Continue
             </button>
           </div>
         </section>
