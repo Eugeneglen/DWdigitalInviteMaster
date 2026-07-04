@@ -9,7 +9,7 @@ const HERO_IMG =
 const TEA_IMG =
   'https://lh3.googleusercontent.com/aida-public/AB6AXuA6SiJt49KQCmMAhF-X_tmX1Y1NKhTieT6ApO53PD9gYuvLO0e78WTxzg8BV7Wnhe6oJ6sG4SwJ4U-nH2m33dv7I89IhLgrHDkabts7ws-QwPlv-ycUzhyuBN0c04ka2inAyysumlM1w-sR8stBZ51HJOGZkQO6cAtfrn9RXWZRFlHJlUp8Jqzi-nBu3xGs57xm7L2Le06Put3xBDMAe39zkMMsdcuUkbeyw5c4Q6VxvXkSmMbcpLM-HJK1iMgYVLkn2kzqUPEALYpH';
 
-const WEDDING_DATE = new Date('2025-10-24T16:00:00').getTime();
+const WEDDING_DATE = new Date('2027-12-25T16:00:00').getTime();
 
 function useCountdown() {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, mins: 0, secs: 0 });
@@ -88,11 +88,9 @@ export default function HomePage() {
           <div className="relative z-10 w-full px-8 md:px-24 pb-20 md:pb-32 flex flex-col items-center text-center">
             {/* Master Date Badge */}
             {/* Original: <div class="animate-fade-in delay-100 mb-8 inline-flex items-center justify-center border border-champagne-silk px-6 py-2 rounded-full bg-paper-cream/10 backdrop-blur-sm"> */}
-            {/* Original:   <span class="font-label-sm text-label-sm text-paper-cream tracking-[0.2em] uppercase font-semibold">October 24, 2025</span> */}
-            {/* NOTE: font-label-sm = fontFamily (Playfair Display). text-label-sm = 12px/16px/0.1em/600. tracking-[0.2em] overrides letter-spacing to 0.2em. font-semibold = 600. */}
             <div className="animate-fade-in delay-100 mb-8 inline-flex items-center justify-center border border-champagne-silk px-6 py-2 rounded-full bg-paper-cream/10 backdrop-blur-sm">
               <span className="font-label-sm text-label-sm leading-label-sm text-paper-cream tracking-[0.2em] uppercase font-semibold">
-                October 24, 2025
+                December 25, 2027
               </span>
             </div>
 
@@ -107,30 +105,23 @@ export default function HomePage() {
             </h2>
 
             {/* Description */}
-            {/* Original: <p class="animate-slide-up delay-300 font-body-md text-body-md text-paper-cream/90 max-w-md mx-auto mb-12 italic"> */}
-            {/* NOTE: font-body-md = fontFamily. text-body-md = 16px/24px/400. */}
-            <p className="animate-slide-up delay-300 font-body-md text-body-md leading-body-md text-paper-cream/90 max-w-md mx-auto mb-12 italic">
-              Join us in celebrating our journey. A weekend of joy, laughter, and lifelong memories in the heart of the countryside.
+            <p className="animate-slide-up delay-300 font-body-md text-body-md leading-body-md text-paper-cream/80 max-w-md mx-auto mb-12 italic">
+              Together with their families, request the pleasure of your company
             </p>
 
-            {/* Countdown Component */}
-            {/* Original: <div class="animate-slide-up delay-400 grid grid-cols-4 gap-4 md:gap-8 w-full max-w-xl mx-auto border-t border-b border-champagne-silk/30 py-6 backdrop-blur-sm bg-charcoal-ink/20"> */}
-            <div className="animate-slide-up delay-400 grid grid-cols-4 gap-4 md:gap-8 w-full max-w-xl mx-auto border-t border-b border-champagne-silk/30 py-6 backdrop-blur-sm bg-charcoal-ink/20">
+            {/* Countdown Component — individual dark rounded boxes */}
+            <div className="animate-slide-up delay-400 grid grid-cols-4 gap-3 md:gap-4 w-full max-w-md mx-auto">
               {[
-                { value: countdown.days, label: 'Days' },
-                { value: countdown.hours, label: 'Hours' },
-                { value: countdown.mins, label: 'Mins' },
-                { value: countdown.secs, label: 'Secs' },
+                { value: countdown.days, label: 'DAYS' },
+                { value: countdown.hours, label: 'HOURS' },
+                { value: countdown.mins, label: 'MINS' },
+                { value: countdown.secs, label: 'SECS' },
               ].map((item) => (
-                <div key={item.label} className="flex flex-col items-center">
-                  {/* Original: <span class="font-display-hero text-headline-lg-mobile md:text-headline-lg text-paper-cream"> */}
-                  {/* NOTE: font-display-hero = fontFamily. text-headline-lg-mobile = 32px/40px/600. md:text-headline-lg = 48px/56px/600. */}
-                  <span className="font-display-hero text-headline-lg-mobile leading-headline-lg-mobile md:text-headline-lg md:leading-headline-lg font-semibold text-paper-cream">
+                <div key={item.label} className="flex flex-col items-center justify-center rounded-lg bg-charcoal-ink/60 backdrop-blur-sm py-4 md:py-5">
+                  <span className="font-display-hero text-3xl md:text-4xl font-bold text-paper-cream leading-none">
                     {String(item.value).padStart(2, '0')}
                   </span>
-                  {/* Original: <span class="font-label-sm text-[10px] md:text-label-sm text-cinematic-gold tracking-widest uppercase mt-2 font-semibold"> */}
-                  {/* NOTE: text-[10px] on mobile (overrides text-label-sm's 12px). md:text-label-sm = 12px on desktop. tracking-widest = 0.1em. */}
-                  <span className="font-label-sm text-[10px] md:text-label-sm text-cinematic-gold tracking-widest uppercase mt-2 font-semibold">
+                  <span className="font-label-sm text-[9px] md:text-[10px] text-paper-cream/80 tracking-widest uppercase mt-2 font-semibold">
                     {item.label}
                   </span>
                 </div>
@@ -142,7 +133,7 @@ export default function HomePage() {
           {/* Original: <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 animate-fade-in delay-400 flex flex-col items-center opacity-70"> */}
           {/* Original:   <span class="font-label-sm text-[10px] text-paper-cream tracking-widest mb-2 uppercase font-semibold">Discover</span> */}
           <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 animate-fade-in delay-400 flex flex-col items-center opacity-70">
-            <span className="font-label-sm text-[10px] text-paper-cream tracking-widest mb-2 uppercase font-semibold">Discover</span>
+            <span className="font-label-sm text-[10px] text-paper-cream tracking-widest mb-2 uppercase font-semibold">Scroll</span>
             <span className="material-symbols-outlined text-paper-cream animate-bounce">arrow_downward</span>
           </div>
         </section>
