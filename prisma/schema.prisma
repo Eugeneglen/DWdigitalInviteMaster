@@ -36,3 +36,12 @@ model Wish {
   imageUrl    String?
   createdAt   DateTime @default(now())
 }
+
+model ContactSubmission {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  contact   String?
+  reason    String
+  createdAt DateTime @default(now())
+}

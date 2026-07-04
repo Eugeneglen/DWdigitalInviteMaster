@@ -39,12 +39,31 @@ export default function ContactConciergeModal({
     async (e: React.FormEvent) => {
       e.preventDefault();
       setSubmitting(true);
-      // Simulate submission
-      await new Promise((r) => setTimeout(r, 800));
+
+      try {
+        const res = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: form.name.trim(),
+            email: form.email.trim(),
+            contact: form.contact.trim() || undefined,
+            reason: form.reason.trim(),
+          }),
+        });
+        if (!res.ok) {
+          setSubmitting(false);
+          return;
+        }
+      } catch {
+        setSubmitting(false);
+        return;
+      }
+
       setSubmitting(false);
       setSubmitted(true);
     },
-    []
+    [form]
   );
 
   const handleClose = useCallback(

@@ -275,3 +275,27 @@ Stage Summary:
 - All three legal documents accessible via popup modals
 - Lint clean, no errors
 
+
+---
+Task ID: api-backend-wiring
+Agent: Main Agent
+Task: Ensure all form submissions (Contact, RSVP, Wishes) persist to backend database
+
+Work Log:
+- Audited existing state: RSVP and Wishes APIs already fully wired with Prisma DB storage
+- Added ContactSubmission model to prisma/schema.prisma (id, name, email, contact, reason, createdAt)
+- Ran bun run db:push to sync schema to SQLite database
+- Created /api/contact/route.ts with Zod validation and Prisma insert
+- Updated ContactConciergeModal: replaced setTimeout simulation with real fetch to /api/contact
+- Updated /api/admin/route.ts to include totalContacts count and recentContacts in dashboard
+- Regenerated Prisma client, restarted dev server
+- Tested all 3 APIs via curl: all return 200 with success IDs
+- Verified admin endpoint shows: RSVPs: 2, Guests: 3, Wishes: 2, Contacts: 1
+- Verified all 3 forms via Agent Browser: RSVP result page, Wishes "Woven" state, Contact "Message Sent" state
+
+Stage Summary:
+- All 3 guest-facing forms now persist data to SQLite via Prisma
+- API endpoints: POST /api/rsvp, POST /api/wishes, POST /api/contact
+- Admin dashboard: GET /api/admin returns counts + recent submissions for all 3 types
+- Contact form was the only one that needed backend wiring (RSVP and Wishes were already connected)
+
