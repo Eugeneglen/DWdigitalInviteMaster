@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useCallback } from 'react';
+import { useNavigationStore } from '@/store/useNavigationStore';
 
 const CEREMONY_IMG =
   'https://lh3.googleusercontent.com/aida-public/AB6AXuAsLNSEjy771owdkkDbKTl1nE5oEzBQFVHob_HKiQb9eJb1X7I79-CxGjCPeKwCSHhwswJRqSrt3ox_aktMQUGlyzg6Eoo5R0aH6CYxxKj5f3uZCWdaDfZEIqmxwZd5DgdvCUWZfIdnNvixcYvcspOOFnGM2ThX9BPZz-ftetacA-b6CkxEEp9BdSatnTG55-e8tZz1jlG1euZgtw17iI67tcMGtR2azzCg8GvNH-xQPfUJlAXxGC3jU9Q7dbVZPK-xnHwtTl5eRNknueI';
@@ -11,40 +12,41 @@ const BANNER_BG =
   'https://lh3.googleusercontent.com/aida-public/AB6AXuA-OyKfcsxXAmZDArHbDXl1cVCgGUG5liFPzyHdVvMG6_4jN9pNTrN9GCrkdnegli9UPJUSPs39KJRsRP7AiLem4xYS-q1ZYq1T3DAIqyvn3wAvbdkoMVkufft0SpQw4gDTPSnIml6k62lRYobUrNu70UGIILiMZQ0fAydTXXwVZ1oswQZ-mjPT8H9mDDqfhxsMSI5zla8GKz_ILXbmdRjtRUk682dPEDBD6I81DzEx7dITgjb6vxQoee5599jkYf_vCYP7npydvxqx';
 
 export default function SchedulePage() {
-  const [drawerId, setDrawerId] = useState<string | null>(null);
-  const stayPanelRef = useRef<HTMLDivElement>(null);
-  const mapPanelRef = useRef<HTMLDivElement>(null);
+  const { setSection } = useNavigationStore();
 
-  const openDrawer = useCallback((id: string) => {
-    setDrawerId(id);
-    document.body.style.overflow = 'hidden';
+  const handleAddToCalendar = useCallback(() => {
+    const weddingDate = new Date('2024-06-22T16:00:00');
+    const endDate = new Date('2024-06-22T23:00:00');
+
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const formatICSDate = (d: Date) =>
+      `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+
+    const icsContent = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Eleanor & James Wedding//EN',
+      'BEGIN:VEVENT',
+      `DTSTART:${formatICSDate(weddingDate)}`,
+      `DTEND:${formatICSDate(endDate)}`,
+      'SUMMARY:Eleanor & James Wedding',
+      'DESCRIPTION:Join us for our wedding celebration! Ceremony at 4:00 PM, followed by cocktail hour, dinner, and dancing.',
+      'LOCATION:The Grand Estate',
+      'STATUS:CONFIRMED',
+      'END:VEVENT',
+      'END:VCALENDAR',
+    ].join('\r\n');
+
+    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'eleanor-james-wedding.ics';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   }, []);
-
-  const closeDrawer = useCallback((id: string) => {
-    const panelRef = id === 'stay-drawer' ? stayPanelRef : mapPanelRef;
-    if (panelRef.current) {
-      panelRef.current.classList.add('translate-y-full');
-    }
-    setTimeout(() => {
-      setDrawerId(null);
-      document.body.style.overflow = '';
-    }, 500);
-  }, []);
-
-  useEffect(() => {
-    return () => { document.body.style.overflow = ''; };
-  }, []);
-
-  useEffect(() => {
-    if (drawerId) {
-      const panelRef = drawerId === 'stay-drawer' ? stayPanelRef : mapPanelRef;
-      requestAnimationFrame(() => {
-        if (panelRef.current) {
-          panelRef.current.classList.remove('translate-y-full');
-        }
-      });
-    }
-  }, [drawerId]);
 
   return (
     <>
@@ -138,26 +140,18 @@ export default function SchedulePage() {
 
         {/* Action Cards — original: stagger-4 */}
         {/* Original card label: <span class="font-label-sm uppercase tracking-[0.15em] text-charcoal-ink"> */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-24 stagger-4">
-          <span
-            className="group relative overflow-hidden bg-surface-container-low border border-champagne-silk/20 p-8 flex flex-col items-center justify-center text-center h-48 transition-colors duration-500 shadow-[0_-4px_20px_rgba(26,26,26,0.04)] opacity-40 cursor-not-allowed"
-            aria-disabled="true"
-            title="Coming soon"
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-24 stagger-4">
+          <button
+            type="button"
+            onClick={handleAddToCalendar}
+            className="group relative overflow-hidden bg-surface-container-low border border-champagne-silk/20 p-8 flex flex-col items-center justify-center text-center h-48 hover:border-cinematic-gold transition-colors duration-500 shadow-[0_-4px_20px_rgba(26,26,26,0.04)]"
           >
             <span className="material-symbols-outlined text-3xl mb-4 text-charcoal-ink group-hover:text-cinematic-gold transition-colors">calendar_add_on</span>
             <span className="text-label-sm leading-label-sm font-semibold uppercase tracking-[0.15em] text-charcoal-ink">Add to Calendar</span>
-          </span>
-          <button
-            type="button"
-            onClick={() => openDrawer('stay-drawer')}
-            className="group relative overflow-hidden bg-surface-container-low border border-champagne-silk/20 p-8 flex flex-col items-center justify-center text-center h-48 hover:border-cinematic-gold transition-colors duration-500 shadow-[0_-4px_20px_rgba(26,26,26,0.04)]"
-          >
-            <span className="material-symbols-outlined text-3xl mb-4 text-charcoal-ink group-hover:text-cinematic-gold transition-colors">hotel</span>
-            <span className="text-label-sm leading-label-sm font-semibold uppercase tracking-[0.15em] text-charcoal-ink">Where to Stay</span>
           </button>
           <button
             type="button"
-            onClick={() => openDrawer('map-drawer')}
+            onClick={() => setSection('getting-there')}
             className="group relative overflow-hidden bg-surface-container-low border border-champagne-silk/20 p-8 flex flex-col items-center justify-center text-center h-48 hover:border-cinematic-gold transition-colors duration-500 shadow-[0_-4px_20px_rgba(26,26,26,0.04)]"
           >
             <span className="material-symbols-outlined text-3xl mb-4 text-charcoal-ink group-hover:text-cinematic-gold transition-colors">map</span>
@@ -165,73 +159,6 @@ export default function SchedulePage() {
           </button>
         </section>
       </main>
-
-      {/* ===== STAY DRAWER ===== */}
-      <div
-        className={`fixed inset-0 z-[100] flex flex-col justify-end ${drawerId === 'stay-drawer' ? '' : 'pointer-events-none'}`}
-      >
-        <div
-          className={`absolute inset-0 drawer-overlay transition-opacity duration-300 ${drawerId === 'stay-drawer' ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-          onClick={() => closeDrawer('stay-drawer')}
-        />
-        <div
-          ref={stayPanelRef}
-          className="bg-paper-cream w-full max-h-[751px] rounded-t-3xl shadow-2xl transform translate-y-full transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] pointer-events-auto flex flex-col border-t border-champagne-silk/30"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="flex justify-between items-center p-6 border-b border-champagne-silk/20 shrink-0">
-            {/* Original: font-display-hero text-headline-md-mobile = 32px/40px */}
-            <h3 className="font-display-hero text-headline-lg-mobile leading-headline-lg-mobile font-semibold text-charcoal-ink">Accommodations</h3>
-            <button className="text-charcoal-ink hover:text-cinematic-gold transition-colors" onClick={() => closeDrawer('stay-drawer')}>
-              <span className="material-symbols-outlined">close</span>
-            </button>
-          </div>
-          <div className="overflow-y-auto p-6 md:p-8 flex-1">
-            <div className="max-w-2xl mx-auto space-y-8">
-              <div className="flex flex-col md:flex-row gap-6 items-start">
-                <div className="w-full md:w-48 aspect-video md:aspect-square bg-surface-container-highest shrink-0 relative overflow-hidden">
-                  <div className="absolute inset-2 border border-champagne-silk z-10 pointer-events-none" />
-                </div>
-                <div>
-                  <h4 className="font-display-hero text-headline-lg-mobile leading-headline-lg-mobile font-semibold text-charcoal-ink mb-2">The Grand Hotel</h4>
-                  <p className="text-body-md leading-body-md text-charcoal-ink/70 mb-4 leading-relaxed">Our primary room block is secured here. A luxury boutique hotel just 10 minutes from the venue.</p>
-                  {/* Original: <span class="inline-block border border-cinematic-gold text-charcoal-ink px-6 py-2 font-label-sm uppercase tracking-widest ...">Book Room</span> */}
-                  <span className="inline-block border border-cinematic-gold text-charcoal-ink px-6 py-2 text-label-sm leading-label-sm font-semibold uppercase tracking-widest transition-colors opacity-40 cursor-not-allowed" aria-disabled="true" title="Coming soon">Book Room</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ===== MAP DRAWER ===== */}
-      <div
-        className={`fixed inset-0 z-[100] flex flex-col justify-end ${drawerId === 'map-drawer' ? '' : 'pointer-events-none'}`}
-      >
-        <div
-          className={`absolute inset-0 drawer-overlay transition-opacity duration-300 ${drawerId === 'map-drawer' ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-          onClick={() => closeDrawer('map-drawer')}
-        />
-        <div
-          ref={mapPanelRef}
-          className="bg-paper-cream w-full h-[751px] rounded-t-3xl shadow-2xl transform translate-y-full transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] pointer-events-auto flex flex-col border-t border-champagne-silk/30"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="flex justify-between items-center p-6 border-b border-champagne-silk/20 shrink-0">
-            <h3 className="font-display-hero text-headline-lg-mobile leading-headline-lg-mobile font-semibold text-charcoal-ink">Directions &amp; Map</h3>
-            <button className="text-charcoal-ink hover:text-cinematic-gold transition-colors" onClick={() => closeDrawer('map-drawer')}>
-              <span className="material-symbols-outlined">close</span>
-            </button>
-          </div>
-          <div className="flex-1 relative bg-surface-container-lowest">
-            <div className="absolute inset-0 flex items-center justify-center flex-col text-charcoal-ink/40">
-              <span className="material-symbols-outlined text-4xl mb-2">map</span>
-              {/* Original: <span class="font-utility-mono uppercase tracking-[0.2em] text-xs"> */}
-              <span className="font-utility-mono text-utility-mono leading-utility-mono font-medium uppercase tracking-[0.2em] text-xs">Map View rendering</span>
-            </div>
-          </div>
-        </div>
-      </div>
     </>
   );
 }
