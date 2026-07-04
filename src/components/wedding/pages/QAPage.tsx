@@ -88,25 +88,26 @@ export default function QAPage() {
         </section>
 
         {/* CTA */}
-        <section className="animate-orchestral delay-400 max-w-[1000px] mx-auto bg-white border border-cinematic-gold/20 p-8 md:p-16 flex flex-col md:flex-row items-center gap-12 relative overflow-hidden shadow-[0_4px_40px_rgba(26,26,26,0.02)]">
-          <div className="z-10 flex-1 text-center md:text-left">
-            <h2
-              className="text-charcoal-ink mb-4"
-              style={{ fontFamily: "'Playfair Display', serif", fontWeight: 600, fontSize: '32px', lineHeight: '40px' }}
-            >
-              Still seeking clarity?
-            </h2>
-            <p className="text-charcoal-ink/70 mb-8 max-w-md mx-auto md:mx-0" style={{ fontSize: '16px', lineHeight: '24px' }}>
-              For highly specific inquiries or logistical support not covered above, our dedicated concierge is available via direct message.
-            </p>
-            <button className="border border-charcoal-ink/15 bg-white rounded px-8 py-3 text-[13px] font-medium uppercase tracking-[0.08em] text-charcoal-ink hover:border-cinematic-gold hover:text-cinematic-gold transition-colors duration-300">
-              Message the Couple
-            </button>
-          </div>
-          <div className="z-10 hidden md:flex items-center justify-center w-56 h-56 rounded-full border border-cinematic-gold/20 flex-shrink-0 relative">
-            <div className="absolute inset-4 border border-cinematic-gold/10 rounded-full animate-[spin_40s_linear_infinite]" />
-            <span className="material-symbols-outlined text-[72px] text-cinematic-gold/60">mark_email_unread</span>
-          </div>
+        <section className="animate-orchestral delay-400 max-w-2xl mx-auto bg-paper-cream/40 py-16 px-8 text-center">
+          <p
+            className="text-cinematic-gold uppercase tracking-[0.2em] mb-3"
+            style={{ fontSize: '12px', lineHeight: '16px', letterSpacing: '0.1em', fontWeight: 600 }}
+          >
+            NEED MORE HELP?
+          </p>
+          <h2
+            className="text-charcoal-ink italic mb-4"
+            style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: '32px', lineHeight: '40px' }}
+          >
+            Still Seeking Clarity?
+          </h2>
+          <p className="text-charcoal-ink/60 mb-10 max-w-md mx-auto" style={{ fontSize: '16px', lineHeight: '24px' }}>
+            Our concierge is standing by to assist with any questions about the event, travel, accommodations, or special arrangements.
+          </p>
+          <button className="bg-charcoal-ink text-paper-cream rounded px-8 py-3.5 text-[13px] font-semibold uppercase tracking-[0.08em] hover:opacity-90 transition-opacity duration-300 inline-flex items-center gap-2.5">
+            <span className="material-symbols-outlined text-paper-cream" style={{ fontSize: '18px' }}>mail</span>
+            Message the Couple
+          </button>
         </section>
       </main>
     </>
