@@ -2,12 +2,14 @@
 
 import { useState } from 'react';
 import LegalDocumentModal from '@/components/wedding/LegalDocumentModal';
+import ContactConciergeModal from '@/components/wedding/ContactConciergeModal';
 import { dataProtectionDocument, termsOfServiceDocument, privacyPolicyDocument } from '@/lib/legal-content';
 
 export default function Footer() {
   const [dataProtectionOpen, setDataProtectionOpen] = useState(false);
   const [termsOfServiceOpen, setTermsOfServiceOpen] = useState(false);
   const [privacyPolicyOpen, setPrivacyPolicyOpen] = useState(false);
+  const [contactConciergeOpen, setContactConciergeOpen] = useState(false);
 
   const footerLinkClass =
     'font-body-md text-body-md leading-body-md text-charcoal-ink/60 hover:text-cinematic-gold underline-offset-4 hover:underline transition-colors cursor-pointer';
@@ -17,12 +19,12 @@ export default function Footer() {
       <footer className="w-full py-20 bg-paper-cream border-t border-champagne-silk/10 pb-32 md:pb-20">
         <div className="max-w-[1440px] mx-auto px-4 md:px-canvas-margin flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex flex-col md:flex-row items-center gap-6">
-            <a
+            <button
               className={footerLinkClass}
-              href="mailto:concierge@dreamweavers.events"
+              onClick={() => setContactConciergeOpen(true)}
             >
               Contact Concierge
-            </a>
+            </button>
             <button
               className={footerLinkClass}
               onClick={() => setPrivacyPolicyOpen(true)}
@@ -48,6 +50,11 @@ export default function Footer() {
           </p>
         </div>
       </footer>
+
+      <ContactConciergeModal
+        open={contactConciergeOpen}
+        onOpenChange={setContactConciergeOpen}
+      />
 
       <LegalDocumentModal
         open={privacyPolicyOpen}
