@@ -72,15 +72,14 @@ export default function HomePage() {
         {/* ===== HERO SECTION ===== */}
         {/* Original: <section class="relative h-[795px] md:h-screen w-full flex flex-col justify-end overflow-hidden"> */}
         <section className="relative h-[795px] md:h-screen w-full flex flex-col justify-end overflow-hidden">
-          {/* Background Image */}
-          {/* Original: <div class="absolute inset-0 z-0 inner-frame m-4 md:m-8"> */}
-          <div className="absolute inset-0 z-0 inner-frame m-4 md:m-8">
+          {/* Background Image — full bleed, no crop */}
+          <div className="absolute inset-0 z-0">
             <img
               alt="Hero Wedding Portrait"
-              className="w-full h-full object-cover object-center rounded-lg shadow-[0_-4px_20px_rgba(26,26,26,0.04)]"
+              className="w-full h-full object-cover object-center"
               src={HERO_IMG}
             />
-            <div className="absolute inset-0 hero-gradient rounded-lg" />
+            <div className="absolute inset-0 hero-gradient" />
           </div>
 
           {/* Content Overlay */}
@@ -93,16 +92,6 @@ export default function HomePage() {
                 December 25, 2027
               </span>
             </div>
-
-            {/* Couple Names Typography */}
-            {/* Original: <h2 class="animate-slide-up delay-200 font-display-hero text-[48px] leading-[1.1] md:text-display-hero text-paper-cream mb-6 tracking-tight drop-shadow-lg"> */}
-            {/* NOTE: font-display-hero = fontFamily. text-[48px] leading-[1.1] on mobile. md:text-display-hero = 84px/100px/-0.02em/700 on desktop. tracking-tight overrides letter-spacing. */}
-            <h2 className="animate-slide-up delay-200 font-display-hero text-[48px] leading-[1.1] md:text-display-hero md:leading-display-hero md:font-bold text-paper-cream mb-6 tracking-tight drop-shadow-lg">
-              Eleanor<br className="md:hidden" />
-              <span className="italic font-light mx-4 text-cinematic-gold">&amp;</span>
-              <br className="md:hidden" />
-              James
-            </h2>
 
             {/* Description */}
             <p className="animate-slide-up delay-300 font-body-md text-body-md leading-body-md text-paper-cream/80 max-w-md mx-auto mb-12 italic">
