@@ -28,7 +28,7 @@ export default function Footer() {
         </div>
 
         <p className="font-label-sm text-label-sm leading-label-sm text-charcoal-ink/40 uppercase tracking-wider font-semibold">
-          © 2024 DREAMWEAVERS DIGITAL HEIRLOOMS
+          © 2026 DREAMWEAVERS DIGITAL HEIRLOOMS. All rights reserved.
         </p>
       </div>
     </footer>
