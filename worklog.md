@@ -239,3 +239,21 @@ Stage Summary:
 - All API routes have correct Zod validation matching frontend payloads
 - Zero lint errors, zero TypeScript errors in src/, zero console.log, zero TODO/FIXME
 - Production-ready: query logging gated, form validation in place, dead code eliminated
+
+---
+Task ID: footer-legal-popups
+Agent: Main Agent
+Task: Replace Privacy Policy with Data Protection, add Terms of Service popup, enable Technical Support in footer
+
+Work Log:
+- Read both uploaded .docx files (Data Protection, Terms of Service) and extracted full text content
+- Created /home/z/my-project/src/lib/legal-content.tsx — structured document data with typed sections and formatted React content (lists, paragraphs, email links, draft notes)
+- Created /home/z/my-project/src/components/wedding/LegalDocumentModal.tsx — reusable dialog modal with scroll area, header (title/subtitle/version), sectioned body, and draft disclaimer banner
+- Updated /home/z/my-project/src/components/wedding/Footer.tsx — replaced disabled "Privacy Policy" with active "Data Protection" button, added active "Terms of Service" button, enabled "Technical Support" as mailto link
+- Verified via Agent Browser: all 4 footer links render correctly, both modals open with full scrollable content and proper close functionality, no console errors
+
+Stage Summary:
+- Footer now has 4 active links: Contact Concierge (mailto), Data Protection (popup), Terms of Service (popup), Technical Support (mailto)
+- Both legal documents render in styled popups matching the wedding theme (paper-cream bg, cinematic-gold section numbers, Playfair Display headings)
+- Lint passes clean (0 errors)
+
