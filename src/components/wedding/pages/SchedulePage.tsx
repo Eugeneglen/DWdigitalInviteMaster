@@ -119,6 +119,26 @@ export default function SchedulePage() {
             Directions
           </button>
         </section>
+
+        {/* Wedding Venue Section */}
+        <section className="stagger-4 mb-24 flex flex-col md:flex-row gap-8 md:gap-12 items-center">
+          <div className="w-full md:w-1/2 shrink-0">
+            <div className="aspect-[4/3] overflow-hidden rounded border border-cinematic-gold/30">
+              <img
+                alt="The Singapore EDITION — Wedding Venue"
+                className="w-full h-full object-cover"
+                src="https://sfile.chatglm.cn/images-ppt/4adf4afbb9a2.jpg"
+              />
+            </div>
+          </div>
+          <div className="w-full md:w-1/2 flex flex-col gap-4">
+            <span className="text-label-sm leading-label-sm text-cinematic-gold tracking-[0.2em] uppercase font-semibold">Wedding Venue</span>
+            <h3 className="font-display-hero text-headline-lg-mobile leading-headline-lg-mobile md:text-headline-md md:leading-headline-md font-semibold text-charcoal-ink">The Singapore EDITION</h3>
+            <p className="text-body-md leading-body-md text-charcoal-ink/70 leading-relaxed">
+              Nestled in the heart of Orchard Road, The Singapore EDITION is a luxury boutique hotel blending timeless elegance with modern sophistication. Its intimate event spaces and bespoke service make it the perfect setting for an unforgettable celebration.
+            </p>
+          </div>
+        </section>
       </main>
     </>
   );
