@@ -111,3 +111,29 @@ Stage Summary:
 - Bottom sheet drawers added to Schedule page
 - Zero lint errors, zero console errors, all 8 pages verified rendering
 
+
+---
+Task ID: 4
+Agent: Main Agent
+Task: Standardize button design across all pages (flat, text-only, no icons, consistent sizing)
+
+Work Log:
+- Audited all buttons across 8 pages: HomePage (FAB), SchedulePage (2), RSVPPage (8), QAPage (1), StoryPage (3), WishesPage (1), GettingTherePage (0 action buttons, tabs preserved), MomentsPage (0)
+- Defined two standard button classes:
+  - Outline (secondary): `border border-charcoal-ink/15 bg-white rounded px-8 py-3 text-[13px] font-medium uppercase tracking-[0.08em] text-charcoal-ink hover:border-cinematic-gold hover:text-cinematic-gold transition-colors duration-300`
+  - Filled (primary): `bg-charcoal-ink text-paper-cream rounded px-8 py-3 text-[13px] font-medium uppercase tracking-[0.08em] hover:opacity-90 transition-opacity duration-300`
+- Updated SchedulePage: 2 outline buttons (Add to Calendar, Directions) — bg-transparent→bg-white, px-6→px-8, text-sm→text-[13px], hover to gold
+- Updated RSVPPage: 3 Back buttons (outline), 4 Next/Continue/Save buttons (filled), 1 Respond/Edit per-guest button (small outline) — all to new standard
+- Updated QAPage: Message the Couple — removed forum icon, changed from filled dark to outline style
+- Updated StoryPage: Amalfi Coast & Kyoto (outline), Submit Recommendation (filled) — bg-transparent→bg-white, hover to gold
+- Updated WishesPage: Weave into Archive — removed arrow_right_alt icon and check_circle/spinner icons, simplified to text-only
+- Preserved non-standard buttons: FAB (circular special purpose), counter ±buttons, tab buttons, attendance radio options, Add Another Guest (link-style)
+- Ran lint: 0 errors
+- Verified all pages via Agent Browser + VLM: buttons are flat, text-only, no icons, correct bg/border colors
+
+Stage Summary:
+- All action buttons across 6 pages standardized to consistent flat design language
+- Two variants: outline (white bg + border, gold hover) and filled (dark bg)
+- All icons removed from action buttons
+- Consistent sizing: px-8 py-3, text-[13px], tracking-[0.08em]
+- Zero lint errors, zero console errors, all verified visually

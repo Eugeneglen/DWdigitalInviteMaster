@@ -175,7 +175,7 @@ export default function RSVPPage() {
               </div>
             </div>
             <button
-              className="w-full bg-charcoal-ink text-paper-cream rounded py-3 text-sm font-medium uppercase tracking-[0.08em] hover:opacity-90 transition-opacity duration-300"
+              className="w-full bg-charcoal-ink text-paper-cream rounded px-8 py-3 text-[13px] font-medium uppercase tracking-[0.08em] hover:opacity-90 transition-opacity duration-300"
               onClick={submitStep1}
             >
               Next
@@ -212,13 +212,13 @@ export default function RSVPPage() {
           </p>
           <div className="flex gap-3">
             <button
-              className="flex-1 border border-charcoal-ink/15 bg-transparent rounded py-3 text-sm font-medium uppercase tracking-[0.08em] text-charcoal-ink hover:border-charcoal-ink/40 transition-colors duration-300"
+              className="flex-1 border border-charcoal-ink/15 bg-white rounded py-3 text-[13px] font-medium uppercase tracking-[0.08em] text-charcoal-ink hover:border-cinematic-gold hover:text-cinematic-gold transition-colors duration-300"
               onClick={() => setStep(1)}
             >
               Back
             </button>
             <button
-              className="flex-[2] bg-charcoal-ink text-paper-cream rounded py-3 text-sm font-medium uppercase tracking-[0.08em] hover:opacity-90 transition-opacity duration-300"
+              className="flex-[2] bg-charcoal-ink text-paper-cream rounded px-8 py-3 text-[13px] font-medium uppercase tracking-[0.08em] hover:opacity-90 transition-opacity duration-300"
               onClick={submitStep2}
             >
               Next
@@ -246,10 +246,10 @@ export default function RSVPPage() {
                   )}
                 </div>
                 <button
-                  className={`border border-charcoal-ink/15 bg-transparent rounded px-5 py-2.5 text-sm font-medium uppercase tracking-[0.08em] hover:border-charcoal-ink/40 transition-colors ${
+                  className={`border border-charcoal-ink/15 bg-white rounded px-5 py-2.5 text-[13px] font-medium uppercase tracking-[0.08em] hover:border-cinematic-gold hover:text-cinematic-gold transition-colors ${
                     g.responded
                       ? 'border-cinematic-gold text-cinematic-gold'
-                      : 'border-charcoal-ink/40 text-charcoal-ink'
+                      : ''
                   }`}
                   onClick={() => respondFor(i)}
                 >
@@ -267,13 +267,13 @@ export default function RSVPPage() {
           </button>
           <div className="flex gap-3">
             <button
-              className="flex-1 border border-charcoal-ink/15 bg-transparent rounded py-3 text-sm font-medium uppercase tracking-[0.08em] text-charcoal-ink hover:border-charcoal-ink/40 transition-colors duration-300"
+              className="flex-1 border border-charcoal-ink/15 bg-white rounded py-3 text-[13px] font-medium uppercase tracking-[0.08em] text-charcoal-ink hover:border-cinematic-gold hover:text-cinematic-gold transition-colors duration-300"
               onClick={() => setStep(2)}
             >
               Back
             </button>
             <button
-              className={`flex-[2] bg-charcoal-ink text-paper-cream rounded py-3 text-sm font-medium uppercase tracking-[0.08em] hover:opacity-90 transition-opacity duration-300 ${
+              className={`flex-[2] bg-charcoal-ink text-paper-cream rounded px-8 py-3 text-[13px] font-medium uppercase tracking-[0.08em] hover:opacity-90 transition-opacity duration-300 ${
                 !allDone ? 'opacity-40' : ''
               }`}
               disabled={!allDone}
@@ -331,13 +331,13 @@ export default function RSVPPage() {
           </div>
           <div className="flex gap-3 mt-10">
             <button
-              className="flex-1 border border-charcoal-ink/15 bg-transparent rounded py-3 text-sm font-medium uppercase tracking-[0.08em] text-charcoal-ink hover:border-charcoal-ink/40 transition-colors duration-300"
+              className="flex-1 border border-charcoal-ink/15 bg-white rounded py-3 text-[13px] font-medium uppercase tracking-[0.08em] text-charcoal-ink hover:border-cinematic-gold hover:text-cinematic-gold transition-colors duration-300"
               onClick={() => setStep(3)}
             >
               Back
             </button>
             <button
-              className={`flex-[2] bg-charcoal-ink text-paper-cream rounded py-3 text-sm font-medium uppercase tracking-[0.08em] hover:opacity-90 transition-opacity duration-300 ${
+              className={`flex-[2] bg-charcoal-ink text-paper-cream rounded px-8 py-3 text-[13px] font-medium uppercase tracking-[0.08em] hover:opacity-90 transition-opacity duration-300 ${
                 !attendance ? 'opacity-40' : ''
               }`}
               disabled={!attendance}

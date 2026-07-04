@@ -99,8 +99,7 @@ export default function QAPage() {
             <p className="text-charcoal-ink/70 mb-8 max-w-md mx-auto md:mx-0" style={{ fontSize: '16px', lineHeight: '24px' }}>
               For highly specific inquiries or logistical support not covered above, our dedicated concierge is available via direct message.
             </p>
-            <button className="group inline-flex items-center gap-4 bg-charcoal-ink text-paper-cream rounded px-6 py-3 text-sm font-medium uppercase tracking-[0.08em] hover:opacity-90 transition-opacity duration-300">
-              <span className="material-symbols-outlined text-[20px]">forum</span>
+            <button className="border border-charcoal-ink/15 bg-white rounded px-8 py-3 text-[13px] font-medium uppercase tracking-[0.08em] text-charcoal-ink hover:border-cinematic-gold hover:text-cinematic-gold transition-colors duration-300">
               Message the Couple
             </button>
           </div>

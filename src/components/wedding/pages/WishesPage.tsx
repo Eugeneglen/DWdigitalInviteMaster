@@ -237,7 +237,7 @@ export default function WishesPage() {
               <div className="flex justify-center pt-8">
                 <button
                   type="submit"
-                  className={`text-paper-cream rounded px-6 py-3 group/btn flex items-center gap-4 text-sm font-medium uppercase tracking-[0.08em] transition-all duration-300 ${
+                  className={`text-paper-cream rounded px-8 py-3 text-[13px] font-medium uppercase tracking-[0.08em] transition-all duration-300 ${
                     submitting
                       ? 'opacity-50 pointer-events-none bg-charcoal-ink'
                       : submitted
@@ -246,18 +246,7 @@ export default function WishesPage() {
                   }`}
                   disabled={submitting}
                 >
-                  {submitting ? (
-                    <span className="material-symbols-outlined animate-spin">refresh</span>
-                  ) : submitted ? (
-                    <>
-                      <span className="material-symbols-outlined">check_circle</span> WOVEN
-                    </>
-                  ) : (
-                    <>
-                      Weave into Archive
-                      <span className="material-symbols-outlined transition-transform group-hover/btn:translate-x-2">arrow_right_alt</span>
-                    </>
-                  )}
+                  {submitting ? 'Submitting...' : submitted ? 'Woven' : 'Weave into Archive'}
                 </button>
               </div>
             </form>
