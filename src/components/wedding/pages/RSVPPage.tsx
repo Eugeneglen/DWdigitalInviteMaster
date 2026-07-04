@@ -131,8 +131,7 @@ export default function RSVPPage() {
         <h1 className="italic text-[40px] md:text-[52px] leading-tight text-charcoal-ink" style={{ fontFamily: "'Playfair Display', serif" }}>
           Eleanor &amp; James
         </h1>
-        <p className="mt-4 text-[15px] text-charcoal-ink/80">The Singapore EDITION, 38 Cuscaden Road</p>
-        <p className="text-[15px] text-charcoal-ink/80">Singapore 249731</p>
+        <p className="mt-4 text-[15px] text-charcoal-ink/80">The Singapore EDITION, Orchard — October 24, 2027</p>
       </div>
 
       {/* Progress dots */}

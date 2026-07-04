@@ -1,0 +1,466 @@
+     1→     1→<!DOCTYPE html><html class="light" lang="en" style=""><head>
+     2→     2→<meta charset="utf-8">
+     3→     3→<meta content="width=device-width, initial-scale=1.0" name="viewport">
+     4→     4→<title>DREAMWEAVERS | Admin Portal</title>
+     5→     5→<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+     6→     6→<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;display=swap" rel="stylesheet">
+     7→     7→<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+     8→     8→<style>
+     9→     9→        .material-symbols-outlined {
+    10→    10→            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+    11→    11→        }
+    12→    12→        .inner-frame {
+    13→    13→            position: relative;
+    14→    14→        }
+    15→    15→        .inner-frame::after {
+    16→    16→            content: '';
+    17→    17→            position: absolute;
+    18→    18→            top: 16px;
+    19→    19→            left: 16px;
+    20→    20→            right: 16px;
+    21→    21→            bottom: 16px;
+    22→    22→            border: 1px solid rgba(212, 175, 55, 0.4);
+    23→    23→            pointer-events: none;
+    24→    24→            z-index: 10;
+    25→    25→        }
+    26→    26→        .custom-scrollbar::-webkit-scrollbar {
+    27→    27→            width: 4px;
+    28→    28→        }
+    29→    29→        .custom-scrollbar::-webkit-scrollbar-track {
+    30→    30→            background: transparent;
+    31→    31→        }
+    32→    32→        .custom-scrollbar::-webkit-scrollbar-thumb {
+    33→    33→            background: #D4AF37;
+    34→    34→            border-radius: 10px;
+    35→    35→        }
+    36→    36→        .tap-highlight-transparent {
+    37→    37→            -webkit-tap-highlight-color: transparent;
+    38→    38→        }
+    39→    39→        body {
+    40→    40→            font-family: 'Playfair Display', serif;
+    41→    41→        }
+    42→    42→    </style>
+    43→    43→<script id="tailwind-config">
+    44→    44→        tailwind.config = {
+    45→    45→            darkMode: "class",
+    46→    46→            theme: {
+    47→    47→                extend: {
+    48→    48→                    "colors": {
+    49→    49→                        "primary-fixed-dim": "#c8c6c5",
+    50→    50→                        "tertiary-container": "#1c1c18",
+    51→    51→                        "on-primary-fixed-variant": "#474746",
+    52→    52→                        "primary": "#000000",
+    53→    53→                        "inverse-surface": "#313030",
+    54→    54→                        "surface-container-lowest": "#ffffff",
+    55→    55→                        "on-primary": "#ffffff",
+    56→    56→                        "surface-container-highest": "#e5e2e1",
+    57→    57→                        "primary-fixed": "#e5e2e1",
+    58→    58→                        "on-tertiary": "#ffffff",
+    59→    59→                        "secondary-container": "#fed65b",
+    60→    60→                        "cinematic-gold": "#D4AF37",
+    61→    61→                        "surface-container-low": "#f7f3f2",
+    62→    62→                        "secondary-fixed-dim": "#e9c349",
+    63→    63→                        "on-secondary-fixed-variant": "#574500",
+    64→    64→                        "surface": "#fdf8f8",
+    65→    65→                        "inverse-on-surface": "#f4f0ef",
+    66→    66→                        "on-tertiary-fixed": "#1c1c18",
+    67→    67→                        "on-secondary-fixed": "#241a00",
+    68→    68→                        "tertiary-fixed": "#e6e2dc",
+    69→    69→                        "surface-tint": "#5f5e5e",
+    70→    70→                        "surface-variant": "#e5e2e1",
+    71→    71→                        "paper-cream": "#FDF9F3",
+    72→    72→                        "on-primary-fixed": "#1c1b1b",
+    73→    73→                        "outline": "#747878",
+    74→    74→                        "champagne-silk": "#E8D5B5",
+    75→    75→                        "on-error-container": "#93000a",
+    76→    76→                        "on-error": "#ffffff",
+    77→    77→                        "background": "#fdf8f8",
+    78→    78→                        "on-surface-variant": "#444748",
+    79→    79→                        "surface-container-high": "#ebe7e6",
+    80→    80→                        "on-tertiary-container": "#86847f",
+    81→    81→                        "error-container": "#ffdad6",
+    82→    82→                        "tertiary": "#000000",
+    83→    83→                        "secondary-fixed": "#ffe088",
+    84→    84→                        "on-surface": "#1c1b1b",
+    85→    85→                        "surface-dim": "#ddd9d8",
+    86→    86→                        "on-tertiary-fixed-variant": "#484743",
+    87→    87→                        "tertiary-fixed-dim": "#c9c6c1",
+    88→    88→                        "on-secondary": "#ffffff",
+    89→    89→                        "outline-variant": "#c4c7c7",
+    90→    90→                        "surface-container": "#f1edec",
+    91→    91→                        "error": "#ba1a1a",
+    92→    92→                        "charcoal-ink": "#1A1A1A",
+    93→    93→                        "primary-container": "#1c1b1b",
+    94→    94→                        "secondary": "#735c00",
+    95→    95→                        "surface-bright": "#fdf8f8",
+    96→    96→                        "on-primary-container": "#858383",
+    97→    97→                        "inverse-primary": "#c8c6c5",
+    98→    98→                        "on-secondary-container": "#745c00",
+    99→    99→                        "on-background": "#1c1b1b"
+   100→   100→                    },
+   101→   101→                    "borderRadius": {
+   102→   102→                        "DEFAULT": "0.125rem",
+   103→   103→                        "lg": "0.25rem",
+   104→   104→                        "xl": "0.5rem",
+   105→   105→                        "full": "0.75rem"
+   106→   106→                    },
+   107→   107→                    "spacing": {
+   108→   108→                        "section-gap": "8rem",
+   109→   109→                        "gutter": "2rem",
+   110→   110→                        "inner-frame-offset": "16px",
+   111→   111→                        "canvas-margin": "4rem",
+   112→   112→                        "unit": "4px"
+   113→   113→                    },
+   114→   114→                    "fontFamily": {
+   115→   115→                        "body-md": ["Playfair Display", "serif"],
+   116→   116→                        "headline-lg": ["Playfair Display", "serif"],
+   117→   117→                        "display-hero": ["Playfair Display", "serif"],
+   118→   118→                        "utility-mono": ["Playfair Display", "serif"],
+   119→   119→                        "body-lg": ["Playfair Display", "serif"],
+   120→   120→                        "headline-md": ["Playfair Display", "serif"],
+   121→   121→                        "headline-lg-mobile": ["Playfair Display", "serif"],
+   122→   122→                        "label-sm": ["Playfair Display", "serif"]
+   123→   123→                    },
+   124→   124→                    "fontSize": {
+   125→   125→                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+   126→   126→                        "headline-lg": ["48px", {"lineHeight": "56px", "fontWeight": "600"}],
+   127→   127→                        "display-hero": ["84px", {"lineHeight": "100px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+   128→   128→                        "utility-mono": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+   129→   129→                        "body-lg": ["18px", {"lineHeight": "32px", "fontWeight": "400"}],
+   130→   130→                        "headline-md": ["32px", {"lineHeight": "40px", "fontWeight": "500"}],
+   131→   131→                        "headline-lg-mobile": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+   132→   132→                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.2em", "fontWeight": "600"}]
+   133→   133→                    }
+   134→   134→                }
+   135→   135→            }
+   136→   136→        }
+   137→   137→    </script>
+   138→   138→<style>
+   139→   139→        body {
+   140→   140→            min-height: max(884px, 100dvh);
+   141→   141→        }
+   142→   142→    </style>
+   143→   143→</head>
+   144→   144→<body class="bg-paper-cream text-on-surface selection:bg-cinematic-gold selection:text-white min-h-screen font-['Playfair_Display']" style="background-color: rgb(252, 249, 242);">
+   145→   145→<!-- TopAppBar -->
+   146→   146→<header class="fixed top-0 right-0 z-50 bg-surface/80 backdrop-blur-md border-b border-cinematic-gold/30 flex justify-between items-center px-canvas-margin py-4 left-0 md:left-64">
+   147→   147→<div class="flex items-center gap-4">
+   148→   148→<img alt="Dreamweavers Logo" class="h-4 w-auto" src="/assets/dreamweavers-logo.png">
+   149→   149→<div class="hidden md:flex items-center gap-2 ml-8">
+   150→   150→<span class="material-symbols-outlined text-cinematic-gold">search</span>
+   151→   151→<input class="bg-transparent border-none focus:ring-0 font-label-sm text-on-surface-variant/60 w-64 placeholder:text-on-surface-variant/40 tracking-wide-luxury" placeholder="Search portal..." type="text">
+   152→   152→</div>
+   153→   153→</div>
+   154→   154→<div class="flex items-center gap-3">
+   155→   155→<div class="hidden md:flex flex-col items-end mr-2">
+   156→   156→<span class="font-label-sm text-primary leading-none tracking-wide-luxury">Admin Profile</span>
+   157→   157→<span class="text-[10px] text-on-surface-variant/60 uppercase tracking-widest-luxury">Master Editor</span>
+   158→   158→</div>
+   159→   159→<div class="w-10 h-10 rounded-full border border-cinematic-gold/40 overflow-hidden shadow-sm">
+   160→   160→<img alt="Admin" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYOLHlQLO3ePWXKS_j-PuQhexURKycIoqoaVuHss98mipov4urICFrjndb5KpVa90qz7Pd-_q9LqZjkVjckxkg3oa6SjfoIW9pbZ0aTOCEQbc8XN8T-jZiKvEl9aJWVHGeR3Y1ehw6gMCW3baqLni1xU4Vj8Zg8hmyMTYDbXq3b64RMjkQY755EfJ3uWQLLyJL7g4zSySDlfwryr4cT_JRz5k2GDLevYNE28Nf6Hm1JXviyN8q4TvO8bpW7LgJRSiHCPyekuNHTXJQ">
+   161→   161→</div>
+   162→   162→</div>
+   163→   163→</header>
+   164→   164→<!-- Navigation Drawer (Desktop Only) -->
+   165→   165→<aside class="fixed top-0 left-0 bottom-0 w-64 hidden md:flex flex-col border-r border-cinematic-gold/20 z-[60] bg-surface text-on-surface" style="background-color: rgb(252, 249, 242);">
+   166→   166→<div class="p-8 mb-8">
+   167→   167→<img alt="Dreamweavers Logo" class="h-4 w-auto" src="/assets/dreamweavers-logo.png">
+   168→   168→</div>
+   169→   169→<nav class="flex-grow px-4 space-y-2">
+   170→   170→<a class="flex items-center gap-4 p-4 rounded-lg transition-colors hover:bg-surface-container-low" href="/admin-dashboard.html">
+   171→   171→<span class="material-symbols-outlined">dashboard</span>
+   172→   172→<span class="font-label-sm uppercase tracking-widest-luxury text-[12px]">Dashboard</span>
+   173→   173→</a>
+   174→   174→<a class="flex items-center gap-4 p-4 rounded-lg transition-colors hover:bg-surface-container-low" href="/admin-guests.html">
+   175→   175→<span class="material-symbols-outlined">group</span>
+   176→   176→<span class="font-label-sm uppercase tracking-widest-luxury text-[12px]">Guests</span>
+   177→   177→</a>
+   178→   178→<a class="flex items-center gap-4 p-4 rounded-lg transition-colors hover:bg-surface-container-low" href="/admin-media.html">
+   179→   179→<span class="material-symbols-outlined">photo_library</span>
+   180→   180→<span class="font-label-sm uppercase tracking-widest-luxury text-[12px]">Media</span>
+   181→   181→</a>
+   182→   182→<a class="flex items-center gap-4 p-4 rounded-lg text-cinematic-gold border border-cinematic-gold/20 bg-surface-container-high" href="/admin.html">
+   183→   183→<span class="material-symbols-outlined">settings</span>
+   184→   184→<span class="font-label-sm uppercase tracking-widest-luxury text-[12px]">Settings</span>
+   185→   185→</a>
+   186→   186→</nav>
+   187→   187→<div class="p-8 border-t border-cinematic-gold/10">
+   188→   188→<div class="flex flex-col gap-2 mb-4">
+   189→   189→<span class="text-[10px] uppercase tracking-widest-luxury transition-colors text-on-surface-variant/60 opacity-40 cursor-not-allowed" aria-disabled="true" title="Coming soon">Support</span>
+   190→   190→<span class="text-[10px] uppercase tracking-widest-luxury transition-colors text-on-surface-variant/60 opacity-40 cursor-not-allowed" aria-disabled="true" title="Coming soon">Privacy</span>
+   191→   191→</div>
+   192→   192→<p class="text-[8px] leading-relaxed uppercase tracking-widest-luxury text-on-surface-variant/50">2024 DREAMWEAVERS • EDITORIAL UTILITY</p>
+   193→   193→</div>
+   194→   194→</aside>
+   195→   195→<!-- Main Content Canvas -->
+   196→   196→<main class="md:ml-64 pt-24 pb-32 px-4 md:px-canvas-margin">
+   197→   197→<div class="max-w-5xl mx-auto">
+   198→   198→<!-- Page Header -->
+   199→   199→<header class="mb-16">
+   200→   200→<span class="text-[11px] text-cinematic-gold uppercase tracking-[0.4em] font-bold">CONFIGURATION</span>
+   201→   201→<h2 class="text-5xl md:text-6xl text-primary mt-2 font-medium">Customization</h2>
+   202→   202→<div class="h-px w-24 bg-cinematic-gold mt-6"></div>
+   203→   203→</header>
+   204→   204→<!-- Settings Grid -->
+   205→   205→<div class="grid grid-cols-1 gap-section-gap">
+   206→   206→<!-- Section: Visual Theme -->
+   207→   207→<section class="space-y-8" id="visual-theme">
+   208→   208→<div class="flex items-center gap-4 mb-8">
+   209→   209→<span class="material-symbols-outlined text-cinematic-gold text-4xl" data-icon="palette">palette</span>
+   210→   210→<h3 class="text-headline-md font-medium">Visual Theme</h3>
+   211→   211→</div>
+   212→   212→<div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+   213→   213→<!-- Background Palette Picker -->
+   214→   214→<div class="space-y-4">
+   215→   215→<label class="text-[11px] uppercase tracking-[0.2em] text-on-surface-variant font-bold">BACKGROUND PALETTE</label>
+   216→   216→<div class="flex flex-wrap gap-4 p-4 border border-cinematic-gold/20 rounded-xl bg-white/50 backdrop-blur-sm" style="background-color: rgb(243, 239, 230);">
+   217→   217→<button class="w-12 h-12 rounded-full bg-paper-cream border-2 border-cinematic-gold ring-4 ring-cinematic-gold/10 transition-transform hover:scale-110 active:scale-95" title="Paper Cream"></button>
+   218→   218→<button class="w-12 h-12 rounded-full bg-white border border-outline-variant hover:scale-110 active:scale-95 transition-all" title="Pristine White"></button>
+   219→   219→<button class="w-12 h-12 rounded-full bg-[#F5F5F0] border border-outline-variant hover:scale-110 active:scale-95 transition-all" title="Linen Soft"></button>
+   220→   220→<button class="w-12 h-12 rounded-full bg-charcoal-ink border border-outline-variant hover:scale-110 active:scale-95 transition-all" title="Midnight Ink"></button>
+   221→   221→<button class="w-12 h-12 rounded-full bg-[#1C1C18] border border-outline-variant hover:scale-110 active:scale-95 transition-all" title="Onyx Slate"></button>
+   222→   222→</div>
+   223→   223→<p class="text-[13px] text-on-surface-variant/60 italic leading-relaxed">Sets the primary background tone for the public-facing guest experience.</p>
+   224→   224→</div>
+   225→   225→<!-- Typography Selector -->
+   226→   226→<div class="space-y-4">
+   227→   227→<label class="text-[11px] uppercase tracking-[0.2em] text-on-surface-variant font-bold">FONT STYLE</label>
+   228→   228→<div class="grid grid-cols-1 gap-2">
+   229→   229→<button class="flex items-center justify-between p-4 border-2 border-cinematic-gold bg-paper-cream rounded-xl text-left transition-all">
+   230→   230→<div>
+   231→   231→<p class="text-xl font-medium">Editorial Serif</p>
+   232→   232→<p class="text-[13px] opacity-60 italic">Classic, Romantic, Timeless</p>
+   233→   233→</div>
+   234→   234→<span class="material-symbols-outlined text-cinematic-gold" data-icon="check_circle" data-weight="fill" style="font-variation-settings: &quot;FILL&quot; 1;">check_circle</span>
+   235→   235→</button>
+   236→   236→<button class="flex items-center justify-between p-4 border border-outline-variant hover:border-cinematic-gold/50 rounded-xl text-left transition-all group">
+   237→   237→<div>
+   238→   238→<p class="text-xl font-light font-sans">Modern Sans</p>
+   239→   239→<p class="text-[13px] opacity-60 italic">Clean, Architectural, Minimal</p>
+   240→   240→</div>
+   241→   241→<span class="material-symbols-outlined text-outline-variant group-hover:text-cinematic-gold" data-icon="radio_button_unchecked">radio_button_unchecked</span>
+   242→   242→</button>
+   243→   243→</div>
+   244→   244→</div>
+   245→   245→</div><div class="space-y-4 pt-8 border-t border-cinematic-gold/10">
+   246→   246→<label class="text-[11px] uppercase tracking-[0.2em] text-cinematic-gold font-bold">PATTERN &amp; SKIN DESIGN</label>
+   247→   247→<div class="flex items-center gap-6 overflow-x-auto pb-4 custom-scrollbar">
+   248→   248→<!-- None -->
+   249→   249→<div class="flex flex-col items-center gap-3 shrink-0">
+   250→   250→<button class="w-16 h-16 rounded-full border-2 border-cinematic-gold ring-4 ring-cinematic-gold/10 bg-surface flex items-center justify-center">
+   251→   251→<span class="material-symbols-outlined text-outline-variant">block</span>
+   252→   252→</button>
+   253→   253→<span class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant">None</span>
+   254→   254→</div>
+   255→   255→<!-- Heritage Peony -->
+   256→   256→<div class="flex flex-col items-center gap-3 shrink-0">
+   257→   257→<button class="w-16 h-16 rounded-full border border-outline-variant hover:border-cinematic-gold transition-colors overflow-hidden">
+   258→   258→<img alt="Heritage Peony" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAB30-hguXeGhna4dg_Gzjz1vIOlKMjx8dpPZtMgDWLZ6JD1o_gBFt-uXCitkK1b7-pvx5MzBt7IG7P_YItK-sZbRHmnHPfx9fHp0LeZ9LsSWjGxXfOacW2IQ6nRMYFXlzX7qEUg94MeFM89Ubnl-Sorn9mbFNXzOH1NkShqqhnRKUrfze9xWtfoRJ0ZkXE-TInAdB4Q3if5TGoZyEp7JG0q8kQjokATu08a-zKUM5d0gPugoEX3HQddVWnf05HXLXsUWULDD7AWfGy">
+   259→   259→</button>
+   260→   260→<span class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant/60">Heritage Peony</span>
+   261→   261→</div>
+   262→   262→<!-- Silk Thread -->
+   263→   263→<div class="flex flex-col items-center gap-3 shrink-0">
+   264→   264→<button class="w-16 h-16 rounded-full border border-outline-variant hover:border-cinematic-gold transition-colors bg-[#FDF9F3] relative overflow-hidden">
+   265→   265→<div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(circle at 2px 2px, #D4AF37 1px, transparent 0); background-size: 8px 8px;"></div>
+   266→   266→</button>
+   267→   267→<span class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant/60">Silk Thread</span>
+   268→   268→</div>
+   269→   269→<!-- Gold Leaf -->
+   270→   270→<div class="flex flex-col items-center gap-3 shrink-0">
+   271→   271→<button class="w-16 h-16 rounded-full border border-outline-variant hover:border-cinematic-gold transition-colors bg-cinematic-gold/10 overflow-hidden">
+   272→   272→<div class="w-full h-full bg-gradient-to-br from-cinematic-gold/40 to-transparent"></div>
+   273→   273→</button>
+   274→   274→<span class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant/60">Gold Leaf</span>
+   275→   275→</div>
+   276→   276→<!-- Custom Upload -->
+   277→   277→<div class="flex flex-col items-center gap-3 shrink-0">
+   278→   278→<button class="w-16 h-16 rounded-full border-2 border-dashed border-outline-variant hover:border-cinematic-gold hover:bg-paper-cream transition-all flex items-center justify-center text-on-surface-variant/40">
+   279→   279→<span class="material-symbols-outlined text-2xl">upload_file</span>
+   280→   280→</button>
+   281→   281→<span class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant/60">Custom Skin</span>
+   282→   282→</div>
+   283→   283→</div>
+   284→   284→</div>
+   285→   285→<!-- Live Preview Card -->
+   286→   286→<div class="mt-8 inner-frame bg-paper-cream p-12 shadow-xl rounded-sm overflow-hidden group">
+   287→   287→<img class="absolute inset-0 w-full h-full object-cover opacity-20" data-alt="An ethereal, cinematic photograph of an elegant dining table" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAB30-hguXeGhna4dg_Gzjz1vIOlKMjx8dpPZtMgDWLZ6JD1o_gBFt-uXCitkK1b7-pvx5MzBt7IG7P_YItK-sZbRHmnHPfx9fHp0LeZ9LsSWjGxXfOacW2IQ6nRMYFXlzX7qEUg94MeFM89Ubnl-Sorn9mbFNXzOH1NkShqqhnRKUrfze9xWtfoRJ0ZkXE-TInAdB4Q3if5TGoZyEp7JG0q8kQjokATu08a-zKUM5d0gPugoEX3HQddVWnf05HXLXsUWULDD7AWfGy">
+   288→   288→<div class="relative z-20 text-center space-y-4 py-8">
+   289→   289→<span class="text-[11px] text-cinematic-gold uppercase tracking-[0.4em] font-bold">THEME PREVIEW</span>
+   290→   290→<h4 class="text-5xl md:text-6xl text-primary font-medium">The Heirloom Look</h4>
+   291→   291→<p class="max-w-md mx-auto text-body-lg text-on-surface-variant leading-relaxed">Experience the sophisticated visual language of your celebration through our curated lens.</p>
+   292→   292→<button class="px-10 py-4 bg-charcoal-ink text-paper-cream text-[11px] uppercase tracking-[0.25em] hover:bg-cinematic-gold transition-colors duration-300 font-bold">EXPLORE GALLERY</button>
+   293→   293→</div>
+   294→   294→<div class="absolute inset-0 bg-gradient-to-t from-paper-cream via-transparent to-transparent opacity-80"></div>
+   295→   295→</div>
+   296→   296→</section>
+   297→   297→<!-- Section: Content Editor -->
+   298→   298→<section class="space-y-8" id="content-editor">
+   299→   299→<div class="flex items-center gap-4 mb-8">
+   300→   300→<span class="material-symbols-outlined text-cinematic-gold text-4xl" data-icon="edit_note">edit_note</span>
+   301→   301→<h3 class="text-headline-md font-medium">Content Editor</h3>
+   302→   302→</div>
+   303→   303→<div class="space-y-12">
+   304→   304→<!-- Story Editor -->
+   305→   305→<div class="space-y-4">
+   306→   306→<div class="flex justify-between items-end">
+   307→   307→<div>
+   308→   308→<label class="text-[11px] uppercase tracking-[0.2em] text-on-surface-variant font-bold block mb-1">OUR STORY</label>
+   309→   309→<p class="text-[13px] text-on-surface-variant/60 italic leading-relaxed">The primary narrative shown on your landing page.</p>
+   310→   310→</div>
+   311→   311→<span class="text-[11px] text-on-surface-variant/40 tracking-[0.1em] font-bold">1240 / 3000 CHARACTERS</span>
+   312→   312→</div>
+   313→   313→<textarea class="w-full bg-white border border-outline-variant rounded-xl p-6 text-body-lg focus:ring-1 focus:ring-cinematic-gold focus:border-cinematic-gold transition-all resize-none shadow-sm leading-relaxed" rows="6">It began in a small gallery in the heart of the city, where light spilled across old canvases and the scent of oil paint hung heavy in the air. We shared a look that felt like a centuries-old secret, a moment frozen in time that would become the first chapter of our own masterpiece. Now, we invite you to join us as we weave the next thread of this modern heirloom...</textarea>
+   314→   314→</div>
+   315→   315→<!-- Schedule Editor -->
+   316→   316→<div class="space-y-4">
+   317→   317→<label class="text-[11px] uppercase tracking-[0.2em] text-on-surface-variant font-bold block mb-4">EVENT SCHEDULE</label>
+   318→   318→<div class="space-y-4">
+   319→   319→<!-- Schedule Item 1 -->
+   320→   320→<div class="flex flex-col md:flex-row gap-4 p-6 border border-cinematic-gold/10 bg-white rounded-xl hover:shadow-md transition-shadow" style="background-color: rgb(243, 239, 230);">
+   321→   321→<div class="w-full md:w-48">
+   322→   322→<input class="w-full border-none text-[11px] uppercase tracking-[0.2em] text-cinematic-gold bg-transparent p-0 focus:ring-0 font-bold" placeholder="Time" type="text" value="4:00 PM">
+   323→   323→</div>
+   324→   324→<div class="flex-grow space-y-2">
+   325→   325→<input class="w-full border-none text-xl font-medium bg-transparent p-0 focus:ring-0 uppercase tracking-[0.05em]" placeholder="Title" type="text" value="THE VOWS">
+   326→   326→<input class="w-full border-none text-body-md text-on-surface-variant/70 bg-transparent p-0 focus:ring-0 italic" placeholder="Location" type="text" value="The Courtyard Garden">
+   327→   327→</div>
+   328→   328→<button class="text-on-surface-variant/30 hover:text-error transition-colors p-2">
+   329→   329→<span class="material-symbols-outlined" data-icon="delete">delete</span>
+   330→   330→</button>
+   331→   331→</div>
+   332→   332→<!-- Schedule Item 2 -->
+   333→   333→<div class="flex flex-col md:flex-row gap-4 p-6 border border-cinematic-gold/10 bg-white rounded-xl hover:shadow-md transition-shadow" style="background-color: rgb(243, 239, 230);">
+   334→   334→<div class="w-full md:w-48">
+   335→   335→<input class="w-full border-none text-[11px] uppercase tracking-[0.2em] text-cinematic-gold bg-transparent p-0 focus:ring-0 font-bold" placeholder="Time" type="text" value="6:00 PM">
+   336→   336→</div>
+   337→   337→<div class="flex-grow space-y-2">
+   338→   338→<input class="w-full border-none text-xl font-medium bg-transparent p-0 focus:ring-0 uppercase tracking-[0.05em]" placeholder="Title" type="text" value="GALA RECEPTION">
+   339→   339→<input class="w-full border-none text-body-md text-on-surface-variant/70 bg-transparent p-0 focus:ring-0 italic" placeholder="Location" type="text" value="The Grand Ballroom">
+   340→   340→</div>
+   341→   341→<button class="text-on-surface-variant/30 hover:text-error transition-colors p-2">
+   342→   342→<span class="material-symbols-outlined" data-icon="delete">delete</span>
+   343→   343→</button>
+   344→   344→</div>
+   345→   345→<!-- Add New Button -->
+   346→   346→<button class="w-full py-5 border-2 border-dashed border-outline-variant hover:border-cinematic-gold/40 hover:bg-paper-cream/50 transition-all rounded-xl flex items-center justify-center gap-3 text-on-surface-variant/60">
+   347→   347→<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+   348→   348→<span class="text-[11px] uppercase tracking-[0.2em] font-bold">ADD SCHEDULE ITEM</span>
+   349→   349→</button>
+   350→   350→</div>
+   351→   351→</div>
+   352→   352→</div>
+   353→   353→</section>
+   354→   354→<!-- Section: System Settings -->
+   355→   355→<section class="space-y-8" id="system-settings">
+   356→   356→<div class="flex items-center gap-4 mb-8">
+   357→   357→<span class="material-symbols-outlined text-cinematic-gold text-4xl" data-icon="settings_ethernet">settings_ethernet</span>
+   358→   358→<h3 class="text-headline-md font-medium">System Settings</h3>
+   359→   359→</div>
+   360→   360→<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+   361→   361→<!-- RSVP Deadline -->
+   362→   362→<div class="bg-white p-8 rounded-xl border border-cinematic-gold/10 shadow-sm space-y-6" style="background-color: rgb(243, 239, 230);">
+   363→   363→<div class="flex items-center justify-between">
+   364→   364→<label class="text-[11px] uppercase tracking-[0.2em] text-on-surface-variant font-bold flex items-center gap-2">
+   365→   365→                                    RSVP DEADLINE
+   366→   366→                                    <span class="material-symbols-outlined text-cinematic-gold text-lg" data-icon="calendar_today">calendar_today</span>
+   367→   367→</label>
+   368→   368→</div>
+   369→   369→<input class="w-full border border-outline-variant rounded-lg p-4 text-body-md focus:ring-1 focus:ring-cinematic-gold outline-none" type="date" value="2024-12-15">
+   370→   370→<div class="flex items-center gap-3">
+   371→   371→<button class="relative inline-flex h-6 w-11 items-center rounded-full bg-cinematic-gold transition-colors focus:outline-none ring-2 ring-offset-2 ring-transparent">
+   372→   372→<span class="inline-block h-4 w-4 translate-x-6 transform rounded-full bg-white transition-transform"></span>
+   373→   373→</button>
+   374→   374→<span class="text-[13px] text-on-surface-variant italic">Notify me on deadline</span>
+   375→   375→</div>
+   376→   376→</div>
+   377→   377→<!-- Custom Domain -->
+   378→   378→<div class="bg-white p-8 rounded-xl border border-cinematic-gold/10 shadow-sm space-y-6" style="background-color: rgb(243, 239, 230);">
+   379→   379→<div class="flex items-center justify-between">
+   380→   380→<label class="text-[11px] uppercase tracking-[0.2em] text-on-surface-variant font-bold flex items-center gap-2">
+   381→   381→                                    CUSTOM DOMAIN
+   382→   382→                                    <span class="material-symbols-outlined text-cinematic-gold text-lg" data-icon="language">language</span>
+   383→   383→</label>
+   384→   384→</div>
+   385→   385→<div class="flex">
+   386→   386→<span class="inline-flex items-center px-5 rounded-l-lg border border-r-0 border-outline-variant bg-surface-container-low text-on-surface-variant/60 text-[13px] tracking-wide font-medium">https://</span>
+   387→   387→<input class="flex-1 border border-outline-variant rounded-r-lg p-4 text-body-md focus:ring-1 focus:ring-cinematic-gold outline-none" type="text" value="forever.dreamweavers.com">
+   388→   388→</div>
+   389→   389→<p class="text-[12px] text-on-surface-variant/60 italic leading-relaxed">Manage your custom SSL and DNS settings in the Domain Portal.</p>
+   390→   390→</div><div class="col-span-1 md:col-span-2 flex justify-end gap-4 mt-8">
+   391→   391→<button class="bg-white border border-outline text-primary px-8 py-4 rounded-full text-[11px] uppercase tracking-[0.2em] shadow-xl hover:bg-surface-container transition-all active:scale-95 font-bold">DISCARD</button>
+   392→   392→<button class="bg-charcoal-ink text-paper-cream px-10 py-4 rounded-full text-[11px] uppercase tracking-[0.25em] shadow-2xl hover:bg-cinematic-gold hover:scale-105 transition-all active:scale-95 flex items-center gap-3 font-bold">
+   393→   393→<span class="material-symbols-outlined text-lg" data-icon="save">save</span>
+   394→   394→                    PUBLISH CHANGES
+   395→   395→                </button>
+   396→   396→</div>
+   397→   397→</div>
+   398→   398→</section>
+   399→   399→</div>
+   400→   400→<!-- Action Bar (Sticky Desktop/Mobile) -->
+   401→   401→
+   402→   402→</div>
+   403→   403→</main>
+   404→   404→<!-- Footer -->
+   405→   405→<footer class="md:ml-64 bg-surface dark:bg-surface-container-lowest border-t border-cinematic-gold/10 py-16 flex flex-col items-center gap-6 w-full mt-section-gap" style="background-color: rgb(252, 249, 242);">
+   406→   406→<p class="text-[10px] uppercase tracking-[0.3em] text-on-surface-variant/50 font-bold text-center px-4">© 2024 DREAMWEAVERS • EDITORIAL UTILITY FOR THE MODERN HEIRLOOM</p>
+   407→   407→<div class="flex gap-12">
+   408→   408→<span class="text-[10px] uppercase tracking-[0.2em] text-on-surface-variant/50 transition-colors font-bold opacity-40 cursor-not-allowed" aria-disabled="true" title="Coming soon">SUPPORT</span>
+   409→   409→<span class="text-[10px] uppercase tracking-[0.2em] text-on-surface-variant/50 transition-colors font-bold opacity-40 cursor-not-allowed" aria-disabled="true" title="Coming soon">PRIVACY</span>
+   410→   410→<span class="text-[10px] uppercase tracking-[0.2em] text-on-surface-variant/50 transition-colors font-bold opacity-40 cursor-not-allowed" aria-disabled="true" title="Coming soon">DOCUMENTATION</span>
+   411→   411→</div>
+   412→   412→</footer>
+   413→   413→<!-- BottomNavBar (Mobile) -->
+   414→   414→<nav class="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] z-50 bg-white/95 backdrop-blur-lg rounded-3xl border border-cinematic-gold/20 shadow-2xl flex justify-around items-center p-3 font-['Playfair_Display']">
+   415→   415→<a class="flex flex-col items-center justify-center text-on-surface/40 p-2" href="/admin-dashboard.html">
+   416→   416→<span class="material-symbols-outlined text-2xl">dashboard</span>
+   417→   417→<span class="text-[9px] uppercase tracking-widest mt-1 font-bold">Dash</span>
+   418→   418→</a>
+   419→   419→<a class="flex flex-col items-center justify-center text-on-surface/40 p-2" href="/admin-guests.html">
+   420→   420→<span class="material-symbols-outlined text-2xl">group</span>
+   421→   421→<span class="text-[9px] uppercase tracking-widest mt-1 font-bold">Guests</span>
+   422→   422→</a>
+   423→   423→<a class="flex flex-col items-center justify-center text-on-surface/40 p-2" href="/admin-media.html">
+   424→   424→<span class="material-symbols-outlined text-2xl">photo_library</span>
+   425→   425→<span class="text-[9px] uppercase tracking-widest mt-1 font-bold">Media</span>
+   426→   426→</a>
+   427→   427→<a class="flex flex-col items-center justify-center text-cinematic-gold p-2 relative" href="/admin.html">
+   428→   428→<span class="material-symbols-outlined text-2xl" style="font-variation-settings: &quot;FILL&quot; 1;">settings</span>
+   429→   429→<span class="text-[9px] uppercase tracking-widest mt-1 font-bold">Set</span>
+   430→   430→<div class="absolute -top-1 right-1 w-1.5 h-1.5 bg-cinematic-gold rounded-full"></div>
+   431→   431→</a>
+   432→   432→</nav>
+   433→   433→<script>
+   434→   434→        // Micro-interactions for color picker
+   435→   435→        const colorButtons = document.querySelectorAll('#visual-theme button[title]');
+   436→   436→        colorButtons.forEach(btn => {
+   437→   437→            btn.addEventListener('click', () => {
+   438→   438→                colorButtons.forEach(b => b.classList.remove('border-cinematic-gold', 'ring-4', 'ring-cinematic-gold/10'));
+   439→   439→                btn.classList.add('border-cinematic-gold', 'ring-4', 'ring-cinematic-gold/10');
+   440→   440→            });
+   441→   441→        });
+   442→   442→
+   443→   443→        // Toggle Switch Logic
+   444→   444→        const toggles = document.querySelectorAll('.relative.inline-flex.h-6.w-11');
+   445→   445→        toggles.forEach(toggle => {
+   446→   446→            toggle.addEventListener('click', () => {
+   447→   447→                const dot = toggle.querySelector('span');
+   448→   448→                const isActive = dot.classList.contains('translate-x-6');
+   449→   449→                if (isActive) {
+   450→   450→                    dot.classList.replace('translate-x-6', 'translate-x-1');
+   451→   451→                    toggle.classList.replace('bg-cinematic-gold', 'bg-outline-variant');
+   452→   452→                } else {
+   453→   453→                    dot.classList.replace('translate-x-1', 'translate-x-6');
+   454→   454→                    toggle.classList.replace('bg-outline-variant', 'bg-cinematic-gold');
+   455→   455→                }
+   456→   456→            });
+   457→   457→        });
+   458→   458→    </script>
+   459→   459→
+   460→   460→
+   461→   461→
+   462→   462→
+   463→   463→
+   464→   464→
+   465→   465→<script src="/nav.js" defer></script>
+   466→   466→</body></html>
