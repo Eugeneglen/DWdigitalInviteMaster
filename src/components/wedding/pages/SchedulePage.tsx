@@ -15,37 +15,15 @@ export default function SchedulePage() {
   const { setSection } = useNavigationStore();
 
   const handleAddToCalendar = useCallback(() => {
-    const weddingDate = new Date('2024-06-22T16:00:00');
-    const endDate = new Date('2024-06-22T23:00:00');
-
-    const pad = (n: number) => String(n).padStart(2, '0');
-    const formatICSDate = (d: Date) =>
-      `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
-
-    const icsContent = [
-      'BEGIN:VCALENDAR',
-      'VERSION:2.0',
-      'PRODID:-//Eleanor & James Wedding//EN',
-      'BEGIN:VEVENT',
-      `DTSTART:${formatICSDate(weddingDate)}`,
-      `DTEND:${formatICSDate(endDate)}`,
-      'SUMMARY:Eleanor & James Wedding',
-      'DESCRIPTION:Join us for our wedding celebration! Ceremony at 4:00 PM, followed by cocktail hour, dinner, and dancing.',
-      'LOCATION:The Grand Estate',
-      'STATUS:CONFIRMED',
-      'END:VEVENT',
-      'END:VCALENDAR',
-    ].join('\r\n');
-
-    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'eleanor-james-wedding.ics';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    const params = new URLSearchParams({
+      action: 'TEMPLATE',
+      text: 'Eleanor & James Wedding',
+      dates: '20240622T160000/20240622T230000',
+      details: 'Join us for our wedding celebration!\n\n4:00 PM — The Ceremony\n5:30 PM — Cocktail Hour\n7:00 PM — Dinner & Dancing\n\nFormal attire requested.',
+      location: 'The Grand Estate',
+      sprop: 'name:Eleanor & James',
+    });
+    window.open(`https://calendar.google.com/calendar/render?${params.toString()}`, '_blank', 'noopener');
   }, []);
 
   return (
