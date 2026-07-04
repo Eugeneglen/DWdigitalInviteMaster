@@ -31,7 +31,7 @@ export default function Home() {
   const PageComponent = PAGES[currentSection] || HomePage;
 
   return (
-    <div className="min-h-screen flex flex-col bg-paper-cream text-charcoal-ink overflow-x-hidden">
+    <div className="min-h-screen flex flex-col bg-paper-cream text-charcoal-ink overflow-x-hidden selection:bg-cinematic-gold selection:text-paper-cream">
       <Header />
       <MobileDrawer />
 

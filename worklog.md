@@ -80,3 +80,34 @@ Stage Summary:
 - Accordion FAQ, masonry photo gallery, masonry wish cards, timeline schedule, tabbed directions
 - Zero lint errors, all pages compile and render successfully
 
+---
+Task ID: 3
+Agent: Main Agent
+Task: Deep comparison and UX/UI fix pass to match original DWdigitalInvite exactly
+
+Work Log:
+- Deep-read all 8 original HTML files + all 8 Next.js page components side by side
+- Identified 12 specific differences between original and Next.js version
+- Fixed paper-cream color: #FDF9F3 → #FCF9F2 (original value) across all CSS variables
+- Added missing Material Design surface color tokens: surface-container-low, surface-container, surface-container-high, surface-container-highest, surface-container-lowest
+- Added Inter font to layout.tsx (used by Wishes page labels/forms)
+- Added selection:bg-cinematic-gold selection:text-paper-cream to page wrapper
+- Fixed HomePage: date 2027→2025, hero description text restored to original
+- Fixed RSVPPage: event header now shows two-line address (38 Cuscaden Road / Singapore 249731)
+- Fixed StoryPage: tidbits heading size 32px→22px, added reveal-on-scroll IntersectionObserver
+- Fixed GettingTherePage: default tab changed from 'car' to 'transit' (matches original)
+- Fixed QAPage: added animate-orchestral staggered fade-in animations with delay classes
+- Fixed BottomNav: per-page nav config (different icons per page, Q&A shows help icon, no More on Q&A)
+- Fixed SchedulePage: only first card disabled, added bottom sheet drawers for Where to Stay & Directions, gold-leaf-dot class
+- Added gold-leaf-dot CSS class to globals.css
+- All pages verified via Agent Browser with zero console errors
+
+Stage Summary:
+- 12 UX/UI differences identified and fixed
+- Color system now matches original (#FCF9F2 paper-cream, all surface tokens)
+- Per-page bottom nav behavior matches original (schedule shows calendar_today, Q&A shows help)
+- Scroll-based reveal animations added to Story page
+- Orchestral stagger animations added to Q&A page
+- Bottom sheet drawers added to Schedule page
+- Zero lint errors, zero console errors, all 8 pages verified rendering
+

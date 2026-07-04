@@ -35,7 +35,7 @@ export default function QAPage() {
 
       <main className="pb-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto min-h-screen pt-[20px] md:pt-[40px]">
         {/* Intro */}
-        <section className="max-w-[900px] mx-auto mb-20 text-center">
+        <section className="animate-orchestral max-w-[900px] mx-auto mb-20 text-center">
           <p
             className="text-charcoal-ink/70 max-w-2xl mx-auto leading-relaxed italic"
             style={{ fontSize: '18px', lineHeight: '32px' }}
@@ -50,7 +50,7 @@ export default function QAPage() {
             {FAQS.map((faq, idx) => {
               const isOpen = openIndex === idx;
               return (
-                <article key={idx} className="border-b border-cinematic-gold/30 group">
+                <article key={idx} className={`animate-orchestral delay-${(idx + 1) * 100} border-b border-cinematic-gold/30 group`}>
                   <button
                     className="w-full py-10 flex justify-between items-center text-left focus:outline-none"
                     onClick={() => toggle(idx)}
@@ -88,7 +88,7 @@ export default function QAPage() {
         </section>
 
         {/* CTA */}
-        <section className="max-w-[1000px] mx-auto bg-white border border-cinematic-gold/20 p-8 md:p-16 flex flex-col md:flex-row items-center gap-12 relative overflow-hidden shadow-[0_4px_40px_rgba(26,26,26,0.02)]">
+        <section className="animate-orchestral delay-400 max-w-[1000px] mx-auto bg-white border border-cinematic-gold/20 p-8 md:p-16 flex flex-col md:flex-row items-center gap-12 relative overflow-hidden shadow-[0_4px_40px_rgba(26,26,26,0.02)]">
           <div className="z-10 flex-1 text-center md:text-left">
             <h2
               className="text-charcoal-ink mb-4"

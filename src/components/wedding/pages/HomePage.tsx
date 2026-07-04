@@ -9,7 +9,7 @@ const HERO_IMG =
 const TEA_IMG =
   'https://lh3.googleusercontent.com/aida-public/AB6AXuA6SiJt49KQCmMAhF-X_tmX1Y1NKhTieT6ApO53PD9gYuvLO0e78WTxzg8BV7Wnhe6oJ6sG4SwJ4U-nH2m33dv7I89IhLgrHDkabts7ws-QwPlv-ycUzhyuBN0c04ka2inAyysumlM1w-sR8stBZ51HJOGZkQO6cAtfrn9RXWZRFlHJlUp8Jqzi-nBu3xGs57xm7L2Le06Put3xBDMAe39zkMMsdcuUkbeyw5c4Q6VxvXkSmMbcpLM-HJK1iMgYVLkn2kzqUPEALYpH';
 
-const WEDDING_DATE = new Date('2027-10-24T16:00:00').getTime();
+const WEDDING_DATE = new Date('2025-10-24T16:00:00').getTime();
 
 function useCountdown() {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, mins: 0, secs: 0 });
@@ -83,7 +83,7 @@ export default function HomePage() {
           {/* Date Badge */}
           <div className="animate-fade-in delay-100 mb-8 inline-flex items-center justify-center border border-champagne-silk px-6 py-2 rounded-full bg-paper-cream/10 backdrop-blur-sm">
             <span className="text-paper-cream tracking-[0.2em] uppercase font-semibold" style={{ fontSize: '12px', lineHeight: '16px', letterSpacing: '0.1em', fontWeight: 600 }}>
-              October 24, 2027
+              October 24, 2025
             </span>
           </div>
 
@@ -99,7 +99,7 @@ export default function HomePage() {
           </h2>
 
           <p className="animate-slide-up delay-300 text-paper-cream/90 max-w-md mx-auto mb-12 italic" style={{ fontSize: '16px', lineHeight: '24px' }}>
-            Together with their families, request the pleasure of your company at the celebration of their marriage.
+            Join us in celebrating our journey. A weekend of joy, laughter, and lifelong memories in the heart of the countryside.
           </p>
 
           {/* Countdown */}

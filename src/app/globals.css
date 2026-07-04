@@ -30,7 +30,12 @@
   --radius-xl: calc(var(--radius) + 4px);
 
   /* Wedding Design System Colors */
-  --color-paper-cream: #FDF9F3;
+  --color-paper-cream: #FCF9F2;
+  --color-surface-container-low: #f7f3f2;
+  --color-surface-container: #f1edec;
+  --color-surface-container-high: #ebe7e6;
+  --color-surface-container-highest: #e5e2e1;
+  --color-surface-container-lowest: #ffffff;
   --color-charcoal-ink: #1A1A1A;
   --color-cinematic-gold: #D4AF37;
   --color-champagne-silk: #E8D5B5;
@@ -45,14 +50,14 @@
 
 :root {
   --radius: 0.625rem;
-  --background: #FDF9F3;
+  --background: #FCF9F2;
   --foreground: #1A1A1A;
   --card: #ffffff;
   --card-foreground: #1A1A1A;
   --popover: #ffffff;
   --popover-foreground: #1A1A1A;
   --primary: #1A1A1A;
-  --primary-foreground: #FDF9F3;
+  --primary-foreground: #FCF9F2;
   --secondary: #E8D5B5;
   --secondary-foreground: #1A1A1A;
   --muted: #F3EFE6;
@@ -202,7 +207,7 @@
 .opt-btn.selected {
   border-color: #1A1A1A;
   border-width: 2px;
-  background: #FDF9F3;
+  background: #FCF9F2;
 }
 
 /* No scrollbar */
@@ -262,17 +267,23 @@
   width: 4px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: #FDF9F2;
+  background: #FCF9F2;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: #D4AF37;
   border-radius: 10px;
 }
 
+/* Gold leaf dot (schedule timeline) */
+.gold-leaf-dot {
+  background: linear-gradient(135deg, #D4AF37 0%, #F5E6AD 50%, #B8860B 100%);
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+}
+
 /* Selection */
 ::selection {
   background-color: #D4AF37;
-  color: #FDF9F3;
+  color: #FCF9F2;
 }
 
 /* Scroll behavior */

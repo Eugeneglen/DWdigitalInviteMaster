@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useCallback, useEffect } from 'react';
 import SectionBanner from '../SectionBanner';
 
 const CEREMONY_IMG =
@@ -27,13 +28,28 @@ const TIMELINE_ITEMS = [
 ];
 
 export default function SchedulePage() {
+  const [drawerId, setDrawerId] = useState<string | null>(null);
+
+  const openDrawer = useCallback((id: string) => setDrawerId(id), []);
+  const closeDrawer = useCallback(() => setDrawerId(null), []);
+
+  // Lock body scroll when drawer is open
+  useEffect(() => {
+    if (drawerId) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [drawerId]);
+
   return (
     <>
       <SectionBanner title="The Schedule" />
 
       <main className="pb-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto min-h-screen pt-[20px] md:pt-[40px]">
         {/* Intro Images */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+        <div className="staggered-fade-in grid grid-cols-1 md:grid-cols-2 gap-6 mb-16" style={{ animationDelay: '0s' }}>
           <div className="aspect-[4/5] overflow-hidden rounded-lg">
             <img alt="The Ceremony" className="w-full h-full object-cover" src={CEREMONY_IMG} />
           </div>
@@ -42,7 +58,7 @@ export default function SchedulePage() {
           </div>
         </div>
 
-        <section className="mb-24 text-center">
+        <section className="staggered-fade-in mb-24 text-center" style={{ animationDelay: '0.1s' }}>
           <p className="text-charcoal-ink/70 max-w-2xl mx-auto italic" style={{ fontSize: '18px', lineHeight: '32px' }}>
             Saturday, June 22, 2024
           </p>
@@ -51,7 +67,7 @@ export default function SchedulePage() {
         {/* Timeline */}
         <section className="max-w-4xl mx-auto">
           <div className="mb-24">
-            <div className="sticky top-24 md:top-40 bg-paper-cream/90 backdrop-blur-sm z-30 py-4 mb-12 border-b border-champagne-silk/30 flex items-baseline gap-4">
+            <div className="staggered-fade-in sticky top-24 md:top-40 bg-paper-cream/90 backdrop-blur-sm z-30 py-4 mb-12 border-b border-champagne-silk/30 flex items-baseline gap-4" style={{ animationDelay: '0.3s' }}>
               <h2 className="text-[32px] md:text-[48px] text-charcoal-ink" style={{ fontFamily: "'Playfair Display', serif", fontWeight: 600, lineHeight: '56px' }}>
                 The Celebration
               </h2>
@@ -65,11 +81,7 @@ export default function SchedulePage() {
                 <div key={idx} className="relative group">
                   {/* Gold dot marker */}
                   <div
-                    className="absolute -left-[37px] md:-left-[69px] top-2 w-4 h-4 rounded-full outline outline-4 outline-paper-cream"
-                    style={{
-                      background: 'linear-gradient(135deg, #D4AF37 0%, #F5E6AD 50%, #B8860B 100%)',
-                      boxShadow: '0 0 10px rgba(212, 175, 55, 0.4)',
-                    }}
+                    className="gold-leaf-dot absolute -left-[37px] md:-left-[69px] top-2 w-4 h-4 rounded-full outline outline-4 outline-paper-cream"
                   />
                   <div className="flex flex-col md:flex-row gap-4 md:gap-12">
                     <div className="md:w-1/4 shrink-0">
@@ -103,7 +115,7 @@ export default function SchedulePage() {
         </section>
 
         {/* Action Cards */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-24">
+        <section className="staggered-fade-in grid grid-cols-1 md:grid-cols-3 gap-6 mb-24" style={{ animationDelay: '0.4s' }}>
           <span
             className="group relative overflow-hidden bg-surface-container-low border border-champagne-silk/20 p-8 flex flex-col items-center justify-center text-center h-48 transition-colors duration-500 shadow-[0_-4px_20px_rgba(26,26,26,0.04)] opacity-40 cursor-not-allowed"
             aria-disabled="true"
@@ -114,27 +126,98 @@ export default function SchedulePage() {
               Add to Calendar
             </span>
           </span>
-          <span
-            className="group relative overflow-hidden bg-surface-container-low border border-champagne-silk/20 p-8 flex flex-col items-center justify-center text-center h-48 hover:border-cinematic-gold transition-colors duration-500 shadow-[0_-4px_20px_rgba(26,26,26,0.04)] opacity-40 cursor-not-allowed"
-            aria-disabled="true"
-            title="Coming soon"
+          <button
+            type="button"
+            onClick={() => openDrawer('stay-drawer')}
+            className="group relative overflow-hidden bg-surface-container-low border border-champagne-silk/20 p-8 flex flex-col items-center justify-center text-center h-48 hover:border-cinematic-gold transition-colors duration-500 shadow-[0_-4px_20px_rgba(26,26,26,0.04)] cursor-pointer"
           >
             <span className="material-symbols-outlined text-3xl mb-4 text-charcoal-ink">hotel</span>
             <span className="uppercase tracking-[0.15em] text-charcoal-ink" style={{ fontSize: '12px', lineHeight: '16px', letterSpacing: '0.1em', fontWeight: 600 }}>
               Where to Stay
             </span>
-          </span>
-          <span
-            className="group relative overflow-hidden bg-surface-container-low border border-champagne-silk/20 p-8 flex flex-col items-center justify-center text-center h-48 hover:border-cinematic-gold transition-colors duration-500 shadow-[0_-4px_20px_rgba(26,26,26,0.04)] opacity-40 cursor-not-allowed"
-            aria-disabled="true"
-            title="Coming soon"
+          </button>
+          <button
+            type="button"
+            onClick={() => openDrawer('map-drawer')}
+            className="group relative overflow-hidden bg-surface-container-low border border-champagne-silk/20 p-8 flex flex-col items-center justify-center text-center h-48 hover:border-cinematic-gold transition-colors duration-500 shadow-[0_-4px_20px_rgba(26,26,26,0.04)] cursor-pointer"
           >
             <span className="material-symbols-outlined text-3xl mb-4 text-charcoal-ink">map</span>
             <span className="uppercase tracking-[0.15em] text-charcoal-ink" style={{ fontSize: '12px', lineHeight: '16px', letterSpacing: '0.1em', fontWeight: 600 }}>
               Directions
             </span>
-          </span>
+          </button>
         </section>
+
+        {/* Bottom Sheet Drawers */}
+        {drawerId && (
+          <div
+            className="fixed inset-0 z-50 flex items-end justify-center"
+            onClick={closeDrawer}
+            role="dialog"
+            aria-modal="true"
+          >
+            {/* Backdrop */}
+            <div className="absolute inset-0 bg-black/40 animate-fade-in" />
+
+            {/* Drawer Panel */}
+            <div
+              className="relative w-full max-w-lg rounded-t-3xl bg-paper-cream border-t border-champagne-silk/30 shadow-2xl max-h-[85vh] overflow-y-auto"
+              style={{ animation: 'slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards' }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Drawer header */}
+              <div className="sticky top-0 z-10 bg-paper-cream/95 backdrop-blur-sm flex items-center justify-between px-6 py-5 border-b border-champagne-silk/30">
+                <h3
+                  className="text-charcoal-ink"
+                  style={{ fontFamily: "'Playfair Display', serif", fontWeight: 500, fontSize: '24px', lineHeight: '32px' }}
+                >
+                  {drawerId === 'stay-drawer' ? 'Accommodations' : 'Directions & Map'}
+                </h3>
+                <button
+                  type="button"
+                  onClick={closeDrawer}
+                  className="p-2 rounded-full hover:bg-champagne-silk/30 transition-colors"
+                  aria-label="Close drawer"
+                >
+                  <span className="material-symbols-outlined text-charcoal-ink">close</span>
+                </button>
+              </div>
+
+              {/* Drawer content */}
+              <div className="p-6">
+                {drawerId === 'stay-drawer' && (
+                  <div className="bg-surface-container-low border border-champagne-silk/20 rounded-xl p-6">
+                    <h4
+                      className="text-charcoal-ink mb-3"
+                      style={{ fontFamily: "'Playfair Display', serif", fontWeight: 500, fontSize: '20px', lineHeight: '28px' }}
+                    >
+                      The Grand Hotel
+                    </h4>
+                    <p className="text-charcoal-ink/70 mb-6 leading-relaxed" style={{ fontSize: '14px', lineHeight: '22px' }}>
+                      Our primary room block is secured here. A luxury boutique hotel just 10 minutes from the venue.
+                    </p>
+                    <span
+                      className="inline-flex items-center px-6 py-3 rounded-full border border-cinematic-gold uppercase tracking-[0.15em] text-charcoal-ink opacity-40 cursor-not-allowed"
+                      style={{ fontSize: '12px', lineHeight: '16px', letterSpacing: '0.1em', fontWeight: 600 }}
+                      aria-disabled="true"
+                      title="Coming soon"
+                    >
+                      Book Room
+                    </span>
+                  </div>
+                )}
+                {drawerId === 'map-drawer' && (
+                  <div className="bg-surface-container-low rounded-xl overflow-hidden flex flex-col items-center justify-center" style={{ minHeight: '300px' }}>
+                    <span className="material-symbols-outlined text-5xl text-charcoal-ink/30 mb-4">map</span>
+                    <p className="text-charcoal-ink/50 italic" style={{ fontSize: '14px', lineHeight: '20px' }}>
+                      Map View rendering
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </>
   );

@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import SectionBanner from '../SectionBanner';
 
 const HERO_IMG =
@@ -23,13 +24,35 @@ const TIDBITS = [
 ];
 
 export default function StoryPage() {
+  const mainRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const container = mainRef.current;
+    if (!container) return;
+    const els = container.querySelectorAll('.reveal');
+    if (!els.length) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('active');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1 },
+    );
+    els.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <>
       <SectionBanner title="Our Story" />
 
-      <main className="pb-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto min-h-screen pt-[20px] md:pt-[40px]">
+      <main ref={mainRef} className="pb-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto min-h-screen pt-[20px] md:pt-[40px]">
         {/* Hero Section */}
-        <section className="max-w-[900px] mx-auto mb-20 flex flex-col items-center justify-center text-center">
+        <section className="reveal max-w-[900px] mx-auto mb-20 flex flex-col items-center justify-center text-center">
           <p className="text-charcoal-ink max-w-2xl mx-auto opacity-80 mb-12 italic" style={{ fontSize: '18px', lineHeight: '32px' }}>
             A narrative woven through time, capturing the moments that led us here.
           </p>
@@ -39,7 +62,7 @@ export default function StoryPage() {
         </section>
 
         {/* Timeline */}
-        <section className="py-section-gap relative">
+        <section className="reveal py-section-gap relative">
           <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-[1px] bg-champagne-silk/50 -translate-x-1/2" />
           <div className="flex flex-col gap-section-gap">
             {/* Milestone 1 */}
@@ -99,7 +122,7 @@ export default function StoryPage() {
         </section>
 
         {/* Tidbits */}
-        <section className="py-section-gap">
+        <section className="reveal py-section-gap">
           <div className="text-center mb-16">
             <h2 className="text-[32px] md:text-[48px] text-charcoal-ink mb-4" style={{ fontFamily: "'Playfair Display', serif", fontWeight: 600, lineHeight: '56px' }}>
               Tidbits
@@ -114,7 +137,7 @@ export default function StoryPage() {
                 key={i}
                 className="p-8 border border-champagne-silk/30 bg-white/50 backdrop-blur-sm hover:shadow-[0_8px_30px_rgba(26,26,26,0.04)] transition-all duration-300"
               >
-                <h4 className="text-[22px] text-charcoal-ink mb-3 font-semibold" style={{ fontFamily: "'Playfair Display', serif", fontWeight: 500, fontSize: '32px', lineHeight: '40px' }}>
+                <h4 className="font-headline-md text-[22px] text-charcoal-ink mb-3 font-semibold">
                   {item.q}
                 </h4>
                 <p className="text-charcoal-ink/80 italic" style={{ fontSize: '16px', lineHeight: '24px' }}>
@@ -126,7 +149,7 @@ export default function StoryPage() {
         </section>
 
         {/* Honeymoon Widget */}
-        <section className="py-section-gap">
+        <section className="reveal py-section-gap">
           <div className="max-w-3xl mx-auto bg-surface-container-low border border-champagne-silk/20 p-8 md:p-16 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-champagne-silk/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
             <div className="relative z-10 text-center">

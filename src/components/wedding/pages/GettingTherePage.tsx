@@ -4,7 +4,7 @@ import { useState } from 'react';
 import SectionBanner from '../SectionBanner';
 
 export default function GettingTherePage() {
-  const [tab, setTab] = useState<'car' | 'transit'>('car');
+  const [tab, setTab] = useState<'car' | 'transit'>('transit');
 
   return (
     <>
