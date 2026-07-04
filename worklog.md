@@ -206,3 +206,36 @@ Stage Summary:
 - "We'll Miss You" page matches reference image design (mail icon, personalized message, guest count)
 - Mixed attendance message gracefully handles both attending and declined guests by first name
 - Guest attendance counter shown on all result pages (e.g., "1 of 2 guests attending")
+
+---
+Task ID: 8
+Agent: Main Agent
+Task: Final production audit — all pages, functions, links, and code quality
+
+Work Log:
+- Ran ESLint: 0 errors, 1 expected warning (custom font in layout.tsx)
+- Ran TypeScript type check: 0 errors in src/ (4 errors in non-app examples/skills dirs)
+- Searched for console.log/warn/error: none found
+- Searched for TODO/FIXME/HACK: none found
+- Launched 2 parallel subagent audits:
+  - Shared components & layout audit (10 files)
+  - All 8 page components audit
+- Fixed 7 blocking issues:
+  1. Deleted 4 dead files: src/lib/store.ts, Navbar.tsx, HeroBanner.tsx, AdminLayout.tsx
+  2. RSVP addGuest() now clamps at max 10 guests (was unbounded)
+  3. RSVP submit payload now sends firstName, lastName, partySize, guests with correct format
+  4. RSVP dietary array joined to comma-separated string for API
+  5. Q&A "Message the Couple" changed from dead <button> to <a href="mailto:...">
+  6. Wishes upload area removed misleading cursor-pointer/hover (decorative only)
+  7. Wishes form now validates name+message before submit, checks res.ok, handles errors
+  8. SchedulePage date reconciled: June 22, 2024 → December 25, 2027 (matches HomePage countdown)
+  9. db.ts Prisma query logging gated to development only
+  10. RSVP dead code goBackToStep4Guest removed
+- Navigated all 8 pages via Agent Browser — zero errors, all compile clean, all 200s
+
+Stage Summary:
+- 7 blocking bugs fixed, 4 dead files removed
+- All 8 pages render and navigate correctly
+- All API routes have correct Zod validation matching frontend payloads
+- Zero lint errors, zero TypeScript errors in src/, zero console.log, zero TODO/FIXME
+- Production-ready: query logging gated, form validation in place, dead code eliminated

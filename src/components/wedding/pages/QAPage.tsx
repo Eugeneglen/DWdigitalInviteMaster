@@ -104,10 +104,13 @@ export default function QAPage() {
           <p className="text-charcoal-ink/60 mb-10 max-w-md mx-auto" style={{ fontSize: '16px', lineHeight: '24px' }}>
             Our concierge is standing by to assist with any questions about the event, travel, accommodations, or special arrangements.
           </p>
-          <button className="bg-charcoal-ink text-paper-cream rounded px-8 py-3.5 text-[13px] font-semibold uppercase tracking-[0.08em] hover:opacity-90 transition-opacity duration-300 inline-flex items-center gap-2.5">
+          <a
+            href="mailto:concierge@dreamweavers.events?subject=Wedding%20Inquiry"
+            className="bg-charcoal-ink text-paper-cream rounded px-8 py-3.5 text-[13px] font-semibold uppercase tracking-[0.08em] hover:opacity-90 transition-opacity duration-300 inline-flex items-center gap-2.5 no-underline"
+          >
             <span className="material-symbols-outlined text-paper-cream" style={{ fontSize: '18px' }}>mail</span>
             Message the Couple
-          </button>
+          </a>
         </section>
       </main>
     </>

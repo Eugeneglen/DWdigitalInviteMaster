@@ -118,8 +118,9 @@ function RSVPPageInner() {
   };
 
   const addGuest = () => {
+    if (partySize >= 10) return;
     setGuests((g) => [...g, { name: '', dietary: [], responded: false }]);
-    setPartySize((p) => p + 1);
+    setPartySize((p) => Math.min(10, p + 1));
   };
 
   // Step 3 → Step 4: start per-guest attendance flow
@@ -166,15 +167,19 @@ function RSVPPageInner() {
       fetch('/api/rsvp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ guests: validGuests }),
+        body: JSON.stringify({
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          partySize: updatedGuests.length,
+          guests: validGuests.map((g) => ({
+            name: g.name.trim(),
+            attendance: g.attendance || 'no',
+            dietary: g.dietary.length > 0 ? g.dietary.join(', ') : undefined,
+          })),
+        }),
       }).catch(() => {});
       setResult(rsvpResult);
     }
-  };
-
-  const goBackToStep4Guest = (idx: number) => {
-    setCurrentGuestIndex(idx);
-    setAttendance(guests[idx].attendance || '');
   };
 
   if (result) {

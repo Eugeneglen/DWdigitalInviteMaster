@@ -44,16 +44,22 @@ export default function WishesPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!name.trim() || !message.trim()) return;
     setSubmitting(true);
 
     try {
-      await fetch('/api/wishes', {
+      const res = await fetch('/api/wishes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, relationship, message }),
+        body: JSON.stringify({ name: name.trim(), relationship: relationship.trim() || undefined, message: message.trim() }),
       });
+      if (!res.ok) {
+        setSubmitting(false);
+        return;
+      }
     } catch {
-      // ignore
+      setSubmitting(false);
+      return;
     }
 
     setTimeout(() => {
@@ -215,7 +221,7 @@ export default function WishesPage() {
               />
 
               {/* Upload area */}
-              <div className="border-2 border-dashed border-charcoal-ink/15 rounded bg-paper-cream/40 py-8 text-center cursor-pointer hover:bg-paper-cream/70 transition-colors">
+              <div className="border-2 border-dashed border-charcoal-ink/15 rounded bg-paper-cream/40 py-8 text-center select-none">
                 <span className="material-symbols-outlined text-charcoal-ink/30 text-[32px] mb-2 block">cloud_upload</span>
                 <p className="text-[14px] text-charcoal-ink/40">
                   Attach a photo or memento

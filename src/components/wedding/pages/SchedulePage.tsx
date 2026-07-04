@@ -18,7 +18,7 @@ export default function SchedulePage() {
     const params = new URLSearchParams({
       action: 'TEMPLATE',
       text: 'Eleanor & James Wedding',
-      dates: '20240622T160000/20240622T230000',
+      dates: '20271225T160000/20271225T230000',
       details: 'Join us for our wedding celebration!\n\n4:00 PM — The Ceremony\n5:30 PM — Cocktail Hour\n7:00 PM — Dinner & Dancing\n\nFormal attire requested.',
       location: 'The Grand Estate',
       sprop: 'name:Eleanor & James',
@@ -52,7 +52,7 @@ export default function SchedulePage() {
 
         {/* Date line — original: stagger-1, font-body-lg = 18px/32px/400 */}
         <section className="mb-24 text-center stagger-1">
-          <p className="text-body-lg leading-body-lg text-charcoal-ink/70 max-w-2xl mx-auto italic">Saturday, June 22, 2024</p>
+          <p className="text-body-lg leading-body-lg text-charcoal-ink/70 max-w-2xl mx-auto italic">Saturday, December 25, 2027</p>
         </section>
 
         {/* Timeline — original: stagger-3 on wrapper */}
@@ -62,7 +62,7 @@ export default function SchedulePage() {
             <div className="sticky top-24 md:top-40 bg-paper-cream/90 backdrop-blur-sm z-30 py-4 mb-12 border-b border-champagne-silk/30 flex items-baseline gap-4">
               <h2 className="font-display-hero text-headline-md leading-headline-md font-medium md:text-headline-lg md:leading-headline-lg md:font-semibold text-charcoal-ink">The Celebration</h2>
               {/* Original: font-utility-mono = 14px/20px/500 */}
-              <span className="font-utility-mono text-utility-mono leading-utility-mono font-medium text-charcoal-ink/60 italic tracking-wider uppercase">June 22, 2024</span>
+              <span className="font-utility-mono text-utility-mono leading-utility-mono font-medium text-charcoal-ink/60 italic tracking-wider uppercase">December 25, 2027</span>
             </div>
 
             <div className="relative border-l border-champagne-silk/40 ml-4 md:ml-8 pl-8 md:pl-16 flex flex-col gap-16">
