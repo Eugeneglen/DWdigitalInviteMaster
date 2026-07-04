@@ -1,6 +1,6 @@
 'use client';
 
-import HeroBanner from '../HeroBanner';
+import SectionBanner from '../SectionBanner';
 
 const CEREMONY_IMG =
   'https://lh3.googleusercontent.com/aida-public/AB6AXuAsLNSEjy771owdkkDbKTl1nE5oEzBQFVHob_HKiQb9eJb1X7I79-CxGjCPeKwCSHhwswJRqSrt3ox_aktMQUGlyzg6Eoo5R0aH6CYxxKj5f3uZCWdaDfZEIqmxwZd5DgdvCUWZfIdnNvixcYvcspOOFnGM2ThX9BPZz-ftetacA-b6CkxEEp9BdSatnTG55-e8tZz1jlG1euZgtw17iI67tcMGtR2azzCg8GvNH-xQPfUJlAXxGC3jU9Q7dbVZPK-xnHwtTl5eRNknueI';
@@ -29,7 +29,7 @@ const TIMELINE_ITEMS = [
 export default function SchedulePage() {
   return (
     <>
-      <HeroBanner title="The Schedule" />
+      <SectionBanner title="The Schedule" />
 
       <main className="pb-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto min-h-screen pt-[20px] md:pt-[40px]">
         {/* Intro Images */}

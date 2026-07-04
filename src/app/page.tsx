@@ -1,7 +1,7 @@
 'use client';
 
-import { useStore } from '@/lib/store';
-import Navbar from '@/components/wedding/Navbar';
+import { useNavigationStore } from '@/store/useNavigationStore';
+import Header from '@/components/wedding/Header';
 import MobileDrawer from '@/components/wedding/MobileDrawer';
 import BottomNav from '@/components/wedding/BottomNav';
 import Footer from '@/components/wedding/Footer';
@@ -13,11 +13,9 @@ import StoryPage from '@/components/wedding/pages/StoryPage';
 import MomentsPage from '@/components/wedding/pages/MomentsPage';
 import WishesPage from '@/components/wedding/pages/WishesPage';
 import QAPage from '@/components/wedding/pages/QAPage';
-import AdminDashboardPage from '@/components/wedding/pages/AdminDashboardPage';
-import AdminGuestsPage from '@/components/wedding/pages/AdminGuestsPage';
-import AdminMediaPage from '@/components/wedding/pages/AdminMediaPage';
+import type { Section } from '@/store/useNavigationStore';
 
-const GUEST_PAGES: Record<string, React.ComponentType> = {
+const PAGES: Record<Section, React.ComponentType> = {
   home: HomePage,
   schedule: SchedulePage,
   rsvp: RSVPPage,
@@ -28,33 +26,17 @@ const GUEST_PAGES: Record<string, React.ComponentType> = {
   qa: QAPage,
 };
 
-const ADMIN_PAGES: Record<string, React.ComponentType> = {
-  'admin-dashboard': AdminDashboardPage,
-  'admin-guests': AdminGuestsPage,
-  'admin-media': AdminMediaPage,
-};
-
-const ADMIN_KEYS = new Set(Object.keys(ADMIN_PAGES));
-
 export default function Home() {
-  const { currentPage } = useStore();
-
-  const isAdmin = ADMIN_KEYS.has(currentPage);
-
-  if (isAdmin) {
-    const PageComponent = ADMIN_PAGES[currentPage] || AdminDashboardPage;
-    return <PageComponent key={currentPage} />;
-  }
-
-  const PageComponent = GUEST_PAGES[currentPage] || HomePage;
+  const { currentSection } = useNavigationStore();
+  const PageComponent = PAGES[currentSection] || HomePage;
 
   return (
     <div className="min-h-screen flex flex-col bg-paper-cream text-charcoal-ink overflow-x-hidden">
-      <Navbar />
+      <Header />
       <MobileDrawer />
 
       <div className="flex-1">
-        <PageComponent key={currentPage} />
+        <PageComponent key={currentSection} />
       </div>
 
       <Footer />

@@ -1,6 +1,6 @@
 'use client';
 
-import HeroBanner from '../HeroBanner';
+import SectionBanner from '../SectionBanner';
 
 const HERO_IMG =
   'https://lh3.googleusercontent.com/aida-public/AB6AXuBZxkwieg-SjxgRYOZxJlQ1v05okmlTqzvosp-ANHaaCSQStncGv3ORTlPiE-uSYP7mQcE_wcB5Povhsm25x-eThbTLAYPt1XD-14RTSL9R5a1etGsU54CUWIwAK_4ckHoB-gD85mc-uqQwOckXVYmn0J7u0r6WkNQ2eFKKTBWBJ8yU_nirHHy8GC7vKRVnGPL6P_TymHuuKnjM3ERN9Zvho_5v7pICElncd6F8dHF-lVKppvz4kKyQe9je7CIDwOSBlcyxaGU6yY-D';
@@ -25,7 +25,7 @@ const TIDBITS = [
 export default function StoryPage() {
   return (
     <>
-      <HeroBanner title="Our Story" />
+      <SectionBanner title="Our Story" />
 
       <main className="pb-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto min-h-screen pt-[20px] md:pt-[40px]">
         {/* Hero Section */}

@@ -1,14 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import HeroBanner from '../HeroBanner';
+import SectionBanner from '../SectionBanner';
 
 export default function GettingTherePage() {
   const [tab, setTab] = useState<'car' | 'transit'>('car');
 
   return (
     <>
-      <HeroBanner title="Getting There" subtitle="The Singapore EDITION, Orchard" />
+      <SectionBanner title="Getting There" subtitle="The Singapore EDITION, Orchard" />
 
       <main className="pb-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto min-h-screen pt-[20px] md:pt-[40px] flex flex-col gap-8">
         {/* Address */}

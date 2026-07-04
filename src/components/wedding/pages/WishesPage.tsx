@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import HeroBanner from '../HeroBanner';
+import SectionBanner from '../SectionBanner';
 
 const WISHES = [
   {
@@ -70,7 +70,7 @@ export default function WishesPage() {
 
   return (
     <>
-      <HeroBanner title="Wishes & Blessings" />
+      <SectionBanner title="Wishes & Blessings" />
 
       <main className="pb-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto min-h-screen pt-[20px] md:pt-[40px]">
         {/* Intro */}
