@@ -24,10 +24,16 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+
+  /* Border Radius — matching original DWdigitalInvite config exactly */
+  --radius: 0.125rem;
+  --radius-sm: 0.125rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.25rem;
+  --radius-xl: 0.5rem;
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
+  --radius-full: 0.75rem;
 
   /* Wedding Design System Colors */
   --color-paper-cream: #FCF9F2;
@@ -46,10 +52,33 @@
   --spacing-section-gap: 8rem;
   --spacing-canvas-margin: 4rem;
   --spacing-gutter: 2rem;
+
+  /* ========================================
+     Font Sizes — matching original tailwind fontSize config.
+     These create proper Tailwind text-* utilities in the utilities layer,
+     so arbitrary values like text-[10px] can override them correctly.
+     ======================================== */
+  --text-display-hero: 84px;
+  --text-headline-lg: 48px;
+  --text-headline-lg-mobile: 32px;
+  --text-headline-md: 32px;
+  --text-label-sm: 12px;
+  --text-body-md: 16px;
+  --text-body-lg: 18px;
+  --text-utility-mono: 14px;
+
+  /* Line heights — matching original tailwind fontSize lineHeight values */
+  --leading-display-hero: 100px;
+  --leading-headline-lg: 56px;
+  --leading-headline-lg-mobile: 40px;
+  --leading-headline-md: 40px;
+  --leading-label-sm: 16px;
+  --leading-body-md: 24px;
+  --leading-body-lg: 32px;
+  --leading-utility-mono: 20px;
 }
 
 :root {
-  --radius: 0.625rem;
   --background: #FCF9F2;
   --foreground: #1A1A1A;
   --card: #ffffff;
@@ -80,15 +109,39 @@
   }
 }
 
-/* Material Symbols */
+/* ============================================
+   Font Family Utility — matching original fontFamily config
+   All fontFamily entries in the original map to Playfair Display.
+   ============================================ */
+.font-display-hero {
+  font-family: 'Playfair Display', serif;
+}
+.font-label-sm {
+  font-family: 'Playfair Display', serif;
+}
+.font-body-md {
+  font-family: 'Playfair Display', serif;
+}
+.font-utility-mono {
+  font-family: 'Playfair Display', serif;
+}
+
+/* ============================================
+   Material Symbols
+   ============================================ */
 .material-symbols-outlined {
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+.material-symbols-outlined[data-weight="fill"] {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 .material-symbols-filled {
   font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 
-/* Animations */
+/* ============================================
+   Animations — matching original DWdigitalInvite
+   ============================================ */
 .animate-fade-in {
   animation: fadeIn 1.2s ease-out forwards;
   opacity: 0;
@@ -114,10 +167,24 @@
   100% { opacity: 1; transform: translateY(0); }
 }
 
+/* Staggered fade-in — from schedule.html */
+@keyframes staggeredFade {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.stagger-1 { animation: staggeredFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards; opacity: 0; }
+.stagger-2 { animation: staggeredFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards; opacity: 0; }
+.stagger-3 { animation: staggeredFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards; opacity: 0; }
+.stagger-4 { animation: staggeredFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards; opacity: 0; }
+
 .delay-100 { animation-delay: 100ms; }
 .delay-200 { animation-delay: 200ms; }
 .delay-300 { animation-delay: 300ms; }
 .delay-400 { animation-delay: 400ms; }
+
+/* ============================================
+   Layout Effects
+   ============================================ */
 
 /* Hero gradient overlay */
 .hero-gradient {
@@ -140,6 +207,16 @@
   pointer-events: none;
   z-index: 10;
 }
+
+/* Drawer overlay — cream-colored blur from schedule.html */
+.drawer-overlay {
+  backdrop-filter: blur(12px);
+  background-color: rgba(253, 249, 243, 0.7);
+}
+
+/* ============================================
+   UI Components
+   ============================================ */
 
 /* Accordion */
 .accordion-content {
@@ -210,6 +287,10 @@
   background: #FCF9F2;
 }
 
+/* ============================================
+   Utility Classes
+   ============================================ */
+
 /* No scrollbar */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
@@ -230,6 +311,16 @@
   transform: translateY(0);
 }
 
+/* Staggered fade in (generic with inline delay) */
+.staggered-fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.8s ease forwards;
+}
+@keyframes fadeInUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* Wishes masonry */
 .masonry-grid {
   columns: 1;
@@ -245,16 +336,6 @@
 }
 .wish-card:hover {
   transform: translateY(-8px);
-}
-
-/* Staggered fade in */
-.staggered-fade-in {
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeInUp 0.8s ease forwards;
-}
-@keyframes fadeInUp {
-  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Cinematic gradient (for overlays) */

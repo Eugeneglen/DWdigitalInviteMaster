@@ -1,0 +1,438 @@
+     1→     1→<!DOCTYPE html>
+     2→     2→
+     3→     3→<html class="scroll-smooth font-['Playfair_Display']" data-stitch-anim-opacity="true" lang="en" style="opacity: 1;"><head class="font-['Playfair_Display']">
+     4→     4→<meta charset="utf-8" class="font-['Playfair_Display']"/>
+     5→     5→<meta class="font-['Playfair_Display']" content="width=device-width, initial-scale=1.0" name="viewport"/>
+     6→     6→<title class="font-['Playfair_Display']">Dreamweavers | Schedule</title>
+     7→     7→<script class="font-['Playfair_Display']" src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+     8→     8→<link class="font-['Playfair_Display']" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+     9→     9→<link class="font-['Playfair_Display']" href="https://fonts.googleapis.com" rel="preconnect"/>
+    10→    10→<link class="font-['Playfair_Display']" crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    11→    11→<link class="font-['Playfair_Display']" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&amp;display=swap" rel="stylesheet"/>
+    12→    12→<script class="font-['Playfair_Display']" id="tailwind-config">
+    13→    13→      tailwind.config = {
+    14→    14→        darkMode: "class",
+    15→    15→        theme: {
+    16→    16→          extend: {
+    17→    17→            "colors": {
+    18→    18→                    "surface-tint": "#5f5e5e",
+    19→    19→                    "secondary-fixed-dim": "#e9c349",
+    20→    20→                    "status-error": "#8B1E1E",
+    21→    21→                    "charcoal-ink": "#1A1A1A",
+    22→    22→                    "on-error": "#ffffff",
+    23→    23→                    "tertiary-fixed-dim": "#c9c6c1",
+    24→    24→                    "surface-dim": "#ddd9d8",
+    25→    25→                    "on-tertiary-fixed": "#1c1c18",
+    26→    26→                    "surface-bright": "#fdf8f8",
+    27→    27→                    "tertiary-fixed": "#e6e2dc",
+    28→    28→                    "on-surface": "#1c1b1b",
+    29→    29→                    "surface-container-low": "#f7f3f2",
+    30→    30→                    "on-error-container": "#93000a",
+    31→    31→                    "on-surface-variant": "#444748",
+    32→    32→                    "on-secondary": "#ffffff",
+    33→    33→                    "paper-cream": "#FDF9F3",
+    34→    34→                    "on-primary-fixed-variant": "#474746",
+    35→    35→                    "inverse-surface": "#313030",
+    36→    36→                    "secondary-fixed": "#ffe088",
+    37→    37→                    "surface-container-highest": "#e5e2e1",
+    38→    38→                    "status-success": "#2D4B3A",
+    39→    39→                    "on-tertiary-fixed-variant": "#484743",
+    40→    40→                    "primary-fixed": "#e5e2e1",
+    41→    41→                    "tertiary": "#000000",
+    42→    42→                    "on-secondary-fixed-variant": "#574500",
+    43→    43→                    "error": "#ba1a1a",
+    44→    44→                    "on-tertiary": "#ffffff",
+    45→    45→                    "on-primary-fixed": "#1c1b1b",
+    46→    46→                    "on-secondary-container": "#745c00",
+    47→    47→                    "primary": "#000000",
+    48→    48→                    "cinematic-gold": "#D4AF37",
+    49→    49→                    "inverse-primary": "#c8c6c5",
+    50→    50→                    "inverse-on-surface": "#f4f0ef",
+    51→    51→                    "on-background": "#1c1b1b",
+    52→    52→                    "outline": "#747878",
+    53→    53→                    "on-primary-container": "#858383",
+    54→    54→                    "champagne-silk": "#E8D5B5",
+    55→    55→                    "error-container": "#ffdad6",
+    56→    56→                    "on-primary": "#ffffff",
+    57→    57→                    "surface": "#fdf8f8",
+    58→    58→                    "secondary-container": "#fed65b",
+    59→    59→                    "surface-container": "#f1edec",
+    60→    60→                    "surface-variant": "#e5e2e1",
+    61→    61→                    "primary-container": "#1c1b1b",
+    62→    62→                    "outline-variant": "#c4c7c7",
+    63→    63→                    "tertiary-container": "#1c1c18",
+    64→    64→                    "on-tertiary-container": "#86847f",
+    65→    65→                    "surface-container-lowest": "#ffffff",
+    66→    66→                    "background": "#fdf8f8",
+    67→    67→                    "on-secondary-fixed": "#241a00",
+    68→    68→                    "primary-fixed-dim": "#c8c6c5",
+    69→    69→                    "surface-container-high": "#ebe7e6",
+    70→    70→                    "secondary": "#735c00"
+    71→    71→            },
+    72→    72→            "borderRadius": {
+    73→    73→                    "DEFAULT": "0.125rem",
+    74→    74→                    "lg": "0.25rem",
+    75→    75→                    "xl": "0.5rem",
+    76→    76→                    "full": "0.75rem"
+    77→    77→            },
+    78→    78→            "spacing": {
+    79→    79→                    "unit": "4px",
+    80→    80→                    "section-gap": "8rem",
+    81→    81→                    "canvas-margin": "4rem",
+    82→    82→                    "gutter": "2rem"
+    83→    83→            },
+    84→    84→            "fontFamily": {
+    85→    85→                    "display-hero": [
+    86→    86→                            "Playfair Display"
+    87→    87→                    ],
+    88→    88→                    "label-sm": [
+    89→    89→                            "Playfair Display"
+    90→    90→                    ],
+    91→    91→                    "body-md": [
+    92→    92→                            "Playfair Display"
+    93→    93→                    ],
+    94→    94→                    "headline-lg-mobile": [
+    95→    95→                            "Playfair Display"
+    96→    96→                    ],
+    97→    97→                    "headline-lg": [
+    98→    98→                            "Playfair Display"
+    99→    99→                    ],
+   100→   100→                    "headline-md": [
+   101→   101→                            "Playfair Display"
+   102→   102→                    ],
+   103→   103→                    "body-lg": [
+   104→   104→                            "Playfair Display"
+   105→   105→                    ],
+   106→   106→                    "utility-mono": [
+   107→   107→                            "Playfair Display"
+   108→   108→                    ]
+   109→   109→            },
+   110→   110→            "fontSize": {
+   111→   111→                    "display-hero": [
+   112→   112→                            "84px",
+   113→   113→                            {
+   114→   114→                                    "lineHeight": "100px",
+   115→   115→                                    "letterSpacing": "-0.02em",
+   116→   116→                                    "fontWeight": "700"
+   117→   117→                            }
+   118→   118→                    ],
+   119→   119→                    "label-sm": [
+   120→   120→                            "12px",
+   121→   121→                            {
+   122→   122→                                    "lineHeight": "16px",
+   123→   123→                                    "letterSpacing": "0.1em",
+   124→   124→                                    "fontWeight": "600"
+   125→   125→                            }
+   126→   126→                    ],
+   127→   127→                    "body-md": [
+   128→   128→                            "16px",
+   129→   129→                            {
+   130→   130→                                    "lineHeight": "24px",
+   131→   131→                                    "fontWeight": "400"
+   132→   132→                            }
+   133→   133→                    ],
+   134→   134→                    "headline-lg-mobile": [
+   135→   135→                            "32px",
+   136→   136→                            {
+   137→   137→                                    "lineHeight": "40px",
+   138→   138→                                    "fontWeight": "600"
+   139→   139→                            }
+   140→   140→                    ],
+   141→   141→                    "headline-lg": [
+   142→   142→                            "48px",
+   143→   143→                            {
+   144→   144→                                    "lineHeight": "56px",
+   145→   145→                                    "fontWeight": "600"
+   146→   146→                            }
+   147→   147→                    ],
+   148→   148→                    "headline-md": [
+   149→   149→                            "32px",
+   150→   150→                            {
+   151→   151→                                    "lineHeight": "40px",
+   152→   152→                                    "fontWeight": "500"
+   153→   153→                            }
+   154→   154→                    ],
+   155→   155→                    "body-lg": [
+   156→   156→                            "18px",
+   157→   157→                            {
+   158→   158→                                    "lineHeight": "32px",
+   159→   159→                                    "fontWeight": "400"
+   160→   160→                            }
+   161→   161→                    ],
+   162→   162→                    "utility-mono": [
+   163→   163→                            "14px",
+   164→   164→                            {
+   165→   165→                                    "lineHeight": "20px",
+   166→   166→                                    "fontWeight": "500"
+   167→   167→                            }
+   168→   168→                    ]
+   169→   169→            }
+   170→   170→    },
+   171→   171→        },
+   172→   172→      }
+   173→   173→    </script>
+   174→   174→<style class="font-['Playfair_Display']">
+   175→   175→        .material-symbols-outlined {
+   176→   176→            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+   177→   177→        }
+   178→   178→        .material-symbols-outlined[data-weight="fill"] {
+   179→   179→            font-variation-settings: 'FILL' 1;
+   180→   180→        }
+   181→   181→        
+   182→   182→        @keyframes staggeredFade {
+   183→   183→            from { opacity: 0; transform: translateY(20px); }
+   184→   184→            to { opacity: 1; transform: translateY(0); }
+   185→   185→        }
+   186→   186→        
+   187→   187→        .stagger-1 { animation: staggeredFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards; opacity: 0; }
+   188→   188→        .stagger-2 { animation: staggeredFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards; opacity: 0; }
+   189→   189→        .stagger-3 { animation: staggeredFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards; opacity: 0; }
+   190→   190→        .stagger-4 { animation: staggeredFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards; opacity: 0; }
+   191→   191→        
+   192→   192→        .drawer-overlay {
+   193→   193→            backdrop-filter: blur(12px);
+   194→   194→            background-color: rgba(253, 249, 243, 0.7);
+   195→   195→        }
+   196→   196→        
+   197→   197→        .font-body-md, .font-body-lg {
+   198→   198→            font-weight: 400;
+   199→   199→        }
+   200→   200→        
+   201→   201→        body {
+   202→   202→            min-height: max(884px, 100dvh);
+   203→   203→            font-family: 'Playfair Display', serif;
+   204→   204→        }
+   205→   205→
+   206→   206→        .gold-leaf-dot {
+   207→   207→            background: linear-gradient(135deg, #D4AF37 0%, #F5E6AD 50%, #B8860B 100%);
+   208→   208→            box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+   209→   209→        }
+   210→   210→    </style>
+   211→   211→</head>
+   212→   212→<body class="bg-paper-cream text-charcoal-ink font-body-md antialiased min-h-screen flex flex-col relative overflow-x-hidden selection:bg-champagne-silk selection:text-charcoal-ink font-['Playfair_Display']">
+   213→   213→<header class="fixed top-0 w-full z-50 bg-paper-cream/80 backdrop-blur-md border-b border-champagne-silk/30">
+   214→   214→<div class="flex justify-between items-center px-4 md:px-6 py-3 w-full max-w-[1440px] mx-auto">
+   215→   215→<div class="flex-shrink-0">
+   216→   216→<img alt="Dreamweavers Logo" class="h-4 md:h-5 w-auto object-contain" src="/assets/dreamweavers-logo.png"/>
+   217→   217→</div>
+   218→   218→<nav class="hidden lg:flex justify-center items-center gap-6 px-4 ml-auto">
+   219→   219→<a class="font-medium text-[11px] tracking-[0.2em] uppercase text-charcoal-ink/40 hover:text-cinematic-gold transition-colors duration-300 pb-1 border-b-2 border-transparent h-[26px] flex items-center" href="/home.html">Home</a>
+   220→   220→<a class="font-medium text-[11px] tracking-[0.2em] uppercase text-cinematic-gold border-b-2 border-cinematic-gold pb-1 h-[26px] flex items-center" href="/schedule.html">Schedule</a>
+   221→   221→<a class="font-medium text-[11px] tracking-[0.2em] uppercase text-charcoal-ink/40 hover:text-cinematic-gold transition-colors duration-300 pb-1 border-b-2 border-transparent h-[26px] flex items-center" href="/rsvp.html">RSVP</a>
+   222→   222→<a class="font-medium text-[11px] tracking-[0.2em] uppercase text-charcoal-ink/40 hover:text-cinematic-gold transition-colors duration-300 pb-1 border-b-2 border-transparent h-[26px] flex items-center" href="/getting-there.html">Getting There</a>
+   223→   223→<a class="font-medium text-[11px] tracking-[0.2em] uppercase text-charcoal-ink/40 hover:text-cinematic-gold transition-colors duration-300 pb-1 border-b-2 border-transparent h-[26px] flex items-center" href="/story.html">Story</a>
+   224→   224→<a class="font-medium text-[11px] tracking-[0.2em] uppercase text-charcoal-ink/40 hover:text-cinematic-gold transition-colors duration-300 pb-1 border-b-2 border-transparent h-[26px] flex items-center" href="/wishes.html">Wishes</a>
+   225→   225→<a class="font-medium text-[11px] tracking-[0.2em] uppercase text-charcoal-ink/40 hover:text-cinematic-gold transition-colors duration-300 pb-1 border-b-2 border-transparent h-[26px] flex items-center" href="/qa.html">Q&amp;A</a>
+   226→   226→<a class="font-medium text-[11px] tracking-[0.2em] uppercase text-charcoal-ink/40 hover:text-cinematic-gold transition-colors duration-300 pb-1 border-b-2 border-transparent h-[26px] flex items-center" href="/moments.html">Moments</a>
+   227→   227→</nav>
+   228→   228→<div class="lg:hidden ml-auto">
+   229→   229→<button class="text-charcoal-ink p-2" id="mobile-menu-trigger">
+   230→   230→<span class="material-symbols-outlined">menu</span>
+   231→   231→</button>
+   232→   232→</div>
+   233→   233→</div>
+   234→   234→</header><div class="w-full h-[360px] md:h-[420px] bg-cover bg-center mt-[54px] md:mt-[64px] relative z-40 border-b border-champagne-silk/20 flex items-center justify-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA-OyKfcsxXAmZDArHbDXl1cVCgGUG5liFPzyHdVvMG6_4jN9pNTrN9GCrkdnegli9UPJUSPs39KJRsRP7AiLem4xYS-q1ZYq1T3DAIqyvn3wAvbdkoMVkufft0SpQw4gDTPSnIml6k62lRYobUrNu70UGIILiMZQ0fAydTXXwVZ1oswQZ-mjPT8H9mDDqfhxsMSI5zla8GKz_ILXbmdRjtRUk682dPEDBD6I81DzEx7dITgjb6vxQoee5599jkYf_vCYP7npydvxqx');"><div class="absolute inset-0 bg-gradient-to-b from-paper-cream/30 via-paper-cream/10 to-paper-cream/60"></div><div class="relative z-10 text-center px-6"><h1 class="font-display-hero text-[44px] md:text-[72px] leading-[1.05] text-charcoal-ink tracking-tight font-bold drop-shadow-sm">The Schedule</h1></div></div>
+   235→   235→<div class="fixed inset-0 z-[60] bg-charcoal-ink/20 backdrop-blur-sm hidden transition-opacity duration-300 opacity-0" id="nav-drawer">
+   236→   236→<nav class="h-full w-80 bg-paper-cream shadow-2xl flex flex-col p-8 gap-4 transform -translate-x-full transition-transform duration-500 ease-in-out">
+   237→   237→<div class="flex justify-between items-center mb-8 border-b border-champagne-silk/30 pb-4">
+   238→   238→<img alt="Dreamweavers" class="h-3" src="/assets/dreamweavers-logo.png"/>
+   239→   239→<button class="text-charcoal-ink" id="close-drawer">
+   240→   240→<span class="material-symbols-outlined" data-icon="close">close</span>
+   241→   241→</button>
+   242→   242→</div>
+   243→   243→<ul class="flex flex-col gap-6">
+   244→   244→<li class=""><a class="flex items-center gap-4 text-charcoal-ink/60 hover:pl-2 transition-all duration-300" href="/home.html"><span class="text-xs uppercase tracking-widest">Home</span></a></li>
+   245→   245→<li class=""><a class="flex items-center gap-4 text-cinematic-gold font-bold hover:pl-2 transition-all duration-300" href="/schedule.html"><span class="text-xs uppercase tracking-widest font-bold">Schedule</span></a></li>
+   246→   246→<li class=""><a class="flex items-center gap-4 text-charcoal-ink/60 hover:pl-2 transition-all duration-300" href="/rsvp.html"><span class="text-xs uppercase tracking-widest">RSVP</span></a></li>
+   247→   247→<li class=""><a class="flex items-center gap-4 text-charcoal-ink/60 hover:pl-2 transition-all duration-300" href="/getting-there.html"><span class="text-xs uppercase tracking-widest">Getting There</span></a></li>
+   248→   248→<li class=""><a class="flex items-center gap-4 text-charcoal-ink/60 hover:pl-2 transition-all duration-300" href="/story.html"><span class="text-xs uppercase tracking-widest">Story</span></a></li>
+   249→   249→<li class=""><a class="flex items-center gap-4 text-charcoal-ink/60 hover:pl-2 transition-all duration-300" href="/wishes.html"><span class="text-xs uppercase tracking-widest">Wishes</span></a></li>
+   250→   250→<li class=""><a class="flex items-center gap-4 text-charcoal-ink/60 hover:pl-2 transition-all duration-300" href="/qa.html"><span class="text-xs uppercase tracking-widest">Q &amp; A</span></a></li>
+   251→   251→<li class=""><a class="flex items-center gap-4 text-charcoal-ink/60 hover:pl-2 transition-all duration-300" href="/moments.html"><span class="text-xs uppercase tracking-widest">Moments</span></a></li>
+   252→   252→</ul>
+   253→   253→</nav>
+   254→   254→</div>
+   255→   255→<main class="pb-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto min-h-screen pt-[20px] md:pt-[40px] font-['Playfair_Display']">
+   256→   256→<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16 stagger-1 font-['Playfair_Display']">
+   257→   257→<div class="aspect-[4/5] overflow-hidden rounded-lg font-['Playfair_Display']">
+   258→   258→<img alt="The Ceremony" class="w-full h-full object-cover font-['Playfair_Display']" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAsLNSEjy771owdkkDbKTl1nE5oEzBQFVHob_HKiQb9eJb1X7I79-CxGjCPeKwCSHhwswJRqSrt3ox_aktMQUGlyzg6Eoo5R0aH6CYxxKj5f3uZCWdaDfZEIqmxwZd5DgdvCUWZfIdnNvixcYvcspOOFnGM2ThX9BPZz-ftetacA-b6CkxEEp9BdSatnTG55-e8tZz1jlG1euZgtw17iI67tcMGtR2azzCg8GvNH-xQPfUJlAXxGC3jU9Q7dbVZPK-xnHwtTl5eRNknueI"/>
+   259→   259→</div>
+   260→   260→<div class="aspect-[4/5] overflow-hidden rounded-lg font-['Playfair_Display']">
+   261→   261→<img alt="The Celebration" class="w-full h-full object-cover font-['Playfair_Display']" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC01POr_eFI2RUG86kAb7dHs-q12Kj6HzxEoXpnzTnJ9n_VB9_BJL6Iy8vtGixOWTn1jVNZKDjXNQkHSy9Gsa8KI5IomZe3968VCNWHhXNZ44gbgs5LCBp4_Axjbj72RJwN0BWAIEmrqH8lgR-_j2_9Ci79wI4t583OCS4YuDca-s2xldrzBhBM-KeS4GFVFDSQdzWRY-4chmwkFfFgO3g-S4VS_jae416SCd-357i_ix3m68zwnHtpBSxyXFSjZISZ_Z66Jlxj6Npv_Lo"/>
+   262→   262→</div>
+   263→   263→</div>
+   264→   264→<section class="mb-24 text-center stagger-1 font-['Playfair_Display']">
+   265→   265→<p class="font-body-lg text-charcoal-ink/70 max-w-2xl mx-auto italic font-['Playfair_Display']">Saturday, June 22, 2024</p>
+   266→   266→</section>
+   267→   267→<section class="max-w-4xl mx-auto font-['Playfair_Display']">
+   268→   268→<div class="mb-24 stagger-3 font-['Playfair_Display']">
+   269→   269→<div class="sticky top-24 md:top-40 bg-paper-cream/90 backdrop-blur-sm z-30 py-4 mb-12 border-b border-champagne-silk/30 flex items-baseline gap-4 font-['Playfair_Display']">
+   270→   270→<h2 class="font-display-hero text-headline-md md:text-headline-lg text-charcoal-ink font-['Playfair_Display']">The Celebration</h2>
+   271→   271→<span class="font-utility-mono text-charcoal-ink/60 italic tracking-wider font-['Playfair_Display'] uppercase">June 22, 2024</span>
+   272→   272→</div>
+   273→   273→<div class="relative border-l-2 border-champagne-silk/30 ml-4 md:ml-8 pl-8 md:pl-16 flex flex-col gap-16 font-['Playfair_Display']">
+   274→   274→<!-- Ceremony -->
+   275→   275→<div class="relative group font-['Playfair_Display']">
+   276→   276→<div class="absolute -left-[37px] md:-left-[69px] top-2 w-4 h-4 rounded-full gold-leaf-dot outline outline-4 outline-paper-cream font-['Playfair_Display']"></div>
+   277→   277→<div class="flex flex-col md:flex-row gap-4 md:gap-12 font-['Playfair_Display']">
+   278→   278→<div class="md:w-1/4 shrink-0 font-['Playfair_Display']">
+   279→   279→<span class="font-utility-mono text-charcoal-ink font-semibold tracking-tighter font-['Playfair_Display']">4:00 PM</span>
+   280→   280→</div>
+   281→   281→<div class="flex-1 font-['Playfair_Display']">
+   282→   282→<h3 class="font-display-hero text-headline-md-mobile md:text-headline-md text-charcoal-ink mb-3 font-['Playfair_Display']">The Ceremony</h3>
+   283→   283→<p class="font-body-md text-charcoal-ink/70 mb-4 leading-relaxed font-['Playfair_Display']">Join us as we exchange our vows and start our new chapter together.</p>
+   284→   284→<div class="flex flex-wrap gap-2 mb-6 font-['Playfair_Display']">
+   285→   285→<span class="inline-flex items-center px-3 py-1 rounded-full bg-champagne-silk/30 text-charcoal-ink font-label-sm uppercase text-[10px] tracking-widest font-bold font-['Playfair_Display']">Formal Attire</span>
+   286→   286→</div>
+   287→   287→</div>
+   288→   288→</div>
+   289→   289→</div>
+   290→   290→<!-- Cocktail Hour -->
+   291→   291→<div class="relative group font-['Playfair_Display']">
+   292→   292→<div class="absolute -left-[37px] md:-left-[69px] top-2 w-4 h-4 rounded-full gold-leaf-dot outline outline-4 outline-paper-cream font-['Playfair_Display']"></div>
+   293→   293→<div class="flex flex-col md:flex-row gap-4 md:gap-12 font-['Playfair_Display']">
+   294→   294→<div class="md:w-1/4 shrink-0 font-['Playfair_Display']">
+   295→   295→<span class="font-utility-mono text-charcoal-ink font-semibold tracking-tighter font-['Playfair_Display']">5:30 PM</span>
+   296→   296→</div>
+   297→   297→<div class="flex-1 font-['Playfair_Display']">
+   298→   298→<h3 class="font-display-hero text-headline-md-mobile md:text-headline-md text-charcoal-ink mb-3 font-['Playfair_Display']">Cocktail Hour</h3>
+   299→   299→<p class="font-body-md text-charcoal-ink/70 mb-4 leading-relaxed font-['Playfair_Display']">Enjoy signature drinks and light hors d'oeuvres in the garden courtyard.</p>
+   300→   300→</div>
+   301→   301→</div>
+   302→   302→</div>
+   303→   303→<!-- Dinner & Dancing -->
+   304→   304→<div class="relative group font-['Playfair_Display']">
+   305→   305→<div class="absolute -left-[37px] md:-left-[69px] top-2 w-4 h-4 rounded-full gold-leaf-dot outline outline-4 outline-paper-cream font-['Playfair_Display']"></div>
+   306→   306→<div class="flex flex-col md:flex-row gap-4 md:gap-12 font-['Playfair_Display']">
+   307→   307→<div class="md:w-1/4 shrink-0 font-['Playfair_Display']">
+   308→   308→<span class="font-utility-mono text-charcoal-ink font-semibold tracking-tighter font-['Playfair_Display']">7:00 PM</span>
+   309→   309→</div>
+   310→   310→<div class="flex-1 font-['Playfair_Display']">
+   311→   311→<h3 class="font-display-hero text-headline-md-mobile md:text-headline-md text-charcoal-ink mb-3 font-['Playfair_Display']">Dinner &amp; Dancing</h3>
+   312→   312→<p class="font-body-md text-charcoal-ink/70 mb-4 leading-relaxed font-['Playfair_Display']">A seated dinner followed by a night of celebration, music, and joy on the dance floor.</p>
+   313→   313→</div>
+   314→   314→</div>
+   315→   315→</div>
+   316→   316→</div>
+   317→   317→</div>
+   318→   318→</section>
+   319→   319→<section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-24 stagger-4 font-['Playfair_Display']">
+   320→   320→<span class="group relative overflow-hidden bg-surface-container-low border border-champagne-silk/20 p-8 flex flex-col items-center justify-center text-center h-48 transition-colors duration-500 shadow-[0_-4px_20px_rgba(26,26,26,0.04)] font-['Playfair_Display'] opacity-40 cursor-not-allowed" aria-disabled="true" title="Coming soon">
+   321→   321→<span class="material-symbols-outlined text-3xl mb-4 text-charcoal-ink group-hover:text-cinematic-gold transition-colors font-['Playfair_Display']">calendar_add_on</span>
+   322→   322→<span class="font-label-sm uppercase tracking-[0.15em] text-charcoal-ink font-['Playfair_Display']">Add to Calendar</span>
+   323→   323→</span>
+   324→   324→<button class="group relative overflow-hidden bg-surface-container-low border border-champagne-silk/20 p-8 flex flex-col items-center justify-center text-center h-48 hover:border-cinematic-gold transition-colors duration-500 shadow-[0_-4px_20px_rgba(26,26,26,0.04)] font-['Playfair_Display']" onclick="openDrawer('stay-drawer')">
+   325→   325→<span class="material-symbols-outlined text-3xl mb-4 text-charcoal-ink group-hover:text-cinematic-gold transition-colors font-['Playfair_Display']">hotel</span>
+   326→   326→<span class="font-label-sm uppercase tracking-[0.15em] text-charcoal-ink font-['Playfair_Display']">Where to Stay</span>
+   327→   327→</button>
+   328→   328→<button class="group relative overflow-hidden bg-surface-container-low border border-champagne-silk/20 p-8 flex flex-col items-center justify-center text-center h-48 hover:border-cinematic-gold transition-colors duration-500 shadow-[0_-4px_20px_rgba(26,26,26,0.04)] font-['Playfair_Display']" onclick="openDrawer('map-drawer')">
+   329→   329→<span class="material-symbols-outlined text-3xl mb-4 text-charcoal-ink group-hover:text-cinematic-gold transition-colors font-['Playfair_Display']">map</span>
+   330→   330→<span class="font-label-sm uppercase tracking-[0.15em] text-charcoal-ink font-['Playfair_Display']">Directions</span>
+   331→   331→</button>
+   332→   332→</section>
+   333→   333→</main>
+   334→   334→<div class="fixed inset-0 z-[100] flex flex-col justify-end pointer-events-none font-['Playfair_Display']" id="stay-drawer">
+   335→   335→<div class="absolute inset-0 drawer-overlay opacity-0 transition-opacity duration-300 pointer-events-none font-['Playfair_Display']" onclick="closeDrawer('stay-drawer')"></div>
+   336→   336→<div class="bg-paper-cream w-full max-h-[751px] rounded-t-3xl shadow-2xl transform translate-y-full transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] pointer-events-auto flex flex-col border-t border-champagne-silk/30 font-['Playfair_Display']">
+   337→   337→<div class="flex justify-between items-center p-6 border-b border-champagne-silk/20 shrink-0 font-['Playfair_Display']">
+   338→   338→<h3 class="font-display-hero text-headline-md-mobile text-charcoal-ink font-['Playfair_Display']">Accommodations</h3>
+   339→   339→<button class="text-charcoal-ink hover:text-cinematic-gold transition-colors font-['Playfair_Display']" onclick="closeDrawer('stay-drawer')">
+   340→   340→<span class="material-symbols-outlined font-['Playfair_Display']">close</span>
+   341→   341→</button>
+   342→   342→</div>
+   343→   343→<div class="overflow-y-auto p-6 md:p-8 flex-1 font-['Playfair_Display']">
+   344→   344→<div class="max-w-2xl mx-auto space-y-8 font-['Playfair_Display']">
+   345→   345→<div class="flex flex-col md:flex-row gap-6 items-start font-['Playfair_Display']">
+   346→   346→<div class="w-full md:w-48 aspect-video md:aspect-square bg-surface-container-highest shrink-0 relative overflow-hidden font-['Playfair_Display']">
+   347→   347→<div class="absolute inset-2 border border-champagne-silk z-10 pointer-events-none font-['Playfair_Display']"></div>
+   348→   348→</div>
+   349→   349→<div class="font-['Playfair_Display']">
+   350→   350→<h4 class="font-display-hero text-headline-md-mobile text-charcoal-ink mb-2 font-['Playfair_Display']">The Grand Hotel</h4>
+   351→   351→<p class="font-body-md text-charcoal-ink/70 mb-4 leading-relaxed font-['Playfair_Display']">Our primary room block is secured here. A luxury boutique hotel just 10 minutes from the venue.</p>
+   352→   352→<span class="inline-block border border-cinematic-gold text-charcoal-ink px-6 py-2 font-label-sm uppercase tracking-widest transition-colors font-['Playfair_Display'] opacity-40 cursor-not-allowed" aria-disabled="true" title="Coming soon">Book Room</span>
+   353→   353→</div>
+   354→   354→</div>
+   355→   355→</div>
+   356→   356→</div>
+   357→   357→</div>
+   358→   358→</div>
+   359→   359→<div class="fixed inset-0 z-[100] flex flex-col justify-end pointer-events-none font-['Playfair_Display']" id="map-drawer">
+   360→   360→<div class="absolute inset-0 drawer-overlay opacity-0 transition-opacity duration-300 pointer-events-none font-['Playfair_Display']" onclick="closeDrawer('map-drawer')"></div>
+   361→   361→<div class="bg-paper-cream w-full h-[751px] rounded-t-3xl shadow-2xl transform translate-y-full transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] pointer-events-auto flex flex-col border-t border-champagne-silk/30 font-['Playfair_Display']">
+   362→   362→<div class="flex justify-between items-center p-6 border-b border-champagne-silk/20 shrink-0 font-['Playfair_Display']">
+   363→   363→<h3 class="font-display-hero text-headline-md-mobile text-charcoal-ink font-['Playfair_Display']">Directions &amp; Map</h3>
+   364→   364→<button class="text-charcoal-ink hover:text-cinematic-gold transition-colors font-['Playfair_Display']" onclick="closeDrawer('map-drawer')">
+   365→   365→<span class="material-symbols-outlined font-['Playfair_Display']">close</span>
+   366→   366→</button>
+   367→   367→</div>
+   368→   368→<div class="flex-1 relative bg-surface-container-lowest font-['Playfair_Display']">
+   369→   369→<div class="absolute inset-0 flex items-center justify-center flex-col text-charcoal-ink/40 font-['Playfair_Display']">
+   370→   370→<span class="material-symbols-outlined text-4xl mb-2 font-['Playfair_Display']">map</span>
+   371→   371→<span class="font-utility-mono uppercase tracking-[0.2em] text-xs font-['Playfair_Display']">Map View rendering</span>
+   372→   372→</div>
+   373→   373→</div>
+   374→   374→</div>
+   375→   375→</div>
+   376→   376→<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center py-4 px-2 md:hidden bg-paper-cream border-t border-champagne-silk/20 shadow-[0_-4px_20px_rgba(26,26,26,0.04)] rounded-t-full z-50 font-['Playfair_Display']">
+   377→   377→<a class="flex flex-col items-center justify-center text-charcoal-ink/50 hover:text-cinematic-gold transition-colors active:scale-90 transition-transform font-['Playfair_Display']" href="/home.html">
+   378→   378→<span class="material-symbols-outlined font-['Playfair_Display']">home</span>
+   379→   379→<span class="font-label-sm text-[10px] uppercase tracking-widest mt-1 font-['Playfair_Display']">Home</span>
+   380→   380→</a>
+   381→   381→<a class="flex flex-col items-center justify-center text-cinematic-gold active:scale-90 transition-transform font-['Playfair_Display']" href="/schedule.html">
+   382→   382→<span class="material-symbols-outlined font-['Playfair_Display']" data-weight="fill">calendar_today</span>
+   383→   383→<span class="font-label-sm text-[10px] uppercase tracking-widest mt-1 font-['Playfair_Display']">Schedule</span>
+   384→   384→</a>
+   385→   385→<a class="flex flex-col items-center justify-center text-charcoal-ink/50 hover:text-cinematic-gold transition-colors active:scale-90 transition-transform font-['Playfair_Display']" href="/rsvp.html">
+   386→   386→<span class="material-symbols-outlined font-['Playfair_Display']">favorite</span>
+   387→   387→<span class="font-label-sm text-[10px] uppercase tracking-widest mt-1 font-['Playfair_Display']">RSVP</span>
+   388→   388→</a>
+   389→   389→<a class="flex flex-col items-center justify-center text-charcoal-ink/50 hover:text-cinematic-gold transition-colors active:scale-90 transition-transform font-['Playfair_Display']" href="#" onclick="event.preventDefault(); document.getElementById('mobile-menu-trigger')?.click();">
+   390→   390→<span class="material-symbols-outlined font-['Playfair_Display']">more_horiz</span>
+   391→   391→<span class="font-label-sm text-[10px] uppercase tracking-widest mt-1 font-['Playfair_Display']">More</span>
+   392→   392→</a>
+   393→   393→</nav>
+   394→   394→<!-- Footer -->
+   395→   395→<footer class="w-full py-20 bg-paper-cream border-t border-champagne-silk/10 pb-32 md:pb-20">
+   396→   396→    <div class="max-w-[1440px] mx-auto px-4 md:px-canvas-margin flex flex-col md:flex-row justify-between items-center gap-8">
+   397→   397→        <div class="flex flex-col md:flex-row items-center gap-6">
+   398→   398→            <a class="font-body-md text-body-md text-charcoal-ink/60 hover:text-cinematic-gold underline-offset-4 hover:underline transition-colors" href="mailto:concierge@dreamweavers.events">Contact Concierge</a>
+   399→   399→            <span class="font-body-md text-body-md text-charcoal-ink/60 underline-offset-4 transition-colors opacity-40 cursor-not-allowed" aria-disabled="true" title="Coming soon">Privacy Policy</span>
+   400→   400→            <span class="font-body-md text-body-md text-charcoal-ink/60 underline-offset-4 transition-colors opacity-40 cursor-not-allowed" aria-disabled="true" title="Coming soon">Technical Support</span>
+   401→   401→        </div>
+   402→   402→        <p class="font-label-sm text-label-sm text-charcoal-ink/40 uppercase tracking-wider font-semibold">© 2024 DREAMWEAVERS DIGITAL HEIRLOOMS</p>
+   403→   403→    </div>
+   404→   404→</footer>
+   405→   405→<script class="font-['Playfair_Display']">
+   406→   406→    function openDrawer(id) {
+   407→   407→        const drawer = document.getElementById(id);
+   408→   408→        const overlay = drawer.querySelector('.drawer-overlay');
+   409→   409→        const panel = drawer.children[1];
+   410→   410→        
+   411→   411→        drawer.classList.remove('pointer-events-none');
+   412→   412→        overlay.classList.remove('pointer-events-none', 'opacity-0');
+   413→   413→        overlay.classList.add('opacity-100');
+   414→   414→        panel.classList.remove('translate-y-full');
+   415→   415→        document.body.style.overflow = 'hidden';
+   416→   416→    }
+   417→   417→
+   418→   418→    function closeDrawer(id) {
+   419→   419→        const drawer = document.getElementById(id);
+   420→   420→        const overlay = drawer.querySelector('.drawer-overlay');
+   421→   421→        const panel = drawer.children[1];
+   422→   422→        
+   423→   423→        overlay.classList.remove('opacity-100');
+   424→   424→        overlay.classList.add('opacity-0', 'pointer-events-none');
+   425→   425→        panel.classList.add('translate-y-full');
+   426→   426→        
+   427→   427→        setTimeout(() => {
+   428→   428→            drawer.classList.add('pointer-events-none');
+   429→   429→            document.body.style.overflow = '';
+   430→   430→        }, 500);
+   431→   431→    }
+   432→   432→
+   433→   433→    document.addEventListener('DOMContentLoaded', () => {
+   434→   434→        document.documentElement.style.opacity = '1';
+   435→   435→    });
+   436→   436→</script>
+   437→   437→<script src="/nav.js" defer></script>
+   438→   438→</body></html>

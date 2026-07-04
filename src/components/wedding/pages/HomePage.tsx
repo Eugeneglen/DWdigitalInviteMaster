@@ -49,130 +49,145 @@ export default function HomePage() {
 
   return (
     <>
-      {/* Top Banner - "Eleanor & James" */}
+      {/* ===== TOP BANNER — "Eleanor & James" ===== */}
+      {/* Original: <div class="w-full h-[360px] md:h-[420px] bg-cover bg-center mt-[54px] md:mt-[64px] relative z-40 border-b border-champagne-silk/20 flex items-center justify-center" style="background-image: url('...')"> */}
+      {/* Original:   <div class="absolute inset-0 bg-gradient-to-b from-paper-cream/30 via-paper-cream/10 to-paper-cream/60"></div> */}
+      {/* Original:   <div class="relative z-10 text-center px-6"> */}
+      {/* Original:     <h1 class="font-display-hero text-[44px] md:text-[72px] leading-[1.05] text-charcoal-ink tracking-tight font-bold drop-shadow-sm">Eleanor &amp; James</h1> */}
       <div
         className="w-full h-[360px] md:h-[420px] bg-cover bg-center mt-[54px] md:mt-[64px] relative z-40 border-b border-champagne-silk/20 flex items-center justify-center"
         style={{ backgroundImage: `url('${BANNER_BG}')` }}
       >
         <div className="absolute inset-0 bg-gradient-to-b from-paper-cream/30 via-paper-cream/10 to-paper-cream/60" />
         <div className="relative z-10 text-center px-6">
-          <h1
-            className="text-[44px] md:text-[72px] leading-[1.05] text-charcoal-ink tracking-tight font-bold drop-shadow-sm"
-            style={{ fontFamily: "'Playfair Display', serif" }}
-          >
+          <h1 className="font-display-hero text-[44px] md:text-[72px] leading-[1.05] text-charcoal-ink tracking-tight font-bold drop-shadow-sm">
             Eleanor &amp; James
           </h1>
         </div>
       </div>
 
+      {/* ===== MAIN CONTENT ===== */}
+      {/* Original: <main class="pb-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto min-h-screen pt-[20px] md:pt-[40px]"> */}
       <main className="pb-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto min-h-screen pt-[20px] md:pt-[40px]">
-        {/* Hero Section */}
+        {/* ===== HERO SECTION ===== */}
+        {/* Original: <section class="relative h-[795px] md:h-screen w-full flex flex-col justify-end overflow-hidden"> */}
         <section className="relative h-[795px] md:h-screen w-full flex flex-col justify-end overflow-hidden">
-        {/* Background Image */}
-        <div className="absolute inset-0 z-0 inner-frame m-4 md:m-8">
-          <img
-            alt="Hero Wedding Portrait"
-            className="w-full h-full object-cover object-center rounded-lg shadow-[0_-4px_20px_rgba(26,26,26,0.04)]"
-            src={HERO_IMG}
-          />
-          <div className="absolute inset-0 hero-gradient rounded-lg" />
-        </div>
-
-        {/* Content Overlay */}
-        <div className="relative z-10 w-full px-8 md:px-24 pb-20 md:pb-32 flex flex-col items-center text-center">
-          {/* Date Badge */}
-          <div className="animate-fade-in delay-100 mb-8 inline-flex items-center justify-center border border-champagne-silk px-6 py-2 rounded-full bg-paper-cream/10 backdrop-blur-sm">
-            <span className="text-paper-cream tracking-[0.2em] uppercase font-semibold" style={{ fontSize: '12px', lineHeight: '16px', letterSpacing: '0.1em', fontWeight: 600 }}>
-              October 24, 2025
-            </span>
-          </div>
-
-          {/* Couple Names */}
-          <h2
-            className="animate-slide-up delay-200 text-[48px] leading-[1.1] md:text-[84px] text-paper-cream mb-6 tracking-tight drop-shadow-lg"
-            style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, letterSpacing: '-0.02em', lineHeight: '100px' }}
-          >
-            Eleanor<br className="md:hidden" />
-            <span className="italic font-light mx-4 text-cinematic-gold">&amp;</span>
-            <br className="md:hidden" />
-            James
-          </h2>
-
-          <p className="animate-slide-up delay-300 text-paper-cream/90 max-w-md mx-auto mb-12 italic" style={{ fontSize: '16px', lineHeight: '24px' }}>
-            Join us in celebrating our journey. A weekend of joy, laughter, and lifelong memories in the heart of the countryside.
-          </p>
-
-          {/* Countdown */}
-          <div className="animate-slide-up delay-400 grid grid-cols-4 gap-4 md:gap-8 w-full max-w-xl mx-auto border-t border-b border-champagne-silk/30 py-6 backdrop-blur-sm bg-charcoal-ink/20">
-            {[
-              { value: countdown.days, label: 'Days' },
-              { value: countdown.hours, label: 'Hours' },
-              { value: countdown.mins, label: 'Mins' },
-              { value: countdown.secs, label: 'Secs' },
-            ].map((item) => (
-              <div key={item.label} className="flex flex-col items-center">
-                <span
-                  className="text-[32px] md:text-[48px] text-paper-cream"
-                  style={{ fontFamily: "'Playfair Display', serif", fontWeight: 600, lineHeight: '56px' }}
-                >
-                  {String(item.value).padStart(2, '0')}
-                </span>
-                <span className="text-cinematic-gold tracking-widest uppercase mt-2 font-semibold" style={{ fontSize: '10px', lineHeight: '16px', letterSpacing: '0.1em', fontWeight: 600 }}>
-                  {item.label}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 animate-fade-in delay-400 flex flex-col items-center opacity-70">
-          <span className="text-[10px] text-paper-cream tracking-widest mb-2 uppercase font-semibold" style={{ fontSize: '10px', letterSpacing: '0.1em', fontWeight: 600 }}>
-            Discover
-          </span>
-          <span className="material-symbols-outlined text-paper-cream animate-bounce">arrow_downward</span>
-        </div>
-      </section>
-
-      {/* Tea Ceremony Section */}
-      <section className="py-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto bg-paper-cream">
-        <div className="max-w-4xl mx-auto flex flex-col items-center">
-          <div className="relative w-full aspect-[2/3] md:aspect-auto md:h-[800px] overflow-hidden rounded-lg shadow-xl mb-8 group">
+          {/* Background Image */}
+          {/* Original: <div class="absolute inset-0 z-0 inner-frame m-4 md:m-8"> */}
+          <div className="absolute inset-0 z-0 inner-frame m-4 md:m-8">
             <img
-              alt="The Tea Ceremony"
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-              src={TEA_IMG}
+              alt="Hero Wedding Portrait"
+              className="w-full h-full object-cover object-center rounded-lg shadow-[0_-4px_20px_rgba(26,26,26,0.04)]"
+              src={HERO_IMG}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-charcoal-ink/40 to-transparent pointer-events-none" />
+            <div className="absolute inset-0 hero-gradient rounded-lg" />
           </div>
-          <div className="text-center">
-            <span className="text-cinematic-gold block mb-2 uppercase tracking-[0.2em] font-semibold" style={{ fontSize: '12px', lineHeight: '16px', letterSpacing: '0.1em', fontWeight: 600 }}>
-              The Tradition
-            </span>
-            <h3 className="text-[32px] md:text-[48px] text-charcoal-ink" style={{ fontFamily: "'Playfair Display', serif", fontWeight: 600, lineHeight: '56px' }}>
-              The Tea Ceremony
-            </h3>
+
+          {/* Content Overlay */}
+          {/* Original: <div class="relative z-10 w-full px-8 md:px-24 pb-20 md:pb-32 flex flex-col items-center text-center"> */}
+          <div className="relative z-10 w-full px-8 md:px-24 pb-20 md:pb-32 flex flex-col items-center text-center">
+            {/* Master Date Badge */}
+            {/* Original: <div class="animate-fade-in delay-100 mb-8 inline-flex items-center justify-center border border-champagne-silk px-6 py-2 rounded-full bg-paper-cream/10 backdrop-blur-sm"> */}
+            {/* Original:   <span class="font-label-sm text-label-sm text-paper-cream tracking-[0.2em] uppercase font-semibold">October 24, 2025</span> */}
+            {/* NOTE: font-label-sm = fontFamily (Playfair Display). text-label-sm = 12px/16px/0.1em/600. tracking-[0.2em] overrides letter-spacing to 0.2em. font-semibold = 600. */}
+            <div className="animate-fade-in delay-100 mb-8 inline-flex items-center justify-center border border-champagne-silk px-6 py-2 rounded-full bg-paper-cream/10 backdrop-blur-sm">
+              <span className="font-label-sm text-label-sm leading-label-sm text-paper-cream tracking-[0.2em] uppercase font-semibold">
+                October 24, 2025
+              </span>
+            </div>
+
+            {/* Couple Names Typography */}
+            {/* Original: <h2 class="animate-slide-up delay-200 font-display-hero text-[48px] leading-[1.1] md:text-display-hero text-paper-cream mb-6 tracking-tight drop-shadow-lg"> */}
+            {/* NOTE: font-display-hero = fontFamily. text-[48px] leading-[1.1] on mobile. md:text-display-hero = 84px/100px/-0.02em/700 on desktop. tracking-tight overrides letter-spacing. */}
+            <h2 className="animate-slide-up delay-200 font-display-hero text-[48px] leading-[1.1] md:text-display-hero md:leading-display-hero md:font-bold text-paper-cream mb-6 tracking-tight drop-shadow-lg">
+              Eleanor<br className="md:hidden" />
+              <span className="italic font-light mx-4 text-cinematic-gold">&amp;</span>
+              <br className="md:hidden" />
+              James
+            </h2>
+
+            {/* Description */}
+            {/* Original: <p class="animate-slide-up delay-300 font-body-md text-body-md text-paper-cream/90 max-w-md mx-auto mb-12 italic"> */}
+            {/* NOTE: font-body-md = fontFamily. text-body-md = 16px/24px/400. */}
+            <p className="animate-slide-up delay-300 font-body-md text-body-md leading-body-md text-paper-cream/90 max-w-md mx-auto mb-12 italic">
+              Join us in celebrating our journey. A weekend of joy, laughter, and lifelong memories in the heart of the countryside.
+            </p>
+
+            {/* Countdown Component */}
+            {/* Original: <div class="animate-slide-up delay-400 grid grid-cols-4 gap-4 md:gap-8 w-full max-w-xl mx-auto border-t border-b border-champagne-silk/30 py-6 backdrop-blur-sm bg-charcoal-ink/20"> */}
+            <div className="animate-slide-up delay-400 grid grid-cols-4 gap-4 md:gap-8 w-full max-w-xl mx-auto border-t border-b border-champagne-silk/30 py-6 backdrop-blur-sm bg-charcoal-ink/20">
+              {[
+                { value: countdown.days, label: 'Days' },
+                { value: countdown.hours, label: 'Hours' },
+                { value: countdown.mins, label: 'Mins' },
+                { value: countdown.secs, label: 'Secs' },
+              ].map((item) => (
+                <div key={item.label} className="flex flex-col items-center">
+                  {/* Original: <span class="font-display-hero text-headline-lg-mobile md:text-headline-lg text-paper-cream"> */}
+                  {/* NOTE: font-display-hero = fontFamily. text-headline-lg-mobile = 32px/40px/600. md:text-headline-lg = 48px/56px/600. */}
+                  <span className="font-display-hero text-headline-lg-mobile leading-headline-lg-mobile md:text-headline-lg md:leading-headline-lg font-semibold text-paper-cream">
+                    {String(item.value).padStart(2, '0')}
+                  </span>
+                  {/* Original: <span class="font-label-sm text-[10px] md:text-label-sm text-cinematic-gold tracking-widest uppercase mt-2 font-semibold"> */}
+                  {/* NOTE: text-[10px] on mobile (overrides text-label-sm's 12px). md:text-label-sm = 12px on desktop. tracking-widest = 0.1em. */}
+                  <span className="font-label-sm text-[10px] md:text-label-sm text-cinematic-gold tracking-widest uppercase mt-2 font-semibold">
+                    {item.label}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
 
-      {/* Narrative Section */}
-      <section className="py-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto bg-paper-cream">
-        <div className="max-w-3xl mx-auto text-center space-y-8">
-          <span className="text-cinematic-gold block font-semibold" style={{ fontSize: '12px', lineHeight: '16px', letterSpacing: '0.2em', fontWeight: 600 }}>
-            The Prelude
-          </span>
-          <h3 className="text-[32px] md:text-[48px] text-charcoal-ink" style={{ fontFamily: "'Playfair Display', serif", fontWeight: 600, lineHeight: '56px' }}>
-            Our Story Begins Here
-          </h3>
-          <p className="text-charcoal-ink/80 leading-relaxed" style={{ fontSize: '16px', lineHeight: '24px' }}>
-            Every great romance is a narrative woven over time. Ours began with a serendipitous meeting and has evolved into a tapestry of shared adventures, quiet moments, and a profound commitment to one another.
-          </p>
-        </div>
-      </section>
-    </main>
+          {/* Scroll Indicator */}
+          {/* Original: <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 animate-fade-in delay-400 flex flex-col items-center opacity-70"> */}
+          {/* Original:   <span class="font-label-sm text-[10px] text-paper-cream tracking-widest mb-2 uppercase font-semibold">Discover</span> */}
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 animate-fade-in delay-400 flex flex-col items-center opacity-70">
+            <span className="font-label-sm text-[10px] text-paper-cream tracking-widest mb-2 uppercase font-semibold">Discover</span>
+            <span className="material-symbols-outlined text-paper-cream animate-bounce">arrow_downward</span>
+          </div>
+        </section>
 
-      {/* Floating Action Button */}
+        {/* ===== TEA CEREMONY SECTION ===== */}
+        {/* Original: <section class="py-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto bg-paper-cream"> */}
+        <section className="py-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto bg-paper-cream">
+          <div className="max-w-4xl mx-auto flex flex-col items-center">
+            {/* Original: <div class="relative w-full aspect-[2/3] md:aspect-auto md:h-[800px] overflow-hidden rounded-lg shadow-xl mb-8 group"> */}
+            <div className="relative w-full aspect-[2/3] md:aspect-auto md:h-[800px] overflow-hidden rounded-lg shadow-xl mb-8 group">
+              <img
+                alt="The Tea Ceremony"
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                src={TEA_IMG}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-charcoal-ink/40 to-transparent pointer-events-none" />
+            </div>
+            <div className="text-center">
+              {/* Original: <span class="font-label-sm text-label-sm text-cinematic-gold tracking-[0.2em] uppercase block mb-2 font-semibold">The Tradition</span> */}
+              <span className="font-label-sm text-label-sm leading-label-sm text-cinematic-gold tracking-[0.2em] uppercase block mb-2 font-semibold">The Tradition</span>
+              {/* Original: <h3 class="font-display-hero text-headline-lg-mobile md:text-headline-lg text-charcoal-ink">The Tea Ceremony</h3> */}
+              <h3 className="font-display-hero text-headline-lg-mobile leading-headline-lg-mobile md:text-headline-lg md:leading-headline-lg font-semibold text-charcoal-ink">The Tea Ceremony</h3>
+            </div>
+          </div>
+        </section>
+
+        {/* ===== NARRATIVE SECTION ===== */}
+        {/* Original: <section class="py-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto bg-paper-cream"> */}
+        <section className="py-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto bg-paper-cream">
+          <div className="max-w-3xl mx-auto text-center space-y-8">
+            {/* Original: <span class="font-label-sm text-label-sm text-cinematic-gold tracking-[0.2em] uppercase block font-semibold">The Prelude</span> */}
+            <span className="font-label-sm text-label-sm leading-label-sm text-cinematic-gold tracking-[0.2em] uppercase block font-semibold">The Prelude</span>
+            {/* Original: <h3 class="font-display-hero text-headline-lg-mobile md:text-headline-lg text-charcoal-ink">Our Story Begins Here</h3> */}
+            <h3 className="font-display-hero text-headline-lg-mobile leading-headline-lg-mobile md:text-headline-lg md:leading-headline-lg font-semibold text-charcoal-ink">Our Story Begins Here</h3>
+            {/* Original: <p class="font-body-md text-body-md text-charcoal-ink/80 leading-relaxed"> */}
+            <p className="font-body-md text-body-md leading-body-md text-charcoal-ink/80 leading-relaxed">
+              Every great romance is a narrative woven over time. Ours began with a serendipitous meeting and has evolved into a tapestry of shared adventures, quiet moments, and a profound commitment to one another.
+            </p>
+          </div>
+        </section>
+      </main>
+
+      {/* ===== FLOATING ACTION BUTTON ===== */}
+      {/* Original: <div class="fixed bottom-24 right-6 md:bottom-12 md:right-12 z-[55] transition-transform duration-300 transform translate-y-20 opacity-0" id="fab"> */}
+      {/* Original:   <button class="bg-charcoal-ink text-paper-cream w-16 h-16 rounded-full shadow-[0_8px_30px_rgba(26,26,26,0.12)] flex items-center justify-center hover:scale-105 active:scale-95 transition-all border border-cinematic-gold/30"> */}
       <div
         className={`fixed bottom-24 right-6 md:bottom-12 md:right-12 z-[55] transition-transform duration-300 ${
           showFab ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'
