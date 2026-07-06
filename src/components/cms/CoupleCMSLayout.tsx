@@ -10,6 +10,10 @@ import {
   HelpCircle,
   ToggleLeft,
   ImageIcon,
+  Users,
+  Mail,
+  MessageSquareHeart,
+  FileText,
   LogOut,
   ArrowLeft,
   Loader2,
@@ -22,11 +26,15 @@ import { useCoupleCMSStore, type CoupleCMSPage } from '@/store/useCoupleCMSStore
 const NAV_ITEMS: { key: CoupleCMSPage; label: string; icon: React.ElementType }[] = [
   { key: 'overview', label: 'Overview', icon: Home },
   { key: 'details', label: 'Your Details', icon: Heart },
+  { key: 'content', label: 'Content', icon: FileText },
   { key: 'schedule', label: 'Schedule', icon: Calendar },
   { key: 'story', label: 'Our Story', icon: BookOpen },
   { key: 'faqs', label: 'FAQs', icon: HelpCircle },
   { key: 'features', label: 'Features', icon: ToggleLeft },
   { key: 'images', label: 'Images', icon: ImageIcon },
+  { key: 'guests', label: 'Guests', icon: Users },
+  { key: 'rsvps', label: 'RSVPs', icon: Mail },
+  { key: 'wishes', label: 'Wishes', icon: MessageSquareHeart },
 ];
 
 export default function CoupleCMSLayout({ children }: { children: React.ReactNode }) {
