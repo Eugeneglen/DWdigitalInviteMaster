@@ -861,3 +861,21 @@ Stage Summary:
 - Guest invitation links: /{slug}?code={invitationCode}
 - OG meta tags for social sharing (title, description, hero image)
 - Pushed to CMS-Phase-1 branch on GitHub
+
+---
+Task ID: phase-9
+Agent: Main Agent
+Task: Phase 9 - Content Templates & Theming
+
+Work Log:
+- Created MasterTemplates.tsx with 6 pre-built wedding themes
+- Each template has color palette, font pairing, enable/disable toggle
+- Template preview with color labels
+- Set as Default functionality
+- Templates persisted via SystemSetting API
+- Updated page.tsx to use real MasterTemplates instead of ComingSoonPage
+
+Stage Summary:
+- Replaced last ComingSoonPage stub in Master CMS
+- 6 visual themes available: Classic Elegance, Modern Minimalist, Romantic Blush, Midnight Garden, Tropical Breeze, Autumn Warmth
+- Templates stored in SystemSetting for persistence

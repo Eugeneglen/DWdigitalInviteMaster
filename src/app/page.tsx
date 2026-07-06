@@ -19,7 +19,7 @@ const MasterWeddings = dynamic(() => import('@/components/cms/pages/MasterWeddin
 const MasterUsers = dynamic(() => import('@/components/cms/pages/MasterUsers'), { ssr: false });
 const MasterAnalytics = dynamic(() => import('@/components/cms/pages/MasterAnalytics'), { ssr: false });
 const MasterSettings = dynamic(() => import('@/components/cms/pages/MasterSettings'), { ssr: false });
-const ComingSoonPage = dynamic(() => import('@/components/cms/pages/ComingSoonPage'), { ssr: false });
+const MasterTemplates = dynamic(() => import('@/components/cms/pages/MasterTemplates'), { ssr: false });
 
 // Couple CMS pages — dynamic imports
 const CoupleOverview = dynamic(() => import('@/components/cms/couple/CoupleOverview'), { ssr: false });
@@ -40,7 +40,7 @@ const MASTER_CMS_PAGES: Record<CMSPage, React.ComponentType> = {
   dashboard: MasterDashboard,
   weddings: MasterWeddings,
   users: MasterUsers,
-  templates: () => <ComingSoonPage title="Content Templates" description="Manage invitation templates and themes" />,
+  templates: MasterTemplates,
   analytics: MasterAnalytics,
   settings: MasterSettings,
 };
