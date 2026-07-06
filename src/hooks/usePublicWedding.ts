@@ -58,6 +58,14 @@ export interface PublicWeddingData {
   }[];
   mediaByCategory: Record<string, PublicWeddingData['media']>;
   featureFlags: Record<string, boolean>;
+  wishes: {
+    id: string;
+    name: string;
+    relationship: string | null;
+    message: string;
+    imageUrl: string | null;
+    createdAt: string;
+  }[];
 }
 
 async function fetchWeddingData(): Promise<PublicWeddingData | null> {
@@ -107,4 +115,12 @@ export function usePublicWedding() {
   };
 
   return { data, loading, getField };
+}
+
+/**
+ * Invalidate the cached wedding data so next usePublicWedding call refetches.
+ */
+export function invalidateWeddingCache() {
+  cachedData = null;
+  cachedPromise = null;
 }

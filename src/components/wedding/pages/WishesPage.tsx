@@ -1,7 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import SectionBanner from '../SectionBanner';
+import { usePublicWedding } from '@/hooks/usePublicWedding';
+import { io as socketIO, Socket } from 'socket.io-client';
 
 const WISHES = [
   {
@@ -35,12 +37,91 @@ const WISHES = [
   },
 ];
 
+interface LocalWish {
+  id: string;
+  name: string;
+  relationship: string | null;
+  message: string;
+  imageUrl: string | null;
+  createdAt: string;
+}
+
 export default function WishesPage() {
+  const { data } = usePublicWedding();
+
+  const [localWishes, setLocalWishes] = useState<LocalWish[]>([]);
   const [name, setName] = useState('');
   const [relationship, setRelationship] = useState('');
   const [message, setMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+
+  const weddingId = data?.wedding?.id;
+  const socketRef = useRef<Socket | null>(null);
+
+  // Connect to real-time wish broadcast
+  useEffect(() => {
+    // Track IDs we already know about (from initial load + own submissions)
+    // to avoid duplicates from WebSocket
+    const socket = socketIO('/?XTransformPort=3004', {
+      transports: ['websocket', 'polling'],
+      reconnectionAttempts: 5,
+      reconnectionDelay: 2000,
+    });
+    socketRef.current = socket;
+
+    socket.on('connect', () => {
+      if (weddingId) {
+        socket.emit('join_wedding', weddingId);
+      }
+    });
+
+    socket.on('new_wish', (wish: LocalWish) => {
+      setLocalWishes((prev) => {
+        // Avoid duplicates
+        if (prev.some((w) => w.id === wish.id)) return prev;
+        return [wish, ...prev];
+      });
+    });
+
+    // Join wedding room when weddingId becomes available
+    if (weddingId && socket.connected) {
+      socket.emit('join_wedding', weddingId);
+    }
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
+  // Re-join room when weddingId loads
+  useEffect(() => {
+    if (weddingId && socketRef.current?.connected) {
+      socketRef.current.emit('join_wedding', weddingId);
+    }
+  }, [weddingId]);
+
+  // Build the CMS wish cards from data.wishes
+  const cmsWishCards = (data?.wishes ?? []).map((w, i) => ({
+    type: w.imageUrl ? 'image' as const : (i % 2 === 0 ? 'text-card' as const : 'dark-card' as const),
+    img: w.imageUrl ?? undefined,
+    role: w.relationship ?? undefined,
+    quote: w.message,
+    author: w.name,
+  }));
+
+  // Combine: CMS wishes + optimistic local wishes + hardcoded fallback
+  const allCards: typeof cmsWishCards = [
+    ...cmsWishCards,
+    ...localWishes.map((w, i) => ({
+      type: w.imageUrl ? 'image' as const : (i % 2 === 0 ? 'text-card' as const : 'dark-card' as const),
+      img: w.imageUrl ?? undefined,
+      role: w.relationship ?? undefined,
+      quote: w.message,
+      author: w.name,
+    })),
+    ...WISHES,
+  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,11 +132,26 @@ export default function WishesPage() {
       const res = await fetch('/api/wishes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name.trim(), relationship: relationship.trim() || undefined, message: message.trim() }),
+        body: JSON.stringify({
+          name: name.trim(),
+          relationship: relationship.trim() || undefined,
+          message: message.trim(),
+          weddingId,
+        }),
       });
       if (!res.ok) {
         setSubmitting(false);
         return;
+      }
+      const result = await res.json();
+
+      // Optimistically add the new wish to the top of the displayed list
+      // (WebSocket will also broadcast, but dedup prevents double-display)
+      if (result?.wish) {
+        setLocalWishes((prev) => {
+          if (prev.some((w) => w.id === result.wish.id)) return prev;
+          return [result.wish as LocalWish, ...prev];
+        });
       }
     } catch {
       setSubmitting(false);
@@ -92,7 +188,7 @@ export default function WishesPage() {
         {/* Masonry Wish Cards */}
         <section className="max-w-[1440px] mx-auto px-8 md:px-canvas-margin mb-32">
           <div className="masonry-grid">
-            {WISHES.map((wish, i) => (
+            {allCards.map((wish, i) => (
               <div key={i} className="wish-card">
                 {wish.type === 'image' && (
                   <>

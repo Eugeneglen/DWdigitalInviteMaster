@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, Suspense, useMemo } from 'react';
+import { useState, Suspense, useMemo, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { usePublicWedding } from '@/hooks/usePublicWedding';
 
 interface Guest {
   name: string;
@@ -30,6 +31,13 @@ export default function RSVPPage() {
 
 function RSVPPageInner() {
   const searchParams = useSearchParams();
+  const { data } = usePublicWedding();
+
+  // CMS data with fallbacks
+  const coupleName = data?.wedding.coupleName || 'Eleanor & James';
+  const venue = data?.wedding.venue || 'The Singapore EDITION';
+  const venueAddress = data?.wedding.venueAddress || '38 Cuscaden Road';
+  const weddingId = data?.wedding.id;
 
   // Parse URL params for auto-fill
   const autoFill = useMemo(() => {
@@ -59,7 +67,7 @@ function RSVPPageInner() {
     return { first, last, party };
   }, [searchParams]);
 
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0);
   const [partySize, setPartySize] = useState(autoFill.party);
   const [guests, setGuests] = useState<Guest[]>([{ name: '', dietary: [], responded: false }]);
   const [currentGuestIndex, setCurrentGuestIndex] = useState(0);
@@ -67,6 +75,21 @@ function RSVPPageInner() {
   const [result, setResult] = useState<RSVPResult | null>(null);
   const [firstName, setFirstName] = useState(autoFill.first);
   const [lastName, setLastName] = useState(autoFill.last);
+
+  // Step 0 — Invitation code lookup state
+  const [inviteCode, setInviteCode] = useState('');
+  const [lookupLoading, setLookupLoading] = useState(false);
+  const [lookupError, setLookupError] = useState('');
+  const [alreadyResponded, setAlreadyResponded] = useState(false);
+  const [alreadyRespondedStatus, setAlreadyRespondedStatus] = useState('');
+
+  // Submission state
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+
+  // Wedding ID from lookup or CMS
+  const [lookupWeddingId, setLookupWeddingId] = useState<string | null>(null);
+  const effectiveWeddingId = lookupWeddingId || weddingId;
 
   const submitStep1 = () => {
     if (!firstName.trim() || !lastName.trim()) return;
@@ -133,7 +156,7 @@ function RSVPPageInner() {
     }
   };
 
-  const submitGuestResponse = () => {
+  const submitGuestResponse = useCallback(async () => {
     if (!attendance) return;
 
     // Build the updated guests array immediately for computation
@@ -164,23 +187,114 @@ function RSVPPageInner() {
         rsvpResult = 'mixed';
       }
 
-      fetch('/api/rsvp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          firstName: firstName.trim(),
-          lastName: lastName.trim(),
-          partySize: updatedGuests.length,
-          guests: validGuests.map((g) => ({
-            name: g.name.trim(),
-            attendance: g.attendance || 'no',
-            dietary: g.dietary.length > 0 ? g.dietary.join(', ') : undefined,
-          })),
-        }),
-      }).catch(() => {});
+      setSubmitting(true);
+      setSubmitError('');
+
+      try {
+        const res = await fetch('/api/rsvp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            firstName: firstName.trim(),
+            lastName: lastName.trim(),
+            partySize: updatedGuests.length,
+            guests: validGuests.map((g) => ({
+              name: g.name.trim(),
+              attendance: g.attendance || 'no',
+              dietary: g.dietary.length > 0 ? g.dietary.join(', ') : undefined,
+            })),
+            weddingId: effectiveWeddingId,
+          }),
+        });
+
+        if (!res.ok) {
+          throw new Error('Submission failed');
+        }
+      } catch {
+        setSubmitError('Something went wrong. Please try again.');
+        setSubmitting(false);
+        return;
+      }
+
+      setSubmitting(false);
       setResult(rsvpResult);
     }
-  };
+  }, [attendance, guests, currentGuestIndex, firstName, effectiveWeddingId]);
+
+  // Step 0 — Look up invitation code
+  const handleLookup = useCallback(async () => {
+    const code = inviteCode.trim();
+    if (!code) return;
+
+    setLookupLoading(true);
+    setLookupError('');
+    setAlreadyResponded(false);
+
+    try {
+      const res = await fetch(`/api/guests/lookup?code=${encodeURIComponent(code)}`);
+      const data = await res.json();
+
+      if (data.found && data.alreadyResponded) {
+        setAlreadyResponded(true);
+        setAlreadyRespondedStatus(data.rsvpStatus || 'responded');
+        setLookupLoading(false);
+        return;
+      }
+
+      if (data.found && !data.alreadyResponded) {
+        const guest = data.guest;
+
+        // Parse name into first/last
+        const nameParts = (guest.name || '').trim().split(/\s+/);
+        const first = nameParts[0] || '';
+        const last = nameParts.slice(1).join(' ') || '';
+
+        setFirstName(first);
+        setLastName(last);
+
+        // Set party size
+        const ps = guest.partySize || 1;
+        setPartySize(ps);
+
+        // Build guests array
+        const newGuests: Guest[] = [{ name: guest.name || '', dietary: [], responded: false }];
+
+        // If plusOneName exists, add second guest
+        if (guest.plusOneName) {
+          newGuests.push({ name: guest.plusOneName, dietary: [], responded: false });
+        }
+
+        // Parse dietary notes into dietary options
+        if (guest.dietaryNotes) {
+          const notes = guest.dietaryNotes.toLowerCase();
+          newGuests[0].dietary = DIETARY_OPTIONS.filter((opt) =>
+            notes.includes(opt.toLowerCase())
+          );
+        }
+
+        setGuests(newGuests);
+
+        // Store wedding ID from lookup
+        if (guest.weddingId) {
+          setLookupWeddingId(guest.weddingId);
+        }
+
+        setLookupLoading(false);
+        setStep(2);
+        return;
+      }
+
+      if (data.error) {
+        setLookupError(data.error);
+        setLookupLoading(false);
+        return;
+      }
+    } catch {
+      setLookupError('Something went wrong. Please try again.');
+    }
+
+    setLookupLoading(false);
+  }, [inviteCode]);
 
   if (result) {
     const validGuests = guests.filter((g) => g.name.trim());
@@ -239,17 +353,89 @@ function RSVPPageInner() {
     <main className="flex-1 w-full max-w-xl mx-auto px-6 pt-32 pb-20 flex flex-col">
       {/* Event header */}
       <div className="text-center mb-10">
-        <h1 className="font-serif italic text-[40px] md:text-[52px] leading-tight text-charcoal-ink">Eleanor &amp; James</h1>
-        <p className="mt-4 text-[15px] text-charcoal-ink/80">The Singapore EDITION, 38 Cuscaden Road</p>
-        <p className="text-[15px] text-charcoal-ink/80">Singapore 249731</p>
+        <h1 className="font-serif italic text-[40px] md:text-[52px] leading-tight text-charcoal-ink">{coupleName}</h1>
+        <p className="mt-4 text-[15px] text-charcoal-ink/80">{venue}, {venueAddress}</p>
       </div>
 
-      {/* Progress dots — 4 steps */}
+      {/* Progress dots — 5 steps (0–4) */}
       <div className="flex items-center justify-center gap-2 mb-10">
-        {[1, 2, 3, 4].map((n) => (
+        {[0, 1, 2, 3, 4].map((n) => (
           <span key={n} className={`step-dot ${n <= step ? 'active' : ''}`} />
         ))}
       </div>
+
+      {/* STEP 0 — Invitation Code Lookup */}
+      {step === 0 && (
+        <section className="staggered-fade-in" style={{ animationDelay: '0s', opacity: 1 }}>
+          <div className="text-center mb-8">
+            <p className="font-semibold text-[15px] tracking-wide">Look Up Your Invitation</p>
+            <p className="text-[13px] text-charcoal-ink/60 italic mt-2">
+              Enter the code from your invitation to auto-fill your details.
+            </p>
+          </div>
+          <div className="space-y-6">
+            <div>
+              <input
+                className="input-line text-center tracking-[0.15em] uppercase"
+                style={{ fontFamily: "'JetBrains Mono', 'SF Mono', 'Fira Code', monospace" }}
+                value={inviteCode}
+                onChange={(e) => {
+                  setInviteCode(e.target.value.toUpperCase());
+                  setLookupError('');
+                  setAlreadyResponded(false);
+                }}
+                type="text"
+                placeholder="Enter your invitation code"
+                autoComplete="off"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleLookup();
+                }}
+                disabled={lookupLoading}
+              />
+              {lookupError && (
+                <p className="text-red-500/70 text-[13px] mt-2 text-center">{lookupError}</p>
+              )}
+              {alreadyResponded && (
+                <div className="mt-4 text-center">
+                  <span className="material-symbols-outlined text-cinematic-gold text-[36px]">favorite</span>
+                  <p className="text-[14px] text-charcoal-ink/80 mt-2">
+                    You&apos;ve already responded! Your status: <span className="font-semibold">{alreadyRespondedStatus}</span>. Thank you!
+                  </p>
+                </div>
+              )}
+            </div>
+            {!alreadyResponded && (
+              <>
+                <button
+                  className="w-full bg-charcoal-ink text-paper-cream rounded px-8 py-3 text-[13px] font-medium uppercase tracking-[0.08em] hover:opacity-90 transition-opacity duration-300 flex items-center justify-center gap-2"
+                  onClick={handleLookup}
+                  disabled={lookupLoading || !inviteCode.trim()}
+                >
+                  {lookupLoading && (
+                    <span className="material-symbols-outlined text-[18px] animate-spin">progress_activity</span>
+                  )}
+                  {lookupLoading ? 'Looking up…' : 'Look Up'}
+                </button>
+
+                {/* Divider */}
+                <div className="flex items-center gap-4 my-2">
+                  <div className="flex-1 border-t border-charcoal-ink/15" />
+                  <span className="text-[12px] text-charcoal-ink/40 uppercase tracking-[0.15em]">or</span>
+                  <div className="flex-1 border-t border-charcoal-ink/15" />
+                </div>
+
+                {/* Skip link */}
+                <button
+                  className="w-full text-[13px] text-charcoal-ink/50 hover:text-cinematic-gold transition-colors duration-300 py-1"
+                  onClick={() => setStep(1)}
+                >
+                  Skip — RSVP manually
+                </button>
+              </>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* STEP 1 */}
       {step === 1 && (
@@ -449,6 +635,11 @@ function RSVPPageInner() {
             </div>
           </div>
 
+          {/* Submission error message */}
+          {submitError && (
+            <p className="text-red-500/70 text-[13px] mt-4 text-center">{submitError}</p>
+          )}
+
           {/* Navigation */}
           <div className="flex gap-3 mt-10">
             <button
@@ -458,13 +649,16 @@ function RSVPPageInner() {
               Back
             </button>
             <button
-              className={`flex-[2] bg-charcoal-ink text-paper-cream rounded px-8 py-3 text-[13px] font-medium uppercase tracking-[0.08em] hover:opacity-90 transition-opacity duration-300 ${
-                !attendance ? 'opacity-40' : ''
+              className={`flex-[2] bg-charcoal-ink text-paper-cream rounded px-8 py-3 text-[13px] font-medium uppercase tracking-[0.08em] hover:opacity-90 transition-opacity duration-300 flex items-center justify-center gap-2 ${
+                !attendance || submitting ? 'opacity-40' : ''
               }`}
-              disabled={!attendance}
+              disabled={!attendance || submitting}
               onClick={submitGuestResponse}
             >
-              Save &amp; Continue
+              {submitting && (
+                <span className="material-symbols-outlined text-[18px] animate-spin">progress_activity</span>
+              )}
+              {submitting ? 'Saving…' : 'Save & Continue'}
             </button>
           </div>
         </section>

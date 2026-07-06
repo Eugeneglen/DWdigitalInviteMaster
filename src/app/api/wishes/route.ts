@@ -6,6 +6,7 @@ const wishSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   relationship: z.string().optional(),
   message: z.string().min(1, 'Message is required'),
+  weddingId: z.string().optional(),
 });
 
 export async function POST(request: Request) {
@@ -20,25 +21,57 @@ export async function POST(request: Request) {
       );
     }
 
-    const { name, relationship, message } = parsed.data;
+    const { name, relationship, message, weddingId } = parsed.data;
+
+    // Validate weddingId if provided
+    if (weddingId) {
+      const wedding = await db.weddingAccount.findUnique({
+        where: { id: weddingId },
+        select: { id: true, status: true },
+      });
+      if (!wedding) {
+        return NextResponse.json({ error: 'Wedding not found' }, { status: 404 });
+      }
+    }
 
     const wish = await db.wish.create({
       data: {
         name,
         relationship: relationship || null,
         message,
+        weddingId: weddingId || null,
       },
     });
 
-    return NextResponse.json({ success: true, id: wish.id });
+    // Notify WebSocket service about new wish
+    try {
+      await fetch(`http://localhost:3004/notify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'new_wish',
+          payload: { id: wish.id, name: wish.name, relationship: wish.relationship, message: wish.message, imageUrl: wish.imageUrl, createdAt: wish.createdAt, weddingId: wish.weddingId },
+        }),
+      }).catch(() => {
+        // WebSocket service may not be running — ignore
+      });
+    } catch {
+      // Ignore WebSocket notification failure
+    }
+
+    return NextResponse.json({ success: true, id: wish.id, wish });
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
+    const { searchParams } = new URL(req.url);
+    const weddingId = searchParams.get('weddingId');
+
     const wishes = await db.wish.findMany({
+      where: weddingId ? { weddingId } : undefined,
       orderBy: { createdAt: 'desc' },
     });
 

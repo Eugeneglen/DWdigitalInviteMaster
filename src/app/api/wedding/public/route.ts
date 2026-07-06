@@ -21,6 +21,7 @@ export async function GET(req: Request) {
         stories: { orderBy: { sortOrder: 'asc' } },
         media: { orderBy: { sortOrder: 'asc' } },
         features: true,
+        wishes: { orderBy: { createdAt: 'desc' } },
       },
     });
 
@@ -70,6 +71,14 @@ export async function GET(req: Request) {
       media: wedding.media,
       mediaByCategory,
       featureFlags,
+      wishes: wedding.wishes.map((w) => ({
+        id: w.id,
+        name: w.name,
+        relationship: w.relationship,
+        message: w.message,
+        imageUrl: w.imageUrl,
+        createdAt: w.createdAt,
+      })),
     });
   } catch (error) {
     console.error('Public wedding API error:', error);

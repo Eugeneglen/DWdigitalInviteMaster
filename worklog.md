@@ -608,3 +608,64 @@ Work Log:
 Stage Summary:
 - Both export buttons generate and download CSV files with date-stamped filenames
 - Sonner toast feedback on export success/empty
+
+---
+Task ID: 5-1
+Agent: Main Agent
+Task: Fix guest submission APIs for multi-tenancy
+
+Work Log:
+- Updated `/api/wedding/public/route.ts` to include `wishes` in response (ordered by createdAt desc)
+- Updated `/api/rsvp/route.ts` to accept optional `weddingId`, validate wedding exists and is ACTIVE, auto-update Guest.rsvpStatus on match
+- Updated `/api/wishes/route.ts` to accept optional `weddingId` on POST, filter GET by weddingId, notify WebSocket service on new wish
+- Updated `/api/contact/route.ts` to accept optional `weddingId`, validate wedding exists
+- Created `/api/guests/lookup/route.ts` — public endpoint for invitation code lookup, returns guest name/partySize/plusOne/dietary/weddingId or already-responded status
+- Updated `usePublicWedding.ts` hook to include `wishes` type and added `invalidateWeddingCache()` export
+
+Stage Summary:
+- All 3 guest submission APIs (RSVP, Wishes, Contact) now link submissions to weddings via weddingId
+- Public API returns wishes for guest-facing display
+- Guest lookup endpoint enables pre-filling RSVP forms from invitation codes
+- Zero lint errors
+
+---
+Task ID: 5-2,5-3,5-4
+Agent: WishesPage & RSVPPage Subagents
+Task: Connect WishesPage to CMS data + Polish RSVPPage with invitation lookup
+
+Work Log:
+- WishesPage: imported usePublicWedding, renders CMS wishes (from data.wishes) + local optimistic wishes + hardcoded fallback
+- WishesPage: CMS wishes alternate text-card/dark-card styles; wishes with imageUrl render as image type cards
+- WishesPage: form submission passes weddingId, optimistically prepends new wish with dedup
+- RSVPPage: imported usePublicWedding, couple name/venue/address from CMS with fallbacks
+- RSVPPage: added Step 0 (Invitation Code Lookup) with monospace input, Look Up button, "or" divider, Skip link
+- RSVPPage: lookup auto-fills firstName/lastName/partySize/plusOneName/dietary, advances to Step 2
+- RSVPPage: already-responded guests see heart icon + status message
+- RSVPPage: invalid codes show error below input in red
+- RSVPPage: submission uses async/await with proper error handling, loading spinner on Save button
+- RSVPPage: progress dots updated from 4 to 5 (steps 0-4)
+
+Stage Summary:
+- WishesPage shows real CMS wishes with optimistic updates on submission
+- RSVPPage has 5-step flow: Lookup → Name → Party Size → Confirm → Attendance
+- All styling preserved exactly (masonry grid, input-line, step-dots, opt-btn, etc.)
+- Zero lint errors
+
+---
+Task ID: 5-5
+Agent: Main Agent
+Task: Real-time wishes via WebSocket mini-service
+
+Work Log:
+- Created `mini-services/wish-broadcast/` with package.json and index.ts
+- Socket.IO server on port 3004 with room-based wedding channels
+- HTTP endpoint POST /notify for API route integration
+- Clients connect via socket.io-client, join wedding room, listen for new_wish events
+- WishesPage connects on mount, joins wedding room, deduplicates incoming wishes
+- Wish submission API notifies broadcast service (best-effort, graceful failure)
+
+Stage Summary:
+- WebSocket mini-service broadcasts new wishes in real-time to all connected clients viewing the same wedding
+- Room-based architecture supports multi-tenant isolation
+- Graceful degradation — wishes still save to DB even if broadcast service is down
+- socket.io-client added as project dependency

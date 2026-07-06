@@ -1,0 +1,611 @@
+     1→# DWdigitalInvite → Next.js Conversion Worklog
+     2→
+     3→---
+     4→Task ID: 1
+     5→Agent: Main Agent
+     6→Task: Convert DWdigitalInvite from TanStack Start to Next.js (continuation)
+     7→
+     8→Work Log:
+     9→- Analyzed 4 reference images showing target design (Home, Schedule, RSVP, Getting There)
+    10→- Explored full DWdigitalInvite project (12 HTML files, React scaffold, 46 shadcn components)
+    11→- Discovered project was already partially converted in a previous session
+    12→- Fixed countdown timer (wedding date was 2025, system date is 2026 - updated to 2027)
+    13→- Fixed logo 404 (copied from /assets/dreamweavers-logo.png to /dreamweavers-logo.png)
+    14→- Updated home page invitation text to match reference design
+    15→- Updated RSVP page date reference to 2027
+    16→- Verified all 8 guest pages via browser automation (Home, Schedule, RSVP, Getting There, Story, Wishes, Q&A, Moments)
+    17→- Tested RSVP multi-step flow (Name → Party Size → Guest List → Attendance → Done)
+    18→- Tested Q&A accordion toggle
+    19→- Tested Getting There tab switching (By Car / Public Transit)
+    20→- Tested mobile drawer navigation
+    21→- Tested bottom navigation bar
+    22→- Ran lint check (0 errors, 1 expected warning)
+    23→- Verified countdown timer shows correct values
+    24→
+    25→Stage Summary:
+    26→- All 8 guest-facing pages are converted and functional
+    27→- SPA navigation via Zustand store working correctly
+    28→- Design system (paper-cream, charcoal-ink, cinematic-gold, champagne-silk) preserved
+    29→- Playfair Display font, Material Symbols icons, staggered animations all working
+    30→- Responsive design with mobile drawer + bottom nav confirmed
+    31→- RSVP flow with 4-step wizard fully interactive
+    32→- Admin pages (Dashboard, Guests, Media) also converted
+    33→
+    34→---
+    35→Task ID: 2
+    36→Agent: Main Agent
+    37→Task: Create 5 layout/navigation components using useNavigationStore
+    38→
+    39→Work Log:
+    40→- Read existing worklog, useNavigationStore.ts, globals.css, and all existing components
+    41→- Discovered existing components (Navbar, MobileDrawer, BottomNav, Footer, HeroBanner) used old `@/lib/store` instead of `@/store/useNavigationStore`
+    42→- Created Header.tsx: fixed top bar with logo, 8-section desktop nav (lg+), mobile hamburger triggering drawer
+    43→- Rewrote MobileDrawer.tsx: CSS transition-based slide-in/out with opacity overlay, body scroll lock, all 8 nav links
+    44→- Rewrote BottomNav.tsx: 5-item mobile bottom bar (Home/RSVP/Story/Moments/More), filled icon for active state, rounded-t-[24px] glass effect, More triggers drawer
+    45→- Rewrote Footer.tsx: simplified to Contact Concierge (mailto), Privacy Policy & Technical Support (disabled/opacity-40), copyright text, no admin link
+    46→- Created SectionBanner.tsx: reusable section header with bg image, gradient overlay, title/subtitle, matching HeroBanner spec
+    47→- Updated page.tsx to import Header instead of Navbar and use useNavigationStore
+    48→- Updated 6 page components (Schedule, GettingThere, Story, Wishes, QA, Moments) to import SectionBanner instead of HeroBanner
+    49→- Ran lint: 0 errors, 1 expected warning (custom font)
+    50→- Verified dev server: all compilations successful, 200 responses
+    51→
+    52→Stage Summary:
+    53→- 5 new/replaced components: Header, MobileDrawer, BottomNav, Footer, SectionBanner
+    54→- All components migrated from `@/lib/store` (untyped) to `@/store/useNavigationStore` (typed Section enum)
+    55→- Consistent design system usage: paper-cream, charcoal-ink, cinematic-gold, champagne-silk
+    56→- Responsive: desktop nav (lg+), mobile hamburger + drawer, bottom nav (md:hidden)
+    57→- SectionBanner replaces HeroBanner as reusable section header across all 6 inner pages---
+    58→Task ID: 1
+    59→Agent: Main
+    60→Task: Deep dive and recreate DWdigitalInvite frontend in Next.js
+    61→
+    62→Work Log:
+    63→- Read all 8 guest-facing HTML pages from /home/z/DWdigitalInvite/public/ (home, schedule, rsvp, getting-there, story, moments, wishes, qa)
+    64→- Extracted complete design system: paper-cream (#FDF9F3), charcoal-ink (#1A1A1A), cinematic-gold (#D4AF37), champagne-silk (#E8D5B5)
+    65→- Identified font: Playfair Display (serif) used throughout
+    66→- Identified icons: Material Symbols Outlined
+    67→- Identified animations: fadeIn, slideUp, staggered delays, reveal-on-scroll, accordion
+    68→- Identified layout patterns: fixed top nav with glassmorphism, mobile bottom nav, hero banners, 1440px max-width
+    69→- Copied dreamweavers-logo.png to Next.js public folder
+    70→- Created Zustand store for single-page navigation (useNavigationStore.ts)
+    71→- Built shared components: Header, MobileDrawer, BottomNav, Footer, SectionBanner
+    72→- Built 8 page components: HomePage, SchedulePage, RSVPPage, GettingTherePage, StoryPage, MomentsPage, WishesPage, QAPage
+    73→- Verified all pages with Agent Browser (desktop + mobile)
+    74→
+    75→Stage Summary:
+    76→- Complete wedding digital invitation app rebuilt as Next.js single-page app
+    77→- All 8 sections faithfully recreated with matching design system
+    78→- RSVP multi-step form verified working (4 steps: name, party size, guest list, per-guest questions)
+    79→- Mobile responsive with bottom nav and side drawer
+    80→- Accordion FAQ, masonry photo gallery, masonry wish cards, timeline schedule, tabbed directions
+    81→- Zero lint errors, all pages compile and render successfully
+    82→
+    83→---
+    84→Task ID: 3
+    85→Agent: Main Agent
+    86→Task: Deep comparison and UX/UI fix pass to match original DWdigitalInvite exactly
+    87→
+    88→Work Log:
+    89→- Deep-read all 8 original HTML files + all 8 Next.js page components side by side
+    90→- Identified 12 specific differences between original and Next.js version
+    91→- Fixed paper-cream color: #FDF9F3 → #FCF9F2 (original value) across all CSS variables
+    92→- Added missing Material Design surface color tokens: surface-container-low, surface-container, surface-container-high, surface-container-highest, surface-container-lowest
+    93→- Added Inter font to layout.tsx (used by Wishes page labels/forms)
+    94→- Added selection:bg-cinematic-gold selection:text-paper-cream to page wrapper
+    95→- Fixed HomePage: date 2027→2025, hero description text restored to original
+    96→- Fixed RSVPPage: event header now shows two-line address (38 Cuscaden Road / Singapore 249731)
+    97→- Fixed StoryPage: tidbits heading size 32px→22px, added reveal-on-scroll IntersectionObserver
+    98→- Fixed GettingTherePage: default tab changed from 'car' to 'transit' (matches original)
+    99→- Fixed QAPage: added animate-orchestral staggered fade-in animations with delay classes
+   100→- Fixed BottomNav: per-page nav config (different icons per page, Q&A shows help icon, no More on Q&A)
+   101→- Fixed SchedulePage: only first card disabled, added bottom sheet drawers for Where to Stay & Directions, gold-leaf-dot class
+   102→- Added gold-leaf-dot CSS class to globals.css
+   103→- All pages verified via Agent Browser with zero console errors
+   104→
+   105→Stage Summary:
+   106→- 12 UX/UI differences identified and fixed
+   107→- Color system now matches original (#FCF9F2 paper-cream, all surface tokens)
+   108→- Per-page bottom nav behavior matches original (schedule shows calendar_today, Q&A shows help)
+   109→- Scroll-based reveal animations added to Story page
+   110→- Orchestral stagger animations added to Q&A page
+   111→- Bottom sheet drawers added to Schedule page
+   112→- Zero lint errors, zero console errors, all 8 pages verified rendering
+   113→
+   114→
+   115→---
+   116→Task ID: 4
+   117→Agent: Main Agent
+   118→Task: Standardize button design across all pages (flat, text-only, no icons, consistent sizing)
+   119→
+   120→Work Log:
+   121→- Audited all buttons across 8 pages: HomePage (FAB), SchedulePage (2), RSVPPage (8), QAPage (1), StoryPage (3), WishesPage (1), GettingTherePage (0 action buttons, tabs preserved), MomentsPage (0)
+   122→- Defined two standard button classes:
+   123→  - Outline (secondary): `border border-charcoal-ink/15 bg-white rounded px-8 py-3 text-[13px] font-medium uppercase tracking-[0.08em] text-charcoal-ink hover:border-cinematic-gold hover:text-cinematic-gold transition-colors duration-300`
+   124→  - Filled (primary): `bg-charcoal-ink text-paper-cream rounded px-8 py-3 text-[13px] font-medium uppercase tracking-[0.08em] hover:opacity-90 transition-opacity duration-300`
+   125→- Updated SchedulePage: 2 outline buttons (Add to Calendar, Directions) — bg-transparent→bg-white, px-6→px-8, text-sm→text-[13px], hover to gold
+   126→- Updated RSVPPage: 3 Back buttons (outline), 4 Next/Continue/Save buttons (filled), 1 Respond/Edit per-guest button (small outline) — all to new standard
+   127→- Updated QAPage: Message the Couple — removed forum icon, changed from filled dark to outline style
+   128→- Updated StoryPage: Amalfi Coast & Kyoto (outline), Submit Recommendation (filled) — bg-transparent→bg-white, hover to gold
+   129→- Updated WishesPage: Weave into Archive — removed arrow_right_alt icon and check_circle/spinner icons, simplified to text-only
+   130→- Preserved non-standard buttons: FAB (circular special purpose), counter ±buttons, tab buttons, attendance radio options, Add Another Guest (link-style)
+   131→- Ran lint: 0 errors
+   132→- Verified all pages via Agent Browser + VLM: buttons are flat, text-only, no icons, correct bg/border colors
+   133→
+   134→Stage Summary:
+   135→- All action buttons across 6 pages standardized to consistent flat design language
+   136→- Two variants: outline (white bg + border, gold hover) and filled (dark bg)
+   137→- All icons removed from action buttons
+   138→- Consistent sizing: px-8 py-3, text-[13px], tracking-[0.08em]
+   139→- Zero lint errors, zero console errors, all verified visually
+   140→
+   141→---
+   142→Task ID: 5
+   143→Agent: Main Agent
+   144→Task: Redesign RSVP Step 3 with dietary preference pills per reference image
+   145→
+   146→Work Log:
+   147→- Analyzed reference image via VLM: guest cards with number, name input, dietary pills (Halal, Vegetarian, No Seafood), dashed "Add Another Guest", Back/Continue
+   148→- Rewrote RSVPPage.tsx: simplified from 4-step to 3-step flow
+   149→  - Removed Step 4 (per-guest attendance + dietary textarea)
+   150→  - Redesigned Step 3: each guest has numbered row + name input + 3 toggleable dietary pills
+   151→  - Updated Guest interface: removed responded/attendance/dietary string, added dietary: string[]
+   152→  - Dietary pills: rounded-full toggle buttons with gold highlight on selection
+   153→  - "Add Another Guest" changed to dashed border button matching reference
+   154→  - Progress dots reduced from 4 to 3
+   155→  - Continue button submits directly (no per-guest response gating)
+   156→- Ran lint: 0 errors
+   157→- Verified full flow via Agent Browser: auto-fill → Step 1 → Step 2 → Step 3 (2 guests, dietary pills, toggle) → Thank You page
+   158→- Verified dietary toggle visual: gold background on selected state, white/gray on unselected
+   159→
+   160→Stage Summary:
+   161→- RSVP flow simplified to 3 steps: Name → Party Size → Confirm Guests + Dietary
+   162→- Each guest row shows: gold number, name input, 3 dietary preference pills (Halal, Vegetarian, No Seafood)
+   163→- Dietary pills are toggleable per guest with gold highlight
+   164→- Dashed "Add Another Guest" button
+   165→- Zero lint errors, zero console errors
+   166→
+   167→---
+   168→Task ID: 6
+   169→Agent: Main Agent
+   170→Task: Re-add per-guest attendance step (Step 4) before thank-you page
+   171→
+   172→Work Log:
+   173→- Analyzed reference image: per-guest attendance with "Responding for {name}", "Guest X of Y", 3 attendance options, Back/Save & Continue
+   174→- Re-added Step 4 to RSVPPage: per-guest attendance question after dietary step
+   175→- Updated Guest interface: added `attendance?: string` and `responded: boolean`
+   176→- Updated progress dots from 3 back to 4
+   177→- Flow: Step 3 Continue → Step 4 (Guest 1) → Save → Step 4 (Guest 2) → Save → Thank You
+   178→- Attendance auto-advances to next unresponded guest, then submits and shows thank you
+   179→- Verified full 4-step flow via Agent Browser with 2 guests
+   180→- Zero lint errors, zero console errors
+   181→
+   182→Stage Summary:
+   183→- 4-step RSVP flow restored: Name → Party Size → Dietary → Attendance → Thank You
+   184→- Step 4 matches reference: "Responding for {name}" header, "Guest X of Y", 3 attendance radio options, Save & Continue
+   185→- Auto-advances through guests, submits on last response
+   186→
+   187→---
+   188→Task ID: 7
+   189→Agent: Main Agent
+   190→Task: Add "We'll Miss You" result page for declined RSVP guests, with mixed-attendance handling
+   191→
+   192→Work Log:
+   193→- Analyzed reference image via VLM: "We'll Miss You" title, mail icon, personalized message, "0 of 1 guest attending" counter
+   194→- Replaced `done: boolean` state with `result: RSVPResult | null` (types: 'all-attending' | 'all-declined' | 'mixed')
+   195→- Built 3 conditional result pages based on attendance outcomes
+   196→- Fixed stale-state bug: `submitGuestResponse` was computing result from pre-update `guests` array (React async setState). Refactored to compute `updatedGuests` synchronously before calling `setGuests()`
+   197→- All 3 scenarios verified via Agent Browser + VLM:
+   198→  - All declined (1 guest, "no"): Shows "We'll Miss You" + mail icon + personalized message + "0 of 1 guest attending"
+   199→  - Mixed (2 guests, "yes" + "no"): Shows "Thank you" + heart icon + "We're sorry Sarah can't make it, but we're so glad Eugene will be joining us! We'll keep everyone in our thoughts on our special day." + "1 of 2 guests attending"
+   200→  - All attending (1 guest, "yes"): Shows "Thank you" + heart icon + "Your RSVP has been received. We can't wait to celebrate with you." + "1 of 1 guest attending"
+   201→- For the mixed attendance case (user's question): title stays "Thank you" (positive tone since someone IS coming), body acknowledges the declined guest by name, celebrates the attending guest by name, and ends with "We'll keep everyone in our thoughts on our special day."
+   202→- Zero lint errors, zero runtime errors
+   203→
+   204→Stage Summary:
+   205→- 3 RSVP result page variants implemented: all-attending, all-declined, mixed
+   206→- "We'll Miss You" page matches reference image design (mail icon, personalized message, guest count)
+   207→- Mixed attendance message gracefully handles both attending and declined guests by first name
+   208→- Guest attendance counter shown on all result pages (e.g., "1 of 2 guests attending")
+   209→
+   210→---
+   211→Task ID: 8
+   212→Agent: Main Agent
+   213→Task: Final production audit — all pages, functions, links, and code quality
+   214→
+   215→Work Log:
+   216→- Ran ESLint: 0 errors, 1 expected warning (custom font in layout.tsx)
+   217→- Ran TypeScript type check: 0 errors in src/ (4 errors in non-app examples/skills dirs)
+   218→- Searched for console.log/warn/error: none found
+   219→- Searched for TODO/FIXME/HACK: none found
+   220→- Launched 2 parallel subagent audits:
+   221→  - Shared components & layout audit (10 files)
+   222→  - All 8 page components audit
+   223→- Fixed 7 blocking issues:
+   224→  1. Deleted 4 dead files: src/lib/store.ts, Navbar.tsx, HeroBanner.tsx, AdminLayout.tsx
+   225→  2. RSVP addGuest() now clamps at max 10 guests (was unbounded)
+   226→  3. RSVP submit payload now sends firstName, lastName, partySize, guests with correct format
+   227→  4. RSVP dietary array joined to comma-separated string for API
+   228→  5. Q&A "Message the Couple" changed from dead <button> to <a href="mailto:...">
+   229→  6. Wishes upload area removed misleading cursor-pointer/hover (decorative only)
+   230→  7. Wishes form now validates name+message before submit, checks res.ok, handles errors
+   231→  8. SchedulePage date reconciled: June 22, 2024 → December 25, 2027 (matches HomePage countdown)
+   232→  9. db.ts Prisma query logging gated to development only
+   233→  10. RSVP dead code goBackToStep4Guest removed
+   234→- Navigated all 8 pages via Agent Browser — zero errors, all compile clean, all 200s
+   235→
+   236→Stage Summary:
+   237→- 7 blocking bugs fixed, 4 dead files removed
+   238→- All 8 pages render and navigate correctly
+   239→- All API routes have correct Zod validation matching frontend payloads
+   240→- Zero lint errors, zero TypeScript errors in src/, zero console.log, zero TODO/FIXME
+   241→- Production-ready: query logging gated, form validation in place, dead code eliminated
+   242→
+   243→---
+   244→Task ID: footer-legal-popups
+   245→Agent: Main Agent
+   246→Task: Replace Privacy Policy with Data Protection, add Terms of Service popup, enable Technical Support in footer
+   247→
+   248→Work Log:
+   249→- Read both uploaded .docx files (Data Protection, Terms of Service) and extracted full text content
+   250→- Created /home/z/my-project/src/lib/legal-content.tsx — structured document data with typed sections and formatted React content (lists, paragraphs, email links, draft notes)
+   251→- Created /home/z/my-project/src/components/wedding/LegalDocumentModal.tsx — reusable dialog modal with scroll area, header (title/subtitle/version), sectioned body, and draft disclaimer banner
+   252→- Updated /home/z/my-project/src/components/wedding/Footer.tsx — replaced disabled "Privacy Policy" with active "Data Protection" button, added active "Terms of Service" button, enabled "Technical Support" as mailto link
+   253→- Verified via Agent Browser: all 4 footer links render correctly, both modals open with full scrollable content and proper close functionality, no console errors
+   254→
+   255→Stage Summary:
+   256→- Footer now has 4 active links: Contact Concierge (mailto), Data Protection (popup), Terms of Service (popup), Technical Support (mailto)
+   257→- Both legal documents render in styled popups matching the wedding theme (paper-cream bg, cinematic-gold section numbers, Playfair Display headings)
+   258→- Lint passes clean (0 errors)
+   259→
+   260→
+   261→---
+   262→Task ID: footer-privacy-policy
+   263→Agent: Main Agent
+   264→Task: Replace "Technical Support" with "Privacy Policy" popup in footer
+   265→
+   266→Work Log:
+   267→- Read uploaded Privacy Policy.docx and extracted full 16-section document text
+   268→- Added privacyPolicyDocument to /home/z/my-project/src/lib/legal-content.tsx with all 16 sections including subsections 3.1/3.2
+   269→- Updated Footer.tsx: replaced Technical Support mailto link with Privacy Policy button + popup state
+   270→- Footer link order: Contact Concierge (mailto) | Privacy Policy (popup) | Data Protection (popup) | Terms of Service (popup)
+   271→- Verified via Agent Browser: all 4 links present, Privacy Policy modal opens with 16 sections + 2 subsections, Technical Support fully removed, no errors
+   272→
+   273→Stage Summary:
+   274→- Footer now shows: Contact Concierge, Privacy Policy, Data Protection, Terms of Service
+   275→- All three legal documents accessible via popup modals
+   276→- Lint clean, no errors
+   277→
+   278→
+   279→---
+   280→Task ID: api-backend-wiring
+   281→Agent: Main Agent
+   282→Task: Ensure all form submissions (Contact, RSVP, Wishes) persist to backend database
+   283→
+   284→Work Log:
+   285→- Audited existing state: RSVP and Wishes APIs already fully wired with Prisma DB storage
+   286→- Added ContactSubmission model to prisma/schema.prisma (id, name, email, contact, reason, createdAt)
+   287→- Ran bun run db:push to sync schema to SQLite database
+   288→- Created /api/contact/route.ts with Zod validation and Prisma insert
+   289→- Updated ContactConciergeModal: replaced setTimeout simulation with real fetch to /api/contact
+   290→- Updated /api/admin/route.ts to include totalContacts count and recentContacts in dashboard
+   291→- Regenerated Prisma client, restarted dev server
+   292→- Tested all 3 APIs via curl: all return 200 with success IDs
+   293→- Verified admin endpoint shows: RSVPs: 2, Guests: 3, Wishes: 2, Contacts: 1
+   294→- Verified all 3 forms via Agent Browser: RSVP result page, Wishes "Woven" state, Contact "Message Sent" state
+   295→
+   296→Stage Summary:
+   297→- All 3 guest-facing forms now persist data to SQLite via Prisma
+   298→- API endpoints: POST /api/rsvp, POST /api/wishes, POST /api/contact
+   299→- Admin dashboard: GET /api/admin returns counts + recent submissions for all 3 types
+   300→- Contact form was the only one that needed backend wiring (RSVP and Wishes were already connected)
+   301→
+   302→
+   303→---
+   304→Task ID: restore-visual-fixes
+   305→Agent: Main Agent
+   306→Task: Restore 3 missing Phase 1 visual refinements: remove overlays, gold dust animation, consistent form inputs
+   307→
+   308→Work Log:
+   309→- Investigated git history (30 commits) — confirmed all 3 changes were NEVER committed (discussed in prior session but not implemented before context ran out)
+   310→- Root cause: Prior session ran out of context before implementation, user assumed they were done
+   311→- Fix 1: Removed `hero-gradient` dark overlay from HomePage hero section (line 82)
+   312→- Fix 1b: Removed `bg-gradient-to-t from-charcoal-ink/40` overlay from Tea Ceremony image (line 141)
+   313→- Fix 2: Added 18 gold-dust-particle elements + 5 bokeh-orb elements to HomePage using existing CSS animations
+   314→- Fix 2b: Discovered Tailwind CSS v4 PostCSS processor strips custom @keyframes classes — used inline <style> tag in component as workaround
+   315→- Fix 3: Converted WishesPage form inputs from bordered boxes to `input-line` underline style (matching RSVP)
+   316→- Fix 3b: Converted ContactConciergeModal inputs from bordered style to `input-line` underline style
+   317→- Verified all 3 fixes via Agent Browser + VLM: overlays removed ✅, particles animating ✅, form inputs consistent ✅
+   318→
+   319→Stage Summary:
+   320→- Hero image: clean, no dark gradient overlay
+   321→- Tea ceremony image: clean, no bottom gradient overlay
+   322→- Gold dust: 18 particles + 5 bokeh orbs with CSS animations (inline style workaround for Tailwind v4)
+   323→- Form consistency: Wishes page + Contact modal now use underline-only inputs matching RSVP page style
+   324→- Downgraded @tailwindcss/postcss from 4.1.18 to 4.0.17 to fix Turbopack PostCSS worker panic
+   325→- Dev server: switched to keep-alive.sh wrapper for process persistence
+   326→
+   327→---
+   328→Task ID: cms-phase-1
+   329→Agent: Main Agent
+   330→Task: CMS Phase 1 — Auth Foundation, Master CMS Shell, Dashboard, Wedding Account CRUD
+   331→
+   332→Work Log:
+   333→- Expanded Prisma schema from 4 to 13 models (User, WeddingAccount, WeddingFeature, WeddingContent, WeddingMedia, EventSchedule, FAQ, StoryItem, Guest, AuditLog, SystemSetting + enhanced existing models with weddingId)
+   334→- Installed bcryptjs for password hashing
+   335→- Configured NextAuth.js v4 with Credentials provider, JWT strategy, role-based sessions
+   336→- Created SessionProvider wrapper in layout.tsx
+   337→- Created LoginModal component (professional dark header, email/password form, error/loading states)
+   338→- Created useCMSStore (Zustand) for CMS page navigation state
+   339→- Created MasterCMSLayout with dark sidebar (slate-900), collapsible icon mode, DW gold logo, 6 nav items, user dropdown, sign out
+   340→- Created MasterDashboard page (7 stat cards, recent weddings list, recent RSVPs list, loading skeletons)
+   341→- Created MasterWeddings page (data table, search, create/edit dialog, status/plan badges, suspend/activate/archive actions)
+   342→- Created ComingSoonPage placeholder for Templates, Analytics, Settings
+   343→- Created MasterUsers placeholder page
+   344→- Created master API routes: /api/master/dashboard, /api/master/weddings (GET/POST/PATCH/DELETE)
+   345→- Created seed script with admin user, couple user, sample wedding (Eleanor & James), 9 features, 13 content items, 4 schedule items, 6 FAQs, 4 story items
+   346→- Updated page.tsx to handle viewMode switching (guest ↔ CMS) based on auth state
+   347→- Added subtle ⚙ login trigger on guest site bottom-left
+   348→- Fixed React lint error (set-state-in-effect) by using derived state instead of useEffect
+   349→- Fixed MasterDashboard data shape mismatch with API response
+   350→- Verified via Agent Browser: login flow, CMS dashboard rendering, wedding accounts table, sign-out, guest site preservation
+   351→
+   352→Stage Summary:
+   353→- CMS Phase 1 complete: auth + master admin panel foundation
+   354→- 13 Prisma models, 3 API routes, 6 CMS page components, 1 layout
+   355→- Login: admin@dreamweavers.sg / Admin@2024 (SUPER_ADMIN), eleanor@wedding.com / Couple@2024 (COUPLE)
+   356→- All on / route — CMS renders for authenticated admins, guest site for everyone else
+   357→- Zero lint errors (1 expected font warning)
+   358→- Backup: dreamweavers-backup-cms-phase1-complete-20260706105122.tar.gz (94MB)
+   359→
+   360→---
+   361→Task ID: phase-3
+   362→Agent: Main Agent
+   363→Task: Phase 3 — Wedding Content Management (Images, Guests, Content Editor, RSVPs, Wishes)
+   364→
+   365→Work Log:
+   366→- Updated useCoupleCMSStore: added 'content', 'guests', 'rsvps', 'wishes' to CoupleCMSPage type (now 11 pages)
+   367→- Updated CoupleCMSLayout nav: added FileText (Content), Users (Guests), Mail (RSVPs), MessageSquareHeart (Wishes) icons
+   368→- Created /api/cms/media/route.ts: GET (filter by category), POST (create with auto sortOrder), PUT (update + setAs hero/banner), DELETE — all with auth + audit logging
+   369→- Created /api/cms/guests/route.ts (via subagent): GET (search/status/group filters + _count), POST (Zod validation, auto 6-char invitationCode), PUT (auto sentAt on sentVia change), DELETE — all with auth + audit logging
+   370→- Created /api/cms/rsvps/route.ts: GET with client-side status filtering (attending/declined/mixed computed from guest responses), includes guest responses
+   371→- Created /api/cms/wishes/route.ts: GET (search by name/message/relationship), DELETE with ownership verification + audit logging
+   372→- Built CoupleImages.tsx: full media management — drag-and-drop upload (base64), 5 category filters (hero/banner/gallery/story/couple-photo), set-as-hero/banner, reorder up/down, full-size preview dialog, delete, category badges, file size display
+   373→- Built CoupleGuests.tsx: guest list — search by name/email/phone, status filter (Pending/Attending/Declined/Partial), 4 summary stat cards, add/edit dialog with plus-one toggle, table number, group/family, dietary notes, invitation code display
+   374→- Built CoupleContent.tsx: section-by-section text content editor — 9 collapsible sections (hero, schedule, rsvp, getting-there, story, wishes, qa, moments, footer), 35+ editable fields, dirty-field tracking with gold dot indicators, batch save with change count
+   375→- Built CoupleRSVPs.tsx: RSVP response viewer — 4 summary cards (Submissions/Attending/Declined/Attendance Rate), per-guest attendance breakdown with CheckCircle/XCircle icons, dietary notes display, status filter, name search
+   376→- Built CoupleWishes.tsx: wish management — total wishes card, top-5 relationships distribution, search, time-ago display, delete with confirmation
+   377→- Wired all 4 new components in page.tsx (dynamic imports + COUPLE_CMS_PAGES map)
+   378→- Fixed lucide-react import: Banner icon doesn't exist, replaced with ImagePlus
+   379→- Added persistent NEXTAUTH_SECRET to .env to prevent JWT decryption failures across server restarts
+   380→- Created keep-alive.sh for dev server persistence
+   381→- ESLint: 0 errors, 1 expected warning (custom font)
+   382→
+   383→Stage Summary:
+   384→- Phase 3 complete: Couple CMS expanded from 7 to 11 pages
+   385→- 4 new frontend components: CoupleContent, CoupleImages, CoupleGuests, CoupleRSVPs, CoupleWishes
+   386→- 4 new API routes: /api/cms/media, /api/cms/guests, /api/cms/rsvps, /api/cms/wishes
+   387→- All endpoints properly authenticated, tenant-scoped, and audit-logged
+   388→- Browser verified: login → CMS renders with all 11 nav items, Overview with Quick Actions, zero console errors
+   389→- Guest site unaffected (still renders correctly)
+   390→
+   391→---
+   392→Task ID: 4-3
+   393→Agent: Master Users Subagent
+   394→Task: Build MasterUsers page with full CRUD
+   395→
+   396→Work Log:
+   397→- Read worklog.md, MasterWeddings.tsx (reference pattern), auth.ts, prisma schema, db.ts, existing weddings API route
+   398→- Created /api/master/users/route.ts with 4 HTTP methods:
+   399→  - GET: List all users with optional ?search= filter (name/email), includes _count.ownedWeddings. Access: SUPER_ADMIN + ACCOUNT_MANAGER
+   400→  - POST: Create user with Zod validation (email, name min 2, password min 8, role enum, isActive default true). Hashes password with bcryptjs. Checks email uniqueness. Creates AuditLog. Access: SUPER_ADMIN only
+   401→  - PUT: Update user (all fields optional, id required). Re-hashes password if provided. Checks email uniqueness on change. Creates AuditLog. Access: SUPER_ADMIN + ACCOUNT_MANAGER
+   402→  - DELETE: Soft-delete (isActive=false) by default, hard delete via ?hard=true. Prevents self-deletion. Creates AuditLog. Access: SUPER_ADMIN only
+   403→- Replaced MasterUsers.tsx placeholder with full user management page:
+   404→  - 3 summary stat cards: Total Users, Active Users, Couple Accounts (with icon + color coding)
+   405→  - Search input with 300ms debounce, filtering by name/email
+   406→  - Data table with columns: Name (avatar initials + join date), Email, Role (colored badge), Status (active/inactive badge), Last Login (relative time), Wedding Count, Actions (edit/delete)
+   407→  - max-h-[500px] overflow-y-auto scrollable table
+   408→  - Create/Edit dialog: Name, Email (disabled when editing), Password (optional when editing, required when creating), Role (select), Active (switch toggle)
+   409→  - Delete confirmation dialog with user info preview and deactivate action
+   410→  - Loading skeletons for stats and table rows
+   411→  - Empty state with descriptive text
+   412→  - Toast notifications for success/error feedback using existing useToast hook
+   413→  - Design matches Master CMS white content area with slate text (not wedding gold theme)
+   414→- Fixed pre-existing TypeScript parsing error in usePublicWedding.ts (line 59: `typeof []` → `PublicWeddingData['media']`)
+   415→- Verified: both new files lint clean (0 errors), dev server returns 200
+   416→
+   417→Stage Summary:
+   418→- Full CRUD user management: API route (GET/POST/PUT/DELETE) + frontend component
+   419→- API: Zod validation, bcryptjs password hashing, role-based access (SUPER_ADMIN + ACCOUNT_MANAGER for read, SUPER_ADMIN only for create/delete), AuditLog for all mutations
+   420→- UI: 3 stat cards, searchable table, create/edit dialog with role select and active switch, delete confirmation dialog, loading skeletons, empty states, toast feedback
+   421→- Follows existing MasterWeddings patterns: XTransformPort=3000, Loader2 spinners, slate design system, shadcn/ui components
+   422→
+   423→---
+   424→Task ID: 4-4,4-5
+   425→Agent: Analytics & Settings Subagent
+   426→Task: Build MasterAnalytics and MasterSettings pages
+   427→
+   428→Work Log:
+   429→- Read worklog.md, existing MasterDashboard.tsx, MasterUsers.tsx, auth.ts, prisma schema, dashboard API route for patterns
+   430→- Created /api/master/analytics/route.ts (GET, SUPER_ADMIN + ACCOUNT_MANAGER):
+   431→  - KPI counts: totalWeddings, activeWeddings, totalUsers (isActive=true), totalRSVPs, totalWishes, totalContacts, totalGuests
+   432→  - rsvpTrend: last 30 days RSVP submissions grouped by date, with zero-fill for missing days
+   433→  - weddingStatusBreakdown: groupBy status with all 5 statuses defaulted to 0
+   434→  - planBreakdown: groupBy plan with FREE/PREMIUM/ENTERPRISE defaulted to 0
+   435→  - recentActivity: last 10 AuditLog entries with user name included
+   436→- Created MasterAnalytics.tsx with recharts:
+   437→  - 6 KPI cards in 3-col grid (Total Weddings, Active Weddings, Total Users, Total RSVPs, Total Wishes, Total Guests) with icons + subtitles
+   438→  - RSVP Trend AreaChart (last 30 days) with slate-400 gradient fill and cinematic-gold (#D4AF37) stroke
+   439→  - Wedding Status PieChart (donut) with status-specific colors: ACTIVE=emerald, DRAFT=amber, SUSPENDED=red, ARCHIVED=slate, COMPLETED=blue
+   440→  - Plan Distribution horizontal BarChart with FREE=slate, PREMIUM=gold, ENTERPRISE=purple
+   441→  - Recent Activity table with timestamp, user, action badge, entity, details columns
+   442→  - All charts use ResponsiveContainer, loading skeletons, error state, empty state handling
+   443→- Created /api/master/settings/route.ts (GET + PUT, SUPER_ADMIN only):
+   444→  - GET: Returns all SystemSetting records as key-value pairs
+   445→  - PUT: Accepts {settings: {key: value}}, upserts each via Prisma upsert, creates AuditLog entry
+   446→- Created MasterSettings.tsx:
+   447→  - 4 grouped setting sections in Cards: Platform Information (4 fields), Wedding Defaults (4 fields), RSVP Settings (2 fields), Notification Settings (3 fields)
+   448→  - Field types: text, email, number, select (shadcn Select), switch (shadcn Switch)
+   449→  - Default values applied for missing settings on first load
+   450→  - Dirty tracking: compares current state with initial fetched state, shows change count
+   451→  - "Save All Settings" button disabled when no changes, shows saving state
+   452→  - Sonner toast on save success with updated count
+   453→  - Loading skeletons for each section, error state handling
+   454→- Updated page.tsx: added dynamic imports for MasterAnalytics and MasterSettings, replaced ComingSoonPage entries in MASTER_CMS_PAGES map
+   455→- Lint: 0 errors, 1 expected warning (custom font)
+   456→- Dev server: compiles clean, 200 responses
+   457→
+   458→Stage Summary:
+   459→- 2 new API routes: /api/master/analytics (GET), /api/master/settings (GET/PUT)
+   460→- 2 new CMS pages: MasterAnalytics (recharts dashboard), MasterSettings (settings management)
+   461→- Analytics: 6 KPI cards + 3 charts (AreaChart, PieChart donut, horizontal BarChart) + activity table
+   462→- Settings: 4 sectioned cards, 13 editable fields, dirty tracking, single save button, sonner toast
+   463→- Both pages follow existing Master CMS design: white bg, slate-200 borders, skeleton loading states
+   464→- page.tsx updated: analytics and settings wired in MASTER_CMS_PAGES map
+   465→
+   466→---
+   467→Task ID: 4-2
+   468→Agent: Guest Pages Subagent
+   469→Task: Connect 6 guest pages to CMS data via public API
+   470→
+   471→Work Log:
+   472→- Read worklog.md, usePublicWedding.ts hook, /api/wedding/public/route.ts, all 6 target page components
+   473→- Updated HomePage.tsx:
+   474→  - Imported usePublicWedding hook
+   475→  - Replaced BANNER_BG constant with data?.wedding.bannerUrl (fallback: hardcoded URL)
+   476→  - Replaced HERO_IMG constant with data?.wedding.heroImageUrl (fallback: hardcoded URL)
+   477→  - Replaced couple name "Eleanor & James" with data?.wedding.coupleName (fallback: hardcoded)
+   478→  - Replaced date badge with formatDate() from data?.wedding.weddingDate (fallback: "December 25, 2027")
+   479→  - Replaced hero description with getField('hero', 'description', fallback)
+   480→  - Refactored useCountdown to accept targetTimestamp parameter, derived from data?.wedding.weddingDate
+   481→  - Added helper functions: formatDate(), parseWeddingTimestamp()
+   482→  - Kept all visual styling, animations, gold dust particles, FAB, scroll indicator intact
+   483→- Updated SchedulePage.tsx:
+   484→  - Replaced BANNER_BG with data?.wedding.bannerUrl (fallback: hardcoded)
+   485→  - Replaced date text with formatFullDate(data?.wedding.weddingDate) and formatShortDate() for sticky header
+   486→  - Replaced section title "The Schedule" with getField('schedule', 'title', 'The Schedule')
+   487→  - Timeline items: if data?.schedules.length > 0, render from CMS (using formatTime for badge, title, description, location); otherwise keep 3 hardcoded fallback items
+   488→  - Venue section: data?.wedding.venue for name, data?.wedding.venueAddress for address
+   489→  - Calendar link: uses getCalendarDateStr() from CMS weddingDate, coupleName, venueName
+   490→  - Added helper functions: formatTime(), formatFullDate(), formatShortDate(), getCalendarDateStr()
+   491→- Updated GettingTherePage.tsx:
+   492→  - SectionBanner subtitle: data?.wedding.venue + ", Orchard" (fallback: "The Singapore EDITION, Orchard")
+   493→  - Venue name and address from data?.wedding.venue and data?.wedding.venueAddress
+   494→  - Car tab content: getField('getting-there', 'carContent', '') — if CMS value exists, render as pre-formatted text; otherwise show original 2-section fallback (Parking + From Airport)
+   495→  - Transit tab content: getField('getting-there', 'transitContent', '') — if CMS value exists, render as pre-formatted text; otherwise show original 3-section fallback (MRT + Bus + Find Your Way)
+   496→  - Google Maps embed: uses data?.wedding.googleMapsUrl (with /embed suffix) or builds query URL from venue name + address
+   497→  - Open in Maps link: uses googleMapsUrl or builds search URL from venue name + address
+   498→- Updated StoryPage.tsx:
+   499→  - SectionBanner subtitle: getField('story', 'subtitle', current subtitle)
+   500→  - If data?.stories.length > 0, render timeline from CMS stories (title, content, date formatted as "Month Year", imageUrl) with alternating left/right layout
+   501→  - Otherwise keep 2 hardcoded milestones (The First Chapter, The Proposal) with their images
+   502→  - Kept tidbits, honeymoon widget (Amalfi Coast/Kyoto voting), reveal-on-scroll animations intact
+   503→  - Added formatStoryDate() helper
+   504→- Updated QAPage.tsx:
+   505→  - If data?.faqs.length > 0, render accordion from CMS FAQs (question, answer)
+   506→  - Otherwise keep 4 hardcoded fallback FAQs
+   507→  - Changed accordion key from index to faq.id for stable rendering
+   508→  - Kept CTA section (mail link) as-is
+   509→- Updated MomentsPage.tsx:
+   510→  - Intro subtitle: getField('moments', 'subtitle', current subtitle)
+   511→  - If data?.mediaByCategory.gallery?.length > 0, render masonry grid from gallery media (url as src, fileName as alt)
+   512→  - Otherwise keep 7 hardcoded PHOTOS fallback
+   513→- All 6 files: zero visual/styling changes, all animations preserved, all Material Symbols icons preserved, all inline styles preserved
+   514→- Ran lint: 0 errors, 1 expected warning (custom font)
+   515→- Dev server: all compilations successful, /api/wedding/public returns 200 with full data
+   516→
+   517→Stage Summary:
+   518→- 6 guest pages connected to CMS data via usePublicWedding hook
+   519→- All pages maintain full fallback to hardcoded data when CMS is unavailable or fields are empty
+   520→- Zero visual changes: all styling, layout, animations, icons, interactive features (countdown, FAB, tidbits, honeymoon widget, accordion) preserved
+   521→- Date formatting uses en-SG locale with toLocaleDateString/toLocaleTimeString
+   522→- Schedule timeline, story timeline, FAQ accordion, and masonry gallery all conditionally render from CMS data
+   523→
+   524→---
+   525→Task ID: 4-1
+   526→Agent: Main Agent
+   527→Task: Create public wedding API endpoint
+   528→
+   529→Work Log:
+   530→- Created /api/wedding/public/route.ts — single GET endpoint returning all wedding data for guest pages
+   531→- Returns nested structure: wedding account, content map (section→fieldKey→value), schedules, faqs, stories, media, mediaByCategory, featureFlags
+   532→- Filters by status=ACTIVE, optional slug query param
+   533→- No auth required (public-facing)
+   534→
+   535→Stage Summary:
+   536→- Single API call provides all data guest pages need
+   537→- Content transformed into nested map for easy field lookup
+   538→- Media grouped by category for gallery/story/hero/banner access
+   539→
+   540→---
+   541→Task ID: 4-2
+   542→Agent: Guest Pages Subagent
+   543→Task: Connect 6 guest pages to CMS data via public API
+   544→
+   545→Work Log:
+   546→- Created /hooks/usePublicWedding.ts — shared hook with module-level cache, used by all guest pages
+   547→- Updated HomePage: banner/hero images, couple name, date, description, countdown from CMS
+   548→- Updated SchedulePage: title, date, timeline from CMS schedules, venue from wedding account
+   549→- Updated GettingTherePage: venue name/address, car/transit content, maps embed from CMS
+   550→- Updated StoryPage: timeline milestones from CMS stories with alternating layout
+   551→- Updated QAPage: FAQ accordion from CMS (now shows 6 FAQs instead of 4 hardcoded)
+   552→- Updated MomentsPage: masonry gallery from CMS gallery media
+   553→- All pages keep hardcoded values as fallbacks when CMS data is empty
+   554→
+   555→Stage Summary:
+   556→- All 6 guest pages now render CMS data with graceful fallback to hardcoded defaults
+   557→- Single shared fetch via usePublicWedding hook (module-level cache)
+   558→- No visual/styling changes — only data source changed
+   559→- Verified: Schedule shows "The Day" + 4 DB events + "The Fullerton Hotel", Q&A shows 6 CMS FAQs
+   560→
+   561→---
+   562→Task ID: 4-3
+   563→Agent: Master Users Subagent
+   564→Task: Build MasterUsers page with full CRUD
+   565→
+   566→Work Log:
+   567→- Created /api/master/users/route.ts: GET (search, _count.ownedWeddings), POST (Zod validation, bcryptjs hash), PUT (optional re-hash), DELETE (soft by default, hard option)
+   568→- Built MasterUsers.tsx: 3 stat cards, search with debounce, user table with role/status badges, create/edit dialog, delete confirmation
+   569→- Role badges: SUPER_ADMIN=purple, ACCOUNT_MANAGER=blue, COUPLE=green
+   570→- Status badges: Active=emerald, Inactive=red
+   571→- Full audit logging on all mutations
+   572→
+   573→Stage Summary:
+   574→- Complete user management: create, edit, delete, search
+   575→- 2 users visible in table with correct data
+   576→- Slate-themed Master CMS styling consistent with existing pages
+   577→
+   578→---
+   579→Task ID: 4-4,4-5
+   580→Agent: Analytics & Settings Subagent
+   581→Task: Build MasterAnalytics and MasterSettings pages
+   582→
+   583→Work Log:
+   584→- Created /api/master/analytics/route.ts: KPI counts, 30-day RSVP trend, status/plan breakdowns, recent audit log
+   585→- Built MasterAnalytics.tsx: 6 KPI cards, RSVP trend AreaChart, status PieChart donut, plan BarChart, recent activity table
+   586→- Created /api/master/settings/route.ts: GET all SystemSetting records, PUT upsert with audit log
+   587→- Built MasterSettings.tsx: 4 grouped sections (Platform Info, Wedding Defaults, RSVP, Notifications), 13 editable fields, dirty tracking, save all
+   588→- Updated page.tsx: replaced ComingSoonPage for analytics and settings with real components + dynamic imports
+   589→
+   590→Stage Summary:
+   591→- Analytics: 6 real KPIs, 3 recharts visualizations, activity log table
+   592→- Settings: 13 configurable fields across 4 sections with change tracking
+   593→- Master CMS now has 4 of 6 pages fully built (only Templates remains as Coming Soon)
+   594→- All charts use recharts ResponsiveContainer
+   595→
+   596→---
+   597→Task ID: 4-6
+   598→Agent: Main Agent
+   599→Task: Add CSV export for Guest list and RSVPs
+   600→
+   601→Work Log:
+   602→- Added Export button to CoupleGuests.tsx header (Download icon, outline style)
+   603→- Added Export button to CoupleRSVPs.tsx header
+   604→- Guest CSV: 10 columns (Name, Email, Phone, Group, Table, Status, Invitation Code, Plus One, Plus One Name, Dietary Notes)
+   605→- RSVP CSV: 7 columns (Submitted By, Email, Party Size, Submitted At, Guest Name, Attendance, Dietary) — one row per guest response
+   606→- Client-side CSV generation with proper quoting and BOM-free UTF-8
+   607→
+   608→Stage Summary:
+   609→- Both export buttons generate and download CSV files with date-stamped filenames
+   610→- Sonner toast feedback on export success/empty
+   611→
