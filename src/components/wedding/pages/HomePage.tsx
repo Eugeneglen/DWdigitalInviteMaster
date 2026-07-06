@@ -1,23 +1,30 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigationStore } from '@/store/useNavigationStore';
+import { usePublicWedding } from '@/hooks/usePublicWedding';
 
-const HERO_IMG =
+const FALLBACK_HERO_IMG =
   'https://lh3.googleusercontent.com/aida-public/AB6AXuBeAe38AA5-0h4B5MmgQCqv54oQXyPMGznDKaw2sJI_FnTbB_yXXWOpirFlFycj_2VI02IVLouUTt86Y1J7Ls-bRsMOHPAcfSqruVoh87sfhw3vi2Z6t1C7ogCLtkvF6QbJkwuV0av8pXTrUeAAi6ymnZpvyOr8qVjTNNorAOmqRrW_fohX_xlkscmBh39K4Wtvs6TH0Nvb_X3LQQRD9W_sySN_iWbWw9O0au8u1jO-hSekE9pSGNo5zsTz3o9PWy5xbzc6lq3knkIy';
 
-const TEA_IMG =
+const FALLBACK_BANNER_BG =
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuA-OyKfcsxXAmZDArHbDXl1cVCgGUG5liFPzyHdVvMG6_4jN9pNTrN9GCrkdnegli9UPJUSPs39KJRsRP7AiLem4xYS-q1ZYq1T3DAIqyvn3wAvbdkoMVkufft0SpQw4gDTPSnIml6k62lRYobUrNu70UGIILiMZQ0fAydTXXwVZ1oswQZ-mjPT8H9mDDqfhxsMSI5zla8GKz_ILXbmdRjtRUk682dPEDBD6I81DzEx7dITgjb6vxQoee5599jkYf_vCYP7npydvxqx';
+
+const FALLBACK_TEA_IMG =
   'https://lh3.googleusercontent.com/aida-public/AB6AXuA6SiJt49KQCmMAhF-X_tmX1Y1NKhTieT6ApO53PD9gYuvLO0e78WTxzg8BV7Wnhe6oJ6sG4SwJ4U-nH2m33dv7I89IhLgrHDkabts7ws-QwPlv-ycUzhyuBN0c04ka2inAyysumlM1w-sR8stBZ51HJOGZkQO6cAtfrn9RXWZRFlHJlUp8Jqzi-nBu3xGs57xm7L2Le06Put3xBDMAe39zkMMsdcuUkbeyw5c4Q6VxvXkSmMbcpLM-HJK1iMgYVLkn2kzqUPEALYpH';
 
-const WEDDING_DATE = new Date('2027-12-25T16:00:00').getTime();
+const FALLBACK_WEDDING_DATE = new Date('2027-12-25T16:00:00').getTime();
+const FALLBACK_COUPLE_NAME = 'Eleanor & James';
+const FALLBACK_DATE_TEXT = 'December 25, 2027';
+const FALLBACK_HERO_DESCRIPTION = 'Together with their families, request the pleasure of your company';
 
-function useCountdown() {
+function useCountdown(targetTimestamp: number) {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, mins: 0, secs: 0 });
 
   useEffect(() => {
     const calc = () => {
       const now = Date.now();
-      const diff = Math.max(0, WEDDING_DATE - now);
+      const diff = Math.max(0, targetTimestamp - now);
       setTimeLeft({
         days: Math.floor(diff / (1000 * 60 * 60 * 24)),
         hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
@@ -28,16 +35,46 @@ function useCountdown() {
     calc();
     const interval = setInterval(calc, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [targetTimestamp]);
 
   return timeLeft;
 }
 
-const BANNER_BG =
-  'https://lh3.googleusercontent.com/aida-public/AB6AXuA-OyKfcsxXAmZDArHbDXl1cVCgGUG5liFPzyHdVvMG6_4jN9pNTrN9GCrkdnegli9UPJUSPs39KJRsRP7AiLem4xYS-q1ZYq1T3DAIqyvn3wAvbdkoMVkufft0SpQw4gDTPSnIml6k62lRYobUrNu70UGIILiMZQ0fAydTXXwVZ1oswQZ-mjPT8H9mDDqfhxsMSI5zla8GKz_ILXbmdRjtRUk682dPEDBD6I81DzEx7dITgjb6vxQoee5599jkYf_vCYP7npydvxqx';
+function formatDate(dateStr: string | null | undefined): string {
+  if (!dateStr) return FALLBACK_DATE_TEXT;
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return FALLBACK_DATE_TEXT;
+    return d.toLocaleDateString('en-SG', { day: 'numeric', month: 'long', year: 'numeric' });
+  } catch {
+    return FALLBACK_DATE_TEXT;
+  }
+}
+
+function parseWeddingTimestamp(dateStr: string | null | undefined): number {
+  if (!dateStr) return FALLBACK_WEDDING_DATE;
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return FALLBACK_WEDDING_DATE;
+    return d.getTime();
+  } catch {
+    return FALLBACK_WEDDING_DATE;
+  }
+}
 
 export default function HomePage() {
-  const countdown = useCountdown();
+  const { data } = usePublicWedding();
+
+  const bannerUrl = data?.wedding.bannerUrl || FALLBACK_BANNER_BG;
+  const heroImgUrl = data?.wedding.heroImageUrl || FALLBACK_HERO_IMG;
+  const coupleName = data?.wedding.coupleName || FALLBACK_COUPLE_NAME;
+  const dateText = formatDate(data?.wedding.weddingDate);
+  const weddingTimestamp = parseWeddingTimestamp(data?.wedding.weddingDate);
+  const heroDescription = data
+    ? (data.content['hero']?.['description'] || FALLBACK_HERO_DESCRIPTION)
+    : FALLBACK_HERO_DESCRIPTION;
+
+  const countdown = useCountdown(weddingTimestamp);
   const { setSection } = useNavigationStore();
   const [showFab, setShowFab] = useState(false);
 
@@ -49,55 +86,47 @@ export default function HomePage() {
 
   return (
     <>
-      {/* ===== TOP BANNER — "Eleanor & James" ===== */}
-      {/* Original: <div class="w-full h-[360px] md:h-[420px] bg-cover bg-center mt-[54px] md:mt-[64px] relative z-40 border-b border-champagne-silk/20 flex items-center justify-center" style="background-image: url('...')"> */}
-      {/* Original:   <div class="absolute inset-0 bg-gradient-to-b from-paper-cream/30 via-paper-cream/10 to-paper-cream/60"></div> */}
-      {/* Original:   <div class="relative z-10 text-center px-6"> */}
-      {/* Original:     <h1 class="font-display-hero text-[44px] md:text-[72px] leading-[1.05] text-charcoal-ink tracking-tight font-bold drop-shadow-sm">Eleanor &amp; James</h1> */}
+      {/* ===== TOP BANNER ===== */}
       <div
         className="w-full h-[360px] md:h-[420px] bg-cover bg-center mt-[54px] md:mt-[64px] relative z-40 border-b border-champagne-silk/20 flex items-center justify-center"
-        style={{ backgroundImage: `url('${BANNER_BG}')` }}
+        style={{ backgroundImage: `url('${bannerUrl}')` }}
       >
         <div className="absolute inset-0 bg-gradient-to-b from-paper-cream/30 via-paper-cream/10 to-paper-cream/60" />
         <div className="relative z-10 text-center px-6">
           <h1 className="font-display-hero text-[44px] md:text-[72px] leading-[1.05] text-charcoal-ink tracking-tight font-bold drop-shadow-sm">
-            Eleanor &amp; James
+            {coupleName.replace(/&/g, '&amp;')}
           </h1>
         </div>
       </div>
 
       {/* ===== MAIN CONTENT ===== */}
-      {/* Original: <main class="pb-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto min-h-screen pt-[20px] md:pt-[40px]"> */}
       <main className="pb-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto min-h-screen pt-[20px] md:pt-[40px]">
         {/* ===== HERO SECTION ===== */}
-        {/* Original: <section class="relative h-[795px] md:h-screen w-full flex flex-col justify-end overflow-hidden"> */}
         <section className="relative h-[795px] md:h-screen w-full flex flex-col justify-end overflow-hidden">
           {/* Background Image — full bleed, no crop */}
           <div className="absolute inset-0 z-0">
             <img
               alt="Hero Wedding Portrait"
               className="w-full h-full object-cover object-center"
-              src={HERO_IMG}
+              src={heroImgUrl}
             />
           </div>
 
           {/* Content Overlay */}
-          {/* Original: <div class="relative z-10 w-full px-8 md:px-24 pb-20 md:pb-32 flex flex-col items-center text-center"> */}
           <div className="relative z-10 w-full px-8 md:px-24 pb-20 md:pb-32 flex flex-col items-center text-center">
             {/* Master Date Badge */}
-            {/* Original: <div class="animate-fade-in delay-100 mb-8 inline-flex items-center justify-center border border-champagne-silk px-6 py-2 rounded-full bg-paper-cream/10 backdrop-blur-sm"> */}
             <div className="animate-fade-in delay-100 mb-8 inline-flex items-center justify-center border border-champagne-silk px-6 py-2 rounded-full bg-paper-cream/10 backdrop-blur-sm">
               <span className="font-label-sm text-label-sm leading-label-sm text-paper-cream tracking-[0.2em] uppercase font-semibold">
-                December 25, 2027
+                {dateText}
               </span>
             </div>
 
             {/* Description */}
             <p className="animate-slide-up delay-300 font-body-md text-body-md leading-body-md text-paper-cream/80 max-w-md mx-auto mb-12 italic">
-              Together with their families, request the pleasure of your company
+              {heroDescription}
             </p>
 
-            {/* Countdown Component — white/champagne style matching wedding date badge */}
+            {/* Countdown Component */}
             <div className="animate-slide-up delay-400 grid grid-cols-4 gap-3 md:gap-4 w-full max-w-md mx-auto">
               {[
                 { value: countdown.days, label: 'DAYS' },
@@ -118,8 +147,6 @@ export default function HomePage() {
           </div>
 
           {/* Scroll Indicator */}
-          {/* Original: <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 animate-fade-in delay-400 flex flex-col items-center opacity-70"> */}
-          {/* Original:   <span class="font-label-sm text-[10px] text-paper-cream tracking-widest mb-2 uppercase font-semibold">Discover</span> */}
           <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 animate-fade-in delay-400 flex flex-col items-center opacity-70">
             <span className="font-label-sm text-[10px] text-paper-cream tracking-widest mb-2 uppercase font-semibold">Scroll</span>
             <span className="material-symbols-outlined text-paper-cream animate-bounce">arrow_downward</span>
@@ -127,37 +154,28 @@ export default function HomePage() {
         </section>
 
         {/* ===== TEA CEREMONY SECTION ===== */}
-        {/* Original: <section class="py-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto bg-paper-cream"> */}
         <section className="py-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto bg-paper-cream">
           <div className="max-w-4xl mx-auto flex flex-col items-center">
-            {/* Original: <div class="relative w-full aspect-[2/3] md:aspect-auto md:h-[800px] overflow-hidden rounded-lg shadow-xl mb-8 group"> */}
             <div className="relative w-full aspect-[2/3] md:aspect-auto md:h-[800px] overflow-hidden rounded-lg shadow-xl mb-8 group">
               <img
                 alt="The Tea Ceremony"
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                src={TEA_IMG}
+                src={FALLBACK_TEA_IMG}
               />
-              {/* Clean image — no overlay */}
             </div>
             <div className="text-center">
-              {/* Original: <span class="font-label-sm text-label-sm text-cinematic-gold tracking-[0.2em] uppercase block mb-2 font-semibold">The Tradition</span> */}
               <span className="font-label-sm text-label-sm leading-label-sm text-cinematic-gold tracking-[0.2em] uppercase block mb-2 font-semibold">The Tradition</span>
-              {/* Original: <h3 class="font-display-hero text-headline-lg-mobile md:text-headline-lg text-charcoal-ink">The Tea Ceremony</h3> */}
               <h3 className="font-display-hero text-headline-lg-mobile leading-headline-lg-mobile md:text-headline-lg md:leading-headline-lg font-semibold text-charcoal-ink">The Tea Ceremony</h3>
             </div>
           </div>
         </section>
 
         {/* ===== NARRATIVE SECTION ===== */}
-        {/* Original: <section class="py-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto bg-paper-cream"> */}
         <section className="py-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto bg-paper-cream">
           <div className="max-w-3xl mx-auto text-center space-y-8">
-            {/* Original: <span class="font-label-sm text-label-sm text-cinematic-gold tracking-[0.2em] uppercase block font-semibold">The Prelude</span> */}
             <span className="font-label-sm text-label-sm leading-label-sm text-cinematic-gold tracking-[0.2em] uppercase block font-semibold">The Prelude</span>
-            {/* Original: <h3 class="font-display-hero text-headline-lg-mobile md:text-headline-lg text-charcoal-ink">Our Story Begins Here</h3> */}
             <h3 className="font-display-hero text-headline-lg-mobile leading-headline-lg-mobile md:text-headline-lg md:leading-headline-lg font-semibold text-charcoal-ink">Our Story Begins Here</h3>
-            {/* Original: <p class="font-body-md text-body-md text-charcoal-ink/80 leading-relaxed"> */}
-            <p className="font-body-md text-body-md leading-body-md text-charcoal-ink/80 leading-relaxed">
+            <p className="font-body-md text-body-md text-charcoal-ink/80 leading-relaxed">
               Every great romance is a narrative woven over time. Ours began with a serendipitous meeting and has evolved into a tapestry of shared adventures, quiet moments, and a profound commitment to one another.
             </p>
           </div>
@@ -256,8 +274,6 @@ export default function HomePage() {
       </div>
 
       {/* ===== FLOATING ACTION BUTTON ===== */}
-      {/* Original: <div class="fixed bottom-24 right-6 md:bottom-12 md:right-12 z-[55] transition-transform duration-300 transform translate-y-20 opacity-0" id="fab"> */}
-      {/* Original:   <button class="bg-charcoal-ink text-paper-cream w-16 h-16 rounded-full shadow-[0_8px_30px_rgba(26,26,26,0.12)] flex items-center justify-center hover:scale-105 active:scale-95 transition-all border border-cinematic-gold/30"> */}
       <div
         className={`fixed bottom-24 right-6 md:bottom-12 md:right-12 z-[55] transition-transform duration-300 ${
           showFab ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'

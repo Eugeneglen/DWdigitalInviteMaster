@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { Loader2, Plus, Pencil, Trash2, Users, Search, Mail, Phone, UserPlus } from 'lucide-react';
+import { Loader2, Plus, Pencil, Trash2, Users, Search, Mail, Phone, UserPlus, Download } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -204,6 +204,35 @@ export default function CoupleGuests() {
 
   const getStatusConfig = (status: string) => STATUS_CONFIG[status] ?? { label: status, color: 'bg-gray-50 text-gray-600 border-gray-200' };
 
+  const handleExportCSV = () => {
+    if (guests.length === 0) {
+      toast.info('No guests to export');
+      return;
+    }
+    const headers = ['Name', 'Email', 'Phone', 'Group', 'Table', 'Status', 'Invitation Code', 'Plus One', 'Plus One Name', 'Dietary Notes'];
+    const rows = guests.map((g) => [
+      g.name,
+      g.email ?? '',
+      g.phone ?? '',
+      g.groupName ?? '',
+      g.tableNumber != null ? String(g.tableNumber) : '',
+      g.rsvpStatus ?? 'PENDING',
+      g.invitationCode,
+      g.plusOne ? 'Yes' : 'No',
+      g.plusOneName ?? '',
+      g.dietaryNotes ?? '',
+    ]);
+    const csv = [headers, ...rows].map((r) => r.map((c) => `"${c.replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `guest-list-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success(`Exported ${guests.length} guests`);
+  };
+
   // Summary stats
   const totalGuests = guests.length;
   const attending = guests.filter((g) => g.rsvpStatus === 'ATTENDING').length;
@@ -229,13 +258,23 @@ export default function CoupleGuests() {
             Manage your guest list, track RSVPs, and send invitations.
           </p>
         </div>
-        <Button
-          onClick={openAddDialog}
-          className="bg-cinematic-gold text-charcoal-ink hover:bg-cinematic-gold/90 rounded px-4 py-2 text-[13px] font-medium uppercase tracking-[0.08em] transition-colors duration-300 shrink-0"
-        >
-          <Plus className="size-4 mr-1.5" />
-          Add Guest
-        </Button>
+        <div className="flex items-center gap-2 shrink-0">
+          <Button
+            onClick={handleExportCSV}
+            variant="outline"
+            className="border-charcoal-ink/15 text-charcoal-ink hover:border-cinematic-gold hover:text-cinematic-gold rounded px-4 py-2 text-[13px] font-medium uppercase tracking-[0.08em] transition-colors duration-300"
+          >
+            <Download className="size-4 mr-1.5" />
+            Export
+          </Button>
+          <Button
+            onClick={openAddDialog}
+            className="bg-cinematic-gold text-charcoal-ink hover:bg-cinematic-gold/90 rounded px-4 py-2 text-[13px] font-medium uppercase tracking-[0.08em] transition-colors duration-300"
+          >
+            <Plus className="size-4 mr-1.5" />
+            Add Guest
+          </Button>
+        </div>
       </div>
 
       <Separator className="bg-champagne-silk" />

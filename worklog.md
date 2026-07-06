@@ -387,3 +387,224 @@ Stage Summary:
 - All endpoints properly authenticated, tenant-scoped, and audit-logged
 - Browser verified: login → CMS renders with all 11 nav items, Overview with Quick Actions, zero console errors
 - Guest site unaffected (still renders correctly)
+
+---
+Task ID: 4-3
+Agent: Master Users Subagent
+Task: Build MasterUsers page with full CRUD
+
+Work Log:
+- Read worklog.md, MasterWeddings.tsx (reference pattern), auth.ts, prisma schema, db.ts, existing weddings API route
+- Created /api/master/users/route.ts with 4 HTTP methods:
+  - GET: List all users with optional ?search= filter (name/email), includes _count.ownedWeddings. Access: SUPER_ADMIN + ACCOUNT_MANAGER
+  - POST: Create user with Zod validation (email, name min 2, password min 8, role enum, isActive default true). Hashes password with bcryptjs. Checks email uniqueness. Creates AuditLog. Access: SUPER_ADMIN only
+  - PUT: Update user (all fields optional, id required). Re-hashes password if provided. Checks email uniqueness on change. Creates AuditLog. Access: SUPER_ADMIN + ACCOUNT_MANAGER
+  - DELETE: Soft-delete (isActive=false) by default, hard delete via ?hard=true. Prevents self-deletion. Creates AuditLog. Access: SUPER_ADMIN only
+- Replaced MasterUsers.tsx placeholder with full user management page:
+  - 3 summary stat cards: Total Users, Active Users, Couple Accounts (with icon + color coding)
+  - Search input with 300ms debounce, filtering by name/email
+  - Data table with columns: Name (avatar initials + join date), Email, Role (colored badge), Status (active/inactive badge), Last Login (relative time), Wedding Count, Actions (edit/delete)
+  - max-h-[500px] overflow-y-auto scrollable table
+  - Create/Edit dialog: Name, Email (disabled when editing), Password (optional when editing, required when creating), Role (select), Active (switch toggle)
+  - Delete confirmation dialog with user info preview and deactivate action
+  - Loading skeletons for stats and table rows
+  - Empty state with descriptive text
+  - Toast notifications for success/error feedback using existing useToast hook
+  - Design matches Master CMS white content area with slate text (not wedding gold theme)
+- Fixed pre-existing TypeScript parsing error in usePublicWedding.ts (line 59: `typeof []` → `PublicWeddingData['media']`)
+- Verified: both new files lint clean (0 errors), dev server returns 200
+
+Stage Summary:
+- Full CRUD user management: API route (GET/POST/PUT/DELETE) + frontend component
+- API: Zod validation, bcryptjs password hashing, role-based access (SUPER_ADMIN + ACCOUNT_MANAGER for read, SUPER_ADMIN only for create/delete), AuditLog for all mutations
+- UI: 3 stat cards, searchable table, create/edit dialog with role select and active switch, delete confirmation dialog, loading skeletons, empty states, toast feedback
+- Follows existing MasterWeddings patterns: XTransformPort=3000, Loader2 spinners, slate design system, shadcn/ui components
+
+---
+Task ID: 4-4,4-5
+Agent: Analytics & Settings Subagent
+Task: Build MasterAnalytics and MasterSettings pages
+
+Work Log:
+- Read worklog.md, existing MasterDashboard.tsx, MasterUsers.tsx, auth.ts, prisma schema, dashboard API route for patterns
+- Created /api/master/analytics/route.ts (GET, SUPER_ADMIN + ACCOUNT_MANAGER):
+  - KPI counts: totalWeddings, activeWeddings, totalUsers (isActive=true), totalRSVPs, totalWishes, totalContacts, totalGuests
+  - rsvpTrend: last 30 days RSVP submissions grouped by date, with zero-fill for missing days
+  - weddingStatusBreakdown: groupBy status with all 5 statuses defaulted to 0
+  - planBreakdown: groupBy plan with FREE/PREMIUM/ENTERPRISE defaulted to 0
+  - recentActivity: last 10 AuditLog entries with user name included
+- Created MasterAnalytics.tsx with recharts:
+  - 6 KPI cards in 3-col grid (Total Weddings, Active Weddings, Total Users, Total RSVPs, Total Wishes, Total Guests) with icons + subtitles
+  - RSVP Trend AreaChart (last 30 days) with slate-400 gradient fill and cinematic-gold (#D4AF37) stroke
+  - Wedding Status PieChart (donut) with status-specific colors: ACTIVE=emerald, DRAFT=amber, SUSPENDED=red, ARCHIVED=slate, COMPLETED=blue
+  - Plan Distribution horizontal BarChart with FREE=slate, PREMIUM=gold, ENTERPRISE=purple
+  - Recent Activity table with timestamp, user, action badge, entity, details columns
+  - All charts use ResponsiveContainer, loading skeletons, error state, empty state handling
+- Created /api/master/settings/route.ts (GET + PUT, SUPER_ADMIN only):
+  - GET: Returns all SystemSetting records as key-value pairs
+  - PUT: Accepts {settings: {key: value}}, upserts each via Prisma upsert, creates AuditLog entry
+- Created MasterSettings.tsx:
+  - 4 grouped setting sections in Cards: Platform Information (4 fields), Wedding Defaults (4 fields), RSVP Settings (2 fields), Notification Settings (3 fields)
+  - Field types: text, email, number, select (shadcn Select), switch (shadcn Switch)
+  - Default values applied for missing settings on first load
+  - Dirty tracking: compares current state with initial fetched state, shows change count
+  - "Save All Settings" button disabled when no changes, shows saving state
+  - Sonner toast on save success with updated count
+  - Loading skeletons for each section, error state handling
+- Updated page.tsx: added dynamic imports for MasterAnalytics and MasterSettings, replaced ComingSoonPage entries in MASTER_CMS_PAGES map
+- Lint: 0 errors, 1 expected warning (custom font)
+- Dev server: compiles clean, 200 responses
+
+Stage Summary:
+- 2 new API routes: /api/master/analytics (GET), /api/master/settings (GET/PUT)
+- 2 new CMS pages: MasterAnalytics (recharts dashboard), MasterSettings (settings management)
+- Analytics: 6 KPI cards + 3 charts (AreaChart, PieChart donut, horizontal BarChart) + activity table
+- Settings: 4 sectioned cards, 13 editable fields, dirty tracking, single save button, sonner toast
+- Both pages follow existing Master CMS design: white bg, slate-200 borders, skeleton loading states
+- page.tsx updated: analytics and settings wired in MASTER_CMS_PAGES map
+
+---
+Task ID: 4-2
+Agent: Guest Pages Subagent
+Task: Connect 6 guest pages to CMS data via public API
+
+Work Log:
+- Read worklog.md, usePublicWedding.ts hook, /api/wedding/public/route.ts, all 6 target page components
+- Updated HomePage.tsx:
+  - Imported usePublicWedding hook
+  - Replaced BANNER_BG constant with data?.wedding.bannerUrl (fallback: hardcoded URL)
+  - Replaced HERO_IMG constant with data?.wedding.heroImageUrl (fallback: hardcoded URL)
+  - Replaced couple name "Eleanor & James" with data?.wedding.coupleName (fallback: hardcoded)
+  - Replaced date badge with formatDate() from data?.wedding.weddingDate (fallback: "December 25, 2027")
+  - Replaced hero description with getField('hero', 'description', fallback)
+  - Refactored useCountdown to accept targetTimestamp parameter, derived from data?.wedding.weddingDate
+  - Added helper functions: formatDate(), parseWeddingTimestamp()
+  - Kept all visual styling, animations, gold dust particles, FAB, scroll indicator intact
+- Updated SchedulePage.tsx:
+  - Replaced BANNER_BG with data?.wedding.bannerUrl (fallback: hardcoded)
+  - Replaced date text with formatFullDate(data?.wedding.weddingDate) and formatShortDate() for sticky header
+  - Replaced section title "The Schedule" with getField('schedule', 'title', 'The Schedule')
+  - Timeline items: if data?.schedules.length > 0, render from CMS (using formatTime for badge, title, description, location); otherwise keep 3 hardcoded fallback items
+  - Venue section: data?.wedding.venue for name, data?.wedding.venueAddress for address
+  - Calendar link: uses getCalendarDateStr() from CMS weddingDate, coupleName, venueName
+  - Added helper functions: formatTime(), formatFullDate(), formatShortDate(), getCalendarDateStr()
+- Updated GettingTherePage.tsx:
+  - SectionBanner subtitle: data?.wedding.venue + ", Orchard" (fallback: "The Singapore EDITION, Orchard")
+  - Venue name and address from data?.wedding.venue and data?.wedding.venueAddress
+  - Car tab content: getField('getting-there', 'carContent', '') — if CMS value exists, render as pre-formatted text; otherwise show original 2-section fallback (Parking + From Airport)
+  - Transit tab content: getField('getting-there', 'transitContent', '') — if CMS value exists, render as pre-formatted text; otherwise show original 3-section fallback (MRT + Bus + Find Your Way)
+  - Google Maps embed: uses data?.wedding.googleMapsUrl (with /embed suffix) or builds query URL from venue name + address
+  - Open in Maps link: uses googleMapsUrl or builds search URL from venue name + address
+- Updated StoryPage.tsx:
+  - SectionBanner subtitle: getField('story', 'subtitle', current subtitle)
+  - If data?.stories.length > 0, render timeline from CMS stories (title, content, date formatted as "Month Year", imageUrl) with alternating left/right layout
+  - Otherwise keep 2 hardcoded milestones (The First Chapter, The Proposal) with their images
+  - Kept tidbits, honeymoon widget (Amalfi Coast/Kyoto voting), reveal-on-scroll animations intact
+  - Added formatStoryDate() helper
+- Updated QAPage.tsx:
+  - If data?.faqs.length > 0, render accordion from CMS FAQs (question, answer)
+  - Otherwise keep 4 hardcoded fallback FAQs
+  - Changed accordion key from index to faq.id for stable rendering
+  - Kept CTA section (mail link) as-is
+- Updated MomentsPage.tsx:
+  - Intro subtitle: getField('moments', 'subtitle', current subtitle)
+  - If data?.mediaByCategory.gallery?.length > 0, render masonry grid from gallery media (url as src, fileName as alt)
+  - Otherwise keep 7 hardcoded PHOTOS fallback
+- All 6 files: zero visual/styling changes, all animations preserved, all Material Symbols icons preserved, all inline styles preserved
+- Ran lint: 0 errors, 1 expected warning (custom font)
+- Dev server: all compilations successful, /api/wedding/public returns 200 with full data
+
+Stage Summary:
+- 6 guest pages connected to CMS data via usePublicWedding hook
+- All pages maintain full fallback to hardcoded data when CMS is unavailable or fields are empty
+- Zero visual changes: all styling, layout, animations, icons, interactive features (countdown, FAB, tidbits, honeymoon widget, accordion) preserved
+- Date formatting uses en-SG locale with toLocaleDateString/toLocaleTimeString
+- Schedule timeline, story timeline, FAQ accordion, and masonry gallery all conditionally render from CMS data
+
+---
+Task ID: 4-1
+Agent: Main Agent
+Task: Create public wedding API endpoint
+
+Work Log:
+- Created /api/wedding/public/route.ts — single GET endpoint returning all wedding data for guest pages
+- Returns nested structure: wedding account, content map (section→fieldKey→value), schedules, faqs, stories, media, mediaByCategory, featureFlags
+- Filters by status=ACTIVE, optional slug query param
+- No auth required (public-facing)
+
+Stage Summary:
+- Single API call provides all data guest pages need
+- Content transformed into nested map for easy field lookup
+- Media grouped by category for gallery/story/hero/banner access
+
+---
+Task ID: 4-2
+Agent: Guest Pages Subagent
+Task: Connect 6 guest pages to CMS data via public API
+
+Work Log:
+- Created /hooks/usePublicWedding.ts — shared hook with module-level cache, used by all guest pages
+- Updated HomePage: banner/hero images, couple name, date, description, countdown from CMS
+- Updated SchedulePage: title, date, timeline from CMS schedules, venue from wedding account
+- Updated GettingTherePage: venue name/address, car/transit content, maps embed from CMS
+- Updated StoryPage: timeline milestones from CMS stories with alternating layout
+- Updated QAPage: FAQ accordion from CMS (now shows 6 FAQs instead of 4 hardcoded)
+- Updated MomentsPage: masonry gallery from CMS gallery media
+- All pages keep hardcoded values as fallbacks when CMS data is empty
+
+Stage Summary:
+- All 6 guest pages now render CMS data with graceful fallback to hardcoded defaults
+- Single shared fetch via usePublicWedding hook (module-level cache)
+- No visual/styling changes — only data source changed
+- Verified: Schedule shows "The Day" + 4 DB events + "The Fullerton Hotel", Q&A shows 6 CMS FAQs
+
+---
+Task ID: 4-3
+Agent: Master Users Subagent
+Task: Build MasterUsers page with full CRUD
+
+Work Log:
+- Created /api/master/users/route.ts: GET (search, _count.ownedWeddings), POST (Zod validation, bcryptjs hash), PUT (optional re-hash), DELETE (soft by default, hard option)
+- Built MasterUsers.tsx: 3 stat cards, search with debounce, user table with role/status badges, create/edit dialog, delete confirmation
+- Role badges: SUPER_ADMIN=purple, ACCOUNT_MANAGER=blue, COUPLE=green
+- Status badges: Active=emerald, Inactive=red
+- Full audit logging on all mutations
+
+Stage Summary:
+- Complete user management: create, edit, delete, search
+- 2 users visible in table with correct data
+- Slate-themed Master CMS styling consistent with existing pages
+
+---
+Task ID: 4-4,4-5
+Agent: Analytics & Settings Subagent
+Task: Build MasterAnalytics and MasterSettings pages
+
+Work Log:
+- Created /api/master/analytics/route.ts: KPI counts, 30-day RSVP trend, status/plan breakdowns, recent audit log
+- Built MasterAnalytics.tsx: 6 KPI cards, RSVP trend AreaChart, status PieChart donut, plan BarChart, recent activity table
+- Created /api/master/settings/route.ts: GET all SystemSetting records, PUT upsert with audit log
+- Built MasterSettings.tsx: 4 grouped sections (Platform Info, Wedding Defaults, RSVP, Notifications), 13 editable fields, dirty tracking, save all
+- Updated page.tsx: replaced ComingSoonPage for analytics and settings with real components + dynamic imports
+
+Stage Summary:
+- Analytics: 6 real KPIs, 3 recharts visualizations, activity log table
+- Settings: 13 configurable fields across 4 sections with change tracking
+- Master CMS now has 4 of 6 pages fully built (only Templates remains as Coming Soon)
+- All charts use recharts ResponsiveContainer
+
+---
+Task ID: 4-6
+Agent: Main Agent
+Task: Add CSV export for Guest list and RSVPs
+
+Work Log:
+- Added Export button to CoupleGuests.tsx header (Download icon, outline style)
+- Added Export button to CoupleRSVPs.tsx header
+- Guest CSV: 10 columns (Name, Email, Phone, Group, Table, Status, Invitation Code, Plus One, Plus One Name, Dietary Notes)
+- RSVP CSV: 7 columns (Submitted By, Email, Party Size, Submitted At, Guest Name, Attendance, Dietary) — one row per guest response
+- Client-side CSV generation with proper quoting and BOM-free UTF-8
+
+Stage Summary:
+- Both export buttons generate and download CSV files with date-stamped filenames
+- Sonner toast feedback on export success/empty

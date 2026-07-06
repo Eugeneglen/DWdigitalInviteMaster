@@ -2,28 +2,40 @@
 
 import { useState } from 'react';
 import SectionBanner from '../SectionBanner';
+import { usePublicWedding } from '@/hooks/usePublicWedding';
 
-const FAQS = [
+const FALLBACK_FAQS = [
   {
+    id: 'fallback-1',
     question: 'What is the dress code for the evening reception?',
     answer: 'The evening calls for Black Tie Optional. We encourage our guests to embrace the elegance of the venue. For gentlemen, a dark suit or tuxedo is appropriate. For ladies, floor-length gowns or sophisticated cocktail attire is preferred.',
+    sortOrder: 0,
   },
   {
+    id: 'fallback-2',
     question: 'Is transportation provided to the venue?',
     answer: 'Yes. For guests staying at our recommended hotels, dedicated luxury shuttles will depart from the main lobbies at exactly 4:15 PM on Saturday. Return transport will run every thirty minutes from 11:00 PM onwards.',
+    sortOrder: 1,
   },
   {
+    id: 'fallback-3',
     question: 'Are children invited to the celebration?',
     answer: "While we adore the little ones in our lives, our wedding weekend will be an adult-only affair (18+), allowing everyone to relax and fully immerse themselves in the evening's festivities.",
+    sortOrder: 2,
   },
   {
+    id: 'fallback-4',
     question: 'How should I inform you of dietary requirements?',
     answer: 'Our culinary team is prepared to accommodate all medical and ethical dietary restrictions. You will be prompted to detail any specific allergies or preferences when completing the formal RSVP process.',
+    sortOrder: 3,
   },
 ];
 
 export default function QAPage() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const { data } = usePublicWedding();
+
+  const faqs = (data?.faqs && data.faqs.length > 0) ? data.faqs : FALLBACK_FAQS;
 
   const toggle = (idx: number) => {
     setOpenIndex(openIndex === idx ? null : idx);
@@ -47,10 +59,10 @@ export default function QAPage() {
         {/* Accordion */}
         <section className="max-w-[800px] mx-auto mb-section-gap">
           <div className="border-t border-cinematic-gold/30">
-            {FAQS.map((faq, idx) => {
+            {faqs.map((faq, idx) => {
               const isOpen = openIndex === idx;
               return (
-                <article key={idx} className={`animate-orchestral delay-${(idx + 1) * 100} border-b border-cinematic-gold/30 group`}>
+                <article key={faq.id} className={`animate-orchestral delay-${(idx + 1) * 100} border-b border-cinematic-gold/30 group`}>
                   <button
                     className="w-full py-10 flex justify-between items-center text-left focus:outline-none"
                     onClick={() => toggle(idx)}

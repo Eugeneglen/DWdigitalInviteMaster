@@ -29,6 +29,8 @@ const QAPage = dynamic(() => import('@/components/wedding/pages/QAPage'), { ssr:
 const MasterDashboard = dynamic(() => import('@/components/cms/pages/MasterDashboard'), { ssr: false });
 const MasterWeddings = dynamic(() => import('@/components/cms/pages/MasterWeddings'), { ssr: false });
 const MasterUsers = dynamic(() => import('@/components/cms/pages/MasterUsers'), { ssr: false });
+const MasterAnalytics = dynamic(() => import('@/components/cms/pages/MasterAnalytics'), { ssr: false });
+const MasterSettings = dynamic(() => import('@/components/cms/pages/MasterSettings'), { ssr: false });
 const ComingSoonPage = dynamic(() => import('@/components/cms/pages/ComingSoonPage'), { ssr: false });
 
 // Couple CMS pages — dynamic imports
@@ -60,8 +62,8 @@ const MASTER_CMS_PAGES: Record<CMSPage, React.ComponentType> = {
   weddings: MasterWeddings,
   users: MasterUsers,
   templates: () => <ComingSoonPage title="Content Templates" description="Manage invitation templates and themes" />,
-  analytics: () => <ComingSoonPage title="Analytics" description="View platform-wide analytics and reports" />,
-  settings: () => <ComingSoonPage title="Settings" description="Configure platform settings and preferences" />,
+  analytics: MasterAnalytics,
+  settings: MasterSettings,
 };
 
 const COUPLE_CMS_PAGES: Record<CoupleCMSPage, React.ComponentType> = {

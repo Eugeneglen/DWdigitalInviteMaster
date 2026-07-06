@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useRef } from 'react';
 import SectionBanner from '../SectionBanner';
+import { usePublicWedding } from '@/hooks/usePublicWedding';
 
-const PHOTOS = [
+const FALLBACK_PHOTOS = [
   {
     alt: 'Early Years',
     src: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAm-8WDgkq_3PeNjdM4_SPcbdyPc4j1BN1NYWpstlUalLgRDkOi-VrJG2ZcdDt04YwBhlSegxOEQ4dbw-6zr2xKHQeTO5gJe67RlcYJ2IkUn3Dp8ZbTzfL8aD2Tq8rbse4QsZBGuz1fOPmW42rjorV-F8aY14aRHg_wk_TAMAaeqaBllL8Qpx_POk9EP9b5wjS_YXtMBnKH7-nGAPwIbuNCwetnkUm6A1gonIw4KTEsPRqq2sW_1A3jAX6wnSIeZTPdzM3VYkva56VG',
@@ -34,6 +35,8 @@ const PHOTOS = [
   },
 ];
 
+const FALLBACK_SUBTITLE = 'The Journey Before the I Do—from childhood dreams to our first steps together.';
+
 function useReveal() {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
@@ -59,6 +62,17 @@ function useReveal() {
 
 export default function MomentsPage() {
   const { ref, visible } = useReveal();
+  const { data, getField } = usePublicWedding();
+
+  const subtitle = getField('moments', 'subtitle', FALLBACK_SUBTITLE);
+
+  const galleryMedia = (data?.mediaByCategory?.gallery && data.mediaByCategory.gallery.length > 0)
+    ? data.mediaByCategory.gallery
+    : null;
+
+  const photos = galleryMedia
+    ? galleryMedia.map((m) => ({ alt: m.fileName || 'Gallery Photo', src: m.url }))
+    : FALLBACK_PHOTOS;
 
   return (
     <>
@@ -68,14 +82,14 @@ export default function MomentsPage() {
         {/* Intro */}
         <section className="max-w-[1440px] mx-auto px-8 md:px-canvas-margin mb-24 text-center">
           <p className="max-w-2xl mx-auto text-charcoal-ink/70 leading-relaxed italic" style={{ fontSize: '18px', lineHeight: '32px' }}>
-            The Journey Before the I Do—from childhood dreams to our first steps together.
+            {subtitle}
           </p>
         </section>
 
         {/* Masonry Photo Grid */}
         <section ref={ref} className="max-w-[1440px] mx-auto px-4 md:px-8">
           <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-6">
-            {PHOTOS.map((photo, idx) => (
+            {photos.map((photo, idx) => (
               <div
                 key={idx}
                 className="break-inside-avoid mb-6 relative group inner-frame overflow-hidden bg-white p-4 shadow-sm"

@@ -2,15 +2,31 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import SectionBanner from '../SectionBanner';
+import { usePublicWedding } from '@/hooks/usePublicWedding';
 
 const HERO_IMG =
   'https://lh3.googleusercontent.com/aida-public/AB6AXuBZxkwieg-SjxgRYOZxJlQ1v05okmlTqzvosp-ANHaaCSQStncGv3ORTlPiE-uSYP7mQcE_wcB5Povhsm25x-eThbTLAYPt1XD-14RTSL9R5a1etGsU54CUWIwAK_4ckHoB-gD85mc-uqQwOckXVYmn0J7u0r6WkNQ2eFKKTBWBJ8yU_nirHHy8GC7vKRVnGPL6P_TymHuuKnjM3ERN9Zvho_5v7pICElncd6F8dHF-lVKppvz4kKyQe9je7CIDwOSBlcyxaGU6yY-D';
 
-const CHAPTER1_IMG =
-  'https://lh3.googleusercontent.com/aida-public/AB6AXuAQPSczTWgJLZS_vzNbN6wuPsTVw72YpOY0ldIaXb2nEM0DjbAoH__IyOfEvlXkIvif3k6TiVwdgbsAPvCUuustCXJ5ogM8o9Mf8qfnHNM052duEcCK8KPbJVfqn8sOuo9cpUPx6XWqHpBxvEfinvKzqiiI7zy3XkVYQ7w0ElfPw1kVlE-oTiwbdti2a6Q3pUBuogYx0KyKtviULD2olRj3ZTd29I37Yi80hUtQtS9LWTuKEtFJvAKUdLp2wmjdEM8om4Ku67LEDI4t';
+const FALLBACK_SUBTITLE = 'A narrative woven through time, capturing the moments that led us here.';
 
-const PROPOSAL_IMG =
-  'https://lh3.googleusercontent.com/aida-public/AB6AXuBzzvAxvGICtmDJ5Ase_8SKR0gvAAqXe_96pLSdSUEjYyVgenag3qekxDbjpLG_SXknWJEoOXPP_XcdU4WMSloZvzj9Pn-dxdG0BBlp0lglCSzzoxLL3-2CaKrawuVRqBglPiiimHDNTlMHai2pnrr404Xg8EgQq8tdW5qRhs-bx2k6N52M80DDUW27KtR0Nc4-WkNjwCsNX8XuiyHBZTqdhpBqml323YRMNj-0offH-_Sn3jp1yxw-EAZs939pzoyGzEfpRwsteoXv';
+const FALLBACK_STORIES = [
+  {
+    id: 'fallback-1',
+    title: 'The First Chapter',
+    content: 'It began over accidentally swapped coffee orders at a local cafe. A simple mistake that sparked a conversation lasting hours, marking the quiet inception of a lifelong journey.',
+    date: '2018-10-01',
+    imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAQPSczTWgJLZS_vzNbN6wuPsTVw72YpOY0ldIaXb2nEM0DjbAoH__IyOfEvlXkIvif3k6TiVwdgbsAPvCUuustCXJ5ogM8o9Mf8qfnHNM052duEcCK8KPbJVfqn8sOuo9cpUPx6XWqHpBxvEfinvKzqiiI7zy3XkVYQ7w0ElfPw1kVlE-oTiwbdti2a6Q3pUBuogYx0KyKtviULD2olRj3ZTd29I37Yi80hUtQtS9LWTuKEtFJvAKUdLp2wmjdEM8om4Ku67LEDI4t',
+    sortOrder: 0,
+  },
+  {
+    id: 'fallback-2',
+    title: 'The Proposal',
+    content: 'Underneath a canopy of winter stars in the mountains, a question was asked and answered. A moment frozen in time, framed by crisp air and profound certainty.',
+    date: '2021-12-01',
+    imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBzzvAxvGICtmDJ5Ase_8SKR0gvAAqXe_96pLSdSUEjYyVgenag3qekxDbjpLG_SXknWJEoOXPP_XcdU4WMSloZvzj9Pn-dxdG0BBlp0lglCSzzoxLL3-2CaKrawuVRqBglPiiimHDNTlMHai2pnrr404Xg8EgQq8tdW5qRhs-bx2k6N52M80DDUW27KtR0Nc4-WkNjwCsNX8XuiyHBZTqdhpBqml323YRMNj-0offH-_Sn3jp1yxw-EAZs939pzoyGzEfpRwsteoXv',
+    sortOrder: 1,
+  },
+];
 
 const TIDBITS = [
   {
@@ -28,16 +44,31 @@ const DESTINATIONS_INIT = [
   { name: 'Kyoto', votes: 0 },
 ];
 
+function formatStoryDate(dateStr: string | null | undefined): string {
+  if (!dateStr) return '';
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return '';
+    return d.toLocaleDateString('en-SG', { month: 'long', year: 'numeric' });
+  } catch {
+    return '';
+  }
+}
+
 export default function StoryPage() {
   const mainRef = useRef<HTMLElement>(null);
   const [destinations, setDestinations] = useState(DESTINATIONS_INIT);
   const [votes, setVotes] = useState<Record<number, boolean>>({});
   const [suggestion, setSuggestion] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const { data, getField } = usePublicWedding();
+
+  const subtitle = getField('story', 'subtitle', FALLBACK_SUBTITLE);
+  const stories = (data?.stories && data.stories.length > 0) ? data.stories : FALLBACK_STORIES;
 
   const handleVote = useCallback((index: number) => {
     setVotes((prev) => {
-      if (prev[index]) return prev; // already voted
+      if (prev[index]) return prev;
       setDestinations((d) => {
         const updated = [...d];
         updated[index] = { ...updated[index], votes: updated[index].votes + 1 };
@@ -49,7 +80,6 @@ export default function StoryPage() {
 
   const handleSubmit = useCallback(() => {
     if (!suggestion.trim() || submitted) return;
-    // In production, send to API
     setSubmitted(true);
   }, [suggestion, submitted]);
 
@@ -81,7 +111,7 @@ export default function StoryPage() {
         {/* Hero Section */}
         <section className="reveal max-w-[900px] mx-auto mb-20 flex flex-col items-center justify-center text-center">
           <p className="text-charcoal-ink max-w-2xl mx-auto opacity-80 mb-12 italic" style={{ fontSize: '18px', lineHeight: '32px' }}>
-            A narrative woven through time, capturing the moments that led us here.
+            {subtitle}
           </p>
           <div className="w-full max-w-4xl aspect-[16/9] inner-frame bg-surface-container-high overflow-hidden shadow-[0_20px_40px_rgba(26,26,26,0.08)]">
             <img alt="Our Story Hero" className="w-full h-full object-cover object-center" src={HERO_IMG} />
@@ -92,59 +122,41 @@ export default function StoryPage() {
         <section className="reveal py-section-gap relative">
           <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-[1px] bg-champagne-silk/50 -translate-x-1/2" />
           <div className="flex flex-col gap-section-gap">
-            {/* Milestone 1 */}
-            <div className="flex flex-col md:flex-row items-center justify-between w-full relative">
-              <div
-                className="absolute left-4 md:left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-cinematic-gold z-10"
-                style={{ boxShadow: '0 0 10px rgba(212,175,55,0.5)' }}
-              />
-              <div className="w-full pl-12 md:pl-0 md:w-5/12 text-left md:text-right pr-0 md:pr-12 mb-8 md:mb-0">
-                <span
-                  className="text-cinematic-gold block mb-2 uppercase tracking-[0.2em]"
-                  style={{ fontSize: '12px', lineHeight: '16px', letterSpacing: '0.1em', fontWeight: 600 }}
-                >
-                  October 2018
-                </span>
-                <h3 className="text-charcoal-ink mb-4 italic" style={{ fontFamily: "'Playfair Display', serif", fontWeight: 500, fontSize: '32px', lineHeight: '40px' }}>
-                  The First Chapter
-                </h3>
-                <p className="text-charcoal-ink/80 italic leading-relaxed" style={{ fontSize: '16px', lineHeight: '24px' }}>
-                  It began over accidentally swapped coffee orders at a local cafe. A simple mistake that sparked a conversation lasting hours, marking the quiet inception of a lifelong journey.
-                </p>
-              </div>
-              <div className="w-full pl-12 md:pl-0 md:w-5/12 flex justify-start">
-                <div className="w-full aspect-square inner-frame bg-surface-container overflow-hidden max-w-[400px]">
-                  <img alt="The First Chapter" className="w-full h-full object-cover" src={CHAPTER1_IMG} />
+            {stories.map((story, idx) => {
+              const isReversed = idx % 2 === 1;
+              const dateLabel = formatStoryDate(story.date);
+              return (
+                <div key={story.id} className={`flex flex-col ${isReversed ? 'md:flex-row-reverse' : 'md:flex-row'} items-center justify-between w-full relative`}>
+                  <div
+                    className="absolute left-4 md:left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-cinematic-gold z-10"
+                    style={{ boxShadow: '0 0 10px rgba(212,175,55,0.5)' }}
+                  />
+                  <div className={`w-full pl-12 md:pl-0 md:w-5/12 text-left ${isReversed ? 'pl-0 md:pl-12' : 'md:text-right pr-0 md:pr-12'} mb-8 md:mb-0`}>
+                    {dateLabel && (
+                      <span
+                        className="text-cinematic-gold block mb-2 uppercase tracking-[0.2em]"
+                        style={{ fontSize: '12px', lineHeight: '16px', letterSpacing: '0.1em', fontWeight: 600 }}
+                      >
+                        {dateLabel}
+                      </span>
+                    )}
+                    <h3 className="text-charcoal-ink mb-4 italic" style={{ fontFamily: "'Playfair Display', serif", fontWeight: 500, fontSize: '32px', lineHeight: '40px' }}>
+                      {story.title}
+                    </h3>
+                    <p className="text-charcoal-ink/80 italic leading-relaxed" style={{ fontSize: '16px', lineHeight: '24px' }}>
+                      {story.content}
+                    </p>
+                  </div>
+                  <div className={`w-full pl-12 md:pl-0 md:w-5/12 flex ${isReversed ? 'justify-end' : 'justify-start'}`}>
+                    {story.imageUrl && (
+                      <div className={`w-full inner-frame bg-surface-container overflow-hidden ${isReversed ? 'max-w-[350px] aspect-[3/4]' : 'max-w-[400px] aspect-square'}`}>
+                        <img alt={story.title} className="w-full h-full object-cover" src={story.imageUrl} />
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </div>
-
-            {/* Milestone 2 */}
-            <div className="flex flex-col md:flex-row-reverse items-center justify-between w-full relative">
-              <div
-                className="absolute left-4 md:left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-cinematic-gold z-10"
-                style={{ boxShadow: '0 0 10px rgba(212,175,55,0.5)' }}
-              />
-              <div className="w-full pl-12 md:pl-0 md:w-5/12 text-left pl-0 md:pl-12 mb-8 md:mb-0">
-                <span
-                  className="text-cinematic-gold block mb-2 uppercase tracking-[0.2em]"
-                  style={{ fontSize: '12px', lineHeight: '16px', letterSpacing: '0.1em', fontWeight: 600 }}
-                >
-                  December 2021
-                </span>
-                <h3 className="text-charcoal-ink mb-4 italic" style={{ fontFamily: "'Playfair Display', serif", fontWeight: 500, fontSize: '32px', lineHeight: '40px' }}>
-                  The Proposal
-                </h3>
-                <p className="text-charcoal-ink/80 italic leading-relaxed" style={{ fontSize: '16px', lineHeight: '24px' }}>
-                  Underneath a canopy of winter stars in the mountains, a question was asked and answered. A moment frozen in time, framed by crisp air and profound certainty.
-                </p>
-              </div>
-              <div className="w-full pl-12 md:pl-0 md:w-5/12 flex justify-end">
-                <div className="w-full aspect-[3/4] inner-frame bg-surface-container overflow-hidden max-w-[350px]">
-                  <img alt="The Proposal" className="w-full h-full object-cover" src={PROPOSAL_IMG} />
-                </div>
-              </div>
-            </div>
+              );
+            })}
           </div>
         </section>
 
