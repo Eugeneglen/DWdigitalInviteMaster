@@ -4,12 +4,14 @@ import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useNavigationStore } from '@/store/useNavigationStore';
 import { useCMSStore, type CMSPage } from '@/store/useCMSStore';
+import { useCoupleCMSStore, type CoupleCMSPage } from '@/store/useCoupleCMSStore';
 import Header from '@/components/wedding/Header';
 import MobileDrawer from '@/components/wedding/MobileDrawer';
 import BottomNav from '@/components/wedding/BottomNav';
 import Footer from '@/components/wedding/Footer';
 import { LoginModal } from '@/components/cms/LoginModal';
 import MasterCMSLayout from '@/components/cms/MasterCMSLayout';
+import CoupleCMSLayout from '@/components/cms/CoupleCMSLayout';
 import type { Section } from '@/store/useNavigationStore';
 import dynamic from 'next/dynamic';
 
@@ -23,11 +25,20 @@ const MomentsPage = dynamic(() => import('@/components/wedding/pages/MomentsPage
 const WishesPage = dynamic(() => import('@/components/wedding/pages/WishesPage'), { ssr: false });
 const QAPage = dynamic(() => import('@/components/wedding/pages/QAPage'), { ssr: false });
 
-// CMS pages — dynamic imports
+// Master CMS pages — dynamic imports
 const MasterDashboard = dynamic(() => import('@/components/cms/pages/MasterDashboard'), { ssr: false });
 const MasterWeddings = dynamic(() => import('@/components/cms/pages/MasterWeddings'), { ssr: false });
 const MasterUsers = dynamic(() => import('@/components/cms/pages/MasterUsers'), { ssr: false });
 const ComingSoonPage = dynamic(() => import('@/components/cms/pages/ComingSoonPage'), { ssr: false });
+
+// Couple CMS pages — dynamic imports
+const CoupleOverview = dynamic(() => import('@/components/cms/couple/CoupleOverview'), { ssr: false });
+const CoupleDetails = dynamic(() => import('@/components/cms/couple/CoupleDetails'), { ssr: false });
+const CoupleSchedule = dynamic(() => import('@/components/cms/couple/CoupleSchedule'), { ssr: false });
+const CoupleStory = dynamic(() => import('@/components/cms/couple/CoupleStory'), { ssr: false });
+const CoupleFAQs = dynamic(() => import('@/components/cms/couple/CoupleFAQs'), { ssr: false });
+const CoupleFeatures = dynamic(() => import('@/components/cms/couple/CoupleFeatures'), { ssr: false });
+const CoupleImages = dynamic(() => import('@/components/cms/couple/CoupleImages'), { ssr: false });
 
 const GUEST_PAGES: Record<Section, React.ComponentType> = {
   home: HomePage,
@@ -40,7 +51,7 @@ const GUEST_PAGES: Record<Section, React.ComponentType> = {
   qa: QAPage,
 };
 
-const CMS_PAGES: Record<CMSPage, React.ComponentType> = {
+const MASTER_CMS_PAGES: Record<CMSPage, React.ComponentType> = {
   dashboard: MasterDashboard,
   weddings: MasterWeddings,
   users: MasterUsers,
@@ -49,9 +60,25 @@ const CMS_PAGES: Record<CMSPage, React.ComponentType> = {
   settings: () => <ComingSoonPage title="Settings" description="Configure platform settings and preferences" />,
 };
 
-function CMSPageRouter() {
+const COUPLE_CMS_PAGES: Record<CoupleCMSPage, React.ComponentType> = {
+  overview: CoupleOverview,
+  details: CoupleDetails,
+  schedule: CoupleSchedule,
+  story: CoupleStory,
+  faqs: CoupleFAQs,
+  features: CoupleFeatures,
+  images: CoupleImages,
+};
+
+function MasterCMSPageRouter() {
   const { currentPage } = useCMSStore();
-  const PageComponent = CMS_PAGES[currentPage] || MasterDashboard;
+  const PageComponent = MASTER_CMS_PAGES[currentPage] || MasterDashboard;
+  return <PageComponent />;
+}
+
+function CoupleCMSPageRouter() {
+  const { currentPage } = useCoupleCMSStore();
+  const PageComponent = COUPLE_CMS_PAGES[currentPage] || CoupleOverview;
   return <PageComponent />;
 }
 
@@ -59,14 +86,22 @@ export default function Home() {
   const { data: session, status } = useSession();
   const { currentSection } = useNavigationStore();
   const [loginOpen, setLoginOpen] = useState(false);
-  const [manualView, setManualView] = useState<'guest' | 'cms' | null>(null);
+  const [manualView, setManualView] = useState<'guest' | 'cms' | 'couple' | null>(null);
 
   const isAdmin = session?.user?.role === 'SUPER_ADMIN' || session?.user?.role === 'ACCOUNT_MANAGER';
-  const viewMode = manualView ?? (isAdmin ? 'cms' : 'guest');
+  const isCouple = session?.user?.role === 'COUPLE';
 
-  // CMS View
+  // Derive view mode from role + manual override
+  const viewMode = manualView ?? (isAdmin ? 'cms' : isCouple ? 'couple' : 'guest');
+
+  // Master CMS View
   if (viewMode === 'cms' && isAdmin) {
-    return <MasterCMSLayout><CMSPageRouter /></MasterCMSLayout>;
+    return <MasterCMSLayout><MasterCMSPageRouter /></MasterCMSLayout>;
+  }
+
+  // Couple CMS View
+  if (viewMode === 'couple' && isCouple) {
+    return <CoupleCMSLayout><CoupleCMSPageRouter /></CoupleCMSLayout>;
   }
 
   // Guest View
@@ -84,13 +119,13 @@ export default function Home() {
       <Footer />
       <BottomNav />
 
-      {/* Subtle admin access for authenticated non-admin users */}
+      {/* CMS access for authenticated non-admin users (couples) */}
       {status === 'authenticated' && !isAdmin && (
         <button
-          onClick={() => setManualView('cms')}
+          onClick={() => setManualView('couple')}
           className="fixed bottom-20 left-6 z-[55] text-xs text-charcoal-ink/30 hover:text-cinematic-gold transition-colors"
         >
-          CMS
+          ✎
         </button>
       )}
 
