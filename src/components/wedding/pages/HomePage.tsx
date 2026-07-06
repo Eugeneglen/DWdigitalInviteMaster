@@ -79,7 +79,6 @@ export default function HomePage() {
               className="w-full h-full object-cover object-center"
               src={HERO_IMG}
             />
-            <div className="absolute inset-0 hero-gradient" />
           </div>
 
           {/* Content Overlay */}
@@ -138,7 +137,7 @@ export default function HomePage() {
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 src={TEA_IMG}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-charcoal-ink/40 to-transparent pointer-events-none" />
+              {/* Clean image — no overlay */}
             </div>
             <div className="text-center">
               {/* Original: <span class="font-label-sm text-label-sm text-cinematic-gold tracking-[0.2em] uppercase block mb-2 font-semibold">The Tradition</span> */}
@@ -164,6 +163,97 @@ export default function HomePage() {
           </div>
         </section>
       </main>
+
+      {/* ===== GOLD DUST PARTICLES ===== */}
+      <style>{`
+        .gold-dust-particle {
+          background: radial-gradient(circle, rgb(212,175,55) 0%, rgb(245,230,173) 60%, transparent 100%);
+          animation: dustRise var(--dust-duration,18s) linear var(--dust-delay,0s) infinite, dustSway var(--dust-duration,18s) ease-in-out var(--dust-delay,0s) infinite;
+        }
+        @keyframes dustRise {
+          0% { opacity: var(--dust-opacity-start,0); transform: translateY(0); }
+          8% { opacity: 1; }
+          85% { opacity: 1; }
+          100% { opacity: 0; transform: translateY(-105vh); }
+        }
+        @keyframes dustSway {
+          0% { margin-left: 0; }
+          25% { margin-left: var(--dust-sway,12px); }
+          50% { margin-left: calc(var(--dust-sway,12px) * -0.5); }
+          75% { margin-left: var(--dust-sway,12px); }
+          100% { margin-left: 0; }
+        }
+        .bokeh-orb {
+          background: radial-gradient(circle at 40% 40%, rgba(212,175,55,0.5) 0%, rgba(245,230,173,0.2) 40%, transparent 70%);
+          filter: blur(30px);
+          animation: bokehDrift var(--bokeh-drift-dur,25s) ease-in-out var(--bokeh-delay,0s) infinite alternate, bokehBreathe var(--bokeh-breath-dur,7s) ease-in-out var(--bokeh-delay,0s) infinite;
+        }
+        @keyframes bokehDrift {
+          0% { transform: translate(0); }
+          100% { transform: translate(var(--bokeh-drift-x,20px), var(--bokeh-drift-y,10px)); }
+        }
+        @keyframes bokehBreathe {
+          0%,100% { opacity: inherit; transform: scale(1); }
+          50% { opacity: calc(var(--bokeh-opacity-peak,1) * 1.4); transform: scale(1.15); }
+        }
+      `}</style>
+      <div className="fixed inset-0 pointer-events-none z-[100] overflow-hidden">
+        {Array.from({ length: 18 }).map((_, i) => {
+          const left = `${(i * 5.5 + 2) % 100}%`;
+          const size = 2 + (i % 4);
+          const duration = 16 + (i % 8) * 2;
+          const delay = (i * 1.7) % 12;
+          const sway = 8 + (i % 3) * 6;
+          const opacity = 0.3 + (i % 3) * 0.2;
+          return (
+            <div
+              key={i}
+              className="gold-dust-particle"
+              style={{
+                position: 'absolute',
+                bottom: '-10px',
+                left,
+                width: `${size}px`,
+                height: `${size}px`,
+                '--dust-duration': `${duration}s`,
+                '--dust-delay': `${delay}s`,
+                '--dust-sway': `${sway}px`,
+                '--dust-opacity-start': '0',
+                opacity,
+              } as React.CSSProperties}
+            />
+          );
+        })}
+        {Array.from({ length: 5 }).map((_, i) => {
+          const left = `${15 + i * 18}%`;
+          const size = 80 + i * 30;
+          const driftDur = 22 + i * 5;
+          const breathDur = 6 + i * 2;
+          const delay = i * 4;
+          const driftX = 15 + i * 8;
+          const driftY = 8 + i * 5;
+          return (
+            <div
+              key={`bokeh-${i}`}
+              className="bokeh-orb"
+              style={{
+                position: 'absolute',
+                bottom: `${10 + i * 15}%`,
+                left,
+                width: `${size}px`,
+                height: `${size}px`,
+                '--bokeh-drift-dur': `${driftDur}s`,
+                '--bokeh-breath-dur': `${breathDur}s`,
+                '--bokeh-delay': `${delay}s`,
+                '--bokeh-drift-x': `${driftX}px`,
+                '--bokeh-drift-y': `${driftY}px`,
+                '--bokeh-opacity-peak': '1',
+                opacity: 0.08 + i * 0.03,
+              } as React.CSSProperties}
+            />
+          );
+        })}
+      </div>
 
       {/* ===== FLOATING ACTION BUTTON ===== */}
       {/* Original: <div class="fixed bottom-24 right-6 md:bottom-12 md:right-12 z-[55] transition-transform duration-300 transform translate-y-20 opacity-0" id="fab"> */}

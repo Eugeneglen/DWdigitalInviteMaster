@@ -78,7 +78,7 @@ export default function ContactConciergeModal({
   );
 
   const inputClass =
-    'w-full border border-charcoal-ink/15 rounded-sm px-4 py-3 bg-white font-body-sm text-body-sm text-charcoal-ink placeholder:text-charcoal-ink/35 outline-none focus:border-cinematic-gold/50 transition-colors';
+    'input-line w-full';
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>

@@ -199,7 +199,7 @@ export default function WishesPage() {
                 placeholder="Full Name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full border border-charcoal-ink/15 rounded px-4 py-3 text-[14px] text-charcoal-ink placeholder:text-charcoal-ink/40 focus:outline-none focus:border-cinematic-gold/50 transition-colors bg-white"
+                className="input-line"
               />
 
               {/* Relationship */}
@@ -208,7 +208,7 @@ export default function WishesPage() {
                 placeholder="Relationship"
                 value={relationship}
                 onChange={(e) => setRelationship(e.target.value)}
-                className="w-full border border-charcoal-ink/15 rounded px-4 py-3 text-[14px] text-charcoal-ink placeholder:text-charcoal-ink/40 focus:outline-none focus:border-cinematic-gold/50 transition-colors bg-white"
+                className="input-line"
               />
 
               {/* Your Message */}
@@ -217,7 +217,7 @@ export default function WishesPage() {
                 rows={4}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                className="w-full border border-charcoal-ink/15 rounded px-4 py-3 text-[14px] text-charcoal-ink placeholder:text-charcoal-ink/40 focus:outline-none focus:border-cinematic-gold/50 transition-colors resize-none bg-white"
+                className="input-line resize-none"
               />
 
               {/* Upload area */}
