@@ -323,3 +323,36 @@ Stage Summary:
 - Form consistency: Wishes page + Contact modal now use underline-only inputs matching RSVP page style
 - Downgraded @tailwindcss/postcss from 4.1.18 to 4.0.17 to fix Turbopack PostCSS worker panic
 - Dev server: switched to keep-alive.sh wrapper for process persistence
+
+---
+Task ID: cms-phase-1
+Agent: Main Agent
+Task: CMS Phase 1 — Auth Foundation, Master CMS Shell, Dashboard, Wedding Account CRUD
+
+Work Log:
+- Expanded Prisma schema from 4 to 13 models (User, WeddingAccount, WeddingFeature, WeddingContent, WeddingMedia, EventSchedule, FAQ, StoryItem, Guest, AuditLog, SystemSetting + enhanced existing models with weddingId)
+- Installed bcryptjs for password hashing
+- Configured NextAuth.js v4 with Credentials provider, JWT strategy, role-based sessions
+- Created SessionProvider wrapper in layout.tsx
+- Created LoginModal component (professional dark header, email/password form, error/loading states)
+- Created useCMSStore (Zustand) for CMS page navigation state
+- Created MasterCMSLayout with dark sidebar (slate-900), collapsible icon mode, DW gold logo, 6 nav items, user dropdown, sign out
+- Created MasterDashboard page (7 stat cards, recent weddings list, recent RSVPs list, loading skeletons)
+- Created MasterWeddings page (data table, search, create/edit dialog, status/plan badges, suspend/activate/archive actions)
+- Created ComingSoonPage placeholder for Templates, Analytics, Settings
+- Created MasterUsers placeholder page
+- Created master API routes: /api/master/dashboard, /api/master/weddings (GET/POST/PATCH/DELETE)
+- Created seed script with admin user, couple user, sample wedding (Eleanor & James), 9 features, 13 content items, 4 schedule items, 6 FAQs, 4 story items
+- Updated page.tsx to handle viewMode switching (guest ↔ CMS) based on auth state
+- Added subtle ⚙ login trigger on guest site bottom-left
+- Fixed React lint error (set-state-in-effect) by using derived state instead of useEffect
+- Fixed MasterDashboard data shape mismatch with API response
+- Verified via Agent Browser: login flow, CMS dashboard rendering, wedding accounts table, sign-out, guest site preservation
+
+Stage Summary:
+- CMS Phase 1 complete: auth + master admin panel foundation
+- 13 Prisma models, 3 API routes, 6 CMS page components, 1 layout
+- Login: admin@dreamweavers.sg / Admin@2024 (SUPER_ADMIN), eleanor@wedding.com / Couple@2024 (COUPLE)
+- All on / route — CMS renders for authenticated admins, guest site for everyone else
+- Zero lint errors (1 expected font warning)
+- Backup: dreamweavers-backup-cms-phase1-complete-20260706105122.tar.gz (94MB)
