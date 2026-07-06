@@ -61,6 +61,9 @@ export interface PublicWeddingData {
   }[];
   mediaByCategory: Record<string, PublicWeddingData['media']>;
   featureFlags: Record<string, boolean>;
+  featureConfigs: Record<string, Record<string, unknown>>;
+  rsvpCount: number;
+  totalGuestCount: number;
   wishes: {
     id: string;
     name: string;

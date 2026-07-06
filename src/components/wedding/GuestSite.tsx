@@ -8,6 +8,7 @@ import Header from '@/components/wedding/Header';
 import MobileDrawer from '@/components/wedding/MobileDrawer';
 import BottomNav from '@/components/wedding/BottomNav';
 import Footer from '@/components/wedding/Footer';
+import MusicPlayer from '@/components/wedding/MusicPlayer';
 import { LoginModal } from '@/components/cms/LoginModal';
 import type { Section } from '@/store/useNavigationStore';
 import dynamic from 'next/dynamic';
@@ -66,6 +67,10 @@ export default function GuestSite({ slug, topOffset, showEditorButton = false }:
       </div>
 
       <Footer />
+
+      {/* Music Player — conditional on feature flag, reads config internally */}
+      <MusicPlayer />
+
       <BottomNav />
 
       {/* Couple CMS toggle — visible floating button for authenticated couples */}

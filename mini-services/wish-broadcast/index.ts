@@ -24,6 +24,18 @@ const httpServer = createServer((req, res) => {
           }
         }
 
+        if (body.type === 'new_rsvp' && body.payload) {
+          const { weddingId, ...rsvpData } = body.payload;
+
+          if (weddingId) {
+            io.to(`wedding:${weddingId}`).emit('new_rsvp', rsvpData);
+            console.log(`[wish-broadcast] Broadcast RSVP to wedding:${weddingId}`);
+          } else {
+            io.emit('new_rsvp', rsvpData);
+            console.log(`[wish-broadcast] Broadcast RSVP to all clients`);
+          }
+        }
+
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ ok: true }));
       } catch {

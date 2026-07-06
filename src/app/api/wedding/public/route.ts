@@ -22,6 +22,7 @@ export async function GET(req: Request) {
         media: { orderBy: { sortOrder: 'asc' } },
         features: true,
         wishes: { orderBy: { createdAt: 'desc' } },
+        rsvps: { select: { id: true, firstName: true, lastName: true, partySize: true, createdAt: true } },
       },
     });
 
@@ -45,8 +46,16 @@ export async function GET(req: Request) {
 
     // Build feature flags map
     const featureFlags: Record<string, boolean> = {};
+    const featureConfigs: Record<string, Record<string, unknown>> = {};
     for (const f of wedding.features) {
       featureFlags[f.featureKey] = f.isEnabled;
+      if (f.config) {
+        try {
+          featureConfigs[f.featureKey] = JSON.parse(f.config);
+        } catch {
+          // ignore malformed config
+        }
+      }
     }
 
     return NextResponse.json({
@@ -71,6 +80,9 @@ export async function GET(req: Request) {
       media: wedding.media,
       mediaByCategory,
       featureFlags,
+      featureConfigs,
+      rsvpCount: wedding.rsvps.length,
+      totalGuestCount: wedding.rsvps.reduce((sum, r) => sum + r.partySize, 0),
       wishes: wedding.wishes.map((w) => ({
         id: w.id,
         name: w.name,

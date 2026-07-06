@@ -35,7 +35,7 @@ export async function PUT(req: NextRequest) {
     const weddingId = await getWeddingId(session.user.id);
     if (!weddingId) return NextResponse.json({ error: 'No wedding account' }, { status: 404 });
 
-    const { features } = await req.json() as { features: { featureKey: string; isEnabled: boolean }[] };
+    const { features } = await req.json() as { features: { featureKey: string; isEnabled: boolean; config?: string }[] };
 
     if (!Array.isArray(features)) {
       return NextResponse.json({ error: 'features array required' }, { status: 400 });
@@ -49,7 +49,10 @@ export async function PUT(req: NextRequest) {
       if (existing) {
         const updated = await db.weddingFeature.update({
           where: { id: existing.id },
-          data: { isEnabled: f.isEnabled },
+          data: {
+            isEnabled: f.isEnabled,
+            ...(f.config !== undefined ? { config: f.config } : {}),
+          },
         });
         results.push(updated);
       }

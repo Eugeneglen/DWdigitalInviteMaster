@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigationStore } from '@/store/useNavigationStore';
 import { usePublicWedding } from '@/hooks/usePublicWedding';
+import { useLiveWeddingData } from '@/hooks/useLiveWeddingData';
 
 const FALLBACK_HERO_IMG =
   'https://lh3.googleusercontent.com/aida-public/AB6AXuBeAe38AA5-0h4B5MmgQCqv54oQXyPMGznDKaw2sJI_FnTbB_yXXWOpirFlFycj_2VI02IVLouUTt86Y1J7Ls-bRsMOHPAcfSqruVoh87sfhw3vi2Z6t1C7ogCLtkvF6QbJkwuV0av8pXTrUeAAi6ymnZpvyOr8qVjTNNorAOmqRrW_fohX_xlkscmBh39K4Wtvs6TH0Nvb_X3LQQRD9W_sySN_iWbWw9O0au8u1jO-hSekE9pSGNo5zsTz3o9PWy5xbzc6lq3knkIy';
@@ -78,6 +79,12 @@ export default function HomePage() {
   const { setSection } = useNavigationStore();
   const [showFab, setShowFab] = useState(false);
 
+  // Live wedding data
+  const weddingId = data?.wedding.id ?? null;
+  const { isConnected, rsvpFlash, liveRsvpIncrement } = useLiveWeddingData({ weddingId });
+  const baseRsvpCount = data?.rsvpCount ?? 0;
+  const displayRsvpCount = baseRsvpCount + liveRsvpIncrement;
+
   useEffect(() => {
     const onScroll = () => setShowFab(window.scrollY > 300);
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -145,6 +152,25 @@ export default function HomePage() {
               ))}
             </div>
           </div>
+
+          {/* Live RSVP Counter */}
+          {isConnected && displayRsvpCount > 0 && (
+            <div
+              className={`mt-6 animate-fade-in flex items-center justify-center gap-2 transition-all duration-500 ${
+                rsvpFlash ? 'scale-105' : 'scale-100'
+              }`}
+            >
+              <span className="text-base">🎉</span>
+              <span className="font-label-sm text-label-sm text-paper-cream/90 tracking-wide">
+                <span className="font-bold text-paper-cream">{displayRsvpCount}</span>{' '}
+                {displayRsvpCount === 1 ? 'guest has' : 'guests have'} RSVP&apos;d
+              </span>
+              <span className="relative flex h-2 w-2 ml-1">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
+              </span>
+            </div>
+          )}
 
           {/* Scroll Indicator */}
           <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 animate-fade-in delay-400 flex flex-col items-center opacity-70">

@@ -1,11 +1,14 @@
 'use client';
 
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { Loader2, Timer, CalendarClock, Mail, BookOpen, Image, Heart, MapPin, HelpCircle, Sparkles } from 'lucide-react';
+import { Loader2, Timer, CalendarClock, Mail, BookOpen, Image, Heart, MapPin, HelpCircle, Sparkles, Music2, Save } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 
 const API_BASE = '/api/cms/features?XTransformPort=3000';
 
@@ -71,6 +74,12 @@ const FEATURE_REGISTRY: Record<string, FeatureConfig> = {
     description: 'Share special moments captured on your journey',
     icon: Sparkles,
   },
+  music: {
+    featureKey: 'music',
+    displayName: 'Background Music',
+    description: 'Play background music on your wedding page',
+    icon: Music2,
+  },
 };
 
 const FEATURE_ORDER = [
@@ -83,11 +92,38 @@ const FEATURE_ORDER = [
   'getting-there',
   'qa',
   'moments',
+  'music',
 ];
 
 interface FeatureItem {
   featureKey: string;
-  enabled: boolean;
+  isEnabled: boolean;
+  config?: string | null;
+}
+
+interface MusicConfig {
+  url: string;
+  title: string;
+  artist: string;
+  autoplay: boolean;
+  loop: boolean;
+}
+
+const DEFAULT_MUSIC_CONFIG: MusicConfig = {
+  url: '',
+  title: '',
+  artist: '',
+  autoplay: true,
+  loop: true,
+};
+
+function parseMusicConfig(config: string | null | undefined): MusicConfig {
+  if (!config) return { ...DEFAULT_MUSIC_CONFIG };
+  try {
+    return { ...DEFAULT_MUSIC_CONFIG, ...JSON.parse(config) };
+  } catch {
+    return { ...DEFAULT_MUSIC_CONFIG };
+  }
 }
 
 export default function CoupleFeatures() {
@@ -96,13 +132,21 @@ export default function CoupleFeatures() {
   const [savingKey, setSavingKey] = useState<string | null>(null);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Music config local state
+  const [musicConfig, setMusicConfig] = useState<MusicConfig>(DEFAULT_MUSIC_CONFIG);
+  const [savingMusic, setSavingMusic] = useState(false);
+
   const fetchFeatures = useCallback(async () => {
     try {
       setLoading(true);
       const res = await fetch(API_BASE);
       if (!res.ok) throw new Error('Failed to load features');
       const data = await res.json();
-      setFeatures(data.features ?? []);
+      const rawFeatures: FeatureItem[] = data.features ?? [];
+      setFeatures(rawFeatures);
+      // Load music config from features
+      const musicFeature = rawFeatures.find((f) => f.featureKey === 'music');
+      setMusicConfig(parseMusicConfig(musicFeature?.config));
     } catch {
       toast.error('Failed to load features');
     } finally {
@@ -135,7 +179,7 @@ export default function CoupleFeatures() {
   const handleToggle = (key: string) => {
     // Optimistic update
     setFeatures((prev) =>
-      prev.map((f) => (f.featureKey === key ? { ...f, enabled: !f.enabled } : f))
+      prev.map((f) => (f.featureKey === key ? { ...f, isEnabled: !f.isEnabled } : f))
     );
 
     // Clear any pending save
@@ -148,7 +192,7 @@ export default function CoupleFeatures() {
 
     // Immediate save on toggle
     const updatedFeatures = features.map((f) =>
-      f.featureKey === key ? { ...f, enabled: !f.enabled } : f
+      f.featureKey === key ? { ...f, isEnabled: !f.isEnabled } : f
     );
 
     saveTimeoutRef.current = setTimeout(async () => {
@@ -164,7 +208,7 @@ export default function CoupleFeatures() {
         }
 
         const config = getFeatureConfig(key);
-        const isEnabled = updatedFeatures.find((f) => f.featureKey === key)?.enabled;
+        const isEnabled = updatedFeatures.find((f) => f.featureKey === key)?.isEnabled;
         toast.success(
           `${config.displayName} ${isEnabled ? 'enabled' : 'disabled'}`
         );
@@ -177,6 +221,36 @@ export default function CoupleFeatures() {
       }
     }, 300);
   };
+
+  const handleSaveMusicConfig = async () => {
+    setSavingMusic(true);
+    try {
+      const currentMusicFeature = features.find((f) => f.featureKey === 'music');
+      if (!currentMusicFeature) return;
+
+      const updatedFeatures = features.map((f) =>
+        f.featureKey === 'music'
+          ? { ...f, config: JSON.stringify(musicConfig) }
+          : f
+      );
+
+      const res = await fetch(API_BASE, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ features: updatedFeatures }),
+      });
+
+      if (!res.ok) throw new Error('Failed to save music settings');
+      setFeatures(updatedFeatures);
+      toast.success('Music settings saved');
+    } catch {
+      toast.error('Failed to save music settings');
+    } finally {
+      setSavingMusic(false);
+    }
+  };
+
+  const isMusicEnabled = features.find((f) => f.featureKey === 'music')?.isEnabled ?? false;
 
   if (loading) {
     return (
@@ -204,7 +278,7 @@ export default function CoupleFeatures() {
         {FEATURE_ORDER.map((key) => {
           const config = getFeatureConfig(key);
           const feature = features.find((f) => f.featureKey === key);
-          const isEnabled = feature?.enabled ?? false;
+          const isEnabled = feature?.isEnabled ?? false;
           const isSaving = savingKey === key;
           const Icon = config.icon;
 
@@ -249,6 +323,71 @@ export default function CoupleFeatures() {
                     )}
                   </div>
                 </div>
+
+                {/* Music inline settings */}
+                {key === 'music' && isEnabled && (
+                  <div className="mt-4 pt-4 border-t border-champagne-silk/60 space-y-3">
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-medium text-charcoal-ink/70">Music URL</Label>
+                      <Input
+                        type="url"
+                        placeholder="https://example.com/song.mp3"
+                        value={musicConfig.url}
+                        onChange={(e) => setMusicConfig((prev) => ({ ...prev, url: e.target.value }))}
+                        className="h-8 text-xs"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <Label className="text-xs font-medium text-charcoal-ink/70">Song Title</Label>
+                        <Input
+                          placeholder="Our Song"
+                          value={musicConfig.title}
+                          onChange={(e) => setMusicConfig((prev) => ({ ...prev, title: e.target.value }))}
+                          className="h-8 text-xs"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label className="text-xs font-medium text-charcoal-ink/70">Artist Name</Label>
+                        <Input
+                          placeholder="Artist"
+                          value={musicConfig.artist}
+                          onChange={(e) => setMusicConfig((prev) => ({ ...prev, artist: e.target.value }))}
+                          className="h-8 text-xs"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-6">
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={musicConfig.autoplay}
+                          onCheckedChange={(checked) => setMusicConfig((prev) => ({ ...prev, autoplay: checked }))}
+                        />
+                        <Label className="text-xs text-charcoal-ink/60">Autoplay</Label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={musicConfig.loop}
+                          onCheckedChange={(checked) => setMusicConfig((prev) => ({ ...prev, loop: checked }))}
+                        />
+                        <Label className="text-xs text-charcoal-ink/60">Loop</Label>
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      onClick={handleSaveMusicConfig}
+                      disabled={savingMusic || !musicConfig.url}
+                      className="h-7 text-xs mt-1"
+                    >
+                      {savingMusic ? (
+                        <Loader2 className="size-3 animate-spin mr-1.5" />
+                      ) : (
+                        <Save className="size-3 mr-1.5" />
+                      )}
+                      Save Music Settings
+                    </Button>
+                  </div>
+                )}
               </CardContent>
             </Card>
           );

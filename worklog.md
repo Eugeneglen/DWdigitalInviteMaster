@@ -879,3 +879,29 @@ Stage Summary:
 - Replaced last ComingSoonPage stub in Master CMS
 - 6 visual themes available: Classic Elegance, Modern Minimalist, Romantic Blush, Midnight Garden, Tropical Breeze, Autumn Warmth
 - Templates stored in SystemSetting for persistence
+
+---
+Task ID: phase-10
+Agent: Main Agent
+Task: Phase 10 - Music Player & Live Features
+
+Work Log:
+- Added music feature to CoupleFeatures registry (FEATURE_REGISTRY + FEATURE_ORDER) with Music2 icon
+- Built inline music settings panel in CoupleFeatures: URL, Song Title, Artist Name, Autoplay switch, Loop switch
+- Updated features API (PUT) to accept and persist config JSON field
+- Updated public wedding API to include featureConfigs (parsed JSON) and rsvpCount/totalGuestCount
+- Updated usePublicWedding type to include featureConfigs, rsvpCount, totalGuestCount
+- Created MusicPlayer floating component with expand/collapse, play/pause, volume, progress bar
+- MusicPlayer handles browser autoplay policies with "Click to play" prompt
+- Integrated MusicPlayer into GuestSite (renders after Footer, before BottomNav, conditional on feature flag)
+- Added new_rsvp event handling to wish-broadcast WebSocket service
+- Created useLiveWeddingData hook for real-time wish/RSVP updates via WebSocket
+- Added live RSVP counter to HomePage with animated updates and green pulse indicator
+- All code passes ESLint with 0 errors
+
+Stage Summary:
+- Background music player with elegant floating UI (z-40, bottom-right, above BottomNav on mobile)
+- Music configurable per wedding via CMS (URL, title, artist, autoplay, loop toggles)
+- Live RSVP counter on guest site via WebSocket with real-time increment
+- WebSocket service enhanced with new_rsvp event type (broadcasts to wedding rooms)
+- useLiveWeddingData hook reusable across pages for live data
