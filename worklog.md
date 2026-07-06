@@ -356,3 +356,34 @@ Stage Summary:
 - All on / route — CMS renders for authenticated admins, guest site for everyone else
 - Zero lint errors (1 expected font warning)
 - Backup: dreamweavers-backup-cms-phase1-complete-20260706105122.tar.gz (94MB)
+
+---
+Task ID: phase-3
+Agent: Main Agent
+Task: Phase 3 — Wedding Content Management (Images, Guests, Content Editor, RSVPs, Wishes)
+
+Work Log:
+- Updated useCoupleCMSStore: added 'content', 'guests', 'rsvps', 'wishes' to CoupleCMSPage type (now 11 pages)
+- Updated CoupleCMSLayout nav: added FileText (Content), Users (Guests), Mail (RSVPs), MessageSquareHeart (Wishes) icons
+- Created /api/cms/media/route.ts: GET (filter by category), POST (create with auto sortOrder), PUT (update + setAs hero/banner), DELETE — all with auth + audit logging
+- Created /api/cms/guests/route.ts (via subagent): GET (search/status/group filters + _count), POST (Zod validation, auto 6-char invitationCode), PUT (auto sentAt on sentVia change), DELETE — all with auth + audit logging
+- Created /api/cms/rsvps/route.ts: GET with client-side status filtering (attending/declined/mixed computed from guest responses), includes guest responses
+- Created /api/cms/wishes/route.ts: GET (search by name/message/relationship), DELETE with ownership verification + audit logging
+- Built CoupleImages.tsx: full media management — drag-and-drop upload (base64), 5 category filters (hero/banner/gallery/story/couple-photo), set-as-hero/banner, reorder up/down, full-size preview dialog, delete, category badges, file size display
+- Built CoupleGuests.tsx: guest list — search by name/email/phone, status filter (Pending/Attending/Declined/Partial), 4 summary stat cards, add/edit dialog with plus-one toggle, table number, group/family, dietary notes, invitation code display
+- Built CoupleContent.tsx: section-by-section text content editor — 9 collapsible sections (hero, schedule, rsvp, getting-there, story, wishes, qa, moments, footer), 35+ editable fields, dirty-field tracking with gold dot indicators, batch save with change count
+- Built CoupleRSVPs.tsx: RSVP response viewer — 4 summary cards (Submissions/Attending/Declined/Attendance Rate), per-guest attendance breakdown with CheckCircle/XCircle icons, dietary notes display, status filter, name search
+- Built CoupleWishes.tsx: wish management — total wishes card, top-5 relationships distribution, search, time-ago display, delete with confirmation
+- Wired all 4 new components in page.tsx (dynamic imports + COUPLE_CMS_PAGES map)
+- Fixed lucide-react import: Banner icon doesn't exist, replaced with ImagePlus
+- Added persistent NEXTAUTH_SECRET to .env to prevent JWT decryption failures across server restarts
+- Created keep-alive.sh for dev server persistence
+- ESLint: 0 errors, 1 expected warning (custom font)
+
+Stage Summary:
+- Phase 3 complete: Couple CMS expanded from 7 to 11 pages
+- 4 new frontend components: CoupleContent, CoupleImages, CoupleGuests, CoupleRSVPs, CoupleWishes
+- 4 new API routes: /api/cms/media, /api/cms/guests, /api/cms/rsvps, /api/cms/wishes
+- All endpoints properly authenticated, tenant-scoped, and audit-logged
+- Browser verified: login → CMS renders with all 11 nav items, Overview with Quick Actions, zero console errors
+- Guest site unaffected (still renders correctly)

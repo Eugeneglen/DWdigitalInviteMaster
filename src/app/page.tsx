@@ -34,11 +34,15 @@ const ComingSoonPage = dynamic(() => import('@/components/cms/pages/ComingSoonPa
 // Couple CMS pages — dynamic imports
 const CoupleOverview = dynamic(() => import('@/components/cms/couple/CoupleOverview'), { ssr: false });
 const CoupleDetails = dynamic(() => import('@/components/cms/couple/CoupleDetails'), { ssr: false });
+const CoupleContent = dynamic(() => import('@/components/cms/couple/CoupleContent'), { ssr: false });
 const CoupleSchedule = dynamic(() => import('@/components/cms/couple/CoupleSchedule'), { ssr: false });
 const CoupleStory = dynamic(() => import('@/components/cms/couple/CoupleStory'), { ssr: false });
 const CoupleFAQs = dynamic(() => import('@/components/cms/couple/CoupleFAQs'), { ssr: false });
 const CoupleFeatures = dynamic(() => import('@/components/cms/couple/CoupleFeatures'), { ssr: false });
 const CoupleImages = dynamic(() => import('@/components/cms/couple/CoupleImages'), { ssr: false });
+const CoupleGuests = dynamic(() => import('@/components/cms/couple/CoupleGuests'), { ssr: false });
+const CoupleRSVPs = dynamic(() => import('@/components/cms/couple/CoupleRSVPs'), { ssr: false });
+const CoupleWishes = dynamic(() => import('@/components/cms/couple/CoupleWishes'), { ssr: false });
 
 const GUEST_PAGES: Record<Section, React.ComponentType> = {
   home: HomePage,
@@ -63,11 +67,15 @@ const MASTER_CMS_PAGES: Record<CMSPage, React.ComponentType> = {
 const COUPLE_CMS_PAGES: Record<CoupleCMSPage, React.ComponentType> = {
   overview: CoupleOverview,
   details: CoupleDetails,
+  content: CoupleContent,
   schedule: CoupleSchedule,
   story: CoupleStory,
   faqs: CoupleFAQs,
   features: CoupleFeatures,
   images: CoupleImages,
+  guests: CoupleGuests,
+  rsvps: CoupleRSVPs,
+  wishes: CoupleWishes,
 };
 
 function MasterCMSPageRouter() {

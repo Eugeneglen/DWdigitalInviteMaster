@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { Loader2, Plus, Trash2, ImageIcon, Star, Banner, Upload, GripVertical, Eye, ImageOff } from 'lucide-react';
+import { Loader2, Plus, Trash2, ImageIcon, Star, ImagePlus, Upload, GripVertical, Eye, ImageOff } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -307,12 +307,12 @@ export default function CoupleImages() {
                 className="relative aspect-square bg-charcoal-ink/5 cursor-pointer"
                 onClick={() => setPreviewUrl(item.url)}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={item.url}
                   alt={item.fileName}
                   className="w-full h-full object-cover"
                   loading="lazy"
+                  unoptimized
                 />
                 {/* Overlay on hover */}
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200 flex items-center justify-center">
@@ -356,7 +356,7 @@ export default function CoupleImages() {
                     className="h-7 w-7 p-0 text-charcoal-ink/40 hover:text-cinematic-gold hover:bg-cinematic-gold/5"
                     title="Set as banner image"
                   >
-                    <Banner className="size-3.5" />
+                    <ImagePlus className="size-3.5" />
                   </Button>
                   {/* Move up */}
                   <Button
@@ -429,11 +429,11 @@ export default function CoupleImages() {
             >
               {uploadForm.url ? (
                 <div className="relative w-full">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={uploadForm.url}
                     alt="Preview"
                     className="max-h-48 mx-auto rounded-lg object-contain"
+                    unoptimized
                   />
                   <p className="text-xs text-charcoal-ink/40 text-center mt-2">
                     Click or drag to replace
@@ -526,11 +526,11 @@ export default function CoupleImages() {
       {/* Preview Dialog */}
       <Dialog open={!!previewUrl} onOpenChange={() => setPreviewUrl(null)}>
         <DialogContent className="sm:max-w-2xl p-2">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={previewUrl ?? ''}
             alt="Preview"
             className="w-full rounded-lg"
+            unoptimized
           />
         </DialogContent>
       </Dialog>
