@@ -97,7 +97,7 @@ export default function HomePage() {
               Together with their families, request the pleasure of your company
             </p>
 
-            {/* Countdown Component — individual dark rounded boxes */}
+            {/* Countdown Component — gold key style */}
             <div className="animate-slide-up delay-400 grid grid-cols-4 gap-3 md:gap-4 w-full max-w-md mx-auto">
               {[
                 { value: countdown.days, label: 'DAYS' },
@@ -105,11 +105,11 @@ export default function HomePage() {
                 { value: countdown.mins, label: 'MINS' },
                 { value: countdown.secs, label: 'SECS' },
               ].map((item) => (
-                <div key={item.label} className="flex flex-col items-center justify-center rounded-lg bg-charcoal-ink/60 backdrop-blur-sm py-4 md:py-5">
-                  <span className="font-display-hero text-3xl md:text-4xl font-bold text-paper-cream leading-none">
+                <div key={item.label} className="flex flex-col items-center justify-center rounded-lg border border-cinematic-gold/40 bg-cinematic-gold/15 backdrop-blur-sm py-4 md:py-5">
+                  <span className="font-display-hero text-3xl md:text-4xl font-bold text-white leading-none">
                     {String(item.value).padStart(2, '0')}
                   </span>
-                  <span className="font-label-sm text-[9px] md:text-[10px] text-paper-cream/80 tracking-widest uppercase mt-2 font-semibold">
+                  <span className="font-label-sm text-[9px] md:text-[10px] text-white/80 tracking-widest uppercase mt-2 font-semibold">
                     {item.label}
                   </span>
                 </div>
