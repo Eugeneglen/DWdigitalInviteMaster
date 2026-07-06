@@ -833,3 +833,31 @@ Stage Summary:
 - Modified: `src/components/wedding/Header.tsx` (added `topOffset` prop)
 - Modified: `src/app/page.tsx` (preview mode: `<Header topOffset="44px" />`, content `pt-11`)
 - Verified: navigation, page switching, and Open Editor all work in preview mode
+
+---
+Task ID: 7
+Agent: Main Agent + 2 Subagents
+Task: Phase 7 — Multi-Tenancy & Sharing (slug routing, QR codes, invitation links)
+
+Work Log:
+- Installed qrcode + @types/qrcode packages
+- Updated usePublicWedding hook: slug-aware Map-based caching, slug param passed to API
+- Extracted GuestSite component from page.tsx (reusable for / and /[slug])
+- Created /[slug]/page.tsx with generateMetadata (OG title, description, openGraph, twitter card)
+- Created /[slug]/SlugWeddingPage.tsx client wrapper
+- Created branded 404 page: DW gold circle, "Invitation Not Found", "Back to Dreamweavers" link
+- Created /api/cms/qr-code/route.ts: authenticated GET, qrcode pkg, PNG output with Content-Disposition
+- Created CoupleSharing.tsx: Wedding Page Link (copy), QR Code (download/copy/open), Guest Invitation Links (search, per-guest copy, Copy All)
+- Added 'sharing' to CoupleCMSPage type and CoupleCMSLayout nav (QrCode icon, after Activity)
+- Fixed weddingData shape: slug is nested under .wedding.slug, not top-level
+- Browser verified: /eleanor-james-2027 renders full guest site with OG title, /nonexistent shows 404, Sharing page shows link+QR+guests
+- Lint: 0 errors, 1 pre-existing warning
+
+Stage Summary:
+- 5 new files: GuestSite.tsx, [slug]/page.tsx, [slug]/SlugWeddingPage.tsx, qr-code/route.ts, CoupleSharing.tsx
+- 5 modified files: page.tsx, usePublicWedding.ts, useCoupleCMSStore.ts, CoupleCMSLayout.tsx, package.json
+- Each wedding now has a shareable public URL: /{slug}
+- QR codes generated server-side, downloadable as PNG
+- Guest invitation links: /{slug}?code={invitationCode}
+- OG meta tags for social sharing (title, description, hero image)
+- Pushed to CMS-Phase-1 branch on GitHub
