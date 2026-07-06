@@ -45,6 +45,18 @@ export async function POST(request: Request) {
       },
     });
 
+    // Notify wedding owner about new contact submission
+    if (weddingId) {
+      const { notifyWeddingOwner } = await import('@/lib/notifications');
+      await notifyWeddingOwner(
+        weddingId,
+        'CONTACT_RECEIVED',
+        'New Concierge Message',
+        `${name} (${email}) contacted you: "${reason.slice(0, 80)}${reason.length > 80 ? '…' : ''}"`,
+        'overview',
+      );
+    }
+
     return NextResponse.json({ success: true, id: submission.id });
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

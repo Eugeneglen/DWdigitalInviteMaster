@@ -67,15 +67,11 @@ export async function POST(request: Request) {
       const matchingGuest = await db.guest.findFirst({
         where: {
           weddingId,
-          AND: [
-            {
-              OR: [
-                { name: { contains: firstName.trim(), mode: 'insensitive' } },
-                { email: { contains: firstName.trim(), mode: 'insensitive' } },
-              ],
-            },
-          ],
           rsvpStatus: 'PENDING',
+          OR: [
+            { name: { contains: firstName.trim() } },
+            { email: { contains: firstName.trim() } },
+          ],
         },
       });
       if (matchingGuest) {
@@ -90,6 +86,20 @@ export async function POST(request: Request) {
           },
         });
       }
+    }
+
+    // Notify wedding owner about new RSVP
+    if (weddingId) {
+      const { notifyWeddingOwner } = await import('@/lib/notifications');
+      const attending = guests.filter((g) => g.attendance === 'yes' || g.attendance === 'partial').length;
+      const declining = guests.filter((g) => g.attendance === 'no').length;
+      await notifyWeddingOwner(
+        weddingId,
+        'RSVP_RECEIVED',
+        'New RSVP Received',
+        `${firstName} ${lastName} submitted an RSVP — ${attending} attending, ${declining} declining (party of ${partySize}).`,
+        'rsvps',
+      );
     }
 
     return NextResponse.json({ success: true, id: submission.id });

@@ -14,6 +14,7 @@ import {
   ArrowRightLeft,
 } from 'lucide-react';
 import { useAuthModalStore } from '@/store/useAuthModalStore';
+import { NotificationBell } from '@/components/cms/NotificationBell';
 
 import {
   SidebarProvider,
@@ -216,7 +217,8 @@ function CMSHeader() {
       <h1 className="text-lg font-semibold text-slate-900">
         {PAGE_TITLES[currentPage]}
       </h1>
-      <div className="ml-auto flex items-center gap-3">
+      <div className="ml-auto flex items-center gap-2">
+        <NotificationBell variant="master" />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="flex items-center gap-2 rounded-full p-0.5 pr-3 hover:bg-slate-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">

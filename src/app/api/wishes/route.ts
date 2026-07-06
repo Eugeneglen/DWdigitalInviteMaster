@@ -43,6 +43,18 @@ export async function POST(request: Request) {
       },
     });
 
+    // Notify wedding owner about new wish
+    if (weddingId) {
+      const { notifyWeddingOwner } = await import('@/lib/notifications');
+      await notifyWeddingOwner(
+        weddingId,
+        'WISH_RECEIVED',
+        'New Wish Received',
+        `${name}${relationship ? ` (${relationship})` : ''} left a wish: "${message.slice(0, 80)}${message.length > 80 ? '…' : ''}"`,
+        'wishes',
+      );
+    }
+
     // Notify WebSocket service about new wish
     try {
       await fetch(`http://localhost:3004/notify`, {

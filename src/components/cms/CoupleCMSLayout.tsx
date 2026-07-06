@@ -22,6 +22,7 @@ import {
   QrCode,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { NotificationBell } from '@/components/cms/NotificationBell';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { useCoupleCMSStore, type CoupleCMSPage } from '@/store/useCoupleCMSStore';
@@ -234,8 +235,9 @@ export default function CoupleCMSLayout({ children }: { children: React.ReactNod
             </h1>
           </div>
 
-          {/* Right: Preview + DW logo + Sign Out */}
+          {/* Right: Notifications + Preview + DW logo + Sign Out */}
           <div className="flex items-center gap-2 sm:gap-3">
+            <NotificationBell variant="couple" />
             <Button
               variant="outline"
               size="sm"
