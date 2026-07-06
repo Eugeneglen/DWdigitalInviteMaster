@@ -299,3 +299,27 @@ Stage Summary:
 - Admin dashboard: GET /api/admin returns counts + recent submissions for all 3 types
 - Contact form was the only one that needed backend wiring (RSVP and Wishes were already connected)
 
+
+---
+Task ID: restore-visual-fixes
+Agent: Main Agent
+Task: Restore 3 missing Phase 1 visual refinements: remove overlays, gold dust animation, consistent form inputs
+
+Work Log:
+- Investigated git history (30 commits) — confirmed all 3 changes were NEVER committed (discussed in prior session but not implemented before context ran out)
+- Root cause: Prior session ran out of context before implementation, user assumed they were done
+- Fix 1: Removed `hero-gradient` dark overlay from HomePage hero section (line 82)
+- Fix 1b: Removed `bg-gradient-to-t from-charcoal-ink/40` overlay from Tea Ceremony image (line 141)
+- Fix 2: Added 18 gold-dust-particle elements + 5 bokeh-orb elements to HomePage using existing CSS animations
+- Fix 2b: Discovered Tailwind CSS v4 PostCSS processor strips custom @keyframes classes — used inline <style> tag in component as workaround
+- Fix 3: Converted WishesPage form inputs from bordered boxes to `input-line` underline style (matching RSVP)
+- Fix 3b: Converted ContactConciergeModal inputs from bordered style to `input-line` underline style
+- Verified all 3 fixes via Agent Browser + VLM: overlays removed ✅, particles animating ✅, form inputs consistent ✅
+
+Stage Summary:
+- Hero image: clean, no dark gradient overlay
+- Tea ceremony image: clean, no bottom gradient overlay
+- Gold dust: 18 particles + 5 bokeh orbs with CSS animations (inline style workaround for Tailwind v4)
+- Form consistency: Wishes page + Contact modal now use underline-only inputs matching RSVP page style
+- Downgraded @tailwindcss/postcss from 4.1.18 to 4.0.17 to fix Turbopack PostCSS worker panic
+- Dev server: switched to keep-alive.sh wrapper for process persistence
