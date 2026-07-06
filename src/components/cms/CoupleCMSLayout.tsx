@@ -17,6 +17,7 @@ import {
   LogOut,
   ArrowLeft,
   Loader2,
+  ScrollText,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -35,11 +36,12 @@ const NAV_ITEMS: { key: CoupleCMSPage; label: string; icon: React.ElementType }[
   { key: 'guests', label: 'Guests', icon: Users },
   { key: 'rsvps', label: 'RSVPs', icon: Mail },
   { key: 'wishes', label: 'Wishes', icon: MessageSquareHeart },
+  { key: 'audit', label: 'Activity', icon: ScrollText },
 ];
 
 export default function CoupleCMSLayout({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession();
-  const { currentPage, setPage, weddingId, setWeddingId, weddingData, setWeddingData } = useCoupleCMSStore();
+  const { currentPage, setPage, weddingId, setWeddingId, weddingData, setWeddingData, previewMode, togglePreview } = useCoupleCMSStore();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -208,8 +210,17 @@ export default function CoupleCMSLayout({ children }: { children: React.ReactNod
             </h1>
           </div>
 
-          {/* Right: DW logo + Sign Out */}
-          <div className="flex items-center gap-3">
+          {/* Right: Preview + DW logo + Sign Out */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => togglePreview(true)}
+              className="h-8 text-xs font-medium text-cinematic-gold border-cinematic-gold/30 hover:bg-cinematic-gold/10 hover:border-cinematic-gold rounded-md px-3 gap-1.5"
+            >
+              <svg className="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+              Preview
+            </Button>
             <div className="flex h-7 w-7 items-center justify-center rounded-full bg-cinematic-gold text-white font-bold text-[11px]">
               DW
             </div>

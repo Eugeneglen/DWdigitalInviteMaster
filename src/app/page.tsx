@@ -45,6 +45,7 @@ const CoupleImages = dynamic(() => import('@/components/cms/couple/CoupleImages'
 const CoupleGuests = dynamic(() => import('@/components/cms/couple/CoupleGuests'), { ssr: false });
 const CoupleRSVPs = dynamic(() => import('@/components/cms/couple/CoupleRSVPs'), { ssr: false });
 const CoupleWishes = dynamic(() => import('@/components/cms/couple/CoupleWishes'), { ssr: false });
+const CoupleAuditLog = dynamic(() => import('@/components/cms/couple/CoupleAuditLog'), { ssr: false });
 
 const GUEST_PAGES: Record<Section, React.ComponentType> = {
   home: HomePage,
@@ -78,6 +79,7 @@ const COUPLE_CMS_PAGES: Record<CoupleCMSPage, React.ComponentType> = {
   guests: CoupleGuests,
   rsvps: CoupleRSVPs,
   wishes: CoupleWishes,
+  audit: CoupleAuditLog,
 };
 
 function MasterCMSPageRouter() {
@@ -95,6 +97,7 @@ function CoupleCMSPageRouter() {
 export default function Home() {
   const { data: session, status } = useSession();
   const { currentSection } = useNavigationStore();
+  const { previewMode, togglePreview } = useCoupleCMSStore();
   const [loginOpen, setLoginOpen] = useState(false);
   const [manualView, setManualView] = useState<'guest' | 'cms' | 'couple' | null>(null);
 
@@ -103,10 +106,39 @@ export default function Home() {
 
   // Derive view mode from role + manual override
   const viewMode = manualView ?? (isAdmin ? 'cms' : isCouple ? 'couple' : 'guest');
+  const GuestPageComponent = GUEST_PAGES[currentSection] || HomePage;
 
   // Master CMS View
   if (viewMode === 'cms' && isAdmin) {
     return <MasterCMSLayout><MasterCMSPageRouter /></MasterCMSLayout>;
+  }
+
+  // Preview Mode — couple user previewing their wedding as a guest
+  if (previewMode && isCouple) {
+    return (
+      <div className="min-h-screen flex flex-col bg-paper-cream text-charcoal-ink overflow-x-hidden selection:bg-cinematic-gold selection:text-paper-cream">
+        {/* Floating Preview Bar */}
+        <div className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-center gap-3 bg-cinematic-gold text-white px-4 py-2 shadow-md">
+          <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span className="text-sm font-medium">Preview Mode</span>
+          <button
+            onClick={() => togglePreview(false)}
+            className="rounded-md bg-white/20 hover:bg-white/30 px-3 py-1 text-xs font-medium transition-colors"
+          >
+            Back to Editor
+          </button>
+        </div>
+        <div className="pt-10">
+          <Header />
+        </div>
+        <MobileDrawer />
+        <div className="flex-1">
+          <GuestPageComponent key={currentSection} />
+        </div>
+        <Footer />
+        <BottomNav />
+      </div>
+    );
   }
 
   // Couple CMS View
@@ -115,15 +147,13 @@ export default function Home() {
   }
 
   // Guest View
-  const PageComponent = GUEST_PAGES[currentSection] || HomePage;
-
   return (
     <div className="min-h-screen flex flex-col bg-paper-cream text-charcoal-ink overflow-x-hidden selection:bg-cinematic-gold selection:text-paper-cream">
       <Header />
       <MobileDrawer />
 
       <div className="flex-1">
-        <PageComponent key={currentSection} />
+        <GuestPageComponent key={currentSection} />
       </div>
 
       <Footer />

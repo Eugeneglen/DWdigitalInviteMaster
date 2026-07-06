@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type CoupleCMSPage = 'overview' | 'details' | 'content' | 'schedule' | 'story' | 'faqs' | 'features' | 'images' | 'guests' | 'rsvps' | 'wishes';
+export type CoupleCMSPage = 'overview' | 'details' | 'content' | 'schedule' | 'story' | 'faqs' | 'features' | 'images' | 'guests' | 'rsvps' | 'wishes' | 'audit';
 
 interface CoupleCMSState {
   currentPage: CoupleCMSPage;
@@ -9,6 +9,8 @@ interface CoupleCMSState {
   setWeddingId: (id: string | null) => void;
   weddingData: Record<string, unknown> | null;
   setWeddingData: (data: Record<string, unknown> | null) => void;
+  previewMode: boolean;
+  togglePreview: (on: boolean) => void;
 }
 
 export const useCoupleCMSStore = create<CoupleCMSState>((set) => ({
@@ -18,4 +20,6 @@ export const useCoupleCMSStore = create<CoupleCMSState>((set) => ({
   setWeddingId: (id) => set({ weddingId: id }),
   weddingData: null,
   setWeddingData: (data) => set({ weddingData: data }),
+  previewMode: false,
+  togglePreview: (on) => set({ previewMode: on }),
 }));

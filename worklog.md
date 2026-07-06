@@ -669,3 +669,128 @@ Stage Summary:
 - Room-based architecture supports multi-tenant isolation
 - Graceful degradation — wishes still save to DB even if broadcast service is down
 - socket.io-client added as project dependency
+
+---
+Task ID: 6-1
+Agent: Dashboard Subagent
+Task: Rewrite CoupleOverview.tsx with rich, data-driven dashboard
+
+Work Log:
+- Read worklog.md for full project context (672 lines of prior work)
+- Read existing CoupleOverview.tsx (simple 4-card layout with quick actions)
+- Read API route at /api/cms/overview to understand exact response shape
+- Verified shadcn/ui components available: Card, Badge, Progress, Skeleton
+- Verified Zustand store: useCoupleCMSStore with setPage() navigation
+- Wrote complete rewrite of CoupleOverview.tsx with 5 dashboard sections:
+  1. Welcome Message — couple name + days until countdown
+  2. Top Stats Row (2x2 mobile, 4-col desktop) — Days Left, Total Guests (with +1 badge), RSVPs (with % responded), Wishes
+  3. Two-column layout: RSVP Progress (progress bar + 4 mini stats with colored dots) + Setup Checklist (clickable items with CheckCircle2/Circle icons that navigate via setPage)
+  4. Content Completion Card (progress bar + section labels with check/x icons for 9 sections)
+  5. Recent Activity Card (timeline list of last 8 actions with color-coded badges for CREATE/UPDATE/DELETE)
+- Implemented formatTimeAgo helper (just now, X min ago, X hr ago, X day ago, X days ago)
+- Loading state: centered Loader2 spinner with "Loading your workspace…" text in cinematic-gold
+- Error state: Card with error message
+- Used design system colors: text-charcoal-ink, bg-cinematic-gold, border-champagne-silk, etc.
+- Used text-xs font-medium uppercase tracking-wider for card labels
+- Progress bars styled with [&>[data-slot=progress-indicator]]:bg-cinematic-gold
+- Checklist items that are NOT done are clickable and navigate to the relevant CMS page
+- Ran bun run lint — 0 errors (2 pre-existing warnings only)
+- Dev server compiled successfully with no issues
+
+Stage Summary:
+- CoupleOverview.tsx fully rewritten as a data-driven dashboard fetching from /api/cms/overview
+- All 5 dashboard sections implemented with proper loading/error states
+- Consistent with existing design system (charcoal-ink, cinematic-gold, champagne-silk)
+- Checklist navigation integration with useCoupleCMSStore
+- Lightweight implementation — no recharts, only shadcn Progress bars
+- ESLint clean (0 errors)
+
+---
+Task ID: 6-3
+Agent: Audit Log Subagent
+Task: Create CoupleAuditLog.tsx component
+
+Work Log:
+- Read existing worklog.md and studied 3 sibling CMS components (CoupleGuests, CoupleFAQs, CoupleWishes) to match design system and code patterns
+- Verified the audit-logs API endpoint returns expected shape (logs array + pagination object)
+- Created `/src/components/cms/couple/CoupleAuditLog.tsx` as a self-contained 'use client' component
+- Implemented header section with title "Activity Log" and subtitle
+- Implemented filter row with two Select dropdowns (Action filter with 6 options, Entity filter with 12 options), responsive flex-col → flex-row layout
+- Implemented 3 stats cards (Total Events, This Week, Most Active Entity) with Skeleton loading states
+- Implemented activity list with color-coded action badges (CREATE=emerald, UPDATE=blue, DELETE=red, LOGIN/LOGOUT=slate, ACTIVATE=emerald, SUSPEND=amber, EXPORT=purple), entity label + details preview (JSON-parsed, truncated to 80 chars), and relative time + user name
+- List has max-h-[500px] overflow-y-auto with custom 4px scrollbar in champagne-silk tones
+- Implemented Previous/Next pagination with page counter, disabled states at boundaries
+- Implemented loading state (4 Skeleton rows) and empty state ("No activity recorded yet")
+- Used formatTimeAgo helper per spec, parseDetailsPreview for JSON details, formatEntityLabel for human-readable entity names
+- Fixed redundant useEffect / eslint-disable warning, lint passes with 0 errors
+
+Stage Summary:
+- CoupleAuditLog.tsx is complete and matches the project design system (text-charcoal-ink, border-champagne-silk, bg-champagne-silk, etc.)
+- Component consumes existing GET /api/cms/audit-logs endpoint with action, entity, page, limit query params
+- All shadcn/ui components used: Card, CardContent, Badge, Button, Select, Skeleton
+- Sonner toast for error handling
+- Lucide icons: Activity, ChevronLeft, ChevronRight, Calendar, TrendingUp, FileText
+
+---
+Task ID: 6-2
+Agent: Bulk Import Subagent
+Task: Add CSV bulk import feature to CoupleGuests.tsx
+
+Work Log:
+- Read existing CoupleGuests.tsx (579 lines) to understand component structure, state, API patterns, and design system
+- Added lucide-react icons: Upload, FileSpreadsheet, CheckCircle2, AlertCircle
+- Defined CSV import types: ImportStep ('upload' | 'preview' | 'result'), ParsedRow, ImportResult
+- Created helper functions outside component: parseCSV (basic split parser), resolveFieldName, rowToPayload (maps to API payload with camelCase/Title case support), downloadTemplate
+- Added CSV import state: importOpen, importStep, importFile, importRows, importHeaders, importing, importResult, importDragOver
+- Added import handlers: resetImportState, openImportDialog, handleImportFileSelect, handleImportNext, handleImportSubmit, handleImportClose
+- handleImportClose calls fetchGuests() on result step to refresh the guest list
+- Added "Import CSV" button (outline style, Upload icon) next to existing Export button in header
+- Created 3-step CSV Import Dialog:
+  - Step 1 (Upload): Drag-and-drop zone with file input, shows file name/size after selection, "Remove file" link, "Download CSV Template" link, "Next" button disabled until file selected
+  - Step 2 (Preview): Table with first 10 rows (#, Name, Email, Group, Table, Plus One), total rows badge, rows with missing names highlighted in red with bg-red-50/60, warning banner for rows missing names, "Back" and "Import X Guests" buttons
+  - Step 3 (Result): Green success banner with CheckCircle2 icon showing created count, skipped count note, scrollable error list (max-h-40) if errors exist, "Close" button
+- API call uses POST /api/cms/guests/bulk?XTransformPort=3000 with { guests: Array } payload
+- Design matches existing system: text-charcoal-ink, bg-cinematic-gold, bg-champagne-silk, border-champagne-silk, text-xs font-medium uppercase tracking-wider labels
+- Ran lint: 0 errors, 1 pre-existing warning (font)
+- Dev server compiled successfully
+
+Stage Summary:
+- CSV bulk import feature fully integrated into CoupleGuests.tsx
+- 3-step dialog flow: Upload → Preview → Result
+- Drag-and-drop + file browser upload, CSV template download
+- Preview table highlights rows with missing names in red
+- Calls existing bulk import API, refreshes guest list on close
+- No existing functionality was modified — purely additive changes
+---
+Task ID: 6-4,6-5
+Agent: Main Agent
+Task: Preview Mode, store/layout wiring, page.tsx integration, lint, browser verification
+
+Work Log:
+- Added 'audit' to CoupleCMSPage type union in useCoupleCMSStore.ts (now 12 pages)
+- Added previewMode + togglePreview to useCoupleCMSStore state
+- Added ScrollText icon import to CoupleCMSLayout.tsx
+- Added { key: 'audit', label: 'Activity', icon: ScrollText } to NAV_ITEMS in CoupleCMSLayout
+- Added "Preview" button to CoupleCMSLayout top bar (eye icon, gold outline, calls togglePreview(true))
+- Created 3 API endpoints:
+  - /api/cms/overview/route.ts (GET): returns daysUntil, guest stats, RSVP/wish counts, content completion, checklist, recent activity, media count
+  - /api/cms/audit-logs/route.ts (GET): paginated audit logs with action/entity filters
+  - /api/cms/guests/bulk/route.ts (POST): bulk import up to 500 guests with auto invitation codes
+- Updated page.tsx:
+  - Added dynamic import for CoupleAuditLog
+  - Added 'audit' to COUPLE_CMS_PAGES map
+  - Moved useCoupleCMSStore() hook to top of Home component (before early returns) to fix React hooks rules
+  - Added GuestPageComponent derivation before conditionals
+  - Added Preview Mode block: when previewMode && isCouple, renders guest site with fixed gold "Preview Mode" bar + "Back to Editor" button
+- Fixed React hooks/rules-of-hooks lint error (hook called after conditional return)
+- Fixed JSX component naming (guestPage → GuestPageComponent)
+- ESLint: 0 errors, 1 expected warning (custom font)
+
+Stage Summary:
+- Phase 6 complete: 4 major features added to Couple CMS
+- 6-1: Enhanced Overview Dashboard (days countdown, 4 stat cards, RSVP progress, 10-item checklist, 9-section content completion, 8-item recent activity)
+- 6-2: CSV Bulk Guest Import (3-step dialog: upload with drag-drop → preview table → result summary)
+- 6-3: Activity Log page (action/entity filters, 3 stat cards, paginated timeline with color-coded badges)
+- 6-4: Preview Mode (gold floating bar, renders guest site for couple, "Back to Editor" return)
+- 6-5: All wired in page.tsx, CoupleCMSLayout nav updated to 12 items, lint clean, browser verified
+- Browser verified: login → CMS renders with 12 nav items → Overview dashboard → Activity Log → Preview Mode → Guest site → Back to Editor → Guests page with Import CSV button → Import dialog

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { Loader2, Plus, Pencil, Trash2, Users, Search, Mail, Phone, UserPlus, Download } from 'lucide-react';
+import { Loader2, Plus, Pencil, Trash2, Users, Search, Mail, Phone, UserPlus, Download, Upload, FileSpreadsheet, CheckCircle2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -74,6 +74,78 @@ const emptyForm: FormData = {
   dietaryNotes: '',
 };
 
+// ---- CSV Import types & helpers ----
+type ImportStep = 'upload' | 'preview' | 'result';
+
+interface ParsedRow {
+  name: string;
+  email: string;
+  phone: string;
+  group: string;
+  groupName: string;
+  GroupName: string;
+  tableNumber: string;
+  plusOne: string;
+  plusOneName: string;
+  dietaryNotes: string;
+  [key: string]: string;
+}
+
+interface ImportResult {
+  success: boolean;
+  created: number;
+  skipped: number;
+  errors: Array<{ row: number; name: string; error: string }>;
+}
+
+const CSV_TEMPLATE_HEADERS = 'name,email,phone,group,tableNumber,plusOne,plusOneName,dietaryNotes';
+const CSV_TEMPLATE_EXAMPLE = 'John Smith,john@email.com,+65 9123 4567,Bride\'s Family,1,yes,Jane Smith,Vegetarian';
+
+function parseCSV(text: string): { headers: string[]; rows: ParsedRow[] } {
+  const lines = text.trim().split(/\r?\n/).filter((l) => l.trim());
+  if (lines.length < 2) return { headers: [], rows: [] };
+  const headers = lines[0].split(',').map((h) => h.trim().replace(/^"|"$/g, ''));
+  const rows: ParsedRow[] = [];
+  for (let i = 1; i < lines.length; i++) {
+    const values = lines[i].split(',').map((v) => v.trim().replace(/^"|"$/g, ''));
+    const row: ParsedRow = {} as ParsedRow;
+    headers.forEach((h, idx) => {
+      row[h] = values[idx] ?? '';
+    });
+    rows.push(row);
+  }
+  return { headers, rows };
+}
+
+function resolveFieldName(row: ParsedRow): string {
+  return row.name || '';
+}
+
+function rowToPayload(row: ParsedRow) {
+  return {
+    name: (row.name || '').trim(),
+    email: (row.email || '').trim() || undefined,
+    phone: (row.phone || '').trim() || undefined,
+    group: (row.group || '').trim() || undefined,
+    groupName: (row.groupName || row.GroupName || '').trim() || undefined,
+    tableNumber: row.tableNumber ? parseInt(row.tableNumber, 10) : undefined,
+    plusOne: ['yes', 'true', '1', 'y'].includes((row.plusOne || '').toLowerCase()),
+    plusOneName: (row.plusOneName || '').trim() || undefined,
+    dietaryNotes: (row.dietaryNotes || '').trim() || undefined,
+  };
+}
+
+function downloadTemplate() {
+  const csv = `${CSV_TEMPLATE_HEADERS}\n${CSV_TEMPLATE_EXAMPLE}`;
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'guest-import-template.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 export default function CoupleGuests() {
   const [guests, setGuests] = useState<GuestItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -84,6 +156,16 @@ export default function CoupleGuests() {
   const [form, setForm] = useState<FormData>(emptyForm);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
+
+  // CSV Import state
+  const [importOpen, setImportOpen] = useState(false);
+  const [importStep, setImportStep] = useState<ImportStep>('upload');
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [importRows, setImportRows] = useState<ParsedRow[]>([]);
+  const [importHeaders, setImportHeaders] = useState<string[]>([]);
+  const [importing, setImporting] = useState(false);
+  const [importResult, setImportResult] = useState<ImportResult | null>(null);
+  const [importDragOver, setImportDragOver] = useState(false);
 
   const fetchGuests = useCallback(async () => {
     try {
@@ -204,6 +286,78 @@ export default function CoupleGuests() {
 
   const getStatusConfig = (status: string) => STATUS_CONFIG[status] ?? { label: status, color: 'bg-gray-50 text-gray-600 border-gray-200' };
 
+  // ---- CSV Import handlers ----
+  const resetImportState = () => {
+    setImportStep('upload');
+    setImportFile(null);
+    setImportRows([]);
+    setImportHeaders([]);
+    setImporting(false);
+    setImportResult(null);
+    setImportDragOver(false);
+  };
+
+  const openImportDialog = () => {
+    resetImportState();
+    setImportOpen(true);
+  };
+
+  const handleImportFileSelect = (file: File) => {
+    if (!file.name.endsWith('.csv')) {
+      toast.error('Please select a .csv file');
+      return;
+    }
+    setImportFile(file);
+  };
+
+  const handleImportNext = async () => {
+    if (!importFile) return;
+    try {
+      const text = await importFile.text();
+      const { headers, rows } = parseCSV(text);
+      if (rows.length === 0) {
+        toast.error('CSV file is empty or has no data rows');
+        return;
+      }
+      setImportHeaders(headers);
+      setImportRows(rows);
+      setImportStep('preview');
+    } catch {
+      toast.error('Failed to read CSV file');
+    }
+  };
+
+  const handleImportSubmit = async () => {
+    try {
+      setImporting(true);
+      const guests_payload = importRows.map(rowToPayload);
+      const res = await fetch('/api/cms/guests/bulk?XTransformPort=3000', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ guests: guests_payload }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Import failed');
+      }
+      const data: ImportResult = await res.json();
+      setImportResult(data);
+      setImportStep('result');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Import failed');
+    } finally {
+      setImporting(false);
+    }
+  };
+
+  const handleImportClose = () => {
+    setImportOpen(false);
+    if (importStep === 'result') {
+      fetchGuests();
+    }
+    resetImportState();
+  };
+
   const handleExportCSV = () => {
     if (guests.length === 0) {
       toast.info('No guests to export');
@@ -259,6 +413,14 @@ export default function CoupleGuests() {
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
+          <Button
+            onClick={openImportDialog}
+            variant="outline"
+            className="border-charcoal-ink/15 text-charcoal-ink hover:border-cinematic-gold hover:text-cinematic-gold rounded px-4 py-2 text-[13px] font-medium uppercase tracking-[0.08em] transition-colors duration-300"
+          >
+            <Upload className="size-4 mr-1.5" />
+            Import CSV
+          </Button>
           <Button
             onClick={handleExportCSV}
             variant="outline"
@@ -435,6 +597,270 @@ export default function CoupleGuests() {
           })}
         </div>
       )}
+
+      {/* CSV Import Dialog */}
+      <Dialog open={importOpen} onOpenChange={(open) => { if (!open) handleImportClose(); }}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-charcoal-ink">Import Guests from CSV</DialogTitle>
+            <DialogDescription className="text-charcoal-ink/50">
+              {importStep === 'upload' && 'Upload a CSV file with your guest list.'}
+              {importStep === 'preview' && 'Review the guests before importing.'}
+              {importStep === 'result' && 'Import completed.'}
+            </DialogDescription>
+          </DialogHeader>
+
+          {/* Step 1: Upload */}
+          {importStep === 'upload' && (
+            <div className="space-y-4 py-2">
+              <div
+                onDragOver={(e) => { e.preventDefault(); setImportDragOver(true); }}
+                onDragLeave={() => setImportDragOver(false)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setImportDragOver(false);
+                  const file = e.dataTransfer.files[0];
+                  if (file) handleImportFileSelect(file);
+                }}
+                className={`rounded-xl border-2 border-dashed p-8 text-center transition-colors duration-200 ${
+                  importDragOver
+                    ? 'border-cinematic-gold bg-cinematic-gold/5'
+                    : importFile
+                      ? 'border-emerald-300 bg-emerald-50/50'
+                      : 'border-charcoal-ink/10 hover:border-charcoal-ink/20'
+                }`
+                }
+              >
+                <input
+                  type="file"
+                  accept=".csv"
+                  className="hidden"
+                  id="csv-file-input"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleImportFileSelect(file);
+                  }}
+                />
+                {importFile ? (
+                  <div className="space-y-2">
+                    <FileSpreadsheet className="size-10 text-emerald-500 mx-auto" />
+                    <p className="text-sm font-medium text-charcoal-ink">{importFile.name}</p>
+                    <p className="text-xs text-charcoal-ink/40">
+                      {(importFile.size / 1024).toFixed(1)} KB
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setImportFile(null);
+                        const input = document.getElementById('csv-file-input') as HTMLInputElement;
+                        if (input) input.value = '';
+                      }}
+                      className="text-xs text-charcoal-ink/40 underline hover:text-red-500 transition-colors"
+                    >
+                      Remove file
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <Upload className="size-10 text-charcoal-ink/20 mx-auto" />
+                    <p className="text-sm text-charcoal-ink/50">
+                      Drag & drop your CSV file here, or{' '}
+                      <button
+                        type="button"
+                        onClick={() => document.getElementById('csv-file-input')?.click()}
+                        className="text-cinematic-gold font-medium underline hover:text-cinematic-gold/80 transition-colors"
+                      >
+                        browse
+                      </button>
+                    </p>
+                    <p className="text-xs text-charcoal-ink/30">.csv files only</p>
+                  </div>
+                )}
+              </div>
+
+              <div className="text-center">
+                <button
+                  type="button"
+                  onClick={downloadTemplate}
+                  className="text-xs text-cinematic-gold font-medium hover:underline transition-colors"
+                >
+                  ↓ Download CSV Template
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Step 2: Preview */}
+          {importStep === 'preview' && (
+            <div className="space-y-4 py-2">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-medium uppercase tracking-wider text-charcoal-ink/50">
+                  Preview
+                </p>
+                <Badge variant="outline" className="text-[10px] font-medium bg-champagne-silk/30 text-charcoal-ink/70 border-champagne-silk">
+                  {importRows.length} guest{importRows.length !== 1 ? 's' : ''}
+                </Badge>
+              </div>
+
+              <div className="rounded-xl border border-charcoal-ink/5 overflow-hidden">
+                <div className="max-h-64 overflow-y-auto">
+                  <table className="w-full text-xs">
+                    <thead className="sticky top-0 bg-champagne-silk/40">
+                      <tr>
+                        <th className="text-left px-3 py-2 font-medium uppercase tracking-wider text-charcoal-ink/50 w-8">#</th>
+                        <th className="text-left px-3 py-2 font-medium uppercase tracking-wider text-charcoal-ink/50">Name</th>
+                        <th className="text-left px-3 py-2 font-medium uppercase tracking-wider text-charcoal-ink/50 hidden sm:table-cell">Email</th>
+                        <th className="text-left px-3 py-2 font-medium uppercase tracking-wider text-charcoal-ink/50 hidden md:table-cell">Group</th>
+                        <th className="text-left px-3 py-2 font-medium uppercase tracking-wider text-charcoal-ink/50 hidden md:table-cell">Table</th>
+                        <th className="text-left px-3 py-2 font-medium uppercase tracking-wider text-charcoal-ink/50 hidden lg:table-cell">Plus One</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {importRows.slice(0, 10).map((row, idx) => {
+                        const name = resolveFieldName(row);
+                        const hasError = !name.trim();
+                        return (
+                          <tr
+                            key={idx}
+                            className={`border-t border-charcoal-ink/5 ${hasError ? 'bg-red-50/60' : ''}`}
+                          >
+                            <td className="px-3 py-2 text-charcoal-ink/30 font-mono">{idx + 1}</td>
+                            <td className={`px-3 py-2 ${hasError ? 'text-red-500 font-medium' : 'text-charcoal-ink'}`}>
+                              {name || <span className="italic text-red-400">Missing name</span>}
+                            </td>
+                            <td className="px-3 py-2 text-charcoal-ink/50 hidden sm:table-cell truncate max-w-[160px]">
+                              {row.email || '—'}
+                            </td>
+                            <td className="px-3 py-2 text-charcoal-ink/50 hidden md:table-cell">
+                              {row.groupName || row.GroupName || row.group || '—'}
+                            </td>
+                            <td className="px-3 py-2 text-charcoal-ink/50 hidden md:table-cell">
+                              {row.tableNumber || '—'}
+                            </td>
+                            <td className="px-3 py-2 text-charcoal-ink/50 hidden lg:table-cell">
+                              {row.plusOne ? 'Yes' : 'No'}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+                {importRows.length > 10 && (
+                  <div className="border-t border-charcoal-ink/5 px-3 py-2 bg-champagne-silk/20 text-center">
+                    <p className="text-xs text-charcoal-ink/40">
+                      …and {importRows.length - 10} more row{importRows.length - 10 !== 1 ? 's' : ''}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {importRows.some((r) => !resolveFieldName(r).trim()) && (
+                <div className="flex items-start gap-2 rounded-lg bg-amber-50 border border-amber-200 p-3">
+                  <AlertCircle className="size-4 text-amber-500 mt-0.5 shrink-0" />
+                  <p className="text-xs text-amber-700">
+                    Some rows are missing a <strong>name</strong> and will be skipped during import.
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Step 3: Result */}
+          {importStep === 'result' && importResult && (
+            <div className="space-y-4 py-2">
+              <div className="flex items-center gap-3 rounded-xl bg-emerald-50 border border-emerald-200 p-4">
+                <CheckCircle2 className="size-8 text-emerald-500 shrink-0" />
+                <div>
+                  <p className="text-sm font-semibold text-emerald-800">
+                    Successfully imported {importResult.created} guest{importResult.created !== 1 ? 's' : ''}
+                  </p>
+                  {importResult.skipped > 0 && (
+                    <p className="text-xs text-emerald-600/70 mt-0.5">
+                      {importResult.skipped} guest{importResult.skipped !== 1 ? 's were' : ' was'} skipped (duplicates)
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {importResult.errors.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-xs font-medium uppercase tracking-wider text-charcoal-ink/50">
+                    Errors ({importResult.errors.length})
+                  </p>
+                  <div className="max-h-40 overflow-y-auto rounded-lg border border-red-100 bg-red-50/50 divide-y divide-red-100">
+                    {importResult.errors.map((err, idx) => (
+                      <div key={idx} className="px-3 py-2 flex items-start gap-2">
+                        <AlertCircle className="size-3.5 text-red-400 mt-0.5 shrink-0" />
+                        <div>
+                          <p className="text-xs font-medium text-red-700">
+                            Row {err.row}: {err.name || 'Unknown'}
+                          </p>
+                          <p className="text-xs text-red-500/70">{err.error}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          <DialogFooter className="gap-2 pt-2">
+            {importStep === 'upload' && (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => setImportOpen(false)}
+                  className="border-charcoal-ink/15 text-charcoal-ink hover:border-cinematic-gold hover:text-cinematic-gold rounded px-6 py-2.5 text-[13px] font-medium uppercase tracking-[0.08em] transition-colors duration-300"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleImportNext}
+                  disabled={!importFile}
+                  className="bg-cinematic-gold text-charcoal-ink hover:bg-cinematic-gold/90 rounded px-6 py-2.5 text-[13px] font-medium uppercase tracking-[0.08em] transition-colors duration-300 disabled:opacity-50"
+                >
+                  Next
+                </Button>
+              </>
+            )}
+            {importStep === 'preview' && (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => { setImportStep('upload'); setImportRows([]); setImportHeaders([]); }}
+                  className="border-charcoal-ink/15 text-charcoal-ink hover:border-cinematic-gold hover:text-cinematic-gold rounded px-6 py-2.5 text-[13px] font-medium uppercase tracking-[0.08em] transition-colors duration-300"
+                >
+                  Back
+                </Button>
+                <Button
+                  onClick={handleImportSubmit}
+                  disabled={importing}
+                  className="bg-cinematic-gold text-charcoal-ink hover:bg-cinematic-gold/90 rounded px-6 py-2.5 text-[13px] font-medium uppercase tracking-[0.08em] transition-colors duration-300 disabled:opacity-50"
+                >
+                  {importing ? (
+                    <>
+                      <Loader2 className="size-4 animate-spin mr-2" />
+                      Importing…
+                    </>
+                  ) : (
+                    `Import ${importRows.length} Guest${importRows.length !== 1 ? 's' : ''}`
+                  )}
+                </Button>
+              </>
+            )}
+            {importStep === 'result' && (
+              <Button
+                onClick={handleImportClose}
+                className="bg-cinematic-gold text-charcoal-ink hover:bg-cinematic-gold/90 rounded px-6 py-2.5 text-[13px] font-medium uppercase tracking-[0.08em] transition-colors duration-300"
+              >
+                Close
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Add/Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
