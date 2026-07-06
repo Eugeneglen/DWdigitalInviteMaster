@@ -13,11 +13,19 @@ const NAV_ITEMS: { label: string; section: Section }[] = [
   { label: 'Moments', section: 'moments' },
 ];
 
-export default function Header() {
+interface HeaderProps {
+  /** CSS top value to push the fixed header below an overlay bar (e.g. "44px") */
+  topOffset?: string;
+}
+
+export default function Header({ topOffset }: HeaderProps) {
   const { currentSection, setSection, openDrawer } = useNavigationStore();
 
   return (
-    <header className="fixed top-0 w-full z-50 bg-paper-cream/80 backdrop-blur-md border-b border-champagne-silk/30">
+    <header
+      className="fixed w-full z-50 bg-paper-cream/80 backdrop-blur-md border-b border-champagne-silk/30"
+      style={topOffset ? { top: topOffset } : undefined}
+    >
       <div className="flex justify-between items-center px-4 md:px-6 py-3 w-full max-w-[1440px] mx-auto">
         {/* Logo */}
         <div

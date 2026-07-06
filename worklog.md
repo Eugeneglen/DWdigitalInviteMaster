@@ -814,3 +814,22 @@ Stage Summary:
 - Modified files: `src/app/page.tsx`, `src/components/cms/LoginModal.tsx`, `src/components/cms/MasterCMSLayout.tsx`, `src/components/cms/CoupleCMSLayout.tsx`
 - Mechanism: "Switch Account" calls `useAuthModalStore.getState().openModal()` then `signOut({ redirect: false })`. The Zustand store keeps the modal open across the sign-out re-render. After sign-in, the modal closes via `useAuthModalStore.getState().closeModal()`.
 - Lint passes cleanly (0 errors, 1 pre-existing warning)
+
+---
+Task ID: 8
+Agent: Main Agent
+Task: Fix missing navigation on couple preview page
+
+Work Log:
+- Analyzed screenshot with VLM: gold "Viewing as Guest" bar was covering the Header completely
+- Root cause: Header was `fixed top-0 z-50`, gold bar was `fixed top-0 z-[100]` — Header nav links hidden behind gold bar
+- Added `topOffset` prop to `Header.tsx` — allows pushing the fixed header below an overlay bar via inline style
+- Updated preview mode in `page.tsx`: passed `topOffset="44px"` to Header, moved `pt-11` padding from Header wrapper to content wrapper
+- Verified with agent-browser: all nav links (HOME, SCHEDULE, RSVP, GETTING THERE, STORY, WISHES, Q&A, MOMENTS) now visible below gold bar
+- Tested navigation click → Schedule page loads correctly
+- Tested "Open Editor" → returns to Couple CMS
+
+Stage Summary:
+- Modified: `src/components/wedding/Header.tsx` (added `topOffset` prop)
+- Modified: `src/app/page.tsx` (preview mode: `<Header topOffset="44px" />`, content `pt-11`)
+- Verified: navigation, page switching, and Open Editor all work in preview mode

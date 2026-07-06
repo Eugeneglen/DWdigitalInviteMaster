@@ -147,11 +147,9 @@ export default function Home() {
             Open Editor
           </button>
         </div>
-        <div className="pt-11">
-          <Header />
-        </div>
+        <Header topOffset="44px" />
         <MobileDrawer />
-        <div className="flex-1">
+        <div className="flex-1 pt-11">
           <GuestPageComponent key={currentSection} />
         </div>
         <Footer />
