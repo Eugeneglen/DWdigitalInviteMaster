@@ -11,7 +11,9 @@ import {
   Settings,
   LogOut,
   ChevronsUpDown,
+  ArrowRightLeft,
 } from 'lucide-react';
+import { useAuthModalStore } from '@/store/useAuthModalStore';
 
 import {
   SidebarProvider,
@@ -247,6 +249,16 @@ function CMSHeader() {
               <span className="text-xs text-muted-foreground">Dreamweavers PTL</span>
             </div>
             <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => {
+                useAuthModalStore.getState().openModal();
+                signOut({ redirect: false });
+              }}
+              className="cursor-pointer"
+            >
+              <ArrowRightLeft className="mr-2 size-4" />
+              Switch Account
+            </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => signOut({ callbackUrl: '/' })}
               className="text-red-600 cursor-pointer"

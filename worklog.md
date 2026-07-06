@@ -794,3 +794,23 @@ Stage Summary:
 - 6-4: Preview Mode (gold floating bar, renders guest site for couple, "Back to Editor" return)
 - 6-5: All wired in page.tsx, CoupleCMSLayout nav updated to 12 items, lint clean, browser verified
 - Browser verified: login → CMS renders with 12 nav items → Overview dashboard → Activity Log → Preview Mode → Guest site → Back to Editor → Guests page with Import CSV button → Import dialog
+
+---
+Task ID: 7
+Agent: Main Agent
+Task: Fix "Switch Account" — Couple CMS auto-logging in as Master Admin
+
+Work Log:
+- Diagnosed root cause: after signing in as SUPER_ADMIN, the JWT session persists with the admin role. When user tries to access Couple CMS, `isAdmin` is still true, so Master CMS always renders. No mechanism existed to properly switch accounts.
+- Created `src/store/useAuthModalStore.ts` — a Zustand store for login modal open/close state, shared across all view modes (Master CMS, Couple CMS, Guest, Preview)
+- Updated `src/app/page.tsx` — replaced local `useState` + `useEffect` (which caused lint error) with the Zustand store; LoginModal is now rendered in ALL view modes so it survives the sign-out re-render
+- Updated `src/components/cms/LoginModal.tsx` — added "Switch Account" UI for authenticated users: shows current session card with role badge, "Sign Out & Switch Account" button, divider, and inline login form for quick re-login
+- Updated `src/components/cms/MasterCMSLayout.tsx` — added "Switch Account" menu item (ArrowRightLeft icon) in the header avatar dropdown
+- Updated `src/components/cms/CoupleCMSLayout.tsx` — added "Switch Account" button in sidebar footer (above "View as Guest" and "Sign Out")
+- Verified end-to-end flow with agent-browser: Admin → Switch Account → Couple → Switch Account → Admin, all working correctly
+
+Stage Summary:
+- New file: `src/store/useAuthModalStore.ts`
+- Modified files: `src/app/page.tsx`, `src/components/cms/LoginModal.tsx`, `src/components/cms/MasterCMSLayout.tsx`, `src/components/cms/CoupleCMSLayout.tsx`
+- Mechanism: "Switch Account" calls `useAuthModalStore.getState().openModal()` then `signOut({ redirect: false })`. The Zustand store keeps the modal open across the sign-out re-render. After sign-in, the modal closes via `useAuthModalStore.getState().closeModal()`.
+- Lint passes cleanly (0 errors, 1 pre-existing warning)

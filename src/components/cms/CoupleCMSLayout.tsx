@@ -16,6 +16,7 @@ import {
   FileText,
   LogOut,
   ArrowLeft,
+  ArrowRightLeft,
   Loader2,
   ScrollText,
 } from 'lucide-react';
@@ -23,6 +24,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { useCoupleCMSStore, type CoupleCMSPage } from '@/store/useCoupleCMSStore';
+import { useAuthModalStore } from '@/store/useAuthModalStore';
 
 const NAV_ITEMS: { key: CoupleCMSPage; label: string; icon: React.ElementType }[] = [
   { key: 'overview', label: 'Overview', icon: Home },
@@ -174,6 +176,17 @@ export default function CoupleCMSLayout({ children }: { children: React.ReactNod
 
         {/* View as guest / sign out */}
         <div className="p-3 space-y-1">
+          <Button
+            variant="ghost"
+            onClick={() => {
+              useAuthModalStore.getState().openModal();
+              signOut({ redirect: false });
+            }}
+            className="w-full justify-start gap-2 text-charcoal-ink/50 hover:text-cinematic-gold hover:bg-champagne-silk/40 px-3 text-xs font-medium"
+          >
+            <ArrowRightLeft className="size-3.5" />
+            Switch Account
+          </Button>
           <Button
             variant="ghost"
             onClick={() => togglePreview(true)}

@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { useNavigationStore } from '@/store/useNavigationStore';
 import { useCMSStore, type CMSPage } from '@/store/useCMSStore';
 import { useCoupleCMSStore, type CoupleCMSPage } from '@/store/useCoupleCMSStore';
+import { useAuthModalStore } from '@/store/useAuthModalStore';
 import Header from '@/components/wedding/Header';
 import MobileDrawer from '@/components/wedding/MobileDrawer';
 import BottomNav from '@/components/wedding/BottomNav';
@@ -99,7 +100,7 @@ export default function Home() {
   const { data: session, status } = useSession();
   const { currentSection } = useNavigationStore();
   const { previewMode, togglePreview } = useCoupleCMSStore();
-  const [loginOpen, setLoginOpen] = useState(false);
+  const { open: loginModalOpen, closeModal } = useAuthModalStore();
   const [manualView, setManualView] = useState<'guest' | 'cms' | 'couple' | null>(null);
   const searchParams = useSearchParams();
   const viewParam = searchParams.get('view');
@@ -115,12 +116,17 @@ export default function Home() {
 
   // Show login modal when ?view= param requires auth but user isn't authenticated
   const wantsCMS = viewParam === 'cms' || viewParam === 'couple';
-  const showLoginModal = loginOpen || (wantsCMS && status !== 'authenticated');
+  const showLoginModal = loginModalOpen || (wantsCMS && status !== 'authenticated');
   const GuestPageComponent = GUEST_PAGES[currentSection] || HomePage;
 
   // Master CMS View
   if (viewMode === 'cms' && isAdmin) {
-    return <MasterCMSLayout><MasterCMSPageRouter /></MasterCMSLayout>;
+    return (
+      <>
+        <MasterCMSLayout><MasterCMSPageRouter /></MasterCMSLayout>
+        <LoginModal open={showLoginModal} onOpenChange={(open) => { if (!open) closeModal(); }} />
+      </>
+    );
   }
 
   // Preview Mode — couple user previewing their wedding as a guest
@@ -150,13 +156,19 @@ export default function Home() {
         </div>
         <Footer />
         <BottomNav />
+        <LoginModal open={showLoginModal} onOpenChange={(open) => { if (!open) closeModal(); }} />
       </div>
     );
   }
 
   // Couple CMS View
   if (viewMode === 'couple' && isCouple) {
-    return <CoupleCMSLayout><CoupleCMSPageRouter /></CoupleCMSLayout>;
+    return (
+      <>
+        <CoupleCMSLayout><CoupleCMSPageRouter /></CoupleCMSLayout>
+        <LoginModal open={showLoginModal} onOpenChange={(open) => { if (!open) closeModal(); }} />
+      </>
+    );
   }
 
   // Guest View
@@ -187,7 +199,7 @@ export default function Home() {
       {/* Admin login trigger — subtle gear icon, bottom-left */}
       {status !== 'authenticated' && (
         <button
-          onClick={() => setLoginOpen(true)}
+          onClick={() => useAuthModalStore.getState().openModal()}
           className="fixed bottom-20 left-6 z-[55] text-xs text-charcoal-ink/20 hover:text-cinematic-gold transition-colors"
           aria-label="Admin login"
         >
@@ -195,7 +207,7 @@ export default function Home() {
         </button>
       )}
 
-      <LoginModal open={showLoginModal} onOpenChange={setLoginOpen} />
+      <LoginModal open={showLoginModal} onOpenChange={(open) => { if (!open) closeModal(); }} />
     </div>
   );
 }
