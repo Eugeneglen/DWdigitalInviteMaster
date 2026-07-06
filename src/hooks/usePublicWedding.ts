@@ -2,9 +2,12 @@
 
 import { useState, useEffect } from 'react';
 
-// Module-level cache — shared across all component instances in the SPA
-let cachedData: PublicWeddingData | null = null;
-let cachedPromise: Promise<PublicWeddingData | null> | null = null;
+// Slug-aware cache — separate entries per slug, plus a default (no slug) entry
+const cacheMap = new Map<string, { data: PublicWeddingData | null; promise: Promise<PublicWeddingData | null> | null }>();
+
+function getCacheKey(slug?: string): string {
+  return slug ?? '__default__';
+}
 
 export interface PublicWeddingData {
   wedding: {
@@ -68,37 +71,50 @@ export interface PublicWeddingData {
   }[];
 }
 
-async function fetchWeddingData(): Promise<PublicWeddingData | null> {
-  if (cachedData) return cachedData;
-  if (cachedPromise) return cachedPromise;
+async function fetchWeddingData(slug?: string): Promise<PublicWeddingData | null> {
+  const key = getCacheKey(slug);
+  const entry = cacheMap.get(key);
 
-  cachedPromise = fetch('/api/wedding/public?XTransformPort=3000')
+  if (entry?.data) return entry.data;
+  if (entry?.promise) return entry.promise;
+
+  const url = slug
+    ? `/api/wedding/public?slug=${encodeURIComponent(slug)}&XTransformPort=3000`
+    : `/api/wedding/public?XTransformPort=3000`;
+
+  const promise = fetch(url)
     .then((res) => {
       if (!res.ok) return null;
       return res.json();
     })
     .then((data) => {
-      cachedData = data;
+      const current = cacheMap.get(key) ?? { data: null, promise: null };
+      current.data = data;
+      cacheMap.set(key, current);
       return data;
     })
     .catch(() => null);
 
-  return cachedPromise;
+  cacheMap.set(key, { data: null, promise });
+  return promise;
 }
 
 /**
  * Fetches the public wedding data once and caches it for the session.
- * All guest pages share the same cached response.
+ * Cache is slug-aware — different slugs get separate caches.
  */
-export function usePublicWedding() {
-  const [data, setData] = useState<PublicWeddingData | null>(cachedData);
-  const [loading, setLoading] = useState(!cachedData);
+export function usePublicWedding(slug?: string) {
+  const key = getCacheKey(slug);
+  const cachedEntry = cacheMap.get(key);
+  const [data, setData] = useState<PublicWeddingData | null>(cachedEntry?.data ?? null);
+  const [loading, setLoading] = useState(!cachedEntry?.data);
 
   useEffect(() => {
-    if (cachedData) return;
+    const entry = cacheMap.get(key);
+    if (entry?.data) return;
     let cancelled = false;
 
-    fetchWeddingData().then((result) => {
+    fetchWeddingData(slug).then((result) => {
       if (!cancelled) {
         setData(result);
         setLoading(false);
@@ -106,7 +122,7 @@ export function usePublicWedding() {
     });
 
     return () => { cancelled = true; };
-  }, []);
+  }, [slug, key]);
 
   /** Helper to get a content field value with fallback */
   const getField = (section: string, fieldKey: string, fallback = ''): string => {
@@ -118,9 +134,13 @@ export function usePublicWedding() {
 }
 
 /**
- * Invalidate the cached wedding data so next usePublicWedding call refetches.
+ * Invalidate cached wedding data.
+ * Pass a specific slug to invalidate that entry only, or omit to clear all.
  */
-export function invalidateWeddingCache() {
-  cachedData = null;
-  cachedPromise = null;
+export function invalidateWeddingCache(slug?: string) {
+  if (slug) {
+    cacheMap.delete(getCacheKey(slug));
+  } else {
+    cacheMap.clear();
+  }
 }

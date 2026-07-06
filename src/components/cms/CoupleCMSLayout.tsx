@@ -19,6 +19,7 @@ import {
   ArrowRightLeft,
   Loader2,
   ScrollText,
+  QrCode,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -39,6 +40,7 @@ const NAV_ITEMS: { key: CoupleCMSPage; label: string; icon: React.ElementType }[
   { key: 'rsvps', label: 'RSVPs', icon: Mail },
   { key: 'wishes', label: 'Wishes', icon: MessageSquareHeart },
   { key: 'audit', label: 'Activity', icon: ScrollText },
+  { key: 'sharing', label: 'Sharing', icon: QrCode },
 ];
 
 export default function CoupleCMSLayout({ children }: { children: React.ReactNode }) {
