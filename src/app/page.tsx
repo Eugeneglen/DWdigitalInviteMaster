@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
+import { useSearchParams } from 'next/navigation';
 import { useNavigationStore } from '@/store/useNavigationStore';
 import { useCMSStore, type CMSPage } from '@/store/useCMSStore';
 import { useCoupleCMSStore, type CoupleCMSPage } from '@/store/useCoupleCMSStore';
@@ -100,12 +101,21 @@ export default function Home() {
   const { previewMode, togglePreview } = useCoupleCMSStore();
   const [loginOpen, setLoginOpen] = useState(false);
   const [manualView, setManualView] = useState<'guest' | 'cms' | 'couple' | null>(null);
+  const searchParams = useSearchParams();
+  const viewParam = searchParams.get('view');
 
   const isAdmin = session?.user?.role === 'SUPER_ADMIN' || session?.user?.role === 'ACCOUNT_MANAGER';
   const isCouple = session?.user?.role === 'COUPLE';
 
-  // Derive view mode from role + manual override
-  const viewMode = manualView ?? (isAdmin ? 'cms' : isCouple ? 'couple' : 'guest');
+  // Derive view: URL param takes priority, then manual toggle, then role-based default
+  const urlView = viewParam === 'cms' && isAdmin ? 'cms' as const
+    : viewParam === 'couple' && isCouple ? 'couple' as const
+    : null;
+  const viewMode = manualView ?? urlView ?? (isAdmin ? 'cms' : isCouple ? 'couple' : 'guest');
+
+  // Show login modal when ?view= param requires auth but user isn't authenticated
+  const wantsCMS = viewParam === 'cms' || viewParam === 'couple';
+  const showLoginModal = loginOpen || (wantsCMS && status !== 'authenticated');
   const GuestPageComponent = GUEST_PAGES[currentSection] || HomePage;
 
   // Master CMS View
@@ -185,7 +195,7 @@ export default function Home() {
         </button>
       )}
 
-      <LoginModal open={loginOpen} onOpenChange={setLoginOpen} />
+      <LoginModal open={showLoginModal} onOpenChange={setLoginOpen} />
     </div>
   );
 }
