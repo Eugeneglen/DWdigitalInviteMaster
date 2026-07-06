@@ -172,15 +172,23 @@ export default function CoupleCMSLayout({ children }: { children: React.ReactNod
 
         <Separator className="bg-champagne-silk" />
 
-        {/* Back to guest site */}
-        <div className="p-3">
+        {/* View as guest / sign out */}
+        <div className="p-3 space-y-1">
+          <Button
+            variant="ghost"
+            onClick={() => togglePreview(true)}
+            className="w-full justify-start gap-2 text-charcoal-ink/50 hover:text-cinematic-gold hover:bg-champagne-silk/40 px-3 text-sm font-medium"
+          >
+            <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            View as Guest
+          </Button>
           <Button
             variant="ghost"
             onClick={() => signOut({ callbackUrl: '/' })}
-            className="w-full justify-start gap-2 text-charcoal-ink/50 hover:text-charcoal-ink hover:bg-champagne-silk/40 px-3 text-sm font-medium"
+            className="w-full justify-start gap-2 text-charcoal-ink/30 hover:text-charcoal-ink hover:bg-champagne-silk/40 px-3 text-xs font-medium"
           >
-            <ArrowLeft className="size-4" />
-            Back to Guest Site
+            <LogOut className="size-3.5" />
+            Sign Out
           </Button>
         </div>
       </aside>
@@ -196,14 +204,15 @@ export default function CoupleCMSLayout({ children }: { children: React.ReactNod
         <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-champagne-silk bg-paper-cream px-4 md:px-6">
           {/* Left: Couple name + mobile menu */}
           <div className="flex items-center gap-3">
-            {/* Mobile back button (visible on small screens) */}
+            {/* Mobile: back to guest view */}
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => signOut({ callbackUrl: '/' })}
-              className="md:hidden -ml-2 text-charcoal-ink/60 hover:text-charcoal-ink p-2 h-auto"
+              onClick={() => togglePreview(true)}
+              className="md:hidden -ml-2 text-charcoal-ink/60 hover:text-cinematic-gold p-2 h-auto"
+              aria-label="View as guest"
             >
-              <ArrowLeft className="size-4" />
+              <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
             </Button>
             <h1 className="text-base font-semibold text-charcoal-ink truncate">
               {coupleName}

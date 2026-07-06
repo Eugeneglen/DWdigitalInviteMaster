@@ -117,18 +117,21 @@ export default function Home() {
   if (previewMode && isCouple) {
     return (
       <div className="min-h-screen flex flex-col bg-paper-cream text-charcoal-ink overflow-x-hidden selection:bg-cinematic-gold selection:text-paper-cream">
-        {/* Floating Preview Bar */}
-        <div className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-center gap-3 bg-cinematic-gold text-white px-4 py-2 shadow-md">
-          <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-          <span className="text-sm font-medium">Preview Mode</span>
+        {/* Floating CMS Toggle Bar */}
+        <div className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between bg-cinematic-gold text-white px-4 py-2.5 shadow-lg">
+          <div className="flex items-center gap-2">
+            <svg className="size-4 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            <span className="text-sm font-medium">Viewing as Guest</span>
+          </div>
           <button
             onClick={() => togglePreview(false)}
-            className="rounded-md bg-white/20 hover:bg-white/30 px-3 py-1 text-xs font-medium transition-colors"
+            className="flex items-center gap-1.5 rounded-md bg-white/20 hover:bg-white/30 px-3.5 py-1.5 text-xs font-semibold transition-colors"
           >
-            Back to Editor
+            <svg className="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            Open Editor
           </button>
         </div>
-        <div className="pt-10">
+        <div className="pt-11">
           <Header />
         </div>
         <MobileDrawer />
@@ -159,13 +162,15 @@ export default function Home() {
       <Footer />
       <BottomNav />
 
-      {/* CMS access for authenticated non-admin users (couples) */}
+      {/* Couple CMS toggle — visible floating button for authenticated couples */}
       {status === 'authenticated' && !isAdmin && (
         <button
-          onClick={() => setManualView('couple')}
-          className="fixed bottom-20 left-6 z-[55] text-xs text-charcoal-ink/30 hover:text-cinematic-gold transition-colors"
+          onClick={() => togglePreview(false)}
+          className="fixed bottom-20 right-4 z-[55] flex items-center gap-2 rounded-full bg-cinematic-gold text-white pl-3 pr-4 py-2.5 text-xs font-semibold shadow-lg hover:bg-cinematic-gold/90 active:scale-95 transition-all"
+          aria-label="Open Editor"
         >
-          ✎
+          <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          Open Editor
         </button>
       )}
 
