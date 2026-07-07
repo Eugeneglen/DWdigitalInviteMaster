@@ -1232,3 +1232,23 @@ Stage Summary:
 - Couple login (`/?view=couple`) while logged in as admin: shows clean "Welcome Back" login with info banner
 - No more forced "Switch Account" / sign-out flow for cross-role login
 - signIn('credentials') replaces the existing session cookie automatically
+
+---
+Task ID: 4
+Agent: Main Agent
+Task: Replace DW box/logo with Dreamweaver logo and apply DW design language to Master CMS
+
+Work Log:
+- Replaced CMSLogo component: removed gold "DW" circle + "Dreamweavers" text, replaced with <img src="/dreamweavers-logo.png">
+- Logo adapts to collapsed/expanded sidebar states (h-7 collapsed, h-8 expanded)
+- Restyled sidebar: bg-slate-900 → bg-charcoal-ink, border-paper-cream/8, text-paper-cream
+- Restyled navigation items: text-paper-cream/60, hover:bg-paper-cream/8, active:bg-cinematic-gold/12, active:text-cinematic-gold
+- Restyled header: bg-slate-50 → bg-paper-cream, border-champagne-silk/30, Playfair Display for page titles
+- Restyled user avatar/dropdown: border-champagne-silk/30, text-charcoal-ink/70, focus ring cinematic-gold/40
+- Restyled sidebar footer: border-paper-cream/8, avatar border-paper-cream/15
+- Replaced all slate-* colors with DW design language tokens
+
+Stage Summary:
+- DW box removed, Dreamweavers logo in sidebar header
+- Full Master CMS layout now uses DW design language (charcoal-ink sidebar, paper-cream content, champagne-silk borders, cinematic-gold accents)
+- Verified via Agent Browser: logo renders, Dashboard active state gold, header Playfair Display

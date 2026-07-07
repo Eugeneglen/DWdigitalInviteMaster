@@ -68,19 +68,12 @@ function CMSLogo() {
   const isCollapsed = state === 'collapsed';
 
   return (
-    <div className="flex flex-col items-center gap-2 py-2">
-      <div
-        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-cinematic-gold text-slate-900 font-bold text-lg transition-all duration-200 ${
-          isCollapsed ? 'h-8 w-8 text-sm' : ''
-        }`}
-      >
-        DW
-      </div>
-      {!isCollapsed && (
-        <span className="text-sm font-semibold text-white tracking-wide">
-          Dreamweavers
-        </span>
-      )}
+    <div className="flex items-center justify-center py-3 px-2">
+      <img
+        src="/dreamweavers-logo.png"
+        alt="Dreamweavers"
+        className={`transition-all duration-200 ${isCollapsed ? 'h-7 w-auto' : 'h-8 w-auto'}`}
+      />
     </div>
   );
 }
@@ -93,7 +86,7 @@ function SidebarNav() {
   return (
     <SidebarContent>
       <SidebarGroup>
-        <SidebarGroupLabel className="text-slate-400">
+        <SidebarGroupLabel className="text-paper-cream/30">
           {isCollapsed ? '···' : 'Navigation'}
         </SidebarGroupLabel>
         <SidebarGroupContent>
@@ -109,8 +102,8 @@ function SidebarNav() {
                     isActive={isActive}
                     onClick={() => setPage(item.key)}
                     className={`
-                      relative rounded-md text-slate-300 hover:bg-slate-800 hover:text-white
-                      data-[active=true]:bg-slate-800 data-[active=true]:text-white
+                      relative rounded-md text-paper-cream/60 hover:bg-paper-cream/8 hover:text-paper-cream
+                      data-[active=true]:bg-cinematic-gold/12 data-[active=true]:text-cinematic-gold
                       data-[active=true]:border-l-2 data-[active=true]:border-cinematic-gold
                       data-[active=true]:font-medium
                       transition-colors duration-150
@@ -148,15 +141,15 @@ function SidebarUserFooter() {
     return (
       <SidebarFooter className="mt-auto">
         <div className="flex flex-col items-center gap-2 px-2 py-2">
-          <Avatar className="h-8 w-8 border border-slate-700">
+          <Avatar className="h-8 w-8 border border-paper-cream/15">
             <AvatarImage src={user?.image ?? undefined} alt={user?.name ?? 'User'} />
-            <AvatarFallback className="bg-slate-700 text-xs text-slate-200">
+            <AvatarFallback className="bg-paper-cream/10 text-xs text-paper-cream/70">
               {initials}
             </AvatarFallback>
           </Avatar>
           <button
             onClick={() => signOut()}
-            className="rounded-md p-1.5 text-slate-400 hover:bg-slate-800 hover:text-red-400 transition-colors"
+            className="rounded-md p-1.5 text-paper-cream/40 hover:bg-paper-cream/8 hover:text-red-400 transition-colors"
             aria-label="Sign out"
           >
             <LogOut className="size-4" />
@@ -168,25 +161,25 @@ function SidebarUserFooter() {
 
   return (
     <SidebarFooter className="mt-auto">
-      <Separator className="bg-slate-700/60 mx-2" />
+      <Separator className="bg-paper-cream/8 mx-2" />
       <div className="flex items-center gap-3 px-3 py-3">
-        <Avatar className="h-9 w-9 border border-slate-700">
+        <Avatar className="h-9 w-9 border border-paper-cream/15">
           <AvatarImage src={user?.image ?? undefined} alt={user?.name ?? 'User'} />
-          <AvatarFallback className="bg-slate-700 text-xs text-slate-200">
+          <AvatarFallback className="bg-paper-cream/10 text-xs text-paper-cream/70">
             {initials}
           </AvatarFallback>
         </Avatar>
         <div className="flex flex-1 flex-col min-w-0">
-          <span className="truncate text-sm font-medium text-white">
+          <span className="truncate text-sm font-medium text-paper-cream">
             {user?.name ?? 'Admin User'}
           </span>
-          <span className="truncate text-xs text-slate-400">
+          <span className="truncate text-xs text-paper-cream/40">
             {user?.email ?? 'admin@dreamweavers.com'}
           </span>
         </div>
         <button
           onClick={() => signOut()}
-          className="rounded-md p-1.5 text-slate-400 hover:bg-slate-800 hover:text-red-400 transition-colors"
+          className="rounded-md p-1.5 text-paper-cream/40 hover:bg-paper-cream/8 hover:text-red-400 transition-colors"
           aria-label="Sign out"
         >
           <LogOut className="size-4" />
@@ -211,27 +204,30 @@ function CMSHeader() {
     : 'AD';
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b border-slate-200 bg-white px-4 md:px-6">
-      <SidebarTrigger className="-ml-1" />
-      <Separator orientation="vertical" className="mr-2 h-4 !bg-slate-200" />
-      <h1 className="text-lg font-semibold text-slate-900">
+    <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b border-champagne-silk/30 bg-paper-cream px-4 md:px-6">
+      <SidebarTrigger className="-ml-1 text-charcoal-ink/60 hover:text-charcoal-ink" />
+      <Separator orientation="vertical" className="mr-2 h-4 !bg-champagne-silk/30" />
+      <h1
+        className="text-lg font-semibold text-charcoal-ink"
+        style={{ fontFamily: "'Playfair Display', serif" }}
+      >
         {PAGE_TITLES[currentPage]}
       </h1>
       <div className="ml-auto flex items-center gap-2">
         <NotificationBell variant="master" />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-2 rounded-full p-0.5 pr-3 hover:bg-slate-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
-              <Avatar className="h-8 w-8">
+            <button className="flex items-center gap-2 rounded-full p-0.5 pr-3 hover:bg-champagne-silk/20 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinematic-gold/40 focus-visible:ring-offset-2">
+              <Avatar className="h-8 w-8 border border-champagne-silk/30">
                 <AvatarImage src={user?.image ?? undefined} alt={user?.name ?? 'User'} />
-                <AvatarFallback className="bg-slate-100 text-xs font-medium text-slate-600">
+                <AvatarFallback className="bg-champagne-silk/20 text-xs font-medium text-charcoal-ink">
                   {initials}
                 </AvatarFallback>
               </Avatar>
-              <span className="hidden sm:block text-sm font-medium text-slate-700">
+              <span className="hidden sm:block text-sm font-medium text-charcoal-ink/70">
                 {user?.name ?? 'Admin User'}
               </span>
-              <ChevronsUpDown className="hidden sm:block size-3.5 text-slate-400" />
+              <ChevronsUpDown className="hidden sm:block size-3.5 text-charcoal-ink/30" />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
@@ -280,15 +276,15 @@ export default function MasterCMSLayout({ children }: { children: React.ReactNod
     <SidebarProvider>
       <Sidebar
         collapsible="icon"
-        className="border-r-0 bg-slate-900 text-white"
+        className="border-r border-paper-cream/8 bg-charcoal-ink text-paper-cream"
       >
-        <SidebarHeader className="border-b border-slate-700/60">
+        <SidebarHeader className="border-b border-paper-cream/8">
           <CMSLogo />
         </SidebarHeader>
         <SidebarNav />
         <SidebarUserFooter />
       </Sidebar>
-      <SidebarInset className="bg-slate-50">
+      <SidebarInset className="bg-paper-cream">
         <CMSHeader />
         <main className="flex-1 overflow-y-auto p-4 md:p-6">
           {children}
