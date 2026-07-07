@@ -184,41 +184,45 @@ export default function GettingTherePage() {
                       </p>
                     </div>
                   </div>
-                  <div className="border-t border-champagne-silk/30 pt-8 space-y-4">
-                    <h3
-                      className="text-xs uppercase tracking-[0.2em] text-cinematic-gold font-bold"
-                      style={{ fontSize: '12px', lineHeight: '16px', letterSpacing: '0.1em', fontWeight: 600 }}
-                    >
-                      FIND YOUR WAY
-                    </h3>
-                    <div className="relative rounded-lg overflow-hidden border border-charcoal-ink/10">
-                      <iframe
-                        src={mapsEmbedUrl}
-                        width="100%"
-                        height="280"
-                        style={{ border: 0 }}
-                        allowFullScreen
-                        loading="lazy"
-                        referrerPolicy="no-referrer-when-downgrade"
-                        title={`${venueName} Location`}
-                        className="w-full"
-                      />
-                      <a
-                        href={mapsLinkUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="absolute top-3 left-3 flex items-center gap-1.5 bg-white border border-charcoal-ink/10 rounded-md px-3 py-1.5 text-[13px] font-medium text-charcoal-ink hover:bg-charcoal-ink/5 transition-colors duration-200 shadow-sm"
-                      >
-                        <span className="material-symbols-outlined text-charcoal-ink" style={{ fontSize: '18px' }}>open_in_new</span>
-                        Open in Maps
-                      </a>
-                    </div>
-                  </div>
                 </>
               )}
             </div>
           </section>
         )}
+
+        {/* Find Your Way — always visible on both tabs */}
+        <section className="max-w-md mx-auto w-full">
+          <div className="border-t border-champagne-silk/30 pt-8 space-y-4">
+            <h3
+              className="text-xs uppercase tracking-[0.2em] text-cinematic-gold font-bold"
+              style={{ fontSize: '12px', lineHeight: '16px', letterSpacing: '0.1em', fontWeight: 600 }}
+            >
+              FIND YOUR WAY
+            </h3>
+            <div className="relative rounded-lg overflow-hidden border border-charcoal-ink/10">
+              <iframe
+                src={mapsEmbedUrl}
+                width="100%"
+                height="280"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title={`${venueName} Location`}
+                className="w-full"
+              />
+              <a
+                href={mapsLinkUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="absolute top-3 left-3 flex items-center gap-1.5 bg-white border border-charcoal-ink/10 rounded-md px-3 py-1.5 text-[13px] font-medium text-charcoal-ink hover:bg-charcoal-ink/5 transition-colors duration-200 shadow-sm"
+              >
+                <span className="material-symbols-outlined text-charcoal-ink" style={{ fontSize: '18px' }}>open_in_new</span>
+                Open in Maps
+              </a>
+            </div>
+          </div>
+        </section>
       </main>
     </>
   );
