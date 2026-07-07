@@ -618,8 +618,10 @@ export default function CoupleImages() {
       {/* Hero Visual Section */}
       <HeroVisualSection weddingData={weddingData} />
 
-      {/* Banner Section */}
-      <BannerSection weddingData={weddingData} />
+      {/* Banner Section — only on Home (shared across all sections) */}
+      {(filterCategory === 'all' || filterCategory === 'home') && (
+        <BannerSection weddingData={weddingData} />
+      )}
 
       <Separator className="bg-champagne-silk" />
 
