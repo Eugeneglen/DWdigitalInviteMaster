@@ -128,6 +128,7 @@ export default function Home() {
         togglePreview={togglePreview}
         onLoginModalChange={handleLoginModalChange}
         wantsCMSView={wantsCMSView}
+        wantsCoupleView={wantsCoupleView}
       />
     </ErrorBoundary>
   );
@@ -142,6 +143,7 @@ function HomeView({
   togglePreview,
   onLoginModalChange,
   wantsCMSView,
+  wantsCoupleView,
 }: {
   viewMode: string;
   isAdmin: boolean;
@@ -151,6 +153,7 @@ function HomeView({
   togglePreview: (v: boolean) => void;
   onLoginModalChange: (open: boolean) => void;
   wantsCMSView: boolean;
+  wantsCoupleView: boolean;
 }) {
   // Master CMS View
   if (viewMode === 'cms' && isAdmin) {
@@ -161,7 +164,7 @@ function HomeView({
             <MasterCMSPageRouter />
           </Suspense>
         </MasterCMSLayout>
-        <LoginModal open={showLoginModal} onOpenChange={onLoginModalChange} variant="cms" />
+        <LoginModal open={showLoginModal} onOpenChange={onLoginModalChange} variant="cms" targetRole="admin" />
       </>
     );
   }
@@ -199,7 +202,7 @@ function HomeView({
             <CoupleCMSPageRouter />
           </Suspense>
         </CoupleCMSLayout>
-        <LoginModal open={showLoginModal} onOpenChange={onLoginModalChange} />
+        <LoginModal open={showLoginModal} onOpenChange={onLoginModalChange} targetRole="couple" />
       </>
     );
   }
@@ -208,7 +211,7 @@ function HomeView({
   return (
     <>
       <GuestSite showEditorButton />
-      <LoginModal open={showLoginModal} onOpenChange={onLoginModalChange} variant={wantsCMSView ? 'cms' : 'default'} />
+      <LoginModal open={showLoginModal} onOpenChange={onLoginModalChange} variant={wantsCMSView ? 'cms' : 'default'} targetRole={wantsCMSView ? 'admin' : wantsCoupleView ? 'couple' : undefined} />
     </>
   );
 }

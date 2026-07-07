@@ -1211,3 +1211,24 @@ Stage Summary:
 - CMS login now has distinct dark color scheme (dark charcoal bg, cream text, gold accents)
 - Couple login retains light cream/white elegant theme
 - Clear visual differentiation between the two login pages verified via screenshots
+
+---
+Task ID: 3
+Agent: Main Agent
+Task: Fix LoginModal showing "Switch Account" when user is authenticated with wrong role
+
+Work Log:
+- Root cause: NextAuth uses a single session cookie shared across tabs. LoginModal checked `isAlreadyAuthenticated` without considering role context.
+- Added `targetRole?: 'admin' | 'couple'` prop to LoginModal
+- Added `roleMismatch` logic: when targetRole is set and current session role doesn't match, treat as "not authenticated"
+- When role mismatch: shows standard login form with info banner ("Currently signed in as X (Role). Sign in below...")
+- When no role mismatch but authenticated: shows original "Switch Account" UI
+- Added `wantsCoupleView` prop pass-through to HomeView component
+- Updated all 3 LoginModal instances in page.tsx with appropriate targetRole values
+- Added Info icon (lucide) for the role mismatch banner
+
+Stage Summary:
+- CMS login (`/?view=cms`) while logged in as couple: shows clean "Admin Portal" login with info banner
+- Couple login (`/?view=couple`) while logged in as admin: shows clean "Welcome Back" login with info banner
+- No more forced "Switch Account" / sign-out flow for cross-role login
+- signIn('credentials') replaces the existing session cookie automatically

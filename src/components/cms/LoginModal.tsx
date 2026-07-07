@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { Loader2, LogOut, Eye, EyeOff } from 'lucide-react';
+import { Loader2, LogOut, Eye, EyeOff, Info } from 'lucide-react';
 import { useAuthModalStore } from '@/store/useAuthModalStore';
 
 interface LoginModalProps {
@@ -17,9 +17,11 @@ interface LoginModalProps {
   onOpenChange: (open: boolean) => void;
   /** Visual variant — 'cms' uses a dark charcoal theme, 'default' uses the light cream theme */
   variant?: 'default' | 'cms';
+  /** When set, a user authenticated with a DIFFERENT role sees the standard login form (not "Switch Account") */
+  targetRole?: 'admin' | 'couple';
 }
 
-export function LoginModal({ open, onOpenChange, variant = 'default' }: LoginModalProps) {
+export function LoginModal({ open, onOpenChange, variant = 'default', targetRole }: LoginModalProps) {
   const isCMS = variant === 'cms';
   const { data: session, status } = useSession();
   const [email, setEmail] = useState('');
@@ -34,7 +36,6 @@ export function LoginModal({ open, onOpenChange, variant = 'default' }: LoginMod
     setIsLoading(true);
 
     try {
-      // Use NextAuth's built-in signIn — handles CSRF, JWT creation, and cookie setting
       const result = await signIn('credentials', {
         email: email.trim().toLowerCase(),
         password,
@@ -44,7 +45,6 @@ export function LoginModal({ open, onOpenChange, variant = 'default' }: LoginMod
       if (result?.error) {
         setError('Invalid email or password. Please try again.');
       } else {
-        // Login successful — close modal and reload to pick up session
         useAuthModalStore.getState().closeModal();
         window.location.reload();
       }
@@ -61,17 +61,26 @@ export function LoginModal({ open, onOpenChange, variant = 'default' }: LoginMod
     setIsLoading(false);
   };
 
-  const isAlreadyAuthenticated = status === 'authenticated' && session;
   const currentRole = session?.user?.role;
-  const roleLabel =
-    currentRole === 'SUPER_ADMIN' || currentRole === 'ACCOUNT_MANAGER'
-      ? 'Admin'
-      : 'Couple';
+  const currentIsAdmin = currentRole === 'SUPER_ADMIN' || currentRole === 'ACCOUNT_MANAGER';
+  const currentIsCouple = currentRole === 'COUPLE';
 
-  // Shared input class for dark variant
+  // If a targetRole is specified and the current session's role doesn't match,
+  // treat it as "not authenticated" so the standard login form is shown.
+  // This lets the user sign in directly without needing to sign out first.
+  const roleMismatch = targetRole
+    ? (targetRole === 'admin' && !currentIsAdmin) || (targetRole === 'couple' && !currentIsCouple)
+    : false;
+
+  const isAlreadyAuthenticated = status === 'authenticated' && session && !roleMismatch;
+
+  const roleLabel = currentIsAdmin ? 'Admin' : 'Couple';
+
+  // Shared style helpers
   const darkInputClass = '!text-paper-cream placeholder:!text-paper-cream/25 !border-paper-cream/15';
   const darkLabelClass = 'text-paper-cream/40';
   const lightLabelClass = 'text-charcoal-ink/50';
+  const labelClass = isCMS ? darkLabelClass : lightLabelClass;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -128,7 +137,7 @@ export function LoginModal({ open, onOpenChange, variant = 'default' }: LoginMod
               </DialogHeader>
             </div>
 
-            {/* Switch Account — authenticated state */}
+            {/* Switch Account — only when authenticated with MATCHING role (no targetRole mismatch) */}
             {isAlreadyAuthenticated && (
               <div className="space-y-5">
                 {/* Current session card */}
@@ -159,7 +168,7 @@ export function LoginModal({ open, onOpenChange, variant = 'default' }: LoginMod
                   </div>
                   <span
                     className={`shrink-0 text-[10px] font-semibold px-3 py-1.5 rounded-sm uppercase tracking-[0.12em] ${
-                      currentRole === 'SUPER_ADMIN' || currentRole === 'ACCOUNT_MANAGER'
+                      currentIsAdmin
                         ? isCMS
                           ? 'bg-cinematic-gold/15 text-cinematic-gold border border-cinematic-gold/30'
                           : 'bg-charcoal-ink text-paper-cream'
@@ -215,7 +224,7 @@ export function LoginModal({ open, onOpenChange, variant = 'default' }: LoginMod
                   <div>
                     <label
                       htmlFor="switch-email"
-                      className={`block text-[11px] tracking-[0.18em] uppercase font-semibold mb-2 ${isCMS ? darkLabelClass : lightLabelClass}`}
+                      className={`block text-[11px] tracking-[0.18em] uppercase font-semibold mb-2 ${labelClass}`}
                     >
                       Different email
                     </label>
@@ -233,7 +242,7 @@ export function LoginModal({ open, onOpenChange, variant = 'default' }: LoginMod
                   <div>
                     <label
                       htmlFor="switch-password"
-                      className={`block text-[11px] tracking-[0.18em] uppercase font-semibold mb-2 ${isCMS ? darkLabelClass : lightLabelClass}`}
+                      className={`block text-[11px] tracking-[0.18em] uppercase font-semibold mb-2 ${labelClass}`}
                     >
                       Password
                     </label>
@@ -285,9 +294,24 @@ export function LoginModal({ open, onOpenChange, variant = 'default' }: LoginMod
               </div>
             )}
 
-            {/* Standard login form */}
+            {/* Standard login form — shown when not authenticated OR when role mismatch */}
             {!isAlreadyAuthenticated && (
               <form onSubmit={handleSubmit} className="space-y-5">
+                {/* Role mismatch info banner */}
+                {roleMismatch && session?.user?.name && (
+                  <div className={`flex items-start gap-3 border px-4 py-3.5 rounded-sm text-[13px] ${
+                    isCMS
+                      ? 'border-cinematic-gold/15 bg-cinematic-gold/5 text-paper-cream/60'
+                      : 'border-champagne-silk/30 bg-paper-cream/80 text-charcoal-ink/60'
+                  }`}>
+                    <Info className="size-4 shrink-0 mt-0.5 text-cinematic-gold/70" />
+                    <p>
+                      Currently signed in as <strong className={isCMS ? 'text-paper-cream/80' : 'text-charcoal-ink/80'}>{session.user.name}</strong> ({roleLabel}).
+                      Sign in below with a different account to continue.
+                    </p>
+                  </div>
+                )}
+
                 {error && (
                   <div className={`border px-4 py-3 rounded-sm text-[13px] ${
                     isCMS ? 'bg-cinematic-gold/10 border-cinematic-gold/25 text-paper-cream/80' : 'bg-cinematic-gold/5 border-cinematic-gold/20 text-charcoal-ink/80'
@@ -299,7 +323,7 @@ export function LoginModal({ open, onOpenChange, variant = 'default' }: LoginMod
                 <div>
                   <label
                     htmlFor="login-email"
-                    className={`block text-[11px] tracking-[0.18em] uppercase font-semibold mb-2 ${isCMS ? darkLabelClass : lightLabelClass}`}
+                    className={`block text-[11px] tracking-[0.18em] uppercase font-semibold mb-2 ${labelClass}`}
                   >
                     Email
                   </label>
@@ -319,7 +343,7 @@ export function LoginModal({ open, onOpenChange, variant = 'default' }: LoginMod
                 <div>
                   <label
                     htmlFor="login-password"
-                    className={`block text-[11px] tracking-[0.18em] uppercase font-semibold mb-2 ${isCMS ? darkLabelClass : lightLabelClass}`}
+                    className={`block text-[11px] tracking-[0.18em] uppercase font-semibold mb-2 ${labelClass}`}
                   >
                     Password
                   </label>
