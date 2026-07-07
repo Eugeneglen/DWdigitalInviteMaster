@@ -57,6 +57,12 @@ export default function CoupleCMSLayout({ children }: { children: React.ReactNod
       try {
         const res = await fetch('/api/cms/wedding?XTransformPort=3000');
         if (!res.ok) {
+          if (res.status === 401) {
+            // Session is invalid or corrupted — sign out and let user re-login
+            await signOut({ redirect: false });
+            setError('auth');
+            return;
+          }
           if (res.status === 404) {
             setError('No wedding account assigned. Please contact Dreamweavers.');
             return;
@@ -110,6 +116,10 @@ export default function CoupleCMSLayout({ children }: { children: React.ReactNod
   }
 
   if (error) {
+    // Session was invalid — redirect cleanly so login modal can re-appear
+    if (error === 'auth') {
+      return null;
+    }
     return (
       <div className="flex min-h-screen items-center justify-center bg-paper-cream p-6">
         <div className="flex flex-col items-center gap-6 max-w-md text-center">

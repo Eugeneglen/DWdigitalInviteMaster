@@ -1103,3 +1103,28 @@ Stage Summary:
 - next.config.ts: Added allowedDevOrigins
 - [...nextauth]/route.ts: Restored to clean state (removed debug logging)
 - Key learning: NextAuth v4 credentials provider uses /api/auth/callback/credentials, NOT /api/auth/signin/credentials
+
+---
+Task ID: 1
+Agent: Main Agent
+Task: Deep investigation and permanent fix for login/CMS broken state
+
+Work Log:
+- Analyzed user screenshot via VLM: showed "Something went wrong. Please try again later." with Heart icon + Sign Out button
+- Identified this comes from `CoupleCMSLayout.tsx` error state (lines 112-132), NOT the LoginModal or ErrorBoundary
+- Read `dev.log` and found critical evidence:
+  - `[next-auth][warn][NO_SECRET]` — no NEXTAUTH_SECRET configured
+  - `[next-auth][warn][NEXTAUTH_URL]` — no NEXTAUTH_URL configured
+  - `JWT_SESSION_ERROR: JWEDecryptionFailed: decryption operation failed` — JWT cookie can't be decrypted
+  - `GET /api/cms/wedding 401` — CMS API rejects the corrupted session
+- Traced the full chain: `.env` only had `DATABASE_URL`, `auth.ts` line 93 reads `process.env.NEXTAUTH_SECRET || process.env.JWT_SECRET` (both undefined)
+- Root cause: NextAuth generates random ephemeral secrets when no NEXTAUTH_SECRET is set. In dev mode with Turbopack, different server workers/reloads get different secrets, making previously-issued JWTs undecryptable
+- Fix 1: Generated a cryptographically secure 256-bit secret and added `NEXTAUTH_SECRET` + `NEXTAUTH_URL` to `.env`
+- Fix 2: Added specific 401 handling in `CoupleCMSLayout.tsx` — auto sign-out on auth failure instead of showing dead-end error screen
+- Verified fix via curl end-to-end: login → session → CMS API all return 200 with correct data, zero auth warnings
+
+Stage Summary:
+- Root cause: Missing `NEXTAUTH_SECRET` in `.env` causing JWT decryption failures across server workers
+- Fixed by adding stable `NEXTAUTH_SECRET=8QL1GmQ9qiOygQ-JJmPrtUHrJnQocrEaJIJXOPnRVzQ` and `NEXTAUTH_URL=http://localhost:3000` to `.env`
+- Added graceful 401 handling in CoupleCMSLayout (auto sign-out instead of error screen)
+- Files changed: `.env`, `src/components/cms/CoupleCMSLayout.tsx`
