@@ -302,6 +302,11 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
 
           {/* Footer */}
           <div className="border-t border-champagne-silk/20 px-10 py-5 text-center">
+            <img
+              src="/dreamweavers-logo.png"
+              alt="Dreamweavers"
+              className="h-5 w-auto mx-auto mb-3 opacity-40"
+            />
             <p
               className="text-[11px] text-charcoal-ink/30 uppercase tracking-[0.12em] font-semibold"
             >
