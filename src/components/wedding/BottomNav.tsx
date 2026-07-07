@@ -1,91 +1,15 @@
 'use client';
 
 import { useNavigationStore, type Section } from '@/store/useNavigationStore';
-
-interface NavItem {
-  label: string;
-  section: Section;
-  icon: string;
-  active?: boolean;
-}
-
-const PAGE_NAV_CONFIG: Record<Section, { items: NavItem[]; showMore: boolean }> = {
-  home: {
-    items: [
-      { label: 'Home', section: 'home', icon: 'home', active: true },
-      { label: 'RSVP', section: 'rsvp', icon: 'favorite' },
-      { label: 'Story', section: 'story', icon: 'auto_stories' },
-      { label: 'Moments', section: 'moments', icon: 'photo_library' },
-    ],
-    showMore: true,
-  },
-  schedule: {
-    items: [
-      { label: 'Home', section: 'home', icon: 'home' },
-      { label: 'Schedule', section: 'schedule', icon: 'calendar_today', active: true },
-      { label: 'RSVP', section: 'rsvp', icon: 'favorite' },
-    ],
-    showMore: true,
-  },
-  rsvp: {
-    items: [
-      { label: 'Home', section: 'home', icon: 'home' },
-      { label: 'RSVP', section: 'rsvp', icon: 'favorite', active: true },
-      { label: 'Story', section: 'story', icon: 'auto_stories' },
-      { label: 'Moments', section: 'moments', icon: 'photo_library' },
-    ],
-    showMore: true,
-  },
-  'getting-there': {
-    items: [
-      { label: 'Home', section: 'home', icon: 'home' },
-      { label: 'RSVP', section: 'rsvp', icon: 'favorite' },
-      { label: 'Story', section: 'story', icon: 'auto_stories' },
-      { label: 'Moments', section: 'moments', icon: 'photo_library' },
-    ],
-    showMore: true,
-  },
-  story: {
-    items: [
-      { label: 'Home', section: 'home', icon: 'home' },
-      { label: 'RSVP', section: 'rsvp', icon: 'favorite' },
-      { label: 'Story', section: 'story', icon: 'auto_stories', active: true },
-      { label: 'Moments', section: 'moments', icon: 'photo_library' },
-    ],
-    showMore: true,
-  },
-  wishes: {
-    items: [
-      { label: 'Home', section: 'home', icon: 'home' },
-      { label: 'RSVP', section: 'rsvp', icon: 'favorite' },
-      { label: 'Story', section: 'story', icon: 'auto_stories' },
-      { label: 'Moments', section: 'moments', icon: 'photo_library' },
-    ],
-    showMore: true,
-  },
-  qa: {
-    items: [
-      { label: 'Home', section: 'home', icon: 'home' },
-      { label: 'RSVP', section: 'rsvp', icon: 'favorite' },
-      { label: 'Story', section: 'story', icon: 'auto_stories' },
-      { label: 'Q&A', section: 'qa', icon: 'help', active: true },
-    ],
-    showMore: false,
-  },
-  moments: {
-    items: [
-      { label: 'Home', section: 'home', icon: 'home' },
-      { label: 'RSVP', section: 'rsvp', icon: 'favorite' },
-      { label: 'Story', section: 'story', icon: 'auto_stories' },
-      { label: 'Moments', section: 'moments', icon: 'photo_library', active: true },
-    ],
-    showMore: true,
-  },
-  };
+import { useSiteSettings, type NavTab } from '@/hooks/useSiteSettings';
 
 export default function BottomNav() {
   const { currentSection, setSection, openDrawer } = useNavigationStore();
-  const config = PAGE_NAV_CONFIG[currentSection];
+  const { navTabs } = useSiteSettings();
+
+  // Show first 4 tabs + More button (same pattern as before)
+  const visibleTabs = navTabs.slice(0, 4);
+  const hasMore = navTabs.length > 4;
 
   return (
     <nav
@@ -93,11 +17,11 @@ export default function BottomNav() {
       role="navigation"
       aria-label="Page navigation"
     >
-      {config.items.map((item) => {
-        const isActive = item.active ?? false;
+      {visibleTabs.map((item: NavTab) => {
+        const isActive = currentSection === item.section;
         return (
           <button
-            key={`${currentSection}-${item.section}`}
+            key={item.id}
             onClick={() => setSection(item.section)}
             aria-label={`Navigate to ${item.label}`}
             aria-current={isActive ? 'page' : undefined}
@@ -110,10 +34,9 @@ export default function BottomNav() {
             <span
               className="material-symbols-outlined mb-1"
               aria-hidden="true"
-              data-weight={isActive ? 'fill' : undefined}
               style={isActive ? { fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24" } : undefined}
             >
-              {item.icon}
+              {getSectionIcon(item.section)}
             </span>
             <span className="font-label-sm text-[10px] uppercase tracking-wider font-semibold mt-1">
               {item.label}
@@ -122,7 +45,7 @@ export default function BottomNav() {
         );
       })}
 
-      {config.showMore && (
+      {hasMore && (
         <button
           onClick={openDrawer}
           aria-label="Open more navigation options"
@@ -134,4 +57,19 @@ export default function BottomNav() {
       )}
     </nav>
   );
+}
+
+// Map section to Material Symbol icon name
+function getSectionIcon(section: Section): string {
+  const icons: Record<Section, string> = {
+    home: 'home',
+    schedule: 'calendar_today',
+    rsvp: 'favorite',
+    'getting-there': 'location_on',
+    story: 'auto_stories',
+    wishes: 'edit_note',
+    qa: 'help',
+    moments: 'photo_library',
+  };
+  return icons[section] || 'article';
 }

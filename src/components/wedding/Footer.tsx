@@ -1,15 +1,16 @@
 'use client';
 
 import { useState } from 'react';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
 import LegalDocumentModal from '@/components/wedding/LegalDocumentModal';
 import ContactConciergeModal from '@/components/wedding/ContactConciergeModal';
-import { dataProtectionDocument, termsOfServiceDocument, privacyPolicyDocument } from '@/lib/legal-content';
 
 export default function Footer() {
   const [dataProtectionOpen, setDataProtectionOpen] = useState(false);
   const [termsOfServiceOpen, setTermsOfServiceOpen] = useState(false);
   const [privacyPolicyOpen, setPrivacyPolicyOpen] = useState(false);
   const [contactConciergeOpen, setContactConciergeOpen] = useState(false);
+  const { footerContent } = useSiteSettings();
 
   const footerLinkClass =
     'font-body-md text-body-md leading-body-md text-charcoal-ink/60 hover:text-cinematic-gold underline-offset-4 hover:underline transition-colors cursor-pointer';
@@ -46,7 +47,7 @@ export default function Footer() {
           </div>
 
           <p className="font-label-sm text-label-sm leading-label-sm text-charcoal-ink/40 uppercase tracking-wider font-semibold">
-            © 2026 DREAMWEAVERS DIGITAL HEIRLOOMS. All rights reserved.
+            {footerContent.copyright}
           </p>
         </div>
       </footer>
@@ -59,19 +60,22 @@ export default function Footer() {
       <LegalDocumentModal
         open={privacyPolicyOpen}
         onOpenChange={setPrivacyPolicyOpen}
-        document={privacyPolicyDocument}
+        title="Privacy Policy"
+        content={footerContent.privacyPolicy}
       />
 
       <LegalDocumentModal
         open={dataProtectionOpen}
         onOpenChange={setDataProtectionOpen}
-        document={dataProtectionDocument}
+        title="Data Protection"
+        content={footerContent.dataProtection}
       />
 
       <LegalDocumentModal
         open={termsOfServiceOpen}
         onOpenChange={setTermsOfServiceOpen}
-        document={termsOfServiceDocument}
+        title="Terms of Service"
+        content={footerContent.termsOfService}
       />
     </>
   );

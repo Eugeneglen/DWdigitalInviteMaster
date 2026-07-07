@@ -1,22 +1,13 @@
 'use client';
 
-import { useNavigationStore, type Section } from '@/store/useNavigationStore';
+import { useNavigationStore } from '@/store/useNavigationStore';
+import { useSiteSettings, type NavTab } from '@/hooks/useSiteSettings';
 import { useEffect } from 'react';
-
-const NAV_ITEMS: { label: string; section: Section }[] = [
-  { label: 'Home', section: 'home' },
-  { label: 'Schedule', section: 'schedule' },
-  { label: 'RSVP', section: 'rsvp' },
-  { label: 'Getting There', section: 'getting-there' },
-  { label: 'Story', section: 'story' },
-  { label: 'Wishes', section: 'wishes' },
-  { label: 'Q&A', section: 'qa' },
-  { label: 'Moments', section: 'moments' },
-];
 
 export default function MobileDrawer() {
   const { drawerOpen, closeDrawer, currentSection, setSection } =
     useNavigationStore();
+  const { navTabs } = useSiteSettings();
 
   // Lock body scroll when drawer is open
   useEffect(() => {
@@ -63,10 +54,10 @@ export default function MobileDrawer() {
 
         {/* Link list */}
         <ul className="flex flex-col gap-6">
-          {NAV_ITEMS.map((item) => {
+          {navTabs.map((item: NavTab) => {
             const isActive = currentSection === item.section;
             return (
-              <li key={item.section}>
+              <li key={item.id}>
                 <button
                   onClick={() => setSection(item.section)}
                   className={`text-xs uppercase tracking-widest flex items-center hover:pl-2 transition-all duration-300 ${

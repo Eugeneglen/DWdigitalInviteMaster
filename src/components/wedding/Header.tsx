@@ -1,17 +1,7 @@
 'use client';
 
-import { useNavigationStore, type Section } from '@/store/useNavigationStore';
-
-const NAV_ITEMS: { label: string; section: Section }[] = [
-  { label: 'Home', section: 'home' },
-  { label: 'Schedule', section: 'schedule' },
-  { label: 'RSVP', section: 'rsvp' },
-  { label: 'Getting There', section: 'getting-there' },
-  { label: 'Story', section: 'story' },
-  { label: 'Wishes', section: 'wishes' },
-  { label: 'Q&A', section: 'qa' },
-  { label: 'Moments', section: 'moments' },
-];
+import { useNavigationStore } from '@/store/useNavigationStore';
+import { useSiteSettings, type NavTab } from '@/hooks/useSiteSettings';
 
 interface HeaderProps {
   /** CSS top value to push the fixed header below an overlay bar (e.g. "44px") */
@@ -20,6 +10,7 @@ interface HeaderProps {
 
 export default function Header({ topOffset }: HeaderProps) {
   const { currentSection, setSection, drawerOpen, openDrawer } = useNavigationStore();
+  const { navTabs } = useSiteSettings();
 
   return (
     <header
@@ -45,11 +36,11 @@ export default function Header({ topOffset }: HeaderProps) {
 
         {/* Desktop navigation (lg+) */}
         <nav className="hidden lg:flex justify-center items-center gap-6 px-4 ml-auto" aria-label="Main navigation">
-          {NAV_ITEMS.map((item) => {
+          {navTabs.map((item: NavTab) => {
             const isActive = currentSection === item.section;
             return (
               <button
-                key={item.section}
+                key={item.id}
                 onClick={() => setSection(item.section)}
                 aria-label={`Navigate to ${item.label}`}
                 aria-current={isActive ? 'page' : undefined}
