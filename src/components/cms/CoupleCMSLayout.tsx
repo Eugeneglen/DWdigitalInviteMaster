@@ -148,13 +148,12 @@ export default function CoupleCMSLayout({ children }: { children: React.ReactNod
       {/* Left Sidebar */}
       <aside className="sticky top-0 hidden h-screen w-56 shrink-0 flex-col border-r border-champagne-silk bg-paper-cream md:flex">
         {/* Logo area */}
-        <div className="flex items-center gap-3 px-4 py-5">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-cinematic-gold text-white font-bold text-sm">
-            DW
-          </div>
-          <span className="text-sm font-semibold text-charcoal-ink tracking-wide">
-            Dreamweavers
-          </span>
+        <div className="flex items-center px-4 py-5">
+          <img
+            alt="Dreamweavers"
+            className="h-5 w-auto object-contain"
+            src="/dreamweavers-logo.png"
+          />
         </div>
 
         <Separator className="bg-champagne-silk" />
