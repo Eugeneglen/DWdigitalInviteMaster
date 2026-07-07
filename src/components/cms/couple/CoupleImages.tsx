@@ -30,7 +30,7 @@ const MEDIA_API = '/api/cms/media?XTransformPort=3000';
 const WEDDING_API = '/api/cms/wedding?XTransformPort=3000';
 
 const CATEGORIES = [
-  { value: 'gallery', label: 'Gallery', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+  { value: 'gallery', label: 'Home', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
   { value: 'story', label: 'Story', color: 'bg-amber-50 text-amber-700 border-amber-200' },
   { value: 'couple-photo', label: 'Couple Photo', color: 'bg-sky-50 text-sky-700 border-sky-200' },
 ] as const;
