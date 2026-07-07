@@ -427,7 +427,7 @@ export default function CoupleImages() {
   const { weddingData } = useCoupleCMSStore();
   const [media, setMedia] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filterCategory, setFilterCategory] = useState<string>('all');
+  const [filterCategory, setFilterCategory] = useState<string>('home');
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -444,7 +444,7 @@ export default function CoupleImages() {
   const fetchMedia = useCallback(async () => {
     try {
       setLoading(true);
-      const url = filterCategory === 'all' ? MEDIA_API : `${MEDIA_API}&category=${filterCategory}`;
+      const url = `${MEDIA_API}&category=${filterCategory}`;
       const res = await fetch(url);
       if (!res.ok) throw new Error('Failed to load media');
       const data = await res.json();
@@ -619,7 +619,7 @@ export default function CoupleImages() {
       <HeroVisualSection weddingData={weddingData} />
 
       {/* Banner Section — only on Home (shared across all sections) */}
-      {(filterCategory === 'all' || filterCategory === 'home') && (
+      {filterCategory === 'home' && (
         <BannerSection weddingData={weddingData} />
       )}
 
@@ -627,17 +627,6 @@ export default function CoupleImages() {
 
       {/* Category Filter */}
       <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-xs font-medium text-charcoal-ink/50 uppercase tracking-wider mr-1">Filter:</span>
-        <button
-          onClick={() => setFilterCategory('all')}
-          className={`rounded-full px-3 py-1 text-xs font-medium transition-colors duration-150 ${
-            filterCategory === 'all'
-              ? 'bg-cinematic-gold text-charcoal-ink'
-              : 'bg-charcoal-ink/5 text-charcoal-ink/50 hover:bg-charcoal-ink/10'
-          }`}
-        >
-          All ({media.length})
-        </button>
         {CATEGORIES.map((cat) => {
           const count = catCount(cat.value);
           const isFull = count >= cat.max;
