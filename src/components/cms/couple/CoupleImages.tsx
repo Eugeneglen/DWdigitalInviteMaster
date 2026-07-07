@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { Loader2, Plus, Trash2, ImageIcon, Star, ImagePlus, Upload, GripVertical, Eye, ImageOff } from 'lucide-react';
+import { Loader2, Trash2, ImagePlus, Upload, GripVertical, Eye, ImageOff, Video, X, Play } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -24,11 +24,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useCoupleCMSStore } from '@/store/useCoupleCMSStore';
 
-const API_BASE = '/api/cms/media?XTransformPort=3000';
+const MEDIA_API = '/api/cms/media?XTransformPort=3000';
+const WEDDING_API = '/api/cms/wedding?XTransformPort=3000';
 
 const CATEGORIES = [
-  { value: 'hero', label: 'Hero', color: 'bg-rose-50 text-rose-700 border-rose-200' },
   { value: 'banner', label: 'Banner', color: 'bg-violet-50 text-violet-700 border-violet-200' },
   { value: 'gallery', label: 'Gallery', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
   { value: 'story', label: 'Story', color: 'bg-amber-50 text-amber-700 border-amber-200' },
@@ -61,7 +62,209 @@ function formatFileSize(bytes: number | null): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+/** ─── Hero Visual Section ─────────────────────────────────────────────── */
+
+function HeroVisualSection({ weddingData }: { weddingData: Record<string, unknown> | null }) {
+  const { setWeddingData } = useCoupleCMSStore();
+  const heroImageUrl = (weddingData?.heroImageUrl as string) || null;
+  const heroVideoUrl = (weddingData?.heroVideoUrl as string) || null;
+  const [saving, setSaving] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileSelect = (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    const file = files[0];
+
+    const isVideo = file.type.startsWith('video/');
+    const isImage = file.type.startsWith('image/');
+
+    if (!isVideo && !isImage) {
+      toast.error('Please select an image or video file');
+      return;
+    }
+
+    // Size limit: 50MB for video, 10MB for image
+    if (isVideo && file.size > 50 * 1024 * 1024) {
+      toast.error('Video must be under 50 MB');
+      return;
+    }
+    if (isImage && file.size > 10 * 1024 * 1024) {
+      toast.error('Image must be under 10 MB');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const dataUrl = e.target?.result as string;
+      // Uploading a new hero clears the other type
+      const updatePayload: Record<string, string | null> = {
+        heroImageUrl: isImage ? dataUrl : null,
+        heroVideoUrl: isVideo ? dataUrl : null,
+      };
+
+      setSaving(true);
+      try {
+        const res = await fetch(WEDDING_API, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updatePayload),
+        });
+        if (!res.ok) throw new Error('Failed to save hero visual');
+        const data = await res.json();
+        setWeddingData(data.wedding);
+        toast.success(`Hero ${isVideo ? 'video' : 'image'} updated`);
+      } catch {
+        toast.error('Failed to save hero visual');
+      } finally {
+        setSaving(false);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    handleFileSelect(e.dataTransfer.files);
+  };
+
+  const handleRemoveHero = async () => {
+    if (!heroImageUrl && !heroVideoUrl) return;
+    if (!confirm('Remove the current hero visual?')) return;
+
+    setSaving(true);
+    try {
+      const res = await fetch(WEDDING_API, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ heroImageUrl: null, heroVideoUrl: null }),
+      });
+      if (!res.ok) throw new Error('Failed to remove hero visual');
+      const data = await res.json();
+      setWeddingData(data.wedding);
+      toast.success('Hero visual removed');
+    } catch {
+      toast.error('Failed to remove hero visual');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const hasHero = !!(heroImageUrl || heroVideoUrl);
+
+  return (
+    <Card className="border-charcoal-ink/5 shadow-none">
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h3 className="text-sm font-semibold text-charcoal-ink">Hero Visual</h3>
+            <p className="text-xs text-charcoal-ink/40 mt-0.5">
+              Upload one image or video for your main page hero section.
+            </p>
+          </div>
+          {hasHero && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleRemoveHero}
+              disabled={saving}
+              className="h-7 text-xs text-charcoal-ink/40 hover:text-red-500 hover:bg-red-50"
+            >
+              {saving ? <Loader2 className="size-3 animate-spin" /> : <X className="size-3.5 mr-1" />}
+              Remove
+            </Button>
+          )}
+        </div>
+
+        <div
+          className={`relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed transition-colors duration-200 cursor-pointer overflow-hidden ${
+            dragOver
+              ? 'border-cinematic-gold bg-cinematic-gold/5'
+              : hasHero
+                ? 'border-cinematic-gold/30 bg-cinematic-gold/5'
+                : 'border-charcoal-ink/10 hover:border-champagne-silk'
+          }`}
+          style={{ minHeight: '200px' }}
+          onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={handleDrop}
+          onClick={() => fileInputRef.current?.click()}
+        >
+          {saving && (
+            <div className="absolute inset-0 z-10 bg-white/60 flex items-center justify-center">
+              <Loader2 className="size-6 animate-spin text-cinematic-gold" />
+            </div>
+          )}
+
+          {heroVideoUrl ? (
+            <div className="relative w-full">
+              <video
+                src={heroVideoUrl}
+                className="w-full max-h-64 object-contain rounded-lg bg-black/5"
+                muted
+                playsInline
+              />
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="bg-black/40 rounded-full p-3">
+                  <Play className="size-5 text-white" />
+                </div>
+              </div>
+              <Badge
+                variant="outline"
+                className="absolute top-2 right-2 bg-black/60 text-white border-transparent text-[10px]"
+              >
+                <Video className="size-3 mr-1" />
+                Video
+              </Badge>
+            </div>
+          ) : heroImageUrl ? (
+            <div className="relative w-full">
+              <img
+                src={heroImageUrl}
+                alt="Current hero image"
+                className="w-full max-h-64 object-contain rounded-lg"
+                unoptimized
+              />
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-10 gap-3">
+              <div className="flex items-center gap-2 text-champagne-silk">
+                <ImagePlus className="size-6" />
+                <Video className="size-6" />
+              </div>
+              <p className="text-sm text-charcoal-ink/50 font-medium text-center">
+                Click or drag to upload
+              </p>
+              <p className="text-xs text-charcoal-ink/30 text-center">
+                Image (PNG, JPG, WebP) or Video (MP4, WebM)
+              </p>
+            </div>
+          )}
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*,video/mp4,video/webm,video/ogg"
+            className="hidden"
+            onChange={(e) => handleFileSelect(e.target.files)}
+          />
+        </div>
+
+        {hasHero && (
+          <p className="text-[10px] text-charcoal-ink/30 mt-2 text-center">
+            Click or drag a new file to replace the current hero visual.
+          </p>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+/** ─── Main Component ──────────────────────────────────────────────────── */
+
 export default function CoupleImages() {
+  const { weddingData } = useCoupleCMSStore();
   const [media, setMedia] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterCategory, setFilterCategory] = useState<string>('all');
@@ -81,7 +284,7 @@ export default function CoupleImages() {
   const fetchMedia = useCallback(async () => {
     try {
       setLoading(true);
-      const url = filterCategory === 'all' ? API_BASE : `${API_BASE}&category=${filterCategory}`;
+      const url = filterCategory === 'all' ? MEDIA_API : `${MEDIA_API}&category=${filterCategory}`;
       const res = await fetch(url);
       if (!res.ok) throw new Error('Failed to load media');
       const data = await res.json();
@@ -134,7 +337,7 @@ export default function CoupleImages() {
 
     try {
       setUploading(true);
-      const res = await fetch(API_BASE, {
+      const res = await fetch(MEDIA_API, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -166,7 +369,7 @@ export default function CoupleImages() {
 
     try {
       setDeleting(id);
-      const res = await fetch(`${API_BASE}&id=${encodeURIComponent(id)}`, {
+      const res = await fetch(`${MEDIA_API}&id=${encodeURIComponent(id)}`, {
         method: 'DELETE',
       });
 
@@ -184,9 +387,9 @@ export default function CoupleImages() {
     }
   };
 
-  const handleSetAs = async (item: MediaItem, type: 'hero' | 'banner') => {
+  const handleSetAs = async (item: MediaItem, type: 'banner') => {
     try {
-      const res = await fetch(API_BASE, {
+      const res = await fetch(MEDIA_API, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: item.id, setAs: type }),
@@ -209,12 +412,12 @@ export default function CoupleImages() {
 
     try {
       // Swap sort orders
-      await fetch(API_BASE, {
+      await fetch(MEDIA_API, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: item.id, sortOrder: swapItem.sortOrder }),
       });
-      await fetch(API_BASE, {
+      await fetch(MEDIA_API, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: swapItem.id, sortOrder: item.sortOrder }),
@@ -225,8 +428,6 @@ export default function CoupleImages() {
       toast.error('Failed to reorder image');
     }
   };
-
-  const filteredMedia = media;
 
   if (loading) {
     return (
@@ -244,7 +445,7 @@ export default function CoupleImages() {
         <div>
           <h2 className="text-xl font-semibold text-charcoal-ink">Images & Media</h2>
           <p className="text-sm text-charcoal-ink/50 mt-1">
-            Upload and manage images for your invitation.
+            Manage your hero visual and upload images for your invitation.
           </p>
         </div>
         <Button
@@ -255,6 +456,11 @@ export default function CoupleImages() {
           Upload
         </Button>
       </div>
+
+      <Separator className="bg-champagne-silk" />
+
+      {/* Hero Visual Section */}
+      <HeroVisualSection weddingData={weddingData} />
 
       <Separator className="bg-champagne-silk" />
 
@@ -290,7 +496,7 @@ export default function CoupleImages() {
       </div>
 
       {/* Media Grid */}
-      {filteredMedia.length === 0 ? (
+      {media.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 gap-3">
           <ImageOff className="size-10 text-champagne-silk" />
           <p className="text-sm text-charcoal-ink/40 font-medium">No images yet</p>
@@ -300,7 +506,7 @@ export default function CoupleImages() {
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-          {filteredMedia.map((item) => (
+          {media.map((item) => (
             <Card key={item.id} className="border-charcoal-ink/5 shadow-none overflow-hidden group hover:border-champagne-silk transition-colors duration-200">
               {/* Thumbnail */}
               <div
@@ -338,16 +544,6 @@ export default function CoupleImages() {
                   </p>
                 )}
                 <div className="flex items-center gap-1">
-                  {/* Set as hero */}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleSetAs(item, 'hero')}
-                    className="h-7 w-7 p-0 text-charcoal-ink/40 hover:text-cinematic-gold hover:bg-cinematic-gold/5"
-                    title="Set as hero image"
-                  >
-                    <Star className="size-3.5" />
-                  </Button>
                   {/* Set as banner */}
                   <Button
                     variant="ghost"

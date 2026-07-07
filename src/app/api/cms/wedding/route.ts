@@ -53,7 +53,7 @@ export async function PUT(req: NextRequest) {
     }
 
     const updateData: Record<string, unknown> = {};
-    const allowedFields = ['coupleName', 'brideName', 'groomName', 'weddingDate', 'weddingTime', 'venue', 'venueAddress', 'googleMapsUrl', 'heroImageUrl', 'bannerUrl'];
+    const allowedFields = ['coupleName', 'brideName', 'groomName', 'weddingDate', 'weddingTime', 'venue', 'venueAddress', 'googleMapsUrl', 'heroImageUrl', 'heroVideoUrl', 'bannerUrl'];
     for (const field of allowedFields) {
       if (body[field] !== undefined) {
         updateData[field] = field === 'weddingDate' ? new Date(body[field]) : body[field];

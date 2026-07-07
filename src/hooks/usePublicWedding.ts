@@ -22,6 +22,7 @@ export interface PublicWeddingData {
     venueAddress: string | null;
     googleMapsUrl: string | null;
     heroImageUrl: string | null;
+    heroVideoUrl: string | null;
     bannerUrl: string | null;
   };
   content: Record<string, Record<string, string>>;

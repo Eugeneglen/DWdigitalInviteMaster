@@ -996,3 +996,34 @@ Stage Summary:
 - CMS: toggle in Features page + inline config panel (URL, title, caption, autoplay, muted, controls)
 - All 9 navigation items updated (Header, MobileDrawer, BottomNav)
 - Feature auto-seeded for existing and new weddings
+
+---
+Task ID: 1
+Agent: Main
+Task: Remove VIDEO tab/section, add hero video support
+
+Work Log:
+- Removed `video` from Section type union in useNavigationStore.ts
+- Removed VideoPage import and entry from GuestSite.tsx GUEST_PAGES map
+- Removed `{ label: Video, section: video }` from Header.tsx, MobileDrawer.tsx NAV_ITEMS
+- Removed `video` key from BottomNav.tsx PAGE_NAV_CONFIG
+- Removed video feature from CoupleFeatures.tsx: removed VideoConfig, parseVideoConfig, videoConfig state, savingVideo state, handleSaveVideoConfig, video inline settings UI, Video import, video from FEATURE_REGISTRY and FEATURE_ORDER
+- Added `heroVideoUrl String?` to WeddingAccount in prisma/schema.prisma
+- Ran `bun run db:push` to sync schema
+- Added `heroVideoUrl` to PublicWeddingData interface in usePublicWedding.ts
+- Updated /api/wedding/public to return heroVideoUrl
+- Added `heroVideoUrl` to allowedFields in /api/cms/wedding PUT handler
+- Removed `video` from default features seed in /api/master/weddings
+- Updated /api/cms/overview checklist to check heroImageUrl OR heroVideoUrl instead of hero category media
+- Rewrote CoupleImages.tsx: added dedicated HeroVisualSection component at top supporting image OR video upload (drag-and-drop, file input), removed hero from CATEGORIES, removed Star/set-as-hero button from media grid
+- Updated HomePage.tsx: hero section now conditionally renders <video> (autoplay, muted, loop) when heroVideoUrl is set, otherwise <img>
+- Verified via agent-browser: guest nav shows 8 items (no Video), page loads without errors, CMS login modal appears correctly
+
+Stage Summary:
+- Video section completely removed from guest site (nav, page, routing)
+- Video feature toggle removed from CMS Features page
+- Hero Visual section in CMS Images tab now allows uploading ONE image OR video for the main page
+- Guest site HomePage renders video (autoplay, muted, loop) or image based on which hero field is set
+- `heroVideoUrl` field added to DB schema, public API, and CMS API
+- Zero lint errors, dev server running clean
+

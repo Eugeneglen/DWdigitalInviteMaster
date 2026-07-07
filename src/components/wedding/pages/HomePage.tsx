@@ -68,6 +68,7 @@ export default function HomePage() {
 
   const bannerUrl = data?.wedding.bannerUrl || FALLBACK_BANNER_BG;
   const heroImgUrl = data?.wedding.heroImageUrl || FALLBACK_HERO_IMG;
+  const heroVideoUrl = data?.wedding.heroVideoUrl || null;
   const coupleName = data?.wedding.coupleName || FALLBACK_COUPLE_NAME;
   const dateText = formatDate(data?.wedding.weddingDate);
   const weddingTimestamp = parseWeddingTimestamp(data?.wedding.weddingDate);
@@ -110,13 +111,24 @@ export default function HomePage() {
       <main className="pb-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto min-h-screen pt-[20px] md:pt-[40px]">
         {/* ===== HERO SECTION ===== */}
         <section className="relative h-[795px] md:h-screen w-full flex flex-col justify-end overflow-hidden">
-          {/* Background Image — full bleed, no crop */}
+          {/* Background — full bleed, video or image */}
           <div className="absolute inset-0 z-0">
-            <img
-              alt="Hero Wedding Portrait"
-              className="w-full h-full object-cover object-center"
-              src={heroImgUrl}
-            />
+            {heroVideoUrl ? (
+              <video
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="w-full h-full object-cover object-center"
+                src={heroVideoUrl}
+              />
+            ) : (
+              <img
+                alt="Hero Wedding Portrait"
+                className="w-full h-full object-cover object-center"
+                src={heroImgUrl}
+              />
+            )}
           </div>
 
           {/* Content Overlay */}

@@ -111,7 +111,7 @@ export async function POST(req: NextRequest) {
     // Enable all features by default for new weddings
     const defaultFeatures = [
       'countdown', 'schedule', 'rsvp', 'story', 'gallery',
-      'wishes', 'getting-there', 'qa', 'moments', 'music', 'video',
+      'wishes', 'getting-there', 'qa', 'moments', 'music',
     ];
     await db.weddingFeature.createMany({
       data: defaultFeatures.map((key) => ({ weddingId: wedding.id, featureKey: key, isEnabled: true })),

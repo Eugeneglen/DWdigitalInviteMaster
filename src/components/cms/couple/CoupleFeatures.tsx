@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { Loader2, Timer, CalendarClock, Mail, BookOpen, Image, Heart, MapPin, HelpCircle, Sparkles, Music2, Video, Save } from 'lucide-react';
+import { Loader2, Timer, CalendarClock, Mail, BookOpen, Image, Heart, MapPin, HelpCircle, Sparkles, Music2, Save } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
@@ -80,12 +80,6 @@ const FEATURE_REGISTRY: Record<string, FeatureConfig> = {
     description: 'Play background music on your wedding page',
     icon: Music2,
   },
-  video: {
-    featureKey: 'video',
-    displayName: 'Wedding Video',
-    description: 'Share a video on your invitation page',
-    icon: Video,
-  },
 };
 
 const FEATURE_ORDER = [
@@ -99,7 +93,6 @@ const FEATURE_ORDER = [
   'qa',
   'moments',
   'music',
-  'video',
 ];
 
 interface FeatureItem {
@@ -133,32 +126,7 @@ function parseMusicConfig(config: string | null | undefined): MusicConfig {
   }
 }
 
-interface VideoConfig {
-  url: string;
-  title: string;
-  caption: string;
-  autoplay: boolean;
-  muted: boolean;
-  showControls: boolean;
-}
 
-const DEFAULT_VIDEO_CONFIG: VideoConfig = {
-  url: '',
-  title: '',
-  caption: '',
-  autoplay: false,
-  muted: true,
-  showControls: true,
-};
-
-function parseVideoConfig(config: string | null | undefined): VideoConfig {
-  if (!config) return { ...DEFAULT_VIDEO_CONFIG };
-  try {
-    return { ...DEFAULT_VIDEO_CONFIG, ...JSON.parse(config) };
-  } catch {
-    return { ...DEFAULT_VIDEO_CONFIG };
-  }
-}
 
 export default function CoupleFeatures() {
   const [features, setFeatures] = useState<FeatureItem[]>([]);
@@ -170,9 +138,7 @@ export default function CoupleFeatures() {
   const [musicConfig, setMusicConfig] = useState<MusicConfig>(DEFAULT_MUSIC_CONFIG);
   const [savingMusic, setSavingMusic] = useState(false);
 
-  // Video config local state
-  const [videoConfig, setVideoConfig] = useState<VideoConfig>(DEFAULT_VIDEO_CONFIG);
-  const [savingVideo, setSavingVideo] = useState(false);
+
 
   const fetchFeatures = useCallback(async () => {
     try {
@@ -185,9 +151,7 @@ export default function CoupleFeatures() {
       // Load music config from features
       const musicFeature = rawFeatures.find((f) => f.featureKey === 'music');
       setMusicConfig(parseMusicConfig(musicFeature?.config));
-      // Load video config from features
-      const videoFeature = rawFeatures.find((f) => f.featureKey === 'video');
-      setVideoConfig(parseVideoConfig(videoFeature?.config));
+
     } catch {
       toast.error('Failed to load features');
     } finally {
@@ -291,33 +255,7 @@ export default function CoupleFeatures() {
     }
   };
 
-  const handleSaveVideoConfig = async () => {
-    setSavingVideo(true);
-    try {
-      const currentVideoFeature = features.find((f) => f.featureKey === 'video');
-      if (!currentVideoFeature) return;
 
-      const updatedFeatures = features.map((f) =>
-        f.featureKey === 'video'
-          ? { ...f, config: JSON.stringify(videoConfig) }
-          : f
-      );
-
-      const res = await fetch(API_BASE, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ features: updatedFeatures }),
-      });
-
-      if (!res.ok) throw new Error('Failed to save video settings');
-      setFeatures(updatedFeatures);
-      toast.success('Video settings saved');
-    } catch {
-      toast.error('Failed to save video settings');
-    } finally {
-      setSavingVideo(false);
-    }
-  };
 
   const isMusicEnabled = features.find((f) => f.featureKey === 'music')?.isEnabled ?? false;
 
@@ -458,78 +396,7 @@ export default function CoupleFeatures() {
                   </div>
                 )}
 
-                {/* Video inline settings */}
-                {key === 'video' && isEnabled && (
-                  <div className="mt-4 pt-4 border-t border-champagne-silk/60 space-y-3">
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-medium text-charcoal-ink/70">Video URL</Label>
-                      <Input
-                        type="url"
-                        placeholder="https://www.youtube.com/watch?v=... or direct .mp4 link"
-                        value={videoConfig.url}
-                        onChange={(e) => setVideoConfig((prev) => ({ ...prev, url: e.target.value }))}
-                        className="h-8 text-xs"
-                      />
-                      <p className="text-[10px] text-charcoal-ink/30">Supports YouTube, Vimeo, and direct MP4 links</p>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="space-y-1.5">
-                        <Label className="text-xs font-medium text-charcoal-ink/70">Title</Label>
-                        <Input
-                          placeholder="Our Wedding Film"
-                          value={videoConfig.title}
-                          onChange={(e) => setVideoConfig((prev) => ({ ...prev, title: e.target.value }))}
-                          className="h-8 text-xs"
-                        />
-                      </div>
-                      <div className="space-y-1.5">
-                        <Label className="text-xs font-medium text-charcoal-ink/70">Caption</Label>
-                        <Input
-                          placeholder="A short description"
-                          value={videoConfig.caption}
-                          onChange={(e) => setVideoConfig((prev) => ({ ...prev, caption: e.target.value }))}
-                          className="h-8 text-xs"
-                        />
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-6">
-                      <div className="flex items-center gap-2">
-                        <Switch
-                          checked={videoConfig.autoplay}
-                          onCheckedChange={(checked) => setVideoConfig((prev) => ({ ...prev, autoplay: checked }))}
-                        />
-                        <Label className="text-xs text-charcoal-ink/60">Autoplay</Label>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Switch
-                          checked={videoConfig.muted}
-                          onCheckedChange={(checked) => setVideoConfig((prev) => ({ ...prev, muted: checked }))}
-                        />
-                        <Label className="text-xs text-charcoal-ink/60">Muted</Label>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Switch
-                          checked={videoConfig.showControls}
-                          onCheckedChange={(checked) => setVideoConfig((prev) => ({ ...prev, showControls: checked }))}
-                        />
-                        <Label className="text-xs text-charcoal-ink/60">Controls</Label>
-                      </div>
-                    </div>
-                    <Button
-                      size="sm"
-                      onClick={handleSaveVideoConfig}
-                      disabled={savingVideo || !videoConfig.url}
-                      className="h-7 text-xs mt-1"
-                    >
-                      {savingVideo ? (
-                        <Loader2 className="size-3 animate-spin mr-1.5" />
-                      ) : (
-                        <Save className="size-3 mr-1.5" />
-                      )}
-                      Save Video Settings
-                    </Button>
-                  </div>
-                )}
+
               </CardContent>
             </Card>
           );

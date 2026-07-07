@@ -46,6 +46,7 @@ model WeddingAccount {
   status        String   @default("DRAFT") // DRAFT | ACTIVE | SUSPENDED | ARCHIVED | COMPLETED
   plan          String   @default("FREE")   // FREE | PREMIUM | ENTERPRISE
   heroImageUrl  String?
+  heroVideoUrl  String?
   bannerUrl     String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

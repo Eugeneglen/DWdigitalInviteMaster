@@ -71,6 +71,7 @@ export async function GET(req: Request) {
         venueAddress: wedding.venueAddress,
         googleMapsUrl: wedding.googleMapsUrl,
         heroImageUrl: wedding.heroImageUrl,
+        heroVideoUrl: wedding.heroVideoUrl,
         bannerUrl: wedding.bannerUrl,
       },
       content: contentMap,
