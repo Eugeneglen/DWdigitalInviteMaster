@@ -1,7 +1,32 @@
 import type { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
+import { readFileSync } from 'fs';
+import path from 'path';
 import { db } from '@/lib/db';
+
+// ── Robust secret resolution ────────────────────────────────────────────────
+// Turbopack route handlers sometimes don't receive process.env from .env.
+// This fallback reads the .env file directly to guarantee the secret is available.
+function resolveSecret(): string | undefined {
+  // 1. Try process.env (normal Next.js behavior)
+  if (process.env.NEXTAUTH_SECRET) return process.env.NEXTAUTH_SECRET;
+  if (process.env.JWT_SECRET) return process.env.JWT_SECRET;
+
+  // 2. Fallback: read .env file directly
+  try {
+    const envPath = path.join(process.cwd(), '.env');
+    const content = readFileSync(envPath, 'utf-8');
+    const match = content.match(/^NEXTAUTH_SECRET=(.+)$/m);
+    if (match?.[1]?.trim()) return match[1].trim();
+    const jwtMatch = content.match(/^JWT_SECRET=(.+)$/m);
+    if (jwtMatch?.[1]?.trim()) return jwtMatch[1].trim();
+  } catch {
+    // .env not readable — fail gracefully
+  }
+
+  return undefined;
+}
 
 declare module 'next-auth' {
   interface Session {
@@ -90,5 +115,5 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
-  secret: process.env.NEXTAUTH_SECRET || process.env.JWT_SECRET,
+  secret: resolveSecret(),
 };

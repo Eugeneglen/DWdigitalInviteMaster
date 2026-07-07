@@ -91,15 +91,18 @@ export default function Home() {
   const isCouple = session?.user?.role === 'COUPLE';
 
   // Derive view: URL param takes priority, then manual toggle, then role-based default
-  const urlView = viewParam === 'cms' && isAdmin ? 'cms' as const
-    : viewParam === 'couple' && isCouple ? 'couple' as const
+  // If a specific ?view= is requested, show login modal if the role doesn't match
+  const wantsCMSView = viewParam === 'cms';
+  const wantsCoupleView = viewParam === 'couple';
+  const urlView = wantsCMSView && isAdmin ? 'cms' as const
+    : wantsCoupleView && isCouple ? 'couple' as const
     : null;
   const viewMode = manualView ?? urlView ?? (isAdmin ? 'cms' : isCouple ? 'couple' : 'guest');
 
   // Show login modal when ?view= param requires auth but user isn't authenticated
-  // Modal re-appears if the view param changes after being dismissed
-  const wantsCMS = viewParam === 'cms' || viewParam === 'couple';
-  const autoShowLogin = wantsCMS && dismissedForView !== viewParam && status === 'unauthenticated';
+  // Also show when ?view= doesn't match the user's current role (e.g. admin visiting ?view=couple)
+  const needsAuthForView = (wantsCMSView && !isAdmin) || (wantsCoupleView && !isCouple);
+  const autoShowLogin = needsAuthForView && dismissedForView !== viewParam && status !== 'loading';
   const showLoginModal = loginModalOpen || autoShowLogin;
 
   const handleLoginModalChange = (open: boolean) => {

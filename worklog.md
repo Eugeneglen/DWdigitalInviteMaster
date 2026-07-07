@@ -1128,3 +1128,26 @@ Stage Summary:
 - Fixed by adding stable `NEXTAUTH_SECRET=8QL1GmQ9qiOygQ-JJmPrtUHrJnQocrEaJIJXOPnRVzQ` and `NEXTAUTH_URL=http://localhost:3000` to `.env`
 - Added graceful 401 handling in CoupleCMSLayout (auto sign-out instead of error screen)
 - Files changed: `.env`, `src/components/cms/CoupleCMSLayout.tsx`
+
+---
+Task ID: 2
+Agent: Main Agent
+Task: Fix dashboard 401 and /?view=couple routing
+
+Work Log:
+- VLM analysis: screenshot showed "Error loading dashboard - Failed to load dashboard (401)"
+- Created debug API endpoint, discovered `process.env.NEXTAUTH_SECRET` was UNDEFINED in Turbopack route handlers
+- Root cause: earlier Edit tool call to `.env` appeared to succeed but the file was NOT actually written — NEXTAUTH_SECRET was never saved
+- Used Write tool to properly persist `.env` with NEXTAUTH_SECRET and NEXTAUTH_URL
+- Added `resolveSecret()` function in `auth.ts` that reads `.env` file directly as fallback (bulletproof against Turbopack env var issues)
+- Full `.next` wipe required to clear stale compiled chunks (`.next/cache` alone was insufficient)
+- Fixed `page.tsx` routing: `?view=couple` now shows login modal for non-couple users instead of silently falling back to CMS
+- Fixed `CoupleCMSLayout.tsx` 401 handling: auto sign-out on auth failure
+- Cleaned up debug endpoint
+
+Stage Summary:
+- `.env` now properly contains NEXTAUTH_SECRET (verified with cat)
+- `auth.ts` has dual-layer secret resolution (process.env + .env file fallback)
+- `page.tsx` fixed: `?view=couple` no longer silently redirects admins to CMS
+- Files changed: `.env`, `src/lib/auth.ts`, `src/app/page.tsx`, `src/components/cms/CoupleCMSLayout.tsx`
+- Removed: `src/app/api/debug-session/` (temporary debug)
