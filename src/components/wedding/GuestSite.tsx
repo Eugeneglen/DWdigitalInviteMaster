@@ -23,6 +23,7 @@ const StoryPage = dynamic(() => import('@/components/wedding/pages/StoryPage'), 
 const MomentsPage = dynamic(() => import('@/components/wedding/pages/MomentsPage'), { ssr: false });
 const WishesPage = dynamic(() => import('@/components/wedding/pages/WishesPage'), { ssr: false });
 const QAPage = dynamic(() => import('@/components/wedding/pages/QAPage'), { ssr: false });
+const VideoPage = dynamic(() => import('@/components/wedding/pages/VideoPage'), { ssr: false });
 
 const GUEST_PAGES: Record<Section, React.ComponentType> = {
   home: HomePage,
@@ -33,6 +34,7 @@ const GUEST_PAGES: Record<Section, React.ComponentType> = {
   moments: MomentsPage,
   wishes: WishesPage,
   qa: QAPage,
+  video: VideoPage,
 };
 
 /** Full-page skeleton that mimics the guest site layout while wedding data loads */

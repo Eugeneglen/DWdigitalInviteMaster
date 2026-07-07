@@ -70,7 +70,7 @@ model WeddingFeature {
   id         String          @id @default(cuid())
   weddingId  String
   wedding    WeddingAccount  @relation(fields: [weddingId], references: [id], onDelete: Cascade)
-  featureKey String          // rsvp | wishes | story | gallery | schedule | faq | moments | getting-there | countdown | music
+  featureKey String          // rsvp | wishes | story | gallery | schedule | faq | moments | getting-there | countdown | music | video
   isEnabled  Boolean         @default(false)
   config     String?         // JSON string for feature-specific settings
   createdAt  DateTime        @default(now())

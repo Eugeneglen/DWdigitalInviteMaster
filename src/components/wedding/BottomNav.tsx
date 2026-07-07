@@ -81,6 +81,15 @@ const PAGE_NAV_CONFIG: Record<Section, { items: NavItem[]; showMore: boolean }> 
     ],
     showMore: true,
   },
+  video: {
+    items: [
+      { label: 'Home', section: 'home', icon: 'home' },
+      { label: 'RSVP', section: 'rsvp', icon: 'favorite' },
+      { label: 'Story', section: 'story', icon: 'auto_stories' },
+      { label: 'Video', section: 'video', icon: 'videocam', active: true },
+    ],
+    showMore: true,
+  },
 };
 
 export default function BottomNav() {

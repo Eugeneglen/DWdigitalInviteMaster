@@ -8,7 +8,8 @@ export type Section =
   | 'story'
   | 'wishes'
   | 'qa'
-  | 'moments';
+  | 'moments'
+  | 'video';
 
 interface NavigationState {
   currentSection: Section;

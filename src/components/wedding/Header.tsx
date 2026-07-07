@@ -11,6 +11,7 @@ const NAV_ITEMS: { label: string; section: Section }[] = [
   { label: 'Wishes', section: 'wishes' },
   { label: 'Q&A', section: 'qa' },
   { label: 'Moments', section: 'moments' },
+  { label: 'Video', section: 'video' },
 ];
 
 interface HeaderProps {

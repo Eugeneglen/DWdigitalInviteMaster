@@ -63,7 +63,7 @@ async function seed() {
   // 4. Enable default features for the wedding
   const defaultFeatures = [
     'countdown', 'schedule', 'rsvp', 'story', 'gallery',
-    'wishes', 'getting-there', 'qa', 'moments',
+    'wishes', 'getting-there', 'qa', 'moments', 'music', 'video',
   ];
   for (const key of defaultFeatures) {
     await db.weddingFeature.upsert({
