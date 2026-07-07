@@ -48,10 +48,10 @@ import { useCMSStore, type CMSPage } from '@/store/useCMSStore';
 const NAV_ITEMS: { key: CMSPage; label: string; icon: React.ElementType; tooltip: string }[] = [
   { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, tooltip: 'Dashboard' },
   { key: 'weddings', label: 'Wedding Accounts', icon: Heart, tooltip: 'Wedding Accounts' },
-  { key: 'users', label: 'Users', icon: Users, tooltip: 'Users' },
   { key: 'templates', label: 'Content Templates', icon: FileText, tooltip: 'Content Templates' },
   { key: 'analytics', label: 'Analytics', icon: BarChart3, tooltip: 'Analytics' },
   { key: 'settings', label: 'Settings', icon: Settings, tooltip: 'Settings' },
+  { key: 'users', label: 'Users', icon: Users, tooltip: 'Users' },
 ];
 
 const PAGE_TITLES: Record<CMSPage, string> = {

@@ -340,14 +340,14 @@ export default function MasterUsers() {
 
     try {
       const res = await fetch(
-        `/api/master/users?id=${deletingUser.id}&hard=false&XTransformPort=3000`,
+        `/api/master/users?id=${deletingUser.id}&hard=true&XTransformPort=3000`,
         { method: 'DELETE' }
       );
       if (!res.ok) {
         const data = await res.json().catch(() => null);
         throw new Error(data?.error || 'Delete failed');
       }
-      toast({ title: 'User Deactivated', description: `${deletingUser.name} has been deactivated.` });
+      toast({ title: 'User Deleted', description: `${deletingUser.name} has been permanently removed.` });
       setDeleteOpen(false);
       setDeletingUser(null);
       fetchUsers();
@@ -706,10 +706,10 @@ export default function MasterUsers() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-red-600">
               <AlertTriangle className="h-5 w-5" />
-              Deactivate User
+              Delete User
             </DialogTitle>
             <DialogDescription>
-              Are you sure you want to deactivate this user? They will no longer be able to log in.
+              Are you sure you want to permanently delete this user? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
 
@@ -765,7 +765,7 @@ export default function MasterUsers() {
               variant="destructive"
               onClick={handleDelete}
             >
-              Deactivate User
+              Delete User
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -240,7 +240,20 @@ export async function DELETE(req: NextRequest) {
     }
 
     if (hard) {
-      await db.user.delete({ where: { id } });
+      // Hard delete — remove user and all their data in a transaction
+      await db.$transaction([
+        // Null out ownership of any weddings they own
+        db.weddingAccount.updateMany({ where: { ownerId: id }, data: { ownerId: null } }),
+        // Remove their audit logs
+        db.auditLog.deleteMany({ where: { userId: id } }),
+        // Remove their notifications
+        db.notification.deleteMany({ where: { userId: id } }),
+        // Remove any guest/wish submissions linked to them
+        db.rSVPSubmission.deleteMany({ where: { userId: id } }),
+        db.guestBookSubmission.deleteMany({ where: { userId: id } }),
+        // Finally delete the user
+        db.user.delete({ where: { id } }),
+      ]);
     } else {
       await db.user.update({
         where: { id },
