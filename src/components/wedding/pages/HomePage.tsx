@@ -102,7 +102,7 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-b from-paper-cream/30 via-paper-cream/10 to-paper-cream/60" />
         <div className="relative z-10 text-center px-6">
           <h1 className="font-display-hero text-[44px] md:text-[72px] leading-[1.05] text-charcoal-ink tracking-tight font-bold drop-shadow-sm">
-            {coupleName.replace(/&/g, '&amp;')}
+            {coupleName}
           </h1>
         </div>
       </div>
