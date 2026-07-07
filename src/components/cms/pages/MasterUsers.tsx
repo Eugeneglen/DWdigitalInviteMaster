@@ -10,6 +10,8 @@ import {
   UserCheck,
   Loader2,
   AlertTriangle,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -179,6 +181,7 @@ export default function MasterUsers() {
   const [deletingUser, setDeletingUser] = useState<UserItem | null>(null);
   const [form, setForm] = useState<UserForm>(EMPTY_FORM);
   const [submitting, setSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // ── Fetch users ──────────────────────────────────────────────────────
 
@@ -227,11 +230,13 @@ export default function MasterUsers() {
   function openCreate() {
     setEditingUser(null);
     setForm(EMPTY_FORM);
+    setShowPassword(false);
     setFormOpen(true);
   }
 
   function openEdit(user: UserItem) {
     setEditingUser(user);
+    setShowPassword(false);
     setForm({
       name: user.name,
       email: user.email,
@@ -627,14 +632,26 @@ export default function MasterUsers() {
               <Label htmlFor="user-password">
                 Password {editingUser ? '' : <span className="text-red-500">*</span>}
               </Label>
-              <Input
-                id="user-password"
-                type="password"
-                placeholder={editingUser ? 'Leave blank to keep current' : 'Minimum 8 characters'}
-                value={form.password}
-                onChange={(e) => setField('password', e.target.value)}
-                {...(!editingUser ? { required: true } : {})}
-              />
+              <div className="relative">
+                <Input
+                  id="user-password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder={editingUser ? 'Leave blank to keep current' : 'Minimum 8 characters'}
+                  value={form.password}
+                  onChange={(e) => setField('password', e.target.value)}
+                  className="pr-10"
+                  {...(!editingUser ? { required: true } : {})}
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none"
+                  onClick={() => setShowPassword((v) => !v)}
+                  tabIndex={-1}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
 
             {/* Role */}
