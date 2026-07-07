@@ -48,7 +48,7 @@ export default function Header({ topOffset }: HeaderProps) {
                     ? 'text-cinematic-gold border-cinematic-gold'
                     : 'text-charcoal-ink/40 hover:text-cinematic-gold border-transparent'
                 }`}
-                style={{ fontFamily: "'Inter', sans-serif" }}
+                style={{ fontFamily: "'Playfair Display', serif" }}
               >
                 {item.label}
               </button>
