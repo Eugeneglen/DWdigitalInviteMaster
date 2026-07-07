@@ -47,9 +47,6 @@ const SECTIONS: SectionConfig[] = [
     fields: [
       { key: 'title', label: 'Section Title', type: 'text', placeholder: 'e.g. The Day' },
       { key: 'subtitle', label: 'Section Subtitle', type: 'text', placeholder: 'e.g. A timeline of our celebration' },
-      { key: 'stayTitle', label: 'Where to Stay Title', type: 'text', placeholder: 'e.g. Where to Stay' },
-      { key: 'stayDescription', label: 'Where to Stay Text', type: 'textarea', placeholder: 'Hotel recommendations...' },
-      { key: 'directionsTitle', label: 'Directions Title', type: 'text', placeholder: 'e.g. Getting There' },
     ],
   },
   {

@@ -92,9 +92,6 @@ export default function CoupleSchedule() {
   const CONTENT_KEYS = [
     { key: 'title', label: 'Section Title', placeholder: 'e.g. The Day', type: 'input' as const },
     { key: 'subtitle', label: 'Section Subtitle', placeholder: 'e.g. A timeline of our celebration', type: 'input' as const },
-    { key: 'stayTitle', label: 'Where to Stay Title', placeholder: '', type: 'input' as const },
-    { key: 'stayDescription', label: 'Where to Stay Text', placeholder: '', type: 'textarea' as const },
-    { key: 'directionsTitle', label: 'Directions Title', placeholder: '', type: 'input' as const },
   ];
 
   const fetchSchedules = useCallback(async () => {
