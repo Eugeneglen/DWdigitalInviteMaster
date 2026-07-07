@@ -1329,3 +1329,22 @@ Stage Summary:
 - File changed: `src/components/cms/LoginModal.tsx` (2 className edits)
 - Login modal now has dark charcoal overlay + cream card with gold border/accents
 - All existing DW design language elements (Playfair Display, gold ornamental details) preserved
+
+---
+Task ID: 3
+Agent: Component Agent
+Task: Create FontPicker.tsx and SectionImageUpload.tsx reusable components
+
+Work Log:
+- Read worklog.md to understand project context (DWdigitalInvite → Next.js conversion)
+- Studied existing CoupleImages.tsx for media upload/delete/grid patterns
+- Studied CoupleContent.tsx and content API route for content CRUD patterns
+- Read use-toast hook to understand toast API (uses `toast({ title, description, variant })`)
+- Created FontPicker.tsx: compact font selector using content API with PUT { items: [...] } format, Google Fonts options displayed in their own font family, DW Card styling, loading spinner while saving
+- Created SectionImageUpload.tsx: extracted inline image upload grid from CoupleImages pattern, supports drag-and-drop + click-to-upload, multi-file upload, maxImages enforcement with toast errors, preview dialog, delete with confirm, responsive grid layout
+
+Stage Summary:
+- FontPicker.tsx: Fetches current font on mount via GET /api/cms/content?section={section}, saves via PUT with items array, 9 Google Fonts options, each displayed in its own font, DW-styled Card with cinematic-gold accents
+- SectionImageUpload.tsx: Fetches images by category, grid with add-card showing remaining slots, drag-and-drop + click upload, multi-file support, delete with confirm, preview dialog, toast for all feedback, consistent DW styling
+- Both components use 'use client', export as default, use toast from @/hooks/use-toast (NOT sonner)
+- Lint passes with 0 errors (1 pre-existing warning)

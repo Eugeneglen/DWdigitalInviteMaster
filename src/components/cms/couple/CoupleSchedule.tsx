@@ -2,7 +2,9 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { Loader2, Plus, Pencil, Trash2, Clock, MapPin, CalendarRange } from 'lucide-react';
-import { toast } from 'sonner';
+import FontPicker from './FontPicker';
+import SectionImageUpload from './SectionImageUpload';
+import { toast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -82,6 +84,20 @@ export default function CoupleSchedule() {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
 
+  // Content editor state
+  const [contentFields, setContentFields] = useState<Record<string, string>>({});
+  const [originalFields, setOriginalFields] = useState<Record<string, string>>({});
+  const [editedFields, setEditedFields] = useState<Record<string, boolean>>({});
+  const [savingContent, setSavingContent] = useState(false);
+
+  const CONTENT_KEYS = [
+    { key: 'title', label: 'Section Title', placeholder: 'e.g. The Day', type: 'input' as const },
+    { key: 'subtitle', label: 'Section Subtitle', placeholder: 'e.g. A timeline of our celebration', type: 'input' as const },
+    { key: 'stayTitle', label: 'Where to Stay Title', placeholder: '', type: 'input' as const },
+    { key: 'stayDescription', label: 'Where to Stay Text', placeholder: '', type: 'textarea' as const },
+    { key: 'directionsTitle', label: 'Directions Title', placeholder: '', type: 'input' as const },
+  ];
+
   const fetchSchedules = useCallback(async () => {
     try {
       setLoading(true);
@@ -90,15 +106,34 @@ export default function CoupleSchedule() {
       const data = await res.json();
       setSchedules(data.schedules ?? []);
     } catch {
-      toast.error('Failed to load event schedule');
+      toast({ title: 'Error', description: 'Failed to load event schedule', variant: 'destructive' });
     } finally {
       setLoading(false);
     }
   }, []);
 
+  const fetchContent = useCallback(async () => {
+    try {
+      const res = await fetch('/api/cms/content?XTransformPort=3000');
+      if (!res.ok) throw new Error('Failed to load content');
+      const data = await res.json();
+      const items = (data.items ?? []).filter((i: { section: string }) => i.section === 'schedule');
+      const fields: Record<string, string> = {};
+      items.forEach((item: { fieldKey: string; fieldValue: string }) => {
+        fields[item.fieldKey] = item.fieldValue;
+      });
+      setContentFields(fields);
+      setOriginalFields({ ...fields });
+      setEditedFields({});
+    } catch {
+      // silently fail for content
+    }
+  }, []);
+
   useEffect(() => {
     fetchSchedules();
-  }, [fetchSchedules]);
+    fetchContent();
+  }, [fetchSchedules, fetchContent]);
 
   const openAddDialog = () => {
     setEditingId(null);
@@ -121,15 +156,15 @@ export default function CoupleSchedule() {
 
   const handleSave = async () => {
     if (!form.title.trim()) {
-      toast.error('Event title is required');
+      toast({ title: 'Error', description: 'Event title is required', variant: 'destructive' });
       return;
     }
     if (!form.eventType) {
-      toast.error('Please select an event type');
+      toast({ title: 'Error', description: 'Please select an event type', variant: 'destructive' });
       return;
     }
     if (!form.startTime) {
-      toast.error('Start time is required');
+      toast({ title: 'Error', description: 'Start time is required', variant: 'destructive' });
       return;
     }
 
@@ -164,13 +199,51 @@ export default function CoupleSchedule() {
         throw new Error(err.error || 'Failed to save event');
       }
 
-      toast.success(editingId ? 'Event updated successfully' : 'Event added successfully');
+      toast({ title: 'Success', description: editingId ? 'Event updated successfully' : 'Event added successfully' });
       setDialogOpen(false);
       fetchSchedules();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to save event');
+      toast({ title: 'Error', description: err instanceof Error ? err.message : 'Failed to save event', variant: 'destructive' });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleContentChange = (key: string, value: string) => {
+    setContentFields((prev) => ({ ...prev, [key]: value }));
+    setEditedFields((prev) => ({
+      ...prev,
+      [key]: value !== originalFields[key],
+    }));
+  };
+
+  const handleSaveContent = async () => {
+    try {
+      setSavingContent(true);
+      const items = Object.keys(editedFields)
+        .filter((k) => editedFields[k])
+        .map((fieldKey) => ({
+          section: 'schedule' as const,
+          fieldKey,
+          fieldValue: contentFields[fieldKey],
+        }));
+      if (items.length === 0) {
+        toast({ title: 'Info', description: 'No changes to save' });
+        return;
+      }
+      const res = await fetch('/api/cms/content?XTransformPort=3000', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items }),
+      });
+      if (!res.ok) throw new Error('Failed to save content');
+      toast({ title: 'Success', description: 'Content saved successfully' });
+      setOriginalFields({ ...contentFields });
+      setEditedFields({});
+    } catch {
+      toast({ title: 'Error', description: 'Failed to save content', variant: 'destructive' });
+    } finally {
+      setSavingContent(false);
     }
   };
 
@@ -188,10 +261,10 @@ export default function CoupleSchedule() {
         throw new Error(err.error || 'Failed to delete event');
       }
 
-      toast.success('Event deleted');
+      toast({ title: 'Success', description: 'Event deleted' });
       fetchSchedules();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to delete event');
+      toast({ title: 'Error', description: err instanceof Error ? err.message : 'Failed to delete event', variant: 'destructive' });
     } finally {
       setDeleting(null);
     }
@@ -219,14 +292,68 @@ export default function CoupleSchedule() {
             Manage the events for your wedding day.
           </p>
         </div>
-        <Button
-          onClick={openAddDialog}
-          className="bg-cinematic-gold text-charcoal-ink hover:bg-cinematic-gold/90 rounded px-4 py-2 text-[13px] font-medium uppercase tracking-[0.08em] transition-colors duration-300 shrink-0"
-        >
-          <Plus className="size-4 mr-1.5" />
-          Add Event
-        </Button>
+        <div className="flex items-center gap-2 shrink-0">
+          {Object.values(editedFields).some(Boolean) && (
+            <Button
+              onClick={handleSaveContent}
+              disabled={savingContent}
+              className="bg-cinematic-gold text-charcoal-ink hover:bg-cinematic-gold/90 rounded px-4 py-2 text-[13px] font-medium uppercase tracking-[0.08em] transition-colors duration-300"
+            >
+              {savingContent ? 'Saving…' : 'Save Content'}
+            </Button>
+          )}
+          <Button
+            onClick={openAddDialog}
+            className="bg-cinematic-gold text-charcoal-ink hover:bg-cinematic-gold/90 rounded px-4 py-2 text-[13px] font-medium uppercase tracking-[0.08em] transition-colors duration-300"
+          >
+            <Plus className="size-4 mr-1.5" />
+            Add Event
+          </Button>
+        </div>
       </div>
+
+      <SectionImageUpload category="schedule" label="Schedule Images" maxImages={3} />
+      <Separator className="bg-champagne-silk" />
+
+      <FontPicker section="schedule" />
+      <Separator className="bg-champagne-silk" />
+
+      {/* Content Card */}
+      <Card className="border-charcoal-ink/5 shadow-none">
+        <CardContent className="p-6">
+          <h3 className="text-sm font-semibold text-charcoal-ink mb-4">Schedule Content</h3>
+          <div className="space-y-4">
+            {CONTENT_KEYS.map(({ key, label, placeholder, type }) => (
+              <div key={key} className="space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <Label className="text-xs font-medium text-charcoal-ink/50 uppercase tracking-wider">
+                    {label}
+                  </Label>
+                  {editedFields[key] && (
+                    <span className="bg-cinematic-gold w-1.5 h-1.5 rounded-full" />
+                  )}
+                </div>
+                {type === 'textarea' ? (
+                  <Textarea
+                    value={contentFields[key] ?? ''}
+                    onChange={(e) => handleContentChange(key, e.target.value)}
+                    placeholder={placeholder}
+                    rows={3}
+                    className="border-charcoal-ink/10 focus:border-cinematic-gold focus:ring-cinematic-gold/20 resize-none"
+                  />
+                ) : (
+                  <Input
+                    value={contentFields[key] ?? ''}
+                    onChange={(e) => handleContentChange(key, e.target.value)}
+                    placeholder={placeholder}
+                    className="border-charcoal-ink/10 focus:border-cinematic-gold focus:ring-cinematic-gold/20"
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       <Separator className="bg-champagne-silk" />
 

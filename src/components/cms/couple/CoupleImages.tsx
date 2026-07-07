@@ -68,7 +68,7 @@ function formatFileSize(bytes: number | null): string {
 
 /** ─── Hero Visual Section (image OR video) ──────────────────────────── */
 
-function HeroVisualSection({ weddingData }: { weddingData: Record<string, unknown> | null }) {
+export function HeroVisualSection({ weddingData }: { weddingData: Record<string, unknown> | null }) {
   const { setWeddingData } = useCoupleCMSStore();
   const heroImageUrl = (weddingData?.heroImageUrl as string) || null;
   const heroVideoUrl = (weddingData?.heroVideoUrl as string) || null;
@@ -265,7 +265,7 @@ function HeroVisualSection({ weddingData }: { weddingData: Record<string, unknow
 
 /** ─── Banner Section (image only) ───────────────────────────────────── */
 
-function BannerSection({ weddingData }: { weddingData: Record<string, unknown> | null }) {
+export function BannerSection({ weddingData }: { weddingData: Record<string, unknown> | null }) {
   const { setWeddingData } = useCoupleCMSStore();
   const bannerUrl = (weddingData?.bannerUrl as string) || null;
   const [saving, setSaving] = useState(false);

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { Loader2, Plus, Pencil, Trash2, HelpCircle, Eye, EyeOff } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
+import FontPicker from './FontPicker';
 import { Separator } from '@/components/ui/separator';
 import {
   Dialog,
@@ -59,7 +60,7 @@ export default function CoupleFAQs() {
       const data = await res.json();
       setFaqs(data.faqs ?? []);
     } catch {
-      toast.error('Failed to load FAQs');
+      toast({ title: 'Error', description: 'Failed to load FAQs', variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -87,11 +88,11 @@ export default function CoupleFAQs() {
 
   const handleSave = async () => {
     if (!form.question.trim()) {
-      toast.error('Question is required');
+      toast({ title: 'Error', description: 'Question is required', variant: 'destructive' });
       return;
     }
     if (!form.answer.trim()) {
-      toast.error('Answer is required');
+      toast({ title: 'Error', description: 'Answer is required', variant: 'destructive' });
       return;
     }
 
@@ -123,11 +124,11 @@ export default function CoupleFAQs() {
         throw new Error(err.error || 'Failed to save FAQ');
       }
 
-      toast.success(editingId ? 'FAQ updated successfully' : 'FAQ added successfully');
+      toast({ title: 'Success', description: editingId ? 'FAQ updated successfully' : 'FAQ added successfully' });
       setDialogOpen(false);
       fetchFAQs();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to save FAQ');
+      toast({ title: 'Error', description: err instanceof Error ? err.message : 'Failed to save FAQ', variant: 'destructive' });
     } finally {
       setSaving(false);
     }
@@ -147,10 +148,10 @@ export default function CoupleFAQs() {
         throw new Error(err.error || 'Failed to delete FAQ');
       }
 
-      toast.success('FAQ deleted');
+      toast({ title: 'Success', description: 'FAQ deleted' });
       fetchFAQs();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to delete FAQ');
+      toast({ title: 'Error', description: err instanceof Error ? err.message : 'Failed to delete FAQ', variant: 'destructive' });
     } finally {
       setDeleting(null);
     }
@@ -179,13 +180,13 @@ export default function CoupleFAQs() {
         throw new Error('Failed to update FAQ status');
       }
 
-      toast.success(newActive ? 'FAQ activated' : 'FAQ deactivated');
+      toast({ title: 'Success', description: newActive ? 'FAQ activated' : 'FAQ deactivated' });
     } catch {
       // Revert optimistic update
       setFaqs((prev) =>
         prev.map((f) => (f.id === item.id ? { ...f, active: item.active } : f))
       );
-      toast.error('Failed to update FAQ status');
+      toast({ title: 'Error', description: 'Failed to update FAQ status', variant: 'destructive' });
     }
   };
 
@@ -217,6 +218,7 @@ export default function CoupleFAQs() {
         </Button>
       </div>
 
+      <FontPicker section="qa" />
       <Separator className="bg-champagne-silk" />
 
       {/* FAQ List */}

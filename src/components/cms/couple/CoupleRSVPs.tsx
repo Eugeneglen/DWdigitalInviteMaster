@@ -2,11 +2,12 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { Loader2, Mail, Search, CheckCircle, XCircle, MinusCircle, Users, Heart, Download } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import FontPicker from './FontPicker';
 import { Separator } from '@/components/ui/separator';
 import {
   Select,
@@ -125,9 +126,9 @@ export default function CoupleRSVPs() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      toast.success('Export downloaded');
+      toast({ title: 'Success', description: 'Export downloaded' });
     } catch {
-      toast.error('Export failed');
+      toast({ title: 'Error', description: 'Export failed', variant: 'destructive' });
     } finally {
       setExporting(false);
     }
@@ -163,6 +164,7 @@ export default function CoupleRSVPs() {
         </Button>
       </div>
 
+      <FontPicker section="rsvp" />
       <Separator className="bg-champagne-silk" />
 
       {/* Summary Cards */}

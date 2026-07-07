@@ -2,11 +2,12 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { Loader2, Trash2, MessageSquareHeart, Search, Heart, User, Download } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import FontPicker from './FontPicker';
 import { Separator } from '@/components/ui/separator';
 
 const API_BASE = '/api/cms/wishes?XTransformPort=3000';
@@ -70,9 +71,9 @@ export default function CoupleWishes() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      toast.success('Export downloaded');
+      toast({ title: 'Success', description: 'Export downloaded' });
     } catch {
-      toast.error('Export failed');
+      toast({ title: 'Error', description: 'Export failed', variant: 'destructive' });
     } finally {
       setExporting(false);
     }
@@ -90,7 +91,7 @@ export default function CoupleWishes() {
       setWishes(data.wishes ?? []);
       setTotal(data.total ?? 0);
     } catch {
-      toast.error('Failed to load wishes');
+      toast({ title: 'Error', description: 'Failed to load wishes', variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -114,10 +115,10 @@ export default function CoupleWishes() {
         throw new Error(err.error || 'Failed to delete wish');
       }
 
-      toast.success('Wish deleted');
+      toast({ title: 'Success', description: 'Wish deleted' });
       fetchWishes();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to delete wish');
+      toast({ title: 'Error', description: err instanceof Error ? err.message : 'Failed to delete wish', variant: 'destructive' });
     } finally {
       setDeleting(null);
     }
@@ -164,6 +165,7 @@ export default function CoupleWishes() {
         </Button>
       </div>
 
+      <FontPicker section="wishes" />
       <Separator className="bg-champagne-silk" />
 
       {/* Summary */}
