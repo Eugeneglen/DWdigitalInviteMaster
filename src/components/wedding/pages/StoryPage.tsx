@@ -105,7 +105,7 @@ export default function StoryPage() {
 
   return (
     <>
-      <SectionBanner title="Our Story" />
+      <SectionBanner title={getField('story', 'title', 'Our Story')} />
 
       <main ref={mainRef} className="pb-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto min-h-screen pt-[20px] md:pt-[40px]">
         {/* Hero Section */}

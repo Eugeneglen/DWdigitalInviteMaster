@@ -25,20 +25,20 @@ interface FAQItem {
   id: string;
   question: string;
   answer: string;
-  active: boolean;
+  isActive: boolean;
   sortOrder: number;
 }
 
 interface FormData {
   question: string;
   answer: string;
-  active: boolean;
+  isActive: boolean;
 }
 
 const emptyForm: FormData = {
   question: '',
   answer: '',
-  active: true,
+  isActive: true,
 };
 
 export default function CoupleFAQs() {
@@ -79,7 +79,7 @@ export default function CoupleFAQs() {
     setForm({
       question: item.question,
       answer: item.answer,
-      active: item.active,
+      isActive: item.isActive,
     });
     setDialogOpen(true);
   };
@@ -99,7 +99,7 @@ export default function CoupleFAQs() {
       const payload = {
         question: form.question.trim(),
         answer: form.answer.trim(),
-        active: form.active,
+        isActive: form.isActive,
       };
 
       let res: Response;
@@ -156,10 +156,10 @@ export default function CoupleFAQs() {
   };
 
   const handleToggleActive = async (item: FAQItem) => {
-    const newActive = !item.active;
+    const newActive = !item.isActive;
     // Optimistic update
     setFaqs((prev) =>
-      prev.map((f) => (f.id === item.id ? { ...f, active: newActive } : f))
+      prev.map((f) => (f.id === item.id ? { ...f, isActive: newActive } : f))
     );
 
     try {
@@ -170,7 +170,7 @@ export default function CoupleFAQs() {
           id: item.id,
           question: item.question,
           answer: item.answer,
-          active: newActive,
+          isActive: newActive,
         }),
       });
 
@@ -182,7 +182,7 @@ export default function CoupleFAQs() {
     } catch {
       // Revert optimistic update
       setFaqs((prev) =>
-        prev.map((f) => (f.id === item.id ? { ...f, active: item.active } : f))
+        prev.map((f) => (f.id === item.id ? { ...f, isActive: item.isActive } : f))
       );
       toast({ title: 'Error', description: 'Failed to update FAQ status', variant: 'destructive' });
     }
@@ -231,7 +231,7 @@ export default function CoupleFAQs() {
             <Card
               key={item.id}
               className={`border-charcoal-ink/5 shadow-none hover:border-champagne-silk transition-colors duration-200 ${
-                !item.active ? 'opacity-60' : ''
+                !item.isActive ? 'opacity-60' : ''
               }`}
             >
               <CardContent className="p-4">
@@ -241,7 +241,7 @@ export default function CoupleFAQs() {
                       <h3 className="text-sm font-semibold text-charcoal-ink">
                         {item.question}
                       </h3>
-                      {!item.active && (
+                      {!item.isActive && (
                         <Badge
                           variant="outline"
                           className="text-[10px] font-medium border-charcoal-ink/10 text-charcoal-ink/40"
@@ -260,13 +260,13 @@ export default function CoupleFAQs() {
                       size="sm"
                       onClick={() => handleToggleActive(item)}
                       className={`h-8 w-8 p-0 ${
-                        item.active
+                        item.isActive
                           ? 'text-cinematic-gold hover:bg-cinematic-gold/5'
                           : 'text-charcoal-ink/30 hover:text-cinematic-gold hover:bg-cinematic-gold/5'
                       }`}
-                      title={item.active ? 'Deactivate FAQ' : 'Activate FAQ'}
+                      title={item.isActive ? 'Deactivate FAQ' : 'Activate FAQ'}
                     >
-                      {item.active ? (
+                      {item.isActive ? (
                         <Eye className="size-3.5" />
                       ) : (
                         <EyeOff className="size-3.5" />
@@ -351,8 +351,8 @@ export default function CoupleFAQs() {
                 </p>
               </div>
               <Switch
-                checked={form.active}
-                onCheckedChange={(checked) => setForm({ ...form, active: checked })}
+                checked={form.isActive}
+                onCheckedChange={(checked) => setForm({ ...form, isActive: checked })}
               />
             </div>
           </div>

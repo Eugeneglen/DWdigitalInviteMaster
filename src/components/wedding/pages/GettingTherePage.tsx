@@ -12,14 +12,15 @@ export default function GettingTherePage() {
   const [tab, setTab] = useState<'car' | 'transit'>('transit');
   const { data, getField } = usePublicWedding();
 
-  const subtitle = data?.wedding.venue
-    ? `${data.wedding.venue}, Orchard`
-    : FALLBACK_VENUE;
+  const subtitle = getField('getting-there', 'subtitle') || (data?.wedding.venue ? `${data.wedding.venue}, Orchard` : FALLBACK_VENUE);
   const venueName = data?.wedding.venue || FALLBACK_VENUE_SHORT;
   const venueAddress = data?.wedding.venueAddress || FALLBACK_ADDRESS;
 
   const carContent = getField('getting-there', 'carContent', '');
   const transitContent = getField('getting-there', 'transitContent', '');
+  const carTitle = getField('getting-there', 'carTitle', 'BY CAR');
+  const transitTitle = getField('getting-there', 'transitTitle', 'PUBLIC TRANSIT');
+  const parkingNote = getField('getting-there', 'parkingNote', '');
 
   const googleMapsUrl = data?.wedding.googleMapsUrl;
   const mapsEmbedUrl = googleMapsUrl
@@ -31,7 +32,7 @@ export default function GettingTherePage() {
 
   return (
     <>
-      <SectionBanner title="Getting There" subtitle={subtitle} />
+      <SectionBanner title={getField('getting-there', 'title', 'Getting There')} subtitle={subtitle} />
 
       <main className="pb-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto min-h-screen pt-[20px] md:pt-[40px] flex flex-col gap-8">
         {/* Address */}
@@ -64,7 +65,7 @@ export default function GettingTherePage() {
               style={{ fontSize: '12px', lineHeight: '16px', letterSpacing: '0.1em', fontWeight: tab === 'car' ? 600 : 500, textTransform: 'uppercase' }}
               onClick={() => setTab('car')}
             >
-              BY CAR
+              {carTitle}
             </button>
             <button
               className={`flex-1 pb-4 font-medium transition-colors duration-300 ${
@@ -75,7 +76,7 @@ export default function GettingTherePage() {
               style={{ fontSize: '12px', lineHeight: '16px', letterSpacing: '0.1em', fontWeight: tab === 'transit' ? 600 : 500, textTransform: 'uppercase' }}
               onClick={() => setTab('transit')}
             >
-              PUBLIC TRANSIT
+              {transitTitle}
             </button>
           </div>
         </section>
@@ -121,6 +122,11 @@ export default function GettingTherePage() {
                   </div>
                 </>
               )}
+            {parkingNote && (
+                  <div className="border-t border-champagne-silk/30 pt-4 space-y-2">
+                    <p className="text-sm text-charcoal-ink/60 leading-relaxed">{parkingNote}</p>
+                  </div>
+                )}
             </div>
           </section>
         )}

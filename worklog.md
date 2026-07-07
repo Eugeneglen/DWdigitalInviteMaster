@@ -1348,3 +1348,27 @@ Stage Summary:
 - SectionImageUpload.tsx: Fetches images by category, grid with add-card showing remaining slots, drag-and-drop + click upload, multi-file support, delete with confirm, preview dialog, toast for all feedback, consistent DW styling
 - Both components use 'use client', export as default, use toast from @/hooks/use-toast (NOT sonner)
 - Lint passes with 0 errors (1 pre-existing warning)
+---
+Task ID: audit-fix
+Agent: Main Agent
+Task: Full audit of CMS→backend→frontend data flow; fix all broken links
+
+Work Log:
+- Ran 3 parallel audit agents covering Home, Schedule/RSVP/GettingThere, and Story/Wishes/FAQ/Moments
+- Found 12 broken links across the codebase
+- Fixed FAQ `active` → `isActive` field name mismatch (CMS toggle/edit completely broken)
+- Fixed MomentsPage reading `mediaByCategory.gallery` → `moments` (images never displayed)
+- Applied CMS font family to GuestSite root via inline style (`fontFamily: '${fontFamily}', serif`)
+- Applied CMS background color via inline style on root div (removed hardcoded `bg-paper-cream` class)
+- Removed hardcoded `bg-paper-cream` from HomePage Tea Ceremony and Narrative sections
+- Wired hero CMS fields to HomePage: `title` (banner heading), `subtitle` (shown below name), `dateDisplay` (date badge), `countdownDate` (countdown target), `description` (hero text)
+- Wired Getting There CMS fields: `title`, `subtitle`, `carTitle`, `transitTitle`, `parkingNote` all now read by guest page
+- Added missing `venueDescription` field to Getting There CMS editor
+- Wired schedule CMS images (category `schedule`) to SchedulePage guest display (fallback to hardcoded URLs)
+- Fixed SchedulePage `venueDescription` dead read to use `getField('getting-there', 'venueDescription')`
+- Wired Story section title from CMS: `getField('story', 'title', 'Our Story')`
+
+Stage Summary:
+- 12 broken links identified, 11 fixed (1 remaining: home/story images — CMS uploads exist but guest pages don't have a clear gallery section for them, deferred as design decision)
+- Lint: 0 errors, 1 expected warning
+- All CMS content fields now flow through: CMS editor → content API → public API → guest page

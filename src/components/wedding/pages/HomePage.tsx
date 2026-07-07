@@ -64,17 +64,19 @@ function parseWeddingTimestamp(dateStr: string | null | undefined): number {
 }
 
 export default function HomePage() {
-  const { data } = usePublicWedding();
+  const { data, getField } = usePublicWedding();
 
   const bannerUrl = data?.wedding.bannerUrl || FALLBACK_BANNER_BG;
   const heroImgUrl = data?.wedding.heroImageUrl || FALLBACK_HERO_IMG;
   const heroVideoUrl = data?.wedding.heroVideoUrl || null;
-  const coupleName = data?.wedding.coupleName || FALLBACK_COUPLE_NAME;
-  const dateText = formatDate(data?.wedding.weddingDate);
-  const weddingTimestamp = parseWeddingTimestamp(data?.wedding.weddingDate);
-  const heroDescription = data
-    ? (data.content['hero']?.['description'] || FALLBACK_HERO_DESCRIPTION)
-    : FALLBACK_HERO_DESCRIPTION;
+  const coupleName = getField('hero', 'title') || data?.wedding.coupleName || FALLBACK_COUPLE_NAME;
+  const heroSubtitle = getField('hero', 'subtitle', '');
+  const dateText = getField('hero', 'dateDisplay') || formatDate(data?.wedding.weddingDate);
+  const countdownDateStr = getField('hero', 'countdownDate');
+  const weddingTimestamp = countdownDateStr
+    ? parseWeddingTimestamp(countdownDateStr)
+    : parseWeddingTimestamp(data?.wedding.weddingDate);
+  const heroDescription = getField('hero', 'description', FALLBACK_HERO_DESCRIPTION);
 
   const countdown = useCountdown(weddingTimestamp);
   const { setSection } = useNavigationStore();
@@ -103,6 +105,11 @@ export default function HomePage() {
           <h1 className="font-display-hero text-[44px] md:text-[72px] leading-[1.05] text-charcoal-ink tracking-tight font-bold drop-shadow-sm">
             {coupleName}
           </h1>
+          {heroSubtitle && (
+            <p className="mt-2 text-sm md:text-base text-charcoal-ink/70 italic tracking-wide">
+              {heroSubtitle}
+            </p>
+          )}
         </div>
       </div>
 
@@ -191,7 +198,7 @@ export default function HomePage() {
         </section>
 
         {/* ===== TEA CEREMONY SECTION ===== */}
-        <section className="py-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto bg-paper-cream">
+        <section className="py-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto">
           <div className="max-w-4xl mx-auto flex flex-col items-center">
             <div className="relative w-full aspect-[2/3] md:aspect-auto md:h-[800px] overflow-hidden rounded-lg shadow-xl mb-8 group">
               <img
@@ -208,7 +215,7 @@ export default function HomePage() {
         </section>
 
         {/* ===== NARRATIVE SECTION ===== */}
-        <section className="py-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto bg-paper-cream">
+        <section className="py-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto">
           <div className="max-w-3xl mx-auto text-center space-y-8">
             <span className="font-label-sm text-label-sm leading-label-sm text-cinematic-gold tracking-[0.2em] uppercase block font-semibold">The Prelude</span>
             <h3 className="font-display-hero text-headline-lg-mobile leading-headline-lg-mobile md:text-headline-lg md:leading-headline-lg font-semibold text-charcoal-ink">Our Story Begins Here</h3>

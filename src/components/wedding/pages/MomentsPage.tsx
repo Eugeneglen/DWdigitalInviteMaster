@@ -66,8 +66,8 @@ export default function MomentsPage() {
 
   const subtitle = getField('moments', 'subtitle', FALLBACK_SUBTITLE);
 
-  const galleryMedia = (data?.mediaByCategory?.gallery && data.mediaByCategory.gallery.length > 0)
-    ? data.mediaByCategory.gallery
+  const galleryMedia = (data?.mediaByCategory?.moments && data.mediaByCategory.moments.length > 0)
+    ? data.mediaByCategory.moments
     : null;
 
   const photos = galleryMedia

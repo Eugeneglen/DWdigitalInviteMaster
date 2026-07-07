@@ -105,6 +105,9 @@ export default function GuestSite({ slug, topOffset, showEditorButton = false }:
   // Read the custom background colour (default: DW paper-cream)
   const backgroundColor = getField('global', 'backgroundColor', '#FCF9F2');
 
+  // Read the custom font family (default: Playfair Display)
+  const fontFamily = getField('hero', 'fontFamily', 'Playfair Display');
+
   // Compute filtered tabs from global config + wedding feature flags
   // and push into the navigation store for Header/MobileDrawer/BottomNav
   const prevFilteredRef = useRef<string>('');
@@ -129,7 +132,7 @@ export default function GuestSite({ slug, topOffset, showEditorButton = false }:
   const GuestPageComponent = GUEST_PAGES[currentSection] || HomePage;
 
   return (
-    <div className="min-h-screen flex flex-col bg-paper-cream text-charcoal-ink overflow-x-hidden selection:bg-cinematic-gold selection:text-paper-cream" style={{ '--wedding-bg': backgroundColor } as React.CSSProperties}>
+    <div className="min-h-screen flex flex-col text-charcoal-ink overflow-x-hidden selection:bg-cinematic-gold selection:text-paper-cream" style={{ backgroundColor, fontFamily: `'${fontFamily}', serif`, '--wedding-bg': backgroundColor } as React.CSSProperties}>
       <GoldDust />
       <Header topOffset={topOffset} />
       <MobileDrawer />

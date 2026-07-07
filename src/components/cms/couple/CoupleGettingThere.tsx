@@ -29,6 +29,7 @@ const FIELDS = [
   { key: 'transitTitle', label: 'Public Transit Title', type: 'text' as const, placeholder: 'e.g. Public Transit' },
   { key: 'transitContent', label: 'Public Transit Directions', type: 'textarea' as const, placeholder: 'MRT/bus directions...' },
   { key: 'parkingNote', label: 'Parking Note', type: 'textarea' as const, placeholder: 'Parking availability and rates...' },
+  { key: 'venueDescription', label: 'Venue Description', type: 'textarea' as const, placeholder: 'A short description of the wedding venue...' },
 ];
 
 export default function CoupleGettingThere() {

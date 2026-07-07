@@ -120,6 +120,11 @@ export default function SchedulePage() {
   const coupleName = data?.wedding.coupleName || FALLBACK_COUPLE_NAME;
 
   const schedules = (data?.schedules && data.schedules.length > 0) ? data.schedules : FALLBACK_SCHEDULE_ITEMS;
+  const scheduleImages = data?.mediaByCategory?.schedule ?? [];
+
+  // Use CMS images if available, otherwise fallback to hardcoded
+  const ceremonyImg = scheduleImages[0]?.url || CEREMONY_IMG;
+  const celebrationImg = scheduleImages[1]?.url || CELEBRATION_IMG;
 
   const handleAddToCalendar = useCallback(() => {
     const calendarDates = getCalendarDateStr(data?.wedding.weddingDate);
@@ -151,10 +156,10 @@ export default function SchedulePage() {
         {/* Intro Images */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16 stagger-1">
           <div className="aspect-[4/5] overflow-hidden rounded-lg">
-            <img alt="The Ceremony" className="w-full h-full object-cover" src={CEREMONY_IMG} />
+            <img alt="The Ceremony" className="w-full h-full object-cover" src={ceremonyImg} />
           </div>
           <div className="aspect-[4/5] overflow-hidden rounded-lg">
-            <img alt="The Celebration" className="w-full h-full object-cover" src={CELEBRATION_IMG} />
+            <img alt="The Celebration" className="w-full h-full object-cover" src={celebrationImg} />
           </div>
         </div>
 
@@ -232,9 +237,7 @@ export default function SchedulePage() {
             <span className="text-label-sm leading-label-sm text-cinematic-gold tracking-[0.2em] uppercase font-semibold">Wedding Venue</span>
             <h3 className="font-display-hero text-headline-lg-mobile leading-headline-lg-mobile md:text-headline-md md:leading-headline-md font-semibold text-charcoal-ink">{venueName}</h3>
             <p className="text-body-md leading-body-md text-charcoal-ink/70 leading-relaxed">
-              {data?.wedding.venue
-                ? (data.content['getting-there']?.['venueDescription'] || FALLBACK_VENUE_DESCRIPTION)
-                : FALLBACK_VENUE_DESCRIPTION}
+              {getField('getting-there', 'venueDescription', FALLBACK_VENUE_DESCRIPTION)}
             </p>
           </div>
         </section>
