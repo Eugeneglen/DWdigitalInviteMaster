@@ -10,8 +10,6 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
-import FontPicker from './FontPicker';
-import { Separator } from '@/components/ui/separator';
 import {
   Dialog,
   DialogContent,
@@ -217,9 +215,6 @@ export default function CoupleFAQs() {
           Add Question
         </Button>
       </div>
-
-      <FontPicker section="qa" />
-      <Separator className="bg-champagne-silk" />
 
       {/* FAQ List */}
       {faqs.length === 0 ? (

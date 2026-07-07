@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { Loader2, Plus, Pencil, Trash2, BookOpen, ImageIcon, Calendar } from 'lucide-react';
-import FontPicker from './FontPicker';
 import SectionImageUpload from './SectionImageUpload';
 import { toast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
@@ -261,11 +260,6 @@ export default function CoupleStory() {
       </div>
 
       <SectionImageUpload category="story" label="Story Images" maxImages={3} />
-      <Separator className="bg-champagne-silk" />
-
-      <FontPicker section="story" />
-      <Separator className="bg-champagne-silk" />
-
       {/* Content Card */}
       <Card className="border-charcoal-ink/5 shadow-none">
         <CardContent className="p-6">

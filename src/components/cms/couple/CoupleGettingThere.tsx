@@ -8,8 +8,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Separator } from '@/components/ui/separator';
-import FontPicker from './FontPicker';
 
 const API_BASE = '/api/cms/content?XTransformPort=3000';
 
@@ -172,13 +170,6 @@ export default function CoupleGettingThere() {
           )}
         </Button>
       </div>
-
-      <Separator className="bg-champagne-silk" />
-
-      {/* Font Picker */}
-      <FontPicker section="getting-there" />
-
-      <Separator className="bg-champagne-silk" />
 
       {/* Content Fields */}
       <Card className="border-charcoal-ink/5 shadow-none">

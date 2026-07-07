@@ -7,8 +7,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import FontPicker from './FontPicker';
-import { Separator } from '@/components/ui/separator';
 import {
   Select,
   SelectContent,
@@ -163,9 +161,6 @@ export default function CoupleRSVPs() {
           Export CSV
         </Button>
       </div>
-
-      <FontPicker section="rsvp" />
-      <Separator className="bg-champagne-silk" />
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">

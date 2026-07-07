@@ -7,7 +7,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import FontPicker from './FontPicker';
 import { Separator } from '@/components/ui/separator';
 
 const API_BASE = '/api/cms/wishes?XTransformPort=3000';
@@ -164,9 +163,6 @@ export default function CoupleWishes() {
           Export CSV
         </Button>
       </div>
-
-      <FontPicker section="wishes" />
-      <Separator className="bg-champagne-silk" />
 
       {/* Summary */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">

@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { Loader2, Plus, Pencil, Trash2, Clock, MapPin, CalendarRange } from 'lucide-react';
-import FontPicker from './FontPicker';
 import SectionImageUpload from './SectionImageUpload';
 import { toast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
@@ -313,11 +312,6 @@ export default function CoupleSchedule() {
       </div>
 
       <SectionImageUpload category="schedule" label="Schedule Images" maxImages={3} />
-      <Separator className="bg-champagne-silk" />
-
-      <FontPicker section="schedule" />
-      <Separator className="bg-champagne-silk" />
-
       {/* Content Card */}
       <Card className="border-charcoal-ink/5 shadow-none">
         <CardContent className="p-6">

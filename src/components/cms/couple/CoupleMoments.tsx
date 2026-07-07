@@ -9,7 +9,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import SectionImageUpload from './SectionImageUpload';
-import FontPicker from './FontPicker';
 
 const API_BASE = '/api/cms/content?XTransformPort=3000';
 
@@ -172,13 +171,6 @@ export default function CoupleMoments() {
 
       {/* Section Image Upload */}
       <SectionImageUpload category="moments" label="Moments Gallery" maxImages={20} />
-
-      <Separator className="bg-champagne-silk" />
-
-      {/* Font Picker */}
-      <FontPicker section="moments" />
-
-      <Separator className="bg-champagne-silk" />
 
       {/* Content Fields */}
       <Card className="border-charcoal-ink/5 shadow-none">
