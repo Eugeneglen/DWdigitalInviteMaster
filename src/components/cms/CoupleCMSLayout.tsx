@@ -151,7 +151,7 @@ export default function CoupleCMSLayout({ children }: { children: React.ReactNod
         <div className="flex items-center px-4 py-5">
           <img
             alt="Dreamweavers"
-            className="h-5 w-auto object-contain"
+            className="h-3.5 w-auto object-contain"
             src="/dreamweavers-logo.png"
           />
         </div>
