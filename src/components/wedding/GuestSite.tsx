@@ -10,6 +10,7 @@ import MobileDrawer from '@/components/wedding/MobileDrawer';
 import BottomNav from '@/components/wedding/BottomNav';
 import Footer from '@/components/wedding/Footer';
 import MusicPlayer from '@/components/wedding/MusicPlayer';
+import GoldDust from '@/components/wedding/GoldDust';
 import { LoginModal } from '@/components/cms/LoginModal';
 import type { Section } from '@/store/useNavigationStore';
 import dynamic from 'next/dynamic';
@@ -110,6 +111,7 @@ export default function GuestSite({ slug, topOffset, showEditorButton = false }:
 
   return (
     <div className="min-h-screen flex flex-col bg-paper-cream text-charcoal-ink overflow-x-hidden selection:bg-cinematic-gold selection:text-paper-cream">
+      <GoldDust />
       <Header topOffset={topOffset} />
       <MobileDrawer />
 
