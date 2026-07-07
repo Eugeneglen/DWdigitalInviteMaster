@@ -11,7 +11,7 @@ const createUserSchema = z.object({
   email: z.email('Invalid email address'),
   name: z.string().min(2, 'Name must be at least 2 characters'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
-  role: z.enum(['SUPER_ADMIN', 'ACCOUNT_MANAGER', 'COUPLE']),
+  role: z.enum(['SUPER_ADMIN', 'ADMIN_1', 'ADMIN_2', 'ADMIN_3']),
   isActive: z.boolean().optional().default(true),
 });
 
@@ -20,14 +20,14 @@ const updateUserSchema = z.object({
   email: z.email('Invalid email address').optional(),
   name: z.string().min(2, 'Name must be at least 2 characters').optional(),
   password: z.string().min(8, 'Password must be at least 8 characters').optional(),
-  role: z.enum(['SUPER_ADMIN', 'ACCOUNT_MANAGER', 'COUPLE']).optional(),
+  role: z.enum(['SUPER_ADMIN', 'ADMIN_1', 'ADMIN_2', 'ADMIN_3']).optional(),
   isActive: z.boolean().optional(),
 });
 
 // ── Helpers ──────────────────────────────────────────────────────────────
 
 function isAuthorized(role?: string): boolean {
-  return role === 'SUPER_ADMIN' || role === 'ACCOUNT_MANAGER';
+  return role === 'SUPER_ADMIN' || role?.startsWith('ADMIN');
 }
 
 // ── GET ───────────────────────────────────────────────────────────────────
@@ -63,9 +63,6 @@ export async function GET(req: NextRequest) {
         lastLoginAt: true,
         createdAt: true,
         updatedAt: true,
-        _count: {
-          select: { ownedWeddings: true },
-        },
       },
     });
 

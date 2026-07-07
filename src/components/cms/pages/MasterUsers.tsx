@@ -8,7 +8,6 @@ import {
   Trash2,
   Users,
   UserCheck,
-  Heart,
   Loader2,
   AlertTriangle,
 } from 'lucide-react';
@@ -57,9 +56,6 @@ interface UserItem {
   lastLoginAt: string | null;
   createdAt: string;
   updatedAt: string;
-  _count?: {
-    ownedWeddings: number;
-  };
 }
 
 interface UserForm {
@@ -74,22 +70,24 @@ const EMPTY_FORM: UserForm = {
   name: '',
   email: '',
   password: '',
-  role: 'COUPLE',
+  role: 'ADMIN_1',
   isActive: true,
 };
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
 const roleVariant: Record<string, string> = {
-  SUPER_ADMIN: 'bg-purple-50 text-purple-700 border-purple-200',
-  ACCOUNT_MANAGER: 'bg-blue-50 text-blue-700 border-blue-200',
-  COUPLE: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  SUPER_ADMIN: 'bg-cinematic-gold/15 text-cinematic-gold border-cinematic-gold/30',
+  ADMIN_1: 'bg-charcoal-ink/10 text-charcoal-ink border-charcoal-ink/20',
+  ADMIN_2: 'bg-charcoal-ink/10 text-charcoal-ink border-charcoal-ink/20',
+  ADMIN_3: 'bg-charcoal-ink/10 text-charcoal-ink border-charcoal-ink/20',
 };
 
 const roleLabel: Record<string, string> = {
   SUPER_ADMIN: 'Super Admin',
-  ACCOUNT_MANAGER: 'Acct. Manager',
-  COUPLE: 'Couple',
+  ADMIN_1: 'Admin 1',
+  ADMIN_2: 'Admin 2',
+  ADMIN_3: 'Admin 3',
 };
 
 function relativeTime(dateStr: string | null): string {
@@ -220,8 +218,8 @@ export default function MasterUsers() {
   const stats = useMemo(() => {
     const total = users.length;
     const active = users.filter((u) => u.isActive).length;
-    const couples = users.filter((u) => u.role === 'COUPLE').length;
-    return { total, active, couples };
+    const admins = users.filter((u) => u.role.startsWith('ADMIN')).length;
+    return { total, active, admins };
   }, [users]);
 
   // ── Form handlers ────────────────────────────────────────────────────
@@ -405,15 +403,15 @@ export default function MasterUsers() {
             </div>
           </Card>
 
-          {/* Couple Accounts */}
+          {/* Admin Staff */}
           <Card className="border-slate-200 bg-white shadow-sm">
             <div className="p-4 flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-emerald-50 flex items-center justify-center">
-                <Heart className="h-5 w-5 text-emerald-600" />
+              <div className="h-10 w-10 rounded-lg bg-cinematic-gold/10 flex items-center justify-center">
+                <Users className="h-5 w-5 text-cinematic-gold" />
               </div>
               <div>
-                <p className="text-xs text-slate-500 font-medium">Couple Accounts</p>
-                <p className="text-2xl font-bold text-slate-900">{stats.couples}</p>
+                <p className="text-xs text-slate-500 font-medium">Admin Staff</p>
+                <p className="text-2xl font-bold text-slate-900">{stats.admins}</p>
               </div>
             </div>
           </Card>
@@ -459,7 +457,6 @@ export default function MasterUsers() {
                     <TableHead className="text-slate-600 font-semibold">Role</TableHead>
                     <TableHead className="text-slate-600 font-semibold">Status</TableHead>
                     <TableHead className="text-slate-600 font-semibold">Last Login</TableHead>
-                    <TableHead className="text-slate-600 font-semibold text-center">Weddings</TableHead>
                     <TableHead className="text-slate-600 font-semibold text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -526,13 +523,6 @@ export default function MasterUsers() {
                       {/* Last Login */}
                       <TableCell className="text-sm text-slate-500">
                         {relativeTime(user.lastLoginAt)}
-                      </TableCell>
-
-                      {/* Wedding Count */}
-                      <TableCell className="text-center">
-                        <Badge variant="secondary" className="bg-slate-100 text-slate-700">
-                          {user._count?.ownedWeddings ?? 0}
-                        </Badge>
                       </TableCell>
 
                       {/* Actions */}
@@ -646,8 +636,9 @@ export default function MasterUsers() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="SUPER_ADMIN">Super Admin</SelectItem>
-                  <SelectItem value="ACCOUNT_MANAGER">Account Manager</SelectItem>
-                  <SelectItem value="COUPLE">Couple</SelectItem>
+                  <SelectItem value="ADMIN_1">Admin 1</SelectItem>
+                  <SelectItem value="ADMIN_2">Admin 2</SelectItem>
+                  <SelectItem value="ADMIN_3">Admin 3</SelectItem>
                 </SelectContent>
               </Select>
             </div>
