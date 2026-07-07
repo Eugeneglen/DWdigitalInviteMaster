@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { Save, GripVertical, Plus, Trash2, ChevronUp, ChevronDown, FileText } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -280,9 +280,9 @@ export default function MasterSettings() {
 
       setInitialSettings({ ...allSettings });
       setInitialTabs([...tabs]);
-      toast.success(`Settings saved (${json.updated} ${json.updated === 1 ? 'value' : 'values'} updated)`);
+      toast({ title: 'Settings Saved', description: `${json.updated} ${json.updated === 1 ? 'value' : 'values'} updated` });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to save settings');
+      toast({ title: 'Save Failed', description: err instanceof Error ? err.message : 'Failed to save settings', variant: 'destructive' });
     } finally {
       setSaving(false);
     }
