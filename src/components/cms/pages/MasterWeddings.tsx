@@ -13,6 +13,7 @@ import {
   Heart,
   Loader2,
 } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -267,7 +268,14 @@ export default function MasterWeddings() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!form.coupleName.trim() || !form.weddingDate) return;
+    if (!form.coupleName.trim()) {
+      toast({ title: 'Validation Error', description: 'Couple name is required.', variant: 'destructive' });
+      return;
+    }
+    if (!form.weddingDate) {
+      toast({ title: 'Validation Error', description: 'Wedding date is required.', variant: 'destructive' });
+      return;
+    }
 
     try {
       setSubmitting(true);
@@ -292,7 +300,11 @@ export default function MasterWeddings() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ id: editingId, ...payload }),
         });
-        if (!res.ok) throw new Error('Update failed');
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(typeof err.error === 'string' ? err.error : 'Update failed');
+        }
+        toast({ title: 'Wedding Updated', description: `${form.coupleName.trim()} has been updated.` });
       } else {
         // Create — auto-generate slug
         payload.slug = slugFromNames(form.coupleName);
@@ -301,13 +313,21 @@ export default function MasterWeddings() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         });
-        if (!res.ok) throw new Error('Create failed');
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(typeof err.error === 'string' ? err.error : 'Create failed');
+        }
+        toast({ title: 'Wedding Created', description: `${form.coupleName.trim()} has been created.` });
       }
 
       setDialogOpen(false);
       fetchWeddings();
-    } catch {
-      // Silently handle — could add toast here
+    } catch (err) {
+      toast({
+        title: editingId ? 'Update Failed' : 'Create Failed',
+        description: err instanceof Error ? err.message : 'An unexpected error occurred',
+        variant: 'destructive',
+      });
     } finally {
       setSubmitting(false);
     }
@@ -324,9 +344,10 @@ export default function MasterWeddings() {
         body: JSON.stringify({ id: w.id, status: newStatus }),
       });
       if (!res.ok) throw new Error('Status update failed');
+      toast({ title: 'Status Updated', description: `${w.coupleName} is now ${newStatus}.` });
       fetchWeddings();
     } catch {
-      // Silently handle
+      toast({ title: 'Action Failed', description: 'Could not update wedding status.', variant: 'destructive' });
     }
   }
 
@@ -340,9 +361,10 @@ export default function MasterWeddings() {
         body: JSON.stringify({ id: w.id }),
       });
       if (!res.ok) throw new Error('Archive failed');
+      toast({ title: 'Wedding Archived', description: `${w.coupleName} has been archived.` });
       fetchWeddings();
     } catch {
-      // Silently handle
+      toast({ title: 'Archive Failed', description: 'Could not archive wedding.', variant: 'destructive' });
     }
   }
 

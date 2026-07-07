@@ -1290,3 +1290,24 @@ Stage Summary:
 - Fix: Moved `setAvailableTabs()` call into `useEffect` with dependency guard via `useRef`
 - File changed: `src/components/wedding/GuestSite.tsx`
 - Page now renders successfully without errors
+
+---
+Task ID: fix-create-wedding
+Agent: Main Agent
+Task: Fix "Create Wedding" button not working
+
+Work Log:
+- Investigated MasterWeddings.tsx and API route
+- Found 4 issues:
+  1. **Silent validation**: `handleSubmit` returned silently on validation failure (no user feedback)
+  2. **Silent catch**: All error handling blocks were `catch { // Silently handle }` — no toast, no error shown
+  3. **Zod schema nullable mismatch**: API schema used `z.string().optional()` but frontend sends `null` for empty fields. In Zod v4, `.optional()` allows `undefined` but NOT `null`. Changed all optional string fields to `.nullable().optional()`
+  4. **DELETE endpoint body mismatch**: Server read `id` from `searchParams` but frontend sends JSON body. Fixed to read from `req.json()`
+- Fixed API Zod error response (same `[object Object]` bug) to return readable string messages
+- Added toast notifications (using `@/hooks/use-toast`) for: create success/fail, update success/fail, status toggle, archive
+- Verified fix: API successfully creates wedding with null optional fields, toast notifications appear correctly, DELETE endpoint works
+
+Stage Summary:
+- Files changed: `src/app/api/master/weddings/route.ts`, `src/components/cms/pages/MasterWeddings.tsx`
+- Root cause: Zod `.optional()` doesn't accept `null` — needed `.nullable().optional()`
+- All actions (create/update/archive/status toggle) now show toast feedback

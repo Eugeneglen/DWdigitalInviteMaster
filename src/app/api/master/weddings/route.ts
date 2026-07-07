@@ -6,13 +6,13 @@ import { z } from 'zod/v4';
 
 const createWeddingSchema = z.object({
   coupleName: z.string().min(2),
-  brideName: z.string().optional(),
-  groomName: z.string().optional(),
+  brideName: z.string().nullable().optional(),
+  groomName: z.string().nullable().optional(),
   weddingDate: z.string(),
-  weddingTime: z.string().optional(),
-  venue: z.string().optional(),
-  venueAddress: z.string().optional(),
-  googleMapsUrl: z.string().optional(),
+  weddingTime: z.string().nullable().optional(),
+  venue: z.string().nullable().optional(),
+  venueAddress: z.string().nullable().optional(),
+  googleMapsUrl: z.string().nullable().optional(),
   plan: z.enum(['FREE', 'PREMIUM', 'ENTERPRISE']).default('FREE'),
   sections: z.array(z.string()).optional(), // optional nav sections to enable
 });
@@ -77,7 +77,8 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsed = createWeddingSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: parsed.error.issues }, { status: 400 });
+      const message = parsed.error.issues.map((i) => i.message).join(', ');
+      return NextResponse.json({ error: message }, { status: 400 });
     }
 
     const data = parsed.data;
@@ -214,8 +215,8 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { searchParams } = new URL(req.url);
-    const id = searchParams.get('id');
+    const body = await req.json();
+    const { id } = body;
     if (!id) {
       return NextResponse.json({ error: 'Wedding ID required' }, { status: 400 });
     }
