@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState, useRef, Suspense } from 'react';
 import { useSession } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
@@ -82,6 +82,8 @@ export default function Home() {
   const { previewMode, togglePreview } = useCoupleCMSStore();
   const { open: loginModalOpen, closeModal } = useAuthModalStore();
   const [manualView, setManualView] = useState<'guest' | 'cms' | 'couple' | null>(null);
+  // Track which view param the user dismissed the modal for — re-shows when view param changes
+  const [dismissedForView, setDismissedForView] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const viewParam = searchParams.get('view');
 
@@ -95,8 +97,18 @@ export default function Home() {
   const viewMode = manualView ?? urlView ?? (isAdmin ? 'cms' : isCouple ? 'couple' : 'guest');
 
   // Show login modal when ?view= param requires auth but user isn't authenticated
+  // Modal re-appears if the view param changes after being dismissed
   const wantsCMS = viewParam === 'cms' || viewParam === 'couple';
-  const showLoginModal = loginModalOpen || (wantsCMS && status !== 'authenticated');
+  const autoShowLogin = wantsCMS && dismissedForView !== viewParam && status === 'unauthenticated';
+  const showLoginModal = loginModalOpen || autoShowLogin;
+
+  const handleLoginModalChange = (open: boolean) => {
+    if (!open) {
+      closeModal();
+      // Remember which view param was dismissed so we don't immediately re-show
+      setDismissedForView(viewParam);
+    }
+  };
 
   return (
     <ErrorBoundary>
@@ -107,7 +119,7 @@ export default function Home() {
         previewMode={previewMode}
         showLoginModal={showLoginModal}
         togglePreview={togglePreview}
-        closeModal={closeModal}
+        onLoginModalChange={handleLoginModalChange}
       />
     </ErrorBoundary>
   );
@@ -120,7 +132,7 @@ function HomeView({
   previewMode,
   showLoginModal,
   togglePreview,
-  closeModal,
+  onLoginModalChange,
 }: {
   viewMode: string;
   isAdmin: boolean;
@@ -128,7 +140,7 @@ function HomeView({
   previewMode: boolean;
   showLoginModal: boolean;
   togglePreview: (v: boolean) => void;
-  closeModal: () => void;
+  onLoginModalChange: (open: boolean) => void;
 }) {
   // Master CMS View
   if (viewMode === 'cms' && isAdmin) {
@@ -139,7 +151,7 @@ function HomeView({
             <MasterCMSPageRouter />
           </Suspense>
         </MasterCMSLayout>
-        <LoginModal open={showLoginModal} onOpenChange={(open) => { if (!open) closeModal(); }} />
+        <LoginModal open={showLoginModal} onOpenChange={onLoginModalChange} />
       </>
     );
   }
@@ -177,11 +189,16 @@ function HomeView({
             <CoupleCMSPageRouter />
           </Suspense>
         </CoupleCMSLayout>
-        <LoginModal open={showLoginModal} onOpenChange={(open) => { if (!open) closeModal(); }} />
+        <LoginModal open={showLoginModal} onOpenChange={onLoginModalChange} />
       </>
     );
   }
 
-  // Guest View (default)
-  return <GuestSite showEditorButton />;
+  // Guest View (default) — includes login modal when ?view= requires auth
+  return (
+    <>
+      <GuestSite showEditorButton />
+      <LoginModal open={showLoginModal} onOpenChange={onLoginModalChange} />
+    </>
+  );
 }
