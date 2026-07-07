@@ -90,7 +90,8 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsed = createUserSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: parsed.error.issues }, { status: 400 });
+      const message = parsed.error.issues.map((i) => i.message).join(', ');
+      return NextResponse.json({ error: message }, { status: 400 });
     }
 
     const { email, name, password, role, isActive } = parsed.data;
@@ -154,7 +155,8 @@ export async function PUT(req: NextRequest) {
     const body = await req.json();
     const parsed = updateUserSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: parsed.error.issues }, { status: 400 });
+      const message = parsed.error.issues.map((i) => i.message).join(', ');
+      return NextResponse.json({ error: message }, { status: 400 });
     }
 
     const { id, ...updates } = parsed.data;

@@ -16,7 +16,7 @@ model User {
   email        String   @unique
   passwordHash String
   name         String
-  role         String   @default("COUPLE") // SUPER_ADMIN | ACCOUNT_MANAGER | COUPLE
+  role         String   @default("ADMIN_1") // SUPER_ADMIN | ADMIN_1 | ADMIN_2 | ADMIN_3
   avatarUrl    String?
   isActive     Boolean  @default(true)
   lastLoginAt  DateTime?

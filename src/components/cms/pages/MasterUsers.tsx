@@ -295,7 +295,12 @@ export default function MasterUsers() {
         });
         if (!res.ok) {
           const data = await res.json().catch(() => null);
-          throw new Error(data?.error || 'Update failed');
+          const msg = typeof data?.error === 'string'
+            ? data.error
+            : Array.isArray(data?.error)
+              ? data.error.map((e: { message?: string }) => e.message ?? '').filter(Boolean).join(', ')
+              : 'Update failed';
+          throw new Error(msg);
         }
         toast({ title: 'User Updated', description: `${form.name} has been updated successfully.` });
       } else {
@@ -313,7 +318,12 @@ export default function MasterUsers() {
         });
         if (!res.ok) {
           const data = await res.json().catch(() => null);
-          throw new Error(data?.error || 'Create failed');
+          const msg = typeof data?.error === 'string'
+            ? data.error
+            : Array.isArray(data?.error)
+              ? data.error.map((e: { message?: string }) => e.message ?? '').filter(Boolean).join(', ')
+              : 'Create failed';
+          throw new Error(msg);
         }
         toast({ title: 'User Created', description: `${form.name} has been created successfully.` });
       }
@@ -343,7 +353,12 @@ export default function MasterUsers() {
       );
       if (!res.ok) {
         const data = await res.json().catch(() => null);
-        throw new Error(data?.error || 'Delete failed');
+        const msg = typeof data?.error === 'string'
+          ? data.error
+          : Array.isArray(data?.error)
+            ? data.error.map((e: { message?: string }) => e.message ?? '').filter(Boolean).join(', ')
+            : 'Delete failed';
+        throw new Error(msg);
       }
       toast({ title: 'User Deleted', description: `${deletingUser.name} has been permanently removed.` });
       setDeleteOpen(false);
@@ -365,7 +380,7 @@ export default function MasterUsers() {
       {/* Page header */}
       <div>
         <h2 className="text-2xl font-semibold text-slate-900">User Management</h2>
-        <p className="text-slate-500 mt-1">Manage platform users and couple accounts</p>
+        <p className="text-slate-500 mt-1">Manage office staff accounts and permissions</p>
       </div>
 
       {/* Summary Stats */}

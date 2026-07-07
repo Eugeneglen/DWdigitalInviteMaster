@@ -1252,3 +1252,22 @@ Stage Summary:
 - DW box removed, Dreamweavers logo in sidebar header
 - Full Master CMS layout now uses DW design language (charcoal-ink sidebar, paper-cream content, champagne-silk borders, cinematic-gold accents)
 - Verified via Agent Browser: logo renders, Dashboard active state gold, header Playfair Display
+---
+Task ID: 1
+Agent: Main Agent
+Task: Fix Users page [object Object] error and related issues shown in screenshot
+
+Work Log:
+- Analyzed screenshot showing "Update Failed" with `[object Object]` error on Edit User dialog
+- Identified root cause: API returned `parsed.error.issues` (Zod array) as error, frontend did `new Error(array)` → `[object Object]`
+- Fixed API route `/api/master/users/route.ts`: converted Zod issues to readable string with `.map(i => i.message).join(', ')` for both POST and PUT handlers
+- Made frontend error handler in `MasterUsers.tsx` robust: handles string, array, and fallback error types for PUT, POST, and DELETE
+- Updated Prisma schema: changed User role default from `"COUPLE"` to `"ADMIN_1"`, updated comment
+- Updated page subtitle from "Manage platform users and couple accounts" to "Manage office staff accounts and permissions"
+- Verified via browser: edit user works without errors, table shows correct columns (Name, Email, Role, Status, Last Login, Actions)
+
+Stage Summary:
+- Key fix: Zod validation errors now display as human-readable strings instead of `[object Object]`
+- Prisma schema default role updated to ADMIN_1
+- Users page confirmed working: no attached account/wedding columns, roles show Super Admin / Admin 1 / Admin 2 / Admin 3
+- All changes compiled and browser-verified successfully
