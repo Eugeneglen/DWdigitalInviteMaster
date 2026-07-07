@@ -2,6 +2,41 @@
 
 import { useMemo } from 'react';
 
+const styles = `
+  .gd-particle {
+    background: radial-gradient(circle, rgb(212,175,55) 0%, rgb(245,230,173) 60%, transparent 100%);
+    animation: gdRise var(--gd-dur,18s) linear var(--gd-delay,0s) infinite,
+               gdSway var(--gd-dur,18s) ease-in-out var(--gd-delay,0s) infinite;
+  }
+  @keyframes gdRise {
+    0%   { opacity: var(--gd-op-start,0); transform: translateY(0); }
+    8%   { opacity: 1; }
+    85%  { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-105vh); }
+  }
+  @keyframes gdSway {
+    0%   { margin-left: 0; }
+    25%  { margin-left: var(--gd-sway,12px); }
+    50%  { margin-left: calc(var(--gd-sway,12px) * -0.5); }
+    75%  { margin-left: var(--gd-sway,12px); }
+    100% { margin-left: 0; }
+  }
+  .gd-orb {
+    background: radial-gradient(circle at 40% 40%, rgba(212,175,55,0.5) 0%, rgba(245,230,173,0.2) 40%, transparent 70%);
+    filter: blur(30px);
+    animation: gdDrift var(--gd-drift-dur,25s) ease-in-out var(--gd-delay,0s) infinite alternate,
+               gdBreathe var(--gd-breath-dur,7s) ease-in-out var(--gd-delay,0s) infinite;
+  }
+  @keyframes gdDrift {
+    0%   { transform: translate(0); }
+    100% { transform: translate(var(--gd-drift-x,20px), var(--gd-drift-y,10px)); }
+  }
+  @keyframes gdBreathe {
+    0%, 100% { opacity: inherit; transform: scale(1); }
+    50%      { opacity: calc(var(--gd-peak,1) * 1.4); transform: scale(1.15); }
+  }
+`;
+
 /**
  * Ambient gold dust particles + bokeh orbs.
  * Purely decorative, pointer-events-none, sits behind all interactive elements.
@@ -33,20 +68,21 @@ export default function GoldDust() {
 
   return (
     <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden" aria-hidden="true">
+      <style dangerouslySetInnerHTML={{ __html: styles }} />
       {particles.map((p, i) => (
         <div
           key={i}
-          className="gold-dust-particle"
+          className="gd-particle"
           style={{
             position: 'absolute',
             bottom: '-10px',
             left: p.left,
             width: `${p.size}px`,
             height: `${p.size}px`,
-            '--dust-duration': `${p.duration}s`,
-            '--dust-delay': `${p.delay}s`,
-            '--dust-sway': `${p.sway}px`,
-            '--dust-opacity-start': '0',
+            '--gd-dur': `${p.duration}s`,
+            '--gd-delay': `${p.delay}s`,
+            '--gd-sway': `${p.sway}px`,
+            '--gd-op-start': '0',
             opacity: p.opacity,
           } as React.CSSProperties}
         />
@@ -54,19 +90,19 @@ export default function GoldDust() {
       {bokehOrbs.map((b, i) => (
         <div
           key={`bokeh-${i}`}
-          className="bokeh-orb"
+          className="gd-orb"
           style={{
             position: 'absolute',
             bottom: `${10 + i * 15}%`,
             left: b.left,
             width: `${b.size}px`,
             height: `${b.size}px`,
-            '--bokeh-drift-dur': `${b.driftDur}s`,
-            '--bokeh-breath-dur': `${b.breathDur}s`,
-            '--bokeh-delay': `${b.delay}s`,
-            '--bokeh-drift-x': `${b.driftX}px`,
-            '--bokeh-drift-y': `${b.driftY}px`,
-            '--bokeh-opacity-peak': '1',
+            '--gd-drift-dur': `${b.driftDur}s`,
+            '--gd-breath-dur': `${b.breathDur}s`,
+            '--gd-delay': `${b.delay}s`,
+            '--gd-drift-x': `${b.driftX}px`,
+            '--gd-drift-y': `${b.driftY}px`,
+            '--gd-peak': '1',
             opacity: b.opacity,
           } as React.CSSProperties}
         />
