@@ -145,6 +145,25 @@ export default function FontPicker({ section }: FontPickerProps) {
   return (
     <Card className="border-charcoal-ink/5 shadow-none">
       <CardContent className="p-4 space-y-3">
+        {/* Live preview */}
+        {!loading && (
+          <div>
+            <p className="text-[11px] text-charcoal-ink/40 uppercase tracking-wider mb-2 font-medium">Preview</p>
+            <p
+              className="text-2xl text-charcoal-ink leading-relaxed"
+              style={{ fontFamily: `'${selectedFont}', serif` }}
+            >
+              Eleanor & James
+            </p>
+            <p
+              className="text-sm text-charcoal-ink/50 mt-1 italic leading-relaxed"
+              style={{ fontFamily: `'${selectedFont}', serif` }}
+            >
+              Together with their families, request the pleasure of your company
+            </p>
+          </div>
+        )}
+
         <div className="space-y-2.5">
           <Label className="text-xs font-medium text-charcoal-ink/50 uppercase tracking-wider">
             Section Font
@@ -195,25 +214,6 @@ export default function FontPicker({ section }: FontPickerProps) {
             )}
           </div>
         </div>
-
-        {/* Live preview */}
-        {!loading && (
-          <div className="border-t border-champagne-silk/40 pt-3">
-            <p className="text-[11px] text-charcoal-ink/40 uppercase tracking-wider mb-2 font-medium">Preview</p>
-            <p
-              className="text-2xl text-charcoal-ink leading-relaxed"
-              style={{ fontFamily: `'${selectedFont}', serif` }}
-            >
-              Eleanor & James
-            </p>
-            <p
-              className="text-sm text-charcoal-ink/50 mt-1 italic leading-relaxed"
-              style={{ fontFamily: `'${selectedFont}', serif` }}
-            >
-              Together with their families, request the pleasure of your company
-            </p>
-          </div>
-        )}
       </CardContent>
     </Card>
   );
