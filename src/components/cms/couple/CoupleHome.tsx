@@ -182,26 +182,26 @@ export default function CoupleHome() {
 
       <Separator className="bg-champagne-silk" />
 
-      {/* 4. Section Image Upload */}
+      {/* 4. Font Picker */}
       <div className="space-y-2">
         <Label className="text-xs font-medium text-charcoal-ink/50 uppercase tracking-wider">
-          Home Images
+          Font
         </Label>
-        <Card className="border-charcoal-ink/5 shadow-none">
-          <CardContent className="p-4">
-            <SectionImageUpload category="home" label="Home Images" maxImages={3} />
-          </CardContent>
-        </Card>
+        <FontPicker section="hero" />
       </div>
 
       <Separator className="bg-champagne-silk" />
 
-      {/* 5. Font Picker */}
+      {/* 5. Image Upload */}
       <div className="space-y-2">
         <Label className="text-xs font-medium text-charcoal-ink/50 uppercase tracking-wider">
-          Hero Font
+          Images
         </Label>
-        <FontPicker section="hero" />
+        <Card className="border-charcoal-ink/5 shadow-none">
+          <CardContent className="p-4">
+            <SectionImageUpload category="home" label="Images" maxImages={3} />
+          </CardContent>
+        </Card>
       </div>
 
       <Separator className="bg-champagne-silk" />
