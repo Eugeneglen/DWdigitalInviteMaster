@@ -127,6 +127,7 @@ export default function Home() {
         showLoginModal={showLoginModal}
         togglePreview={togglePreview}
         onLoginModalChange={handleLoginModalChange}
+        wantsCMSView={wantsCMSView}
       />
     </ErrorBoundary>
   );
@@ -140,6 +141,7 @@ function HomeView({
   showLoginModal,
   togglePreview,
   onLoginModalChange,
+  wantsCMSView,
 }: {
   viewMode: string;
   isAdmin: boolean;
@@ -148,6 +150,7 @@ function HomeView({
   showLoginModal: boolean;
   togglePreview: (v: boolean) => void;
   onLoginModalChange: (open: boolean) => void;
+  wantsCMSView: boolean;
 }) {
   // Master CMS View
   if (viewMode === 'cms' && isAdmin) {
@@ -158,7 +161,7 @@ function HomeView({
             <MasterCMSPageRouter />
           </Suspense>
         </MasterCMSLayout>
-        <LoginModal open={showLoginModal} onOpenChange={onLoginModalChange} darkOverlay />
+        <LoginModal open={showLoginModal} onOpenChange={onLoginModalChange} variant="cms" />
       </>
     );
   }
@@ -205,7 +208,7 @@ function HomeView({
   return (
     <>
       <GuestSite showEditorButton />
-      <LoginModal open={showLoginModal} onOpenChange={onLoginModalChange} />
+      <LoginModal open={showLoginModal} onOpenChange={onLoginModalChange} variant={wantsCMSView ? 'cms' : 'default'} />
     </>
   );
 }

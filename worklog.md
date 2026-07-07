@@ -1188,3 +1188,26 @@ Stage Summary:
 - Password preview toggle added to both login forms
 - Dark overlay on CMS login modal for visual differentiation
 - Key files changed: `.env`, `src/lib/auth.ts`, `src/lib/auth-session.ts`, `src/app/api/master/dashboard/route.ts`, `src/app/page.tsx`, `src/components/cms/LoginModal.tsx`
+
+---
+Task ID: 2
+Agent: Main Agent
+Task: Add password toggle icon + change CMS login color scheme to differentiate from couple login
+
+Work Log:
+- Verified password toggle (Eye/EyeOff) was already implemented in both standard and switch-account login forms
+- Replaced unreliable `darkOverlay` prop with `variant: 'default' | 'cms'` prop on LoginModal
+- Implemented full dark theme for CMS variant: dark charcoal overlay (`#1A1410`), dark modal card (`#1E1816`), cream text, gold accent button
+- CMS variant shows "Admin Portal" heading and "Sign in to the CMS Dashboard" subtitle
+- Default variant keeps the existing light cream/white elegant theme with "Welcome Back" heading
+- Updated page.tsx: passes `variant="cms"` for Master CMS view and `variant={wantsCMSView ? 'cms' : 'default'}` for guest view
+- Couple CMS login modal keeps default (light) variant
+- Added `wantsCMSView` prop to HomeView component for variant selection
+- Passed lint (0 errors, 1 pre-existing warning)
+- Verified via Agent Browser + VLM: CMS login renders dark theme, couple login renders light theme
+
+Stage Summary:
+- Password toggle: Already complete (no changes needed)
+- CMS login now has distinct dark color scheme (dark charcoal bg, cream text, gold accents)
+- Couple login retains light cream/white elegant theme
+- Clear visual differentiation between the two login pages verified via screenshots
