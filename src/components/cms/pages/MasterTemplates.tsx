@@ -20,6 +20,15 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -49,6 +58,45 @@ const COLOR_LABELS: Record<keyof WeddingTemplate['colors'], string> = {
   secondary: 'Secondary',
   muted: 'Muted',
 };
+
+const TEMPLATE_FONT_OPTIONS = [
+  { value: 'Playfair Display', category: 'Elegant Serif' },
+  { value: 'Cormorant Garamond', category: 'Elegant Serif' },
+  { value: 'EB Garamond', category: 'Elegant Serif' },
+  { value: 'Lora', category: 'Elegant Serif' },
+  { value: 'Spectral', category: 'Elegant Serif' },
+  { value: 'Libre Baskerville', category: 'Elegant Serif' },
+  { value: 'Merriweather', category: 'Elegant Serif' },
+  { value: 'DM Serif Display', category: 'Elegant Serif' },
+  { value: 'Bodoni Moda', category: 'Elegant Serif' },
+  { value: 'Cinzel', category: 'Display Serif' },
+  { value: 'Cinzel Decorative', category: 'Display Serif' },
+  { value: 'Prata', category: 'Display Serif' },
+  { value: 'Italiana', category: 'Display Serif' },
+  { value: 'Montserrat', category: 'Modern Sans' },
+  { value: 'Raleway', category: 'Modern Sans' },
+  { value: 'Poppins', category: 'Modern Sans' },
+  { value: 'Lato', category: 'Modern Sans' },
+  { value: 'Quicksand', category: 'Modern Sans' },
+  { value: 'Nunito', category: 'Modern Sans' },
+  { value: 'Work Sans', category: 'Modern Sans' },
+  { value: 'Great Vibes', category: 'Script & Calligraphy' },
+  { value: 'Alex Brush', category: 'Script & Calligraphy' },
+  { value: 'Allura', category: 'Script & Calligraphy' },
+  { value: 'Parisienne', category: 'Script & Calligraphy' },
+  { value: 'Sacramento', category: 'Script & Calligraphy' },
+  { value: 'Dancing Script', category: 'Handwritten' },
+  { value: 'Kaushan Script', category: 'Handwritten' },
+  { value: 'Caveat', category: 'Handwritten' },
+  { value: 'Amatic SC', category: 'Handwritten' },
+  { value: 'Satisfy', category: 'Handwritten' },
+  { value: 'Pacifico', category: 'Handwritten' },
+  { value: 'Lobster', category: 'Handwritten' },
+  { value: 'Inter', category: 'Modern Sans' },
+  { value: 'Josefin Sans', category: 'Modern Sans' },
+];
+
+const FONT_CATEGORIES = [...new Set(TEMPLATE_FONT_OPTIONS.map((f) => f.category))];
 
 // ── Default Templates (hardcoded) ─────────────────────────────────────────
 
@@ -263,21 +311,73 @@ function EditTemplateDialog({
             <h4 className="text-sm font-semibold text-slate-700">Fonts</h4>
             <div className="flex items-center gap-3">
               <Label className="text-sm text-slate-600 w-20 shrink-0">Heading</Label>
-              <Input
+              <Select
                 value={editing.fonts.heading}
-                onChange={(e) => updateFont('heading', e.target.value)}
-                className="flex-1 text-sm h-8"
-                placeholder="Font family"
-              />
+                onValueChange={(v) => updateFont('heading', v)}
+              >
+                <SelectTrigger className="flex-1 text-sm h-8">
+                  <SelectValue placeholder="Select font…" />
+                </SelectTrigger>
+                <SelectContent className="max-h-[300px]">
+                  {FONT_CATEGORIES.map((category) => (
+                    <SelectGroup key={category}>
+                      <SelectLabel className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">
+                        {category}
+                      </SelectLabel>
+                      {TEMPLATE_FONT_OPTIONS
+                        .filter((f) => f.category === category)
+                        .map((font) => (
+                          <SelectItem key={font.value} value={font.value}>
+                            <span className="flex items-center justify-between gap-6 w-full">
+                              <span className="truncate">{font.value}</span>
+                              <span
+                                className="text-slate-500 text-xs shrink-0"
+                                style={{ fontFamily: `'${font.value}', serif` }}
+                              >
+                                Aa Bb Cc
+                              </span>
+                            </span>
+                          </SelectItem>
+                        ))}
+                    </SelectGroup>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="flex items-center gap-3">
               <Label className="text-sm text-slate-600 w-20 shrink-0">Body</Label>
-              <Input
+              <Select
                 value={editing.fonts.body}
-                onChange={(e) => updateFont('body', e.target.value)}
-                className="flex-1 text-sm h-8"
-                placeholder="Font family"
-              />
+                onValueChange={(v) => updateFont('body', v)}
+              >
+                <SelectTrigger className="flex-1 text-sm h-8">
+                  <SelectValue placeholder="Select font…" />
+                </SelectTrigger>
+                <SelectContent className="max-h-[300px]">
+                  {FONT_CATEGORIES.map((category) => (
+                    <SelectGroup key={category}>
+                      <SelectLabel className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">
+                        {category}
+                      </SelectLabel>
+                      {TEMPLATE_FONT_OPTIONS
+                        .filter((f) => f.category === category)
+                        .map((font) => (
+                          <SelectItem key={font.value} value={font.value}>
+                            <span className="flex items-center justify-between gap-6 w-full">
+                              <span className="truncate">{font.value}</span>
+                              <span
+                                className="text-slate-500 text-xs shrink-0"
+                                style={{ fontFamily: `'${font.value}', serif` }}
+                              >
+                                Aa Bb Cc
+                              </span>
+                            </span>
+                          </SelectItem>
+                        ))}
+                    </SelectGroup>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
