@@ -8,24 +8,69 @@ import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
 
 const CONTENT_API = '/api/cms/content?XTransformPort=3000';
 
-const FONT_OPTIONS = [
-  { value: 'Playfair Display', category: 'serif' },
-  { value: 'Cormorant Garamond', category: 'serif' },
-  { value: 'Lora', category: 'serif' },
-  { value: 'Montserrat', category: 'sans-serif' },
-  { value: 'Raleway', category: 'sans-serif' },
-  { value: 'Lato', category: 'sans-serif' },
-  { value: 'Great Vibes', category: 'cursive' },
-  { value: 'Dancing Script', category: 'cursive' },
-  { value: 'Josefin Sans', category: 'sans-serif' },
-] as const;
+interface FontOption {
+  value: string;
+  category: string;
+  preview: string;
+}
+
+const FONT_OPTIONS: FontOption[] = [
+  // ── Elegant Serif ────────────────────────────────────────
+  { value: 'Playfair Display', category: 'Elegant Serif', preview: 'Eleanor & James' },
+  { value: 'Cormorant Garamond', category: 'Elegant Serif', preview: 'Eleanor & James' },
+  { value: 'EB Garamond', category: 'Elegant Serif', preview: 'Eleanor & James' },
+  { value: 'Lora', category: 'Elegant Serif', preview: 'Eleanor & James' },
+  { value: 'Spectral', category: 'Elegant Serif', preview: 'Eleanor & James' },
+  { value: 'Libre Baskerville', category: 'Elegant Serif', preview: 'Eleanor & James' },
+  { value: 'Merriweather', category: 'Elegant Serif', preview: 'Eleanor & James' },
+  { value: 'DM Serif Display', category: 'Elegant Serif', preview: 'Eleanor & James' },
+  { value: 'Bodoni Moda', category: 'Elegant Serif', preview: 'Eleanor & James' },
+  { value: 'Philosopher', category: 'Elegant Serif', preview: 'Eleanor & James' },
+  // ── Display Serif ────────────────────────────────────────
+  { value: 'Cinzel', category: 'Display Serif', preview: 'Eleanor & James' },
+  { value: 'Cinzel Decorative', category: 'Display Serif', preview: 'Eleanor & James' },
+  { value: 'Prata', category: 'Display Serif', preview: 'Eleanor & James' },
+  { value: 'Italiana', category: 'Display Serif', preview: 'Eleanor & James' },
+  { value: 'Arizonia', category: 'Display Serif', preview: 'Eleanor & James' },
+  // ── Modern Sans ─────────────────────────────────────────
+  { value: 'Montserrat', category: 'Modern Sans', preview: 'Eleanor & James' },
+  { value: 'Raleway', category: 'Modern Sans', preview: 'Eleanor & James' },
+  { value: 'Poppins', category: 'Modern Sans', preview: 'Eleanor & James' },
+  { value: 'Lato', category: 'Modern Sans', preview: 'Eleanor & James' },
+  { value: 'Quicksand', category: 'Modern Sans', preview: 'Eleanor & James' },
+  { value: 'Nunito', category: 'Modern Sans', preview: 'Eleanor & James' },
+  { value: 'Work Sans', category: 'Modern Sans', preview: 'Eleanor & James' },
+  { value: 'Josefin Sans', category: 'Modern Sans', preview: 'Eleanor & James' },
+  // ── Script & Calligraphy ─────────────────────────────────
+  { value: 'Great Vibes', category: 'Script & Calligraphy', preview: 'Eleanor & James' },
+  { value: 'Alex Brush', category: 'Script & Calligraphy', preview: 'Eleanor & James' },
+  { value: 'Allura', category: 'Script & Calligraphy', preview: 'Eleanor & James' },
+  { value: 'Parisienne', category: 'Script & Calligraphy', preview: 'Eleanor & James' },
+  { value: 'Tangerine', category: 'Script & Calligraphy', preview: 'Eleanor & James' },
+  { value: 'Sacramento', category: 'Script & Calligraphy', preview: 'Eleanor & James' },
+  { value: 'Petit Formal Script', category: 'Script & Calligraphy', preview: 'Eleanor & James' },
+  { value: 'Cookie', category: 'Script & Calligraphy', preview: 'Eleanor & James' },
+  // ── Handwritten ─────────────────────────────────────────
+  { value: 'Dancing Script', category: 'Handwritten', preview: 'Eleanor & James' },
+  { value: 'Kaushan Script', category: 'Handwritten', preview: 'Eleanor & James' },
+  { value: 'Caveat', category: 'Handwritten', preview: 'Eleanor & James' },
+  { value: 'Amatic SC', category: 'Handwritten', preview: 'Eleanor & James' },
+  { value: 'Satisfy', category: 'Handwritten', preview: 'Eleanor & James' },
+  { value: 'Pacifico', category: 'Handwritten', preview: 'Eleanor & James' },
+  { value: 'Lobster', category: 'Handwritten', preview: 'Eleanor & James' },
+  { value: 'Yellowtail', category: 'Handwritten', preview: 'Eleanor & James' },
+];
+
+const FONT_CATEGORIES = [...new Set(FONT_OPTIONS.map((f) => f.category))];
 
 const DEFAULT_FONT = 'Playfair Display';
 
@@ -99,7 +144,7 @@ export default function FontPicker({ section }: FontPickerProps) {
 
   return (
     <Card className="border-charcoal-ink/5 shadow-none">
-      <CardContent className="p-4">
+      <CardContent className="p-4 space-y-3">
         <div className="space-y-2.5">
           <Label className="text-xs font-medium text-charcoal-ink/50 uppercase tracking-wider">
             Section Font
@@ -120,13 +165,26 @@ export default function FontPicker({ section }: FontPickerProps) {
                   <SelectValue placeholder="Select font…" />
                 )}
               </SelectTrigger>
-              <SelectContent>
-                {FONT_OPTIONS.map((font) => (
-                  <SelectItem key={font.value} value={font.value}>
-                    <span style={{ fontFamily: font.value, fallback: font.category }}>
-                      {font.value}
-                    </span>
-                  </SelectItem>
+              <SelectContent className="max-h-[340px]">
+                {FONT_CATEGORIES.map((category) => (
+                  <SelectGroup key={category}>
+                    <SelectLabel className="text-[11px] text-cinematic-gold/80 font-semibold uppercase tracking-wider">
+                      {category}
+                    </SelectLabel>
+                    {FONT_OPTIONS.filter((f) => f.category === category).map((font) => (
+                      <SelectItem key={font.value} value={font.value}>
+                        <span className="flex items-center justify-between gap-6 w-full">
+                          <span className="truncate">{font.value}</span>
+                          <span
+                            className="text-charcoal-ink/60 text-sm shrink-0"
+                            style={{ fontFamily: `'${font.value}', serif` }}
+                          >
+                            {font.preview}
+                          </span>
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
                 ))}
               </SelectContent>
             </Select>
@@ -137,6 +195,25 @@ export default function FontPicker({ section }: FontPickerProps) {
             )}
           </div>
         </div>
+
+        {/* Live preview */}
+        {!loading && (
+          <div className="border-t border-champagne-silk/40 pt-3">
+            <p className="text-[11px] text-charcoal-ink/40 uppercase tracking-wider mb-2 font-medium">Preview</p>
+            <p
+              className="text-2xl text-charcoal-ink leading-relaxed"
+              style={{ fontFamily: `'${selectedFont}', serif` }}
+            >
+              Eleanor & James
+            </p>
+            <p
+              className="text-sm text-charcoal-ink/50 mt-1 italic leading-relaxed"
+              style={{ fontFamily: `'${selectedFont}', serif` }}
+            >
+              Together with their families, request the pleasure of your company
+            </p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
