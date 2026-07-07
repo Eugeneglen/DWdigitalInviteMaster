@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
-import { Loader2, Check } from 'lucide-react';
+import { Loader2, Check, Type } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -143,26 +143,29 @@ export default function FontPicker({ section }: FontPickerProps) {
   return (
     <Card className="border-charcoal-ink/5 shadow-none">
       <CardContent className="p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <Type className="size-4 text-cinematic-gold" />
+          <Label className="text-xs font-medium text-charcoal-ink/50 uppercase tracking-wider">
+            Font
+          </Label>
+          {saving && <Loader2 className="size-3.5 animate-spin text-cinematic-gold ml-auto" />}
+        </div>
+
         {/* Preview */}
         {!loading && (
-          <div className="flex items-end justify-between gap-4">
-            <div className="min-w-0">
-              <p
-                className="text-xl text-charcoal-ink leading-snug truncate"
-                style={{ fontFamily: `'${selectedFont}', serif` }}
-              >
-                Eleanor & James
-              </p>
-              <p
-                className="text-xs text-charcoal-ink/40 mt-0.5 italic truncate"
-                style={{ fontFamily: `'${selectedFont}', serif` }}
-              >
-                Together with their families
-              </p>
-            </div>
-            {saving && (
-              <Loader2 className="size-3.5 animate-spin text-cinematic-gold shrink-0" />
-            )}
+          <div className="min-w-0">
+            <p
+              className="text-lg text-charcoal-ink leading-snug truncate"
+              style={{ fontFamily: `'${selectedFont}', serif` }}
+            >
+              Eleanor & James
+            </p>
+            <p
+              className="text-[11px] text-charcoal-ink/40 mt-0.5 italic truncate"
+              style={{ fontFamily: `'${selectedFont}', serif` }}
+            >
+              Together with their families
+            </p>
           </div>
         )}
 

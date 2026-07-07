@@ -184,21 +184,9 @@ export default function CoupleHome() {
 
       <Separator className="bg-champagne-silk" />
 
-      {/* 3. Background Colour */}
-      <div className="space-y-2">
-        <Label className="text-xs font-medium text-charcoal-ink/50 uppercase tracking-wider">
-          Background Colour
-        </Label>
+      {/* 3. Colour & Font — 2-column layout */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <BackgroundColorPicker />
-      </div>
-
-      <Separator className="bg-champagne-silk" />
-
-      {/* 4. Font Picker */}
-      <div className="space-y-2">
-        <Label className="text-xs font-medium text-charcoal-ink/50 uppercase tracking-wider">
-          Font
-        </Label>
         <FontPicker section="hero" />
       </div>
 
