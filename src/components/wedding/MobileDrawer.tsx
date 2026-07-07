@@ -65,6 +65,7 @@ export default function MobileDrawer() {
                       ? 'text-cinematic-gold font-bold'
                       : 'text-charcoal-ink/60'
                   }`}
+                  style={{ fontFamily: "'Inter', sans-serif" }}
                 >
                   {item.label}
                 </button>
