@@ -1,73 +1,63 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { Loader2 } from 'lucide-react';
+import React, { useEffect, useState, useRef } from 'react';
+import { Loader2, Check } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 
 const CONTENT_API = '/api/cms/content?XTransformPort=3000';
 
 interface FontOption {
   value: string;
   category: string;
-  preview: string;
 }
 
 const FONT_OPTIONS: FontOption[] = [
   // ── Elegant Serif ────────────────────────────────────────
-  { value: 'Playfair Display', category: 'Elegant Serif', preview: 'Eleanor & James' },
-  { value: 'Cormorant Garamond', category: 'Elegant Serif', preview: 'Eleanor & James' },
-  { value: 'EB Garamond', category: 'Elegant Serif', preview: 'Eleanor & James' },
-  { value: 'Lora', category: 'Elegant Serif', preview: 'Eleanor & James' },
-  { value: 'Spectral', category: 'Elegant Serif', preview: 'Eleanor & James' },
-  { value: 'Libre Baskerville', category: 'Elegant Serif', preview: 'Eleanor & James' },
-  { value: 'Merriweather', category: 'Elegant Serif', preview: 'Eleanor & James' },
-  { value: 'DM Serif Display', category: 'Elegant Serif', preview: 'Eleanor & James' },
-  { value: 'Bodoni Moda', category: 'Elegant Serif', preview: 'Eleanor & James' },
-  { value: 'Philosopher', category: 'Elegant Serif', preview: 'Eleanor & James' },
+  { value: 'Playfair Display', category: 'Elegant Serif' },
+  { value: 'Cormorant Garamond', category: 'Elegant Serif' },
+  { value: 'EB Garamond', category: 'Elegant Serif' },
+  { value: 'Lora', category: 'Elegant Serif' },
+  { value: 'Spectral', category: 'Elegant Serif' },
+  { value: 'Libre Baskerville', category: 'Elegant Serif' },
+  { value: 'Merriweather', category: 'Elegant Serif' },
+  { value: 'DM Serif Display', category: 'Elegant Serif' },
+  { value: 'Bodoni Moda', category: 'Elegant Serif' },
+  { value: 'Philosopher', category: 'Elegant Serif' },
   // ── Display Serif ────────────────────────────────────────
-  { value: 'Cinzel', category: 'Display Serif', preview: 'Eleanor & James' },
-  { value: 'Cinzel Decorative', category: 'Display Serif', preview: 'Eleanor & James' },
-  { value: 'Prata', category: 'Display Serif', preview: 'Eleanor & James' },
-  { value: 'Italiana', category: 'Display Serif', preview: 'Eleanor & James' },
-  { value: 'Arizonia', category: 'Display Serif', preview: 'Eleanor & James' },
+  { value: 'Cinzel', category: 'Display Serif' },
+  { value: 'Cinzel Decorative', category: 'Display Serif' },
+  { value: 'Prata', category: 'Display Serif' },
+  { value: 'Italiana', category: 'Display Serif' },
+  { value: 'Arizonia', category: 'Display Serif' },
   // ── Modern Sans ─────────────────────────────────────────
-  { value: 'Montserrat', category: 'Modern Sans', preview: 'Eleanor & James' },
-  { value: 'Raleway', category: 'Modern Sans', preview: 'Eleanor & James' },
-  { value: 'Poppins', category: 'Modern Sans', preview: 'Eleanor & James' },
-  { value: 'Lato', category: 'Modern Sans', preview: 'Eleanor & James' },
-  { value: 'Quicksand', category: 'Modern Sans', preview: 'Eleanor & James' },
-  { value: 'Nunito', category: 'Modern Sans', preview: 'Eleanor & James' },
-  { value: 'Work Sans', category: 'Modern Sans', preview: 'Eleanor & James' },
-  { value: 'Josefin Sans', category: 'Modern Sans', preview: 'Eleanor & James' },
+  { value: 'Montserrat', category: 'Modern Sans' },
+  { value: 'Raleway', category: 'Modern Sans' },
+  { value: 'Poppins', category: 'Modern Sans' },
+  { value: 'Lato', category: 'Modern Sans' },
+  { value: 'Quicksand', category: 'Modern Sans' },
+  { value: 'Nunito', category: 'Modern Sans' },
+  { value: 'Work Sans', category: 'Modern Sans' },
+  { value: 'Josefin Sans', category: 'Modern Sans' },
   // ── Script & Calligraphy ─────────────────────────────────
-  { value: 'Great Vibes', category: 'Script & Calligraphy', preview: 'Eleanor & James' },
-  { value: 'Alex Brush', category: 'Script & Calligraphy', preview: 'Eleanor & James' },
-  { value: 'Allura', category: 'Script & Calligraphy', preview: 'Eleanor & James' },
-  { value: 'Parisienne', category: 'Script & Calligraphy', preview: 'Eleanor & James' },
-  { value: 'Tangerine', category: 'Script & Calligraphy', preview: 'Eleanor & James' },
-  { value: 'Sacramento', category: 'Script & Calligraphy', preview: 'Eleanor & James' },
-  { value: 'Petit Formal Script', category: 'Script & Calligraphy', preview: 'Eleanor & James' },
-  { value: 'Cookie', category: 'Script & Calligraphy', preview: 'Eleanor & James' },
+  { value: 'Great Vibes', category: 'Script & Calligraphy' },
+  { value: 'Alex Brush', category: 'Script & Calligraphy' },
+  { value: 'Allura', category: 'Script & Calligraphy' },
+  { value: 'Parisienne', category: 'Script & Calligraphy' },
+  { value: 'Tangerine', category: 'Script & Calligraphy' },
+  { value: 'Sacramento', category: 'Script & Calligraphy' },
+  { value: 'Petit Formal Script', category: 'Script & Calligraphy' },
+  { value: 'Cookie', category: 'Script & Calligraphy' },
   // ── Handwritten ─────────────────────────────────────────
-  { value: 'Dancing Script', category: 'Handwritten', preview: 'Eleanor & James' },
-  { value: 'Kaushan Script', category: 'Handwritten', preview: 'Eleanor & James' },
-  { value: 'Caveat', category: 'Handwritten', preview: 'Eleanor & James' },
-  { value: 'Amatic SC', category: 'Handwritten', preview: 'Eleanor & James' },
-  { value: 'Satisfy', category: 'Handwritten', preview: 'Eleanor & James' },
-  { value: 'Pacifico', category: 'Handwritten', preview: 'Eleanor & James' },
-  { value: 'Lobster', category: 'Handwritten', preview: 'Eleanor & James' },
-  { value: 'Yellowtail', category: 'Handwritten', preview: 'Eleanor & James' },
+  { value: 'Dancing Script', category: 'Handwritten' },
+  { value: 'Kaushan Script', category: 'Handwritten' },
+  { value: 'Caveat', category: 'Handwritten' },
+  { value: 'Amatic SC', category: 'Handwritten' },
+  { value: 'Satisfy', category: 'Handwritten' },
+  { value: 'Pacifico', category: 'Handwritten' },
+  { value: 'Lobster', category: 'Handwritten' },
+  { value: 'Yellowtail', category: 'Handwritten' },
 ];
 
 const FONT_CATEGORIES = [...new Set(FONT_OPTIONS.map((f) => f.category))];
@@ -82,6 +72,7 @@ export default function FontPicker({ section }: FontPickerProps) {
   const [selectedFont, setSelectedFont] = useState<string>(DEFAULT_FONT);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
+  const listRef = useRef<HTMLDivElement>(null);
 
   // Fetch current font for this section on mount
   useEffect(() => {
@@ -110,7 +101,16 @@ export default function FontPicker({ section }: FontPickerProps) {
     fetchFont();
   }, [section]);
 
+  // Scroll selected font into view on load
+  useEffect(() => {
+    if (!loading && listRef.current) {
+      const el = listRef.current.querySelector(`[data-font="${selectedFont}"]`);
+      if (el) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+  }, [loading, selectedFont]);
+
   const handleChange = async (value: string) => {
+    if (value === selectedFont || saving) return;
     setSelectedFont(value);
     setSaving(true);
     try {
@@ -135,8 +135,6 @@ export default function FontPicker({ section }: FontPickerProps) {
         description: 'Failed to save font selection',
         variant: 'destructive',
       });
-      // Revert to previous selection on error
-      setSelectedFont(DEFAULT_FONT);
     } finally {
       setSaving(false);
     }
@@ -145,72 +143,87 @@ export default function FontPicker({ section }: FontPickerProps) {
   return (
     <Card className="border-charcoal-ink/5 shadow-none">
       <CardContent className="p-4 space-y-3">
-        {/* Live preview */}
+        {/* Preview */}
         {!loading && (
-          <div>
-            <p className="text-[11px] text-charcoal-ink/40 uppercase tracking-wider mb-2 font-medium">Preview</p>
-            <p
-              className="text-2xl text-charcoal-ink leading-relaxed"
-              style={{ fontFamily: `'${selectedFont}', serif` }}
-            >
-              Eleanor & James
-            </p>
-            <p
-              className="text-sm text-charcoal-ink/50 mt-1 italic leading-relaxed"
-              style={{ fontFamily: `'${selectedFont}', serif` }}
-            >
-              Together with their families, request the pleasure of your company
-            </p>
+          <div className="flex items-end justify-between gap-4">
+            <div className="min-w-0">
+              <p
+                className="text-xl text-charcoal-ink leading-snug truncate"
+                style={{ fontFamily: `'${selectedFont}', serif` }}
+              >
+                Eleanor & James
+              </p>
+              <p
+                className="text-xs text-charcoal-ink/40 mt-0.5 italic truncate"
+                style={{ fontFamily: `'${selectedFont}', serif` }}
+              >
+                Together with their families
+              </p>
+            </div>
+            {saving && (
+              <Loader2 className="size-3.5 animate-spin text-cinematic-gold shrink-0" />
+            )}
           </div>
         )}
 
-        <div className="space-y-2.5">
-          <Label className="text-xs font-medium text-charcoal-ink/50 uppercase tracking-wider">
-            Section Font
+        {/* Scrollable font list */}
+        <div>
+          <Label className="text-xs font-medium text-charcoal-ink/50 uppercase tracking-wider mb-2 block">
+            Choose Font
           </Label>
-          <div className="relative">
-            <Select
-              value={selectedFont}
-              onValueChange={handleChange}
-              disabled={loading || saving}
-            >
-              <SelectTrigger className="border-charcoal-ink/10 focus:border-cinematic-gold focus:ring-cinematic-gold/20">
-                {saving ? (
-                  <span className="flex items-center gap-2">
-                    <Loader2 className="size-3.5 animate-spin text-cinematic-gold" />
-                    Saving…
-                  </span>
-                ) : (
-                  <SelectValue placeholder="Select font…" />
-                )}
-              </SelectTrigger>
-              <SelectContent className="max-h-[340px]">
-                {FONT_CATEGORIES.map((category) => (
-                  <SelectGroup key={category}>
-                    <SelectLabel className="text-[11px] text-cinematic-gold/80 font-semibold uppercase tracking-wider">
+          <div
+            ref={listRef}
+            className="max-h-[220px] overflow-y-auto rounded-lg border border-charcoal-ink/10 bg-white/50"
+            style={{
+              scrollbarWidth: 'thin',
+              scrollbarColor: '#D4AF37 transparent',
+            }}
+          >
+            {loading ? (
+              <div className="flex items-center justify-center py-10">
+                <Loader2 className="size-4 animate-spin text-cinematic-gold" />
+              </div>
+            ) : (
+              FONT_CATEGORIES.map((category) => (
+                <div key={category}>
+                  <div className="sticky top-0 z-10 bg-paper-cream/95 backdrop-blur-sm px-3 py-1.5">
+                    <span className="text-[10px] text-cinematic-gold/70 font-semibold uppercase tracking-widest">
                       {category}
-                    </SelectLabel>
-                    {FONT_OPTIONS.filter((f) => f.category === category).map((font) => (
-                      <SelectItem key={font.value} value={font.value}>
-                        <span className="flex items-center justify-between gap-6 w-full">
-                          <span className="truncate">{font.value}</span>
+                    </span>
+                  </div>
+                  {FONT_OPTIONS.filter((f) => f.category === category).map((font) => {
+                    const isSelected = font.value === selectedFont;
+                    return (
+                      <button
+                        key={font.value}
+                        data-font={font.value}
+                        onClick={() => handleChange(font.value)}
+                        disabled={saving}
+                        className={`w-full flex items-center justify-between gap-3 px-3 py-1.5 text-left transition-colors duration-150 ${
+                          isSelected
+                            ? 'bg-cinematic-gold/10 border-l-2 border-cinematic-gold'
+                            : 'border-l-2 border-transparent hover:bg-charcoal-ink/[0.03]'
+                        }`}
+                      >
+                        <span className={`text-xs truncate ${isSelected ? 'text-charcoal-ink font-medium' : 'text-charcoal-ink/70'}`}>
+                          {font.value}
+                        </span>
+                        <div className="flex items-center gap-2 shrink-0">
                           <span
-                            className="text-charcoal-ink/60 text-sm shrink-0"
+                            className="text-[11px] text-charcoal-ink/40 max-w-[120px] truncate"
                             style={{ fontFamily: `'${font.value}', serif` }}
                           >
-                            {font.preview}
+                            Aa Bb Cc
                           </span>
-                        </span>
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                ))}
-              </SelectContent>
-            </Select>
-            {loading && (
-              <div className="absolute right-8 top-1/2 -translate-y-1/2">
-                <Loader2 className="size-3.5 animate-spin text-charcoal-ink/30" />
-              </div>
+                          {isSelected && (
+                            <Check className="size-3 text-cinematic-gold" strokeWidth={3} />
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              ))
             )}
           </div>
         </div>

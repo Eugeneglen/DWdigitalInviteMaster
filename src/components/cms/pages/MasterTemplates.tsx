@@ -20,15 +20,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Check } from 'lucide-react';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -309,75 +301,54 @@ function EditTemplateDialog({
           {/* Fonts */}
           <div className="space-y-3">
             <h4 className="text-sm font-semibold text-slate-700">Fonts</h4>
-            <div className="flex items-center gap-3">
-              <Label className="text-sm text-slate-600 w-20 shrink-0">Heading</Label>
-              <Select
-                value={editing.fonts.heading}
-                onValueChange={(v) => updateFont('heading', v)}
-              >
-                <SelectTrigger className="flex-1 text-sm h-8">
-                  <SelectValue placeholder="Select font…" />
-                </SelectTrigger>
-                <SelectContent className="max-h-[300px]">
-                  {FONT_CATEGORIES.map((category) => (
-                    <SelectGroup key={category}>
-                      <SelectLabel className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">
-                        {category}
-                      </SelectLabel>
-                      {TEMPLATE_FONT_OPTIONS
-                        .filter((f) => f.category === category)
-                        .map((font) => (
-                          <SelectItem key={font.value} value={font.value}>
-                            <span className="flex items-center justify-between gap-6 w-full">
-                              <span className="truncate">{font.value}</span>
-                              <span
-                                className="text-slate-500 text-xs shrink-0"
-                                style={{ fontFamily: `'${font.value}', serif` }}
+            <div className="space-y-3">
+              {(['heading', 'body'] as const).map((key) => (
+                <div key={key} className="space-y-1.5">
+                  <Label className="text-sm text-slate-600">{key === 'heading' ? 'Heading' : 'Body'}</Label>
+                  <div
+                    className="max-h-[140px] overflow-y-auto rounded-lg border border-slate-200 bg-white"
+                    style={{ scrollbarWidth: 'thin', scrollbarColor: '#D4AF37 transparent' }}
+                  >
+                    {FONT_CATEGORIES.map((category) => (
+                      <div key={category}>
+                        <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm px-2.5 py-1">
+                          <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-widest">{category}</span>
+                        </div>
+                        {TEMPLATE_FONT_OPTIONS
+                          .filter((f) => f.category === category)
+                          .map((font) => {
+                            const isSelected = editing.fonts[key] === font.value;
+                            return (
+                              <button
+                                key={font.value}
+                                type="button"
+                                onClick={() => updateFont(key, font.value)}
+                                className={`w-full flex items-center justify-between gap-2 px-2.5 py-1 text-left transition-colors duration-150 ${
+                                  isSelected
+                                    ? 'bg-slate-100 border-l-2 border-slate-800'
+                                    : 'border-l-2 border-transparent hover:bg-slate-50'
+                                }`}
                               >
-                                Aa Bb Cc
-                              </span>
-                            </span>
-                          </SelectItem>
-                        ))}
-                    </SelectGroup>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex items-center gap-3">
-              <Label className="text-sm text-slate-600 w-20 shrink-0">Body</Label>
-              <Select
-                value={editing.fonts.body}
-                onValueChange={(v) => updateFont('body', v)}
-              >
-                <SelectTrigger className="flex-1 text-sm h-8">
-                  <SelectValue placeholder="Select font…" />
-                </SelectTrigger>
-                <SelectContent className="max-h-[300px]">
-                  {FONT_CATEGORIES.map((category) => (
-                    <SelectGroup key={category}>
-                      <SelectLabel className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">
-                        {category}
-                      </SelectLabel>
-                      {TEMPLATE_FONT_OPTIONS
-                        .filter((f) => f.category === category)
-                        .map((font) => (
-                          <SelectItem key={font.value} value={font.value}>
-                            <span className="flex items-center justify-between gap-6 w-full">
-                              <span className="truncate">{font.value}</span>
-                              <span
-                                className="text-slate-500 text-xs shrink-0"
-                                style={{ fontFamily: `'${font.value}', serif` }}
-                              >
-                                Aa Bb Cc
-                              </span>
-                            </span>
-                          </SelectItem>
-                        ))}
-                    </SelectGroup>
-                  ))}
-                </SelectContent>
-              </Select>
+                                <span className={`text-xs truncate ${isSelected ? 'text-slate-800 font-medium' : 'text-slate-600'}`}>
+                                  {font.value}
+                                </span>
+                                <div className="flex items-center gap-1.5 shrink-0">
+                                  <span
+                                    className="text-[10px] text-slate-400 max-w-[100px] truncate"
+                                    style={{ fontFamily: `'${font.value}', serif` }}
+                                  >
+                                    Aa Bb
+                                  </span>
+                                  {isSelected && <Check className="size-3 text-slate-700" strokeWidth={3} />}
+                                </div>
+                              </button>
+                            );
+                          })}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
