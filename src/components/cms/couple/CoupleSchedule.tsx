@@ -83,15 +83,26 @@ export default function CoupleSchedule() {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
 
-  // Content editor state
+  // Content editor state (schedule section)
   const [contentFields, setContentFields] = useState<Record<string, string>>({});
   const [originalFields, setOriginalFields] = useState<Record<string, string>>({});
   const [editedFields, setEditedFields] = useState<Record<string, boolean>>({});
   const [savingContent, setSavingContent] = useState(false);
 
+  // Venue content state (getting-there section)
+  const [venueFields, setVenueFields] = useState<Record<string, string>>({});
+  const [venueOriginals, setVenueOriginals] = useState<Record<string, string>>({});
+  const [venueEdited, setVenueEdited] = useState<Record<string, boolean>>({});
+  const [savingVenue, setSavingVenue] = useState(false);
+
   const CONTENT_KEYS = [
     { key: 'title', label: 'Section Title', placeholder: 'e.g. The Day', type: 'input' as const },
     { key: 'subtitle', label: 'Section Subtitle', placeholder: 'e.g. A timeline of our celebration', type: 'input' as const },
+  ];
+
+  const VENUE_KEYS = [
+    { key: 'venueImage', label: 'Venue Image URL', placeholder: 'https://example.com/venue-photo.jpg', type: 'input' as const },
+    { key: 'venueDescription', label: 'Venue Description', placeholder: 'A short description of the wedding venue…', type: 'textarea' as const },
   ];
 
   const fetchSchedules = useCallback(async () => {
@@ -113,14 +124,27 @@ export default function CoupleSchedule() {
       const res = await fetch('/api/cms/content?XTransformPort=3000');
       if (!res.ok) throw new Error('Failed to load content');
       const data = await res.json();
-      const items = (data.items ?? []).filter((i: { section: string }) => i.section === 'schedule');
+      const allItems = data.items ?? [];
+
+      // Schedule section fields
+      const scheduleItems = allItems.filter((i: { section: string }) => i.section === 'schedule');
       const fields: Record<string, string> = {};
-      items.forEach((item: { fieldKey: string; fieldValue: string }) => {
+      scheduleItems.forEach((item: { fieldKey: string; fieldValue: string }) => {
         fields[item.fieldKey] = item.fieldValue;
       });
       setContentFields(fields);
       setOriginalFields({ ...fields });
       setEditedFields({});
+
+      // Getting-there section venue fields
+      const gtItems = allItems.filter((i: { section: string }) => i.section === 'getting-there');
+      const vFields: Record<string, string> = {};
+      gtItems.forEach((item: { fieldKey: string; fieldValue: string }) => {
+        vFields[item.fieldKey] = item.fieldValue;
+      });
+      setVenueFields(vFields);
+      setVenueOriginals({ ...vFields });
+      setVenueEdited({});
     } catch {
       // silently fail for content
     }
@@ -211,6 +235,44 @@ export default function CoupleSchedule() {
       ...prev,
       [key]: value !== originalFields[key],
     }));
+  };
+
+  const handleVenueChange = (key: string, value: string) => {
+    setVenueFields((prev) => ({ ...prev, [key]: value }));
+    setVenueEdited((prev) => ({
+      ...prev,
+      [key]: value !== venueOriginals[key],
+    }));
+  };
+
+  const handleSaveVenue = async () => {
+    try {
+      setSavingVenue(true);
+      const items = Object.keys(venueEdited)
+        .filter((k) => venueEdited[k])
+        .map((fieldKey) => ({
+          section: 'getting-there' as const,
+          fieldKey,
+          fieldValue: venueFields[fieldKey],
+        }));
+      if (items.length === 0) {
+        toast({ title: 'Info', description: 'No changes to save' });
+        return;
+      }
+      const res = await fetch('/api/cms/content?XTransformPort=3000', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items }),
+      });
+      if (!res.ok) throw new Error('Failed to save venue content');
+      toast({ title: 'Success', description: 'Venue content saved' });
+      setVenueOriginals({ ...venueFields });
+      setVenueEdited({});
+    } catch {
+      toast({ title: 'Error', description: 'Failed to save venue content', variant: 'destructive' });
+    } finally {
+      setSavingVenue(false);
+    }
   };
 
   const handleSaveContent = async () => {
@@ -309,6 +371,56 @@ export default function CoupleSchedule() {
       </div>
 
       <SectionImageUpload category="schedule" label="Schedule Images" maxImages={3} />
+
+      {/* Wedding Venue Card */}
+      <Card className="border-charcoal-ink/5 shadow-none">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-semibold text-charcoal-ink">Wedding Venue</h3>
+            {Object.values(venueEdited).some(Boolean) && (
+              <Button
+                onClick={handleSaveVenue}
+                disabled={savingVenue}
+                size="sm"
+                className="bg-cinematic-gold text-charcoal-ink hover:bg-cinematic-gold/90 rounded px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.08em] transition-colors duration-300"
+              >
+                {savingVenue ? 'Saving…' : 'Save'}
+              </Button>
+            )}
+          </div>
+          <div className="space-y-4">
+            {VENUE_KEYS.map(({ key, label, placeholder, type }) => (
+              <div key={key} className="space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <Label className="text-xs font-medium text-charcoal-ink/50 uppercase tracking-wider">
+                    {label}
+                  </Label>
+                  {venueEdited[key] && (
+                    <span className="bg-cinematic-gold w-1.5 h-1.5 rounded-full" />
+                  )}
+                </div>
+                {type === 'textarea' ? (
+                  <Textarea
+                    value={venueFields[key] ?? ''}
+                    onChange={(e) => handleVenueChange(key, e.target.value)}
+                    placeholder={placeholder}
+                    rows={3}
+                    className="border-charcoal-ink/10 focus:border-cinematic-gold focus:ring-cinematic-gold/20 resize-none"
+                  />
+                ) : (
+                  <Input
+                    value={venueFields[key] ?? ''}
+                    onChange={(e) => handleVenueChange(key, e.target.value)}
+                    placeholder={placeholder}
+                    className="border-charcoal-ink/10 focus:border-cinematic-gold focus:ring-cinematic-gold/20"
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Content Card */}
       <Card className="border-charcoal-ink/5 shadow-none">
         <CardContent className="p-6">
