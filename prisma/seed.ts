@@ -10,7 +10,7 @@ async function seed() {
   const adminPassword = await bcrypt.hash('Admin@2024', 12);
   const admin = await db.user.upsert({
     where: { email: 'admin@dreamweavers.sg' },
-    update: {},
+    update: { role: 'SUPER_ADMIN' },
     create: {
       email: 'admin@dreamweavers.sg',
       passwordHash: adminPassword,
@@ -25,7 +25,7 @@ async function seed() {
   const couplePassword = await bcrypt.hash('Couple@2024', 12);
   const couple = await db.user.upsert({
     where: { email: 'eleanor@wedding.com' },
-    update: {},
+    update: { role: 'COUPLE' },
     create: {
       email: 'eleanor@wedding.com',
       passwordHash: couplePassword,
