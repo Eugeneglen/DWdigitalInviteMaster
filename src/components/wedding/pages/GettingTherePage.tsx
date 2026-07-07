@@ -4,16 +4,14 @@ import { useState } from 'react';
 import SectionBanner from '../SectionBanner';
 import { usePublicWedding } from '@/hooks/usePublicWedding';
 
-const FALLBACK_VENUE = 'The Singapore EDITION, Orchard';
-const FALLBACK_VENUE_SHORT = 'The Singapore EDITION';
+const FALLBACK_VENUE = 'The Singapore EDITION';
 const FALLBACK_ADDRESS = '38 Cuscaden Road, Singapore 249731';
 
 export default function GettingTherePage() {
   const [tab, setTab] = useState<'car' | 'transit'>('transit');
   const { data, getField } = usePublicWedding();
 
-  const subtitle = getField('getting-there', 'subtitle') || (data?.wedding.venue ? `${data.wedding.venue}, Orchard` : FALLBACK_VENUE);
-  const venueName = data?.wedding.venue || FALLBACK_VENUE_SHORT;
+  const venueName = data?.wedding.venue || FALLBACK_VENUE;
   const venueAddress = data?.wedding.venueAddress || FALLBACK_ADDRESS;
 
   const carContent = getField('getting-there', 'carContent', '');
@@ -32,7 +30,7 @@ export default function GettingTherePage() {
 
   return (
     <>
-      <SectionBanner title={getField('getting-there', 'title', 'Getting There')} subtitle={subtitle} />
+      <SectionBanner title={getField('getting-there', 'title', 'Getting There')} />
 
       <main className="pb-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto min-h-screen pt-[20px] md:pt-[40px] flex flex-col gap-8">
         {/* Address */}
