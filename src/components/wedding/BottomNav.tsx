@@ -88,13 +88,19 @@ export default function BottomNav() {
   const config = PAGE_NAV_CONFIG[currentSection];
 
   return (
-    <nav className="fixed bottom-0 left-0 w-full flex justify-around items-center py-4 px-2 md:hidden bg-paper-cream border-t border-champagne-silk/20 z-50 rounded-t-full shadow-[0_-4px_20px_rgba(26,26,26,0.04)] pb-8 pt-4">
+    <nav
+      className="fixed bottom-0 left-0 w-full flex justify-around items-center py-4 px-2 md:hidden bg-paper-cream border-t border-champagne-silk/20 z-50 rounded-t-full shadow-[0_-4px_20px_rgba(26,26,26,0.04)] pb-8 pt-4"
+      role="navigation"
+      aria-label="Page navigation"
+    >
       {config.items.map((item) => {
         const isActive = item.active ?? false;
         return (
           <button
             key={`${currentSection}-${item.section}`}
             onClick={() => setSection(item.section)}
+            aria-label={`Navigate to ${item.label}`}
+            aria-current={isActive ? 'page' : undefined}
             className={`flex flex-col items-center justify-center active:scale-90 transition-transform ${
               isActive
                 ? 'text-cinematic-gold'
@@ -103,6 +109,7 @@ export default function BottomNav() {
           >
             <span
               className="material-symbols-outlined mb-1"
+              aria-hidden="true"
               data-weight={isActive ? 'fill' : undefined}
               style={isActive ? { fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24" } : undefined}
             >
@@ -118,9 +125,10 @@ export default function BottomNav() {
       {config.showMore && (
         <button
           onClick={openDrawer}
+          aria-label="Open more navigation options"
           className="flex flex-col items-center justify-center text-charcoal-ink/50 hover:text-cinematic-gold transition-colors active:scale-90 transition-transform"
         >
-          <span className="material-symbols-outlined mb-1">more_horiz</span>
+          <span className="material-symbols-outlined mb-1" aria-hidden="true">more_horiz</span>
           <span className="font-label-sm text-[10px] uppercase tracking-wider font-semibold mt-1">More</span>
         </button>
       )}

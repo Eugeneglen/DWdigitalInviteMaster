@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
@@ -17,9 +17,16 @@ const inter = Inter({
   weight: ["300", "400", "500", "600"],
 });
 
+export const viewport: Viewport = {
+  themeColor: "#D4AF37",
+};
+
 export const metadata: Metadata = {
-  title: "Dreamweavers - The Digital Keepsake",
-  description: "Eleanor & James — A wedding digital keepsake celebrating our journey together.",
+  title: {
+    default: "Dreamweavers — Digital Wedding Invitations",
+    template: "%s — Dreamweavers",
+  },
+  description: "Create beautiful, cinematic digital wedding invitations. Dreamweavers transforms your love story into an unforgettable online experience for your guests.",
 };
 
 export default function RootLayout({

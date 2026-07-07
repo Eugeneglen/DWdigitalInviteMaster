@@ -4,6 +4,7 @@ import { useSession } from 'next-auth/react';
 import { useNavigationStore } from '@/store/useNavigationStore';
 import { useCoupleCMSStore } from '@/store/useCoupleCMSStore';
 import { useAuthModalStore } from '@/store/useAuthModalStore';
+import { usePublicWedding } from '@/hooks/usePublicWedding';
 import Header from '@/components/wedding/Header';
 import MobileDrawer from '@/components/wedding/MobileDrawer';
 import BottomNav from '@/components/wedding/BottomNav';
@@ -12,7 +13,6 @@ import MusicPlayer from '@/components/wedding/MusicPlayer';
 import { LoginModal } from '@/components/cms/LoginModal';
 import type { Section } from '@/store/useNavigationStore';
 import dynamic from 'next/dynamic';
-import { usePublicWedding } from '@/hooks/usePublicWedding';
 
 // Guest pages — dynamic imports to reduce Turbopack compilation memory
 const HomePage = dynamic(() => import('@/components/wedding/pages/HomePage'), { ssr: false });
@@ -35,6 +35,50 @@ const GUEST_PAGES: Record<Section, React.ComponentType> = {
   qa: QAPage,
 };
 
+/** Full-page skeleton that mimics the guest site layout while wedding data loads */
+function GuestSiteSkeleton() {
+  return (
+    <div className="min-h-screen flex flex-col bg-paper-cream text-charcoal-ink overflow-x-hidden">
+      {/* Header skeleton */}
+      <div className="fixed w-full z-50 bg-paper-cream/80 backdrop-blur-md border-b border-champagne-silk/30 h-14">
+        <div className="flex justify-between items-center px-4 md:px-6 py-3 max-w-[1440px] mx-auto">
+          <div className="h-4 w-24 animate-pulse rounded bg-champagne-silk/60" />
+          <div className="hidden lg:flex gap-6">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="h-4 w-16 animate-pulse rounded bg-champagne-silk/40" />
+            ))}
+          </div>
+          <div className="lg:hidden h-4 w-6 animate-pulse rounded bg-champagne-silk/40" />
+        </div>
+      </div>
+
+      {/* Hero banner skeleton */}
+      <div className="pt-14">
+        <div className="relative h-[70vh] animate-pulse bg-champagne-silk/40" />
+      </div>
+
+      {/* Content cards skeleton */}
+      <div className="px-4 md:px-6 py-10 max-w-3xl mx-auto w-full space-y-6">
+        <div className="h-6 w-48 animate-pulse rounded bg-champagne-silk/40 mx-auto" />
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="rounded-2xl border border-champagne-silk/20 bg-white p-5 space-y-3">
+            <div className="h-4 w-3/4 animate-pulse rounded bg-champagne-silk/30" />
+            <div className="h-3 w-full animate-pulse rounded bg-champagne-silk/20" />
+            <div className="h-3 w-5/6 animate-pulse rounded bg-champagne-silk/20" />
+          </div>
+        ))}
+      </div>
+
+      {/* Footer skeleton */}
+      <div className="mt-auto border-t border-champagne-silk/20 py-8 px-4">
+        <div className="max-w-3xl mx-auto flex justify-center">
+          <div className="h-4 w-32 animate-pulse rounded bg-champagne-silk/30" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 interface GuestSiteProps {
   /** Wedding slug — when provided, fetches data for that specific wedding */
   slug?: string;
@@ -51,7 +95,12 @@ export default function GuestSite({ slug, topOffset, showEditorButton = false }:
   const { open: loginModalOpen, closeModal } = useAuthModalStore();
 
   // Pre-fetch wedding data for this slug so all child pages share the cache
-  usePublicWedding(slug);
+  const { loading } = usePublicWedding(slug);
+
+  // Show full-page skeleton while wedding data is loading
+  if (loading) {
+    return <GuestSiteSkeleton />;
+  }
 
   const isAdmin = session?.user?.role === 'SUPER_ADMIN' || session?.user?.role === 'ACCOUNT_MANAGER';
   const isCouple = session?.user?.role === 'COUPLE';

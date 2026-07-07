@@ -39,6 +39,7 @@ export default function MobileDrawer() {
       aria-hidden={!drawerOpen}
     >
       <nav
+        id="mobile-drawer"
         className={`h-full w-80 bg-paper-cream shadow-2xl flex flex-col p-8 gap-4 transition-transform duration-500 ease-in-out ${
           drawerOpen ? 'translate-x-0' : '-translate-x-full'
         }`}

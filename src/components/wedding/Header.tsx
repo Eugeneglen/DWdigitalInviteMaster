@@ -19,7 +19,7 @@ interface HeaderProps {
 }
 
 export default function Header({ topOffset }: HeaderProps) {
-  const { currentSection, setSection, openDrawer } = useNavigationStore();
+  const { currentSection, setSection, drawerOpen, openDrawer } = useNavigationStore();
 
   return (
     <header
@@ -31,6 +31,10 @@ export default function Header({ topOffset }: HeaderProps) {
         <div
           className="flex-shrink-0 cursor-pointer"
           onClick={() => setSection('home')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSection('home'); } }}
+          aria-label="Go to Home"
         >
           <img
             alt="Dreamweavers Logo"
@@ -40,13 +44,15 @@ export default function Header({ topOffset }: HeaderProps) {
         </div>
 
         {/* Desktop navigation (lg+) */}
-        <nav className="hidden lg:flex justify-center items-center gap-6 px-4 ml-auto">
+        <nav className="hidden lg:flex justify-center items-center gap-6 px-4 ml-auto" aria-label="Main navigation">
           {NAV_ITEMS.map((item) => {
             const isActive = currentSection === item.section;
             return (
               <button
                 key={item.section}
                 onClick={() => setSection(item.section)}
+                aria-label={`Navigate to ${item.label}`}
+                aria-current={isActive ? 'page' : undefined}
                 className={`font-medium text-[11px] tracking-[0.2em] uppercase border-b-2 h-[26px] flex items-center transition-colors duration-300 ${
                   isActive
                     ? 'text-cinematic-gold border-cinematic-gold'
@@ -65,6 +71,8 @@ export default function Header({ topOffset }: HeaderProps) {
             className="text-charcoal-ink p-2"
             onClick={openDrawer}
             aria-label="Open navigation menu"
+            aria-expanded={drawerOpen}
+            aria-controls="mobile-drawer"
           >
             <span className="material-symbols-outlined">menu</span>
           </button>

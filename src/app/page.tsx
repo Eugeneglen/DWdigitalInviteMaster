@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useSession } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
@@ -8,6 +8,8 @@ import { useNavigationStore } from '@/store/useNavigationStore';
 import { useCMSStore, type CMSPage } from '@/store/useCMSStore';
 import { useCoupleCMSStore, type CoupleCMSPage } from '@/store/useCoupleCMSStore';
 import { useAuthModalStore } from '@/store/useAuthModalStore';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { CMSPageSkeleton } from '@/components/cms/LoadingSkeleton';
 import GuestSite from '@/components/wedding/GuestSite';
 import { LoginModal } from '@/components/cms/LoginModal';
 import MasterCMSLayout from '@/components/cms/MasterCMSLayout';
@@ -96,11 +98,47 @@ export default function Home() {
   const wantsCMS = viewParam === 'cms' || viewParam === 'couple';
   const showLoginModal = loginModalOpen || (wantsCMS && status !== 'authenticated');
 
+  return (
+    <ErrorBoundary>
+      <HomeView
+        viewMode={viewMode}
+        isAdmin={isAdmin}
+        isCouple={isCouple}
+        previewMode={previewMode}
+        showLoginModal={showLoginModal}
+        togglePreview={togglePreview}
+        closeModal={closeModal}
+      />
+    </ErrorBoundary>
+  );
+}
+
+function HomeView({
+  viewMode,
+  isAdmin,
+  isCouple,
+  previewMode,
+  showLoginModal,
+  togglePreview,
+  closeModal,
+}: {
+  viewMode: string;
+  isAdmin: boolean;
+  isCouple: boolean;
+  previewMode: boolean;
+  showLoginModal: boolean;
+  togglePreview: (v: boolean) => void;
+  closeModal: () => void;
+}) {
   // Master CMS View
   if (viewMode === 'cms' && isAdmin) {
     return (
       <>
-        <MasterCMSLayout><MasterCMSPageRouter /></MasterCMSLayout>
+        <MasterCMSLayout>
+          <Suspense fallback={<CMSPageSkeleton />}>
+            <MasterCMSPageRouter />
+          </Suspense>
+        </MasterCMSLayout>
         <LoginModal open={showLoginModal} onOpenChange={(open) => { if (!open) closeModal(); }} />
       </>
     );
@@ -119,6 +157,7 @@ export default function Home() {
           <button
             onClick={() => togglePreview(false)}
             className="flex items-center gap-1.5 rounded-md bg-white/20 hover:bg-white/30 px-3.5 py-1.5 text-xs font-semibold transition-colors"
+            aria-label="Open Editor"
           >
             <svg className="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
             Open Editor
@@ -133,7 +172,11 @@ export default function Home() {
   if (viewMode === 'couple' && isCouple) {
     return (
       <>
-        <CoupleCMSLayout><CoupleCMSPageRouter /></CoupleCMSLayout>
+        <CoupleCMSLayout>
+          <Suspense fallback={<CMSPageSkeleton />}>
+            <CoupleCMSPageRouter />
+          </Suspense>
+        </CoupleCMSLayout>
         <LoginModal open={showLoginModal} onOpenChange={(open) => { if (!open) closeModal(); }} />
       </>
     );
