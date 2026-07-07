@@ -78,6 +78,16 @@ export default function HomePage() {
     : parseWeddingTimestamp(data?.wedding.weddingDate);
   const heroDescription = getField('hero', 'description', FALLBACK_HERO_DESCRIPTION);
 
+  // Tea Ceremony section
+  const teaCeremonyImage = getField('hero', 'teaCeremonyImage', FALLBACK_TEA_IMG);
+  const teaCeremonyLabel = getField('hero', 'teaCeremonyLabel', 'The Tradition');
+  const teaCeremonyTitle = getField('hero', 'teaCeremonyTitle', 'The Tea Ceremony');
+
+  // Narrative section
+  const narrativeLabel = getField('hero', 'narrativeLabel', 'The Prelude');
+  const narrativeTitle = getField('hero', 'narrativeTitle', 'Our Story Begins Here');
+  const narrativeBody = getField('hero', 'narrativeBody', 'Every great romance is a narrative woven over time. Ours began with a serendipitous meeting and has evolved into a tapestry of shared adventures, quiet moments, and a profound commitment to one another.');
+
   const countdown = useCountdown(weddingTimestamp);
   const { setSection } = useNavigationStore();
   const [showFab, setShowFab] = useState(false);
@@ -202,14 +212,14 @@ export default function HomePage() {
           <div className="max-w-4xl mx-auto flex flex-col items-center">
             <div className="relative w-full aspect-[2/3] md:aspect-auto md:h-[800px] overflow-hidden rounded-lg shadow-xl mb-8 group">
               <img
-                alt="The Tea Ceremony"
+                alt={teaCeremonyTitle}
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                src={FALLBACK_TEA_IMG}
+                src={teaCeremonyImage}
               />
             </div>
             <div className="text-center">
-              <span className="font-label-sm text-label-sm leading-label-sm text-cinematic-gold tracking-[0.2em] uppercase block mb-2 font-semibold">The Tradition</span>
-              <h3 className="font-display-hero text-headline-lg-mobile leading-headline-lg-mobile md:text-headline-lg md:leading-headline-lg font-semibold text-charcoal-ink">The Tea Ceremony</h3>
+              <span className="font-label-sm text-label-sm leading-label-sm text-cinematic-gold tracking-[0.2em] uppercase block mb-2 font-semibold">{teaCeremonyLabel}</span>
+              <h3 className="font-display-hero text-headline-lg-mobile leading-headline-lg-mobile md:text-headline-lg md:leading-headline-lg font-semibold text-charcoal-ink">{teaCeremonyTitle}</h3>
             </div>
           </div>
         </section>
@@ -217,10 +227,10 @@ export default function HomePage() {
         {/* ===== NARRATIVE SECTION ===== */}
         <section className="py-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto">
           <div className="max-w-3xl mx-auto text-center space-y-8">
-            <span className="font-label-sm text-label-sm leading-label-sm text-cinematic-gold tracking-[0.2em] uppercase block font-semibold">The Prelude</span>
-            <h3 className="font-display-hero text-headline-lg-mobile leading-headline-lg-mobile md:text-headline-lg md:leading-headline-lg font-semibold text-charcoal-ink">Our Story Begins Here</h3>
+            <span className="font-label-sm text-label-sm leading-label-sm text-cinematic-gold tracking-[0.2em] uppercase block font-semibold">{narrativeLabel}</span>
+            <h3 className="font-display-hero text-headline-lg-mobile leading-headline-lg-mobile md:text-headline-lg md:leading-headline-lg font-semibold text-charcoal-ink">{narrativeTitle}</h3>
             <p className="font-body-md text-body-md text-charcoal-ink/80 leading-relaxed">
-              Every great romance is a narrative woven over time. Ours began with a serendipitous meeting and has evolved into a tapestry of shared adventures, quiet moments, and a profound commitment to one another.
+              {narrativeBody}
             </p>
           </div>
         </section>

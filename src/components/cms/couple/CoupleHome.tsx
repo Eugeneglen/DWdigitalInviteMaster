@@ -33,6 +33,18 @@ const HERO_FIELDS = [
   { key: 'countdownDate', label: 'Countdown Target Date', type: 'text' as const, placeholder: 'e.g. 2027-12-25T16:00:00+08:00' },
 ];
 
+const TEA_CEREMONY_FIELDS = [
+  { key: 'teaCeremonyImage', label: 'Image URL', type: 'text' as const, placeholder: 'https://example.com/tea-ceremony.jpg' },
+  { key: 'teaCeremonyLabel', label: 'Label', type: 'text' as const, placeholder: 'e.g. The Tradition' },
+  { key: 'teaCeremonyTitle', label: 'Title', type: 'text' as const, placeholder: 'e.g. The Tea Ceremony' },
+];
+
+const NARRATIVE_FIELDS = [
+  { key: 'narrativeLabel', label: 'Label', type: 'text' as const, placeholder: 'e.g. The Prelude' },
+  { key: 'narrativeTitle', label: 'Title', type: 'text' as const, placeholder: 'e.g. Our Story Begins Here' },
+  { key: 'narrativeBody', label: 'Body Text', type: 'textarea' as const, placeholder: 'A short narrative paragraph…' },
+];
+
 export default function CoupleHome() {
   const { weddingData } = useCoupleCMSStore();
   const [content, setContent] = useState<ContentItem[]>([]);
@@ -280,6 +292,100 @@ export default function CoupleHome() {
                 );
               })
             )}
+          </CardContent>
+        </Card>
+      </div>
+
+      <Separator className="bg-champagne-silk" />
+
+      {/* 7. Tea Ceremony Section */}
+      <div className="space-y-3">
+        <Label className="text-xs font-medium text-charcoal-ink/50 uppercase tracking-wider">
+          Tea Ceremony Section
+        </Label>
+        <Card className="border-charcoal-ink/5 shadow-none">
+          <CardContent className="p-4 space-y-4">
+            {TEA_CEREMONY_FIELDS.map((field) => {
+              const value = getFieldValue(field.key);
+              const isChanged = editedFields[`hero/${field.key}`] !== undefined;
+              return (
+                <div key={field.key} className="space-y-1.5">
+                  <Label
+                    htmlFor={`hero-content-${field.key}`}
+                    className="text-xs font-medium text-charcoal-ink/50 uppercase tracking-wider flex items-center gap-1.5"
+                  >
+                    {field.label}
+                    {isChanged && <span className="inline-flex h-1.5 w-1.5 rounded-full bg-cinematic-gold" />}
+                  </Label>
+                  {field.type === 'textarea' ? (
+                    <Textarea
+                      id={`hero-content-${field.key}`}
+                      value={value}
+                      onChange={(e) => setFieldValue(field.key, e.target.value)}
+                      placeholder={field.placeholder}
+                      rows={3}
+                      className={`border-charcoal-ink/10 focus:border-cinematic-gold focus:ring-cinematic-gold/20 resize-none ${isChanged ? 'border-cinematic-gold/50' : ''}`}
+                    />
+                  ) : (
+                    <Input
+                      id={`hero-content-${field.key}`}
+                      type="text"
+                      value={value}
+                      onChange={(e) => setFieldValue(field.key, e.target.value)}
+                      placeholder={field.placeholder}
+                      className={`border-charcoal-ink/10 focus:border-cinematic-gold focus:ring-cinematic-gold/20 ${isChanged ? 'border-cinematic-gold/50' : ''}`}
+                    />
+                  )}
+                </div>
+              );
+            })}
+          </CardContent>
+        </Card>
+      </div>
+
+      <Separator className="bg-champagne-silk" />
+
+      {/* 8. Narrative Section */}
+      <div className="space-y-3">
+        <Label className="text-xs font-medium text-charcoal-ink/50 uppercase tracking-wider">
+          Narrative Section
+        </Label>
+        <Card className="border-charcoal-ink/5 shadow-none">
+          <CardContent className="p-4 space-y-4">
+            {NARRATIVE_FIELDS.map((field) => {
+              const value = getFieldValue(field.key);
+              const isChanged = editedFields[`hero/${field.key}`] !== undefined;
+              return (
+                <div key={field.key} className="space-y-1.5">
+                  <Label
+                    htmlFor={`hero-content-${field.key}`}
+                    className="text-xs font-medium text-charcoal-ink/50 uppercase tracking-wider flex items-center gap-1.5"
+                  >
+                    {field.label}
+                    {isChanged && <span className="inline-flex h-1.5 w-1.5 rounded-full bg-cinematic-gold" />}
+                  </Label>
+                  {field.type === 'textarea' ? (
+                    <Textarea
+                      id={`hero-content-${field.key}`}
+                      value={value}
+                      onChange={(e) => setFieldValue(field.key, e.target.value)}
+                      placeholder={field.placeholder}
+                      rows={3}
+                      className={`border-charcoal-ink/10 focus:border-cinematic-gold focus:ring-cinematic-gold/20 resize-none ${isChanged ? 'border-cinematic-gold/50' : ''}`}
+                    />
+                  ) : (
+                    <Input
+                      id={`hero-content-${field.key}`}
+                      type="text"
+                      value={value}
+                      onChange={(e) => setFieldValue(field.key, e.target.value)}
+                      placeholder={field.placeholder}
+                      className={`border-charcoal-ink/10 focus:border-cinematic-gold focus:ring-cinematic-gold/20 ${isChanged ? 'border-cinematic-gold/50' : ''}`}
+                    />
+                  )}
+                </div>
+              );
+            })}
           </CardContent>
         </Card>
       </div>
