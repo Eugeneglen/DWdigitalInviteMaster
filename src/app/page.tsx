@@ -33,6 +33,7 @@ const CoupleImages = dynamic(() => import('@/components/cms/couple/CoupleImages'
 const CoupleGuests = dynamic(() => import('@/components/cms/couple/CoupleGuests'), { ssr: false });
 const CoupleRSVPs = dynamic(() => import('@/components/cms/couple/CoupleRSVPs'), { ssr: false });
 const CoupleWishes = dynamic(() => import('@/components/cms/couple/CoupleWishes'), { ssr: false });
+const CoupleAnalytics = dynamic(() => import('@/components/cms/couple/CoupleAnalytics'), { ssr: false });
 const CoupleAuditLog = dynamic(() => import('@/components/cms/couple/CoupleAuditLog'), { ssr: false });
 const CoupleSharing = dynamic(() => import('@/components/cms/couple/CoupleSharing'), { ssr: false });
 
@@ -57,6 +58,7 @@ const COUPLE_CMS_PAGES: Record<CoupleCMSPage, React.ComponentType> = {
   guests: CoupleGuests,
   rsvps: CoupleRSVPs,
   wishes: CoupleWishes,
+  analytics: CoupleAnalytics,
   audit: CoupleAuditLog,
   sharing: CoupleSharing,
 };

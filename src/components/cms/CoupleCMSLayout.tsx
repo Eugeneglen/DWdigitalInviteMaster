@@ -20,6 +20,7 @@ import {
   Loader2,
   ScrollText,
   QrCode,
+  BarChart3,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { NotificationBell } from '@/components/cms/NotificationBell';
@@ -40,6 +41,7 @@ const NAV_ITEMS: { key: CoupleCMSPage; label: string; icon: React.ElementType }[
   { key: 'guests', label: 'Guests', icon: Users },
   { key: 'rsvps', label: 'RSVPs', icon: Mail },
   { key: 'wishes', label: 'Wishes', icon: MessageSquareHeart },
+  { key: 'analytics', label: 'Analytics', icon: BarChart3 },
   { key: 'audit', label: 'Activity', icon: ScrollText },
   { key: 'sharing', label: 'Sharing', icon: QrCode },
 ];

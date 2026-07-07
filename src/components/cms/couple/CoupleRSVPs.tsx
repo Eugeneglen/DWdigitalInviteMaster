@@ -64,6 +64,7 @@ export default function CoupleRSVPs() {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [search, setSearch] = useState('');
+  const [exporting, setExporting] = useState(false);
 
   const fetchRSVPs = useCallback(async () => {
     try {
@@ -110,38 +111,26 @@ export default function CoupleRSVPs() {
     0
   );
 
-  const handleExportCSV = () => {
-    if (rsvps.length === 0) {
-      toast.info('No RSVPs to export');
-      return;
+  const handleExportCSV = async () => {
+    try {
+      setExporting(true);
+      const res = await fetch('/api/cms/export?XTransformPort=3000&type=rsvps');
+      if (!res.ok) return;
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `rsvps-export.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success('Export downloaded');
+    } catch {
+      toast.error('Export failed');
+    } finally {
+      setExporting(false);
     }
-    const headers = ['Submitted By', 'Email', 'Party Size', 'Submitted At', 'Guest Name', 'Attendance', 'Dietary'];
-    const rows: string[][] = [];
-    for (const r of rsvps) {
-      const guestLines = r.guests.length > 0
-        ? r.guests.map((g) => [g.name, g.attendance === 'yes' ? 'Attending' : 'Declined', g.dietary ?? ''])
-        : [['—', '—', '']];
-      for (const gl of guestLines) {
-        rows.push([
-          `${r.firstName} ${r.lastName}`,
-          '',
-          String(r.partySize),
-          formatDate(r.createdAt),
-          gl[0],
-          gl[1],
-          gl[2],
-        ]);
-      }
-    }
-    const csv = [headers, ...rows].map((r) => r.map((c) => `"${c.replace(/"/g, '""')}"`).join(',')).join('\n');
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `rsvp-responses-${new Date().toISOString().slice(0, 10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.success(`Exported ${rsvps.length} RSVP submissions`);
   };
 
   if (loading) {
@@ -165,11 +154,12 @@ export default function CoupleRSVPs() {
         </div>
         <Button
           onClick={handleExportCSV}
+          disabled={exporting}
           variant="outline"
           className="border-charcoal-ink/15 text-charcoal-ink hover:border-cinematic-gold hover:text-cinematic-gold rounded px-4 py-2 text-[13px] font-medium uppercase tracking-[0.08em] transition-colors duration-300 shrink-0"
         >
-          <Download className="size-4 mr-1.5" />
-          Export
+          {exporting ? <Loader2 className="size-4 mr-1.5 animate-spin" /> : <Download className="size-4 mr-1.5" />}
+          Export CSV
         </Button>
       </div>
 

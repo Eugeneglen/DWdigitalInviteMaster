@@ -358,33 +358,28 @@ export default function CoupleGuests() {
     resetImportState();
   };
 
-  const handleExportCSV = () => {
-    if (guests.length === 0) {
-      toast.info('No guests to export');
-      return;
+  const [exporting, setExporting] = useState(false);
+
+  const handleExportCSV = async () => {
+    try {
+      setExporting(true);
+      const res = await fetch('/api/cms/export?XTransformPort=3000&type=guests');
+      if (!res.ok) return;
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `guests-export.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success('Export downloaded');
+    } catch {
+      toast.error('Export failed');
+    } finally {
+      setExporting(false);
     }
-    const headers = ['Name', 'Email', 'Phone', 'Group', 'Table', 'Status', 'Invitation Code', 'Plus One', 'Plus One Name', 'Dietary Notes'];
-    const rows = guests.map((g) => [
-      g.name,
-      g.email ?? '',
-      g.phone ?? '',
-      g.groupName ?? '',
-      g.tableNumber != null ? String(g.tableNumber) : '',
-      g.rsvpStatus ?? 'PENDING',
-      g.invitationCode,
-      g.plusOne ? 'Yes' : 'No',
-      g.plusOneName ?? '',
-      g.dietaryNotes ?? '',
-    ]);
-    const csv = [headers, ...rows].map((r) => r.map((c) => `"${c.replace(/"/g, '""')}"`).join(',')).join('\n');
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `guest-list-${new Date().toISOString().slice(0, 10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.success(`Exported ${guests.length} guests`);
   };
 
   // Summary stats
@@ -423,11 +418,12 @@ export default function CoupleGuests() {
           </Button>
           <Button
             onClick={handleExportCSV}
+            disabled={exporting}
             variant="outline"
             className="border-charcoal-ink/15 text-charcoal-ink hover:border-cinematic-gold hover:text-cinematic-gold rounded px-4 py-2 text-[13px] font-medium uppercase tracking-[0.08em] transition-colors duration-300"
           >
-            <Download className="size-4 mr-1.5" />
-            Export
+            {exporting ? <Loader2 className="size-4 mr-1.5 animate-spin" /> : <Download className="size-4 mr-1.5" />}
+            Export CSV
           </Button>
           <Button
             onClick={openAddDialog}

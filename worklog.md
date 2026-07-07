@@ -905,3 +905,20 @@ Stage Summary:
 - Live RSVP counter on guest site via WebSocket with real-time increment
 - WebSocket service enhanced with new_rsvp event type (broadcasts to wedding rooms)
 - useLiveWeddingData hook reusable across pages for live data
+
+---
+Task ID: phase-11
+Agent: Main Agent
+Task: Phase 11 - Enhanced Reporting & Data Export
+
+Work Log:
+- Created CoupleAnalytics page with KPI cards, RSVP donut chart, response timeline, group breakdown table
+- Created /api/cms/analytics endpoint for couple-level analytics data
+- Created /api/cms/export endpoint for CSV exports (guests, rsvps, wishes, contacts)
+- Added "Analytics" page to Couple CMS navigation
+- Added "Export CSV" buttons to Guests, RSVPs, and Wishes pages
+
+Stage Summary:
+- Couples now have their own analytics dashboard with charts and tables
+- CSV export available for all major data types
+- Analytics shows RSVP breakdown, response timeline, and guest group stats

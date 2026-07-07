@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { Loader2, Trash2, MessageSquareHeart, Search, Heart, User } from 'lucide-react';
+import { Loader2, Trash2, MessageSquareHeart, Search, Heart, User, Download } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -54,6 +54,29 @@ export default function CoupleWishes() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [exporting, setExporting] = useState(false);
+
+  const handleExportCSV = async () => {
+    try {
+      setExporting(true);
+      const res = await fetch('/api/cms/export?XTransformPort=3000&type=wishes');
+      if (!res.ok) return;
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `wishes-export.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success('Export downloaded');
+    } catch {
+      toast.error('Export failed');
+    } finally {
+      setExporting(false);
+    }
+  };
 
   const fetchWishes = useCallback(async () => {
     try {
@@ -123,11 +146,22 @@ export default function CoupleWishes() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div>
-        <h2 className="text-xl font-semibold text-charcoal-ink">Wishes & Blessings</h2>
-        <p className="text-sm text-charcoal-ink/50 mt-1">
-          View and manage heartfelt messages from your guests.
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h2 className="text-xl font-semibold text-charcoal-ink">Wishes & Blessings</h2>
+          <p className="text-sm text-charcoal-ink/50 mt-1">
+            View and manage heartfelt messages from your guests.
+          </p>
+        </div>
+        <Button
+          onClick={handleExportCSV}
+          disabled={exporting}
+          variant="outline"
+          className="border-charcoal-ink/15 text-charcoal-ink hover:border-cinematic-gold hover:text-cinematic-gold rounded px-4 py-2 text-[13px] font-medium uppercase tracking-[0.08em] transition-colors duration-300 shrink-0"
+        >
+          {exporting ? <Loader2 className="size-4 mr-1.5 animate-spin" /> : <Download className="size-4 mr-1.5" />}
+          Export CSV
+        </Button>
       </div>
 
       <Separator className="bg-champagne-silk" />
