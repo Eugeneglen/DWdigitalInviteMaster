@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { signOut, useSession } from 'next-auth/react';
+import { signIn, signOut, useSession } from 'next-auth/react';
 import {
   Dialog,
   DialogContent,
@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { Loader2, ArrowRightLeft, LogOut } from 'lucide-react';
+import { Loader2, LogOut } from 'lucide-react';
 import { useAuthModalStore } from '@/store/useAuthModalStore';
 
 interface LoginModalProps {
@@ -30,21 +30,18 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
     setIsLoading(true);
 
     try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+      // Use NextAuth's built-in signIn — handles CSRF, JWT creation, and cookie setting
+      const result = await signIn('credentials', {
+        email: email.trim().toLowerCase(),
+        password,
+        redirect: false,
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || 'Invalid email or password. Please try again.');
+      if (result?.error) {
+        setError('Invalid email or password. Please try again.');
       } else {
-        // Reload session via NextAuth's internal fetch
-        await fetch('/api/auth/session?update=1');
+        // Login successful — close modal and reload to pick up session
         useAuthModalStore.getState().closeModal();
-        // Trigger a page reload to pick up the new session
         window.location.reload();
       }
     } catch {
@@ -56,7 +53,6 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
 
   const handleSwitchAccount = async () => {
     setIsLoading(true);
-    await fetch('/api/auth/logout', { method: 'POST' });
     await signOut({ redirect: false });
     setIsLoading(false);
   };
@@ -74,6 +70,9 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
         overlayClassName="!bg-paper-cream"
         showCloseButton={false}
         className="!bg-transparent !border-0 !shadow-none !max-w-[420px] !p-0 !gap-0 !rounded-none"
+        onInteractOutside={(e) => e.preventDefault()}
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onEscapeKeyDown={(e) => e.preventDefault()}
       >
         <div className="bg-white border border-champagne-silk/40 rounded-sm">
           {/* Gold accent top bar */}

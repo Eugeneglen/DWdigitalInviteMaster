@@ -37,8 +37,10 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
+        const normalizedEmail = credentials.email.trim().toLowerCase();
+
         const user = await db.user.findUnique({
-          where: { email: credentials.email },
+          where: { email: normalizedEmail },
         });
 
         if (!user || !user.isActive) {
@@ -67,20 +69,16 @@ export const authOptions: NextAuthOptions = {
   ],
   session: {
     strategy: 'jwt',
-    maxAge: 24 * 60 * 60, // 24 hours
+    maxAge: 24 * 60 * 60,
   },
   pages: {
-    signIn: '/', // We handle login as a modal, not a separate page
+    signIn: '/',
   },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id!;
         token.role = user.role;
-      } else if (token.sub && !token.id) {
-        // Custom login JWT: map sub → id, extract role
-        token.id = token.sub as string;
-        // role is already on the token from our custom JWT
       }
       return token;
     },
