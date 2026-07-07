@@ -1,270 +1,315 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { signIn, signOut, useSession } from 'next-auth/react'
+import { useState } from 'react';
+import { signIn, signOut, useSession } from 'next-auth/react';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Label } from '@/components/ui/label'
-import { Loader2, ArrowRightLeft } from 'lucide-react'
-import { useAuthModalStore } from '@/store/useAuthModalStore'
+} from '@/components/ui/dialog';
+import { Loader2, ArrowRightLeft, LogOut } from 'lucide-react';
+import { useAuthModalStore } from '@/store/useAuthModalStore';
 
 interface LoginModalProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 export function LoginModal({ open, onOpenChange }: LoginModalProps) {
-  const { data: session, status } = useSession()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+  const { data: session, status } = useSession();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setIsLoading(true)
+    e.preventDefault();
+    setError('');
+    setIsLoading(true);
 
     try {
       const result = await signIn('credentials', {
         email,
         password,
         redirect: false,
-      })
+      });
 
       if (result?.error) {
-        setError('Invalid email or password. Please try again.')
+        setError('Invalid email or password. Please try again.');
       } else {
-        // Successful login — close the modal
-        useAuthModalStore.getState().closeModal()
+        useAuthModalStore.getState().closeModal();
       }
     } catch {
-      setError('An unexpected error occurred. Please try again.')
+      setError('An unexpected error occurred. Please try again.');
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleSwitchAccount = async () => {
-    setIsLoading(true)
-    // The modal stays open via Zustand store; signOut just clears the session
-    await signOut({ redirect: false })
-    setIsLoading(false)
-  }
+    setIsLoading(true);
+    await signOut({ redirect: false });
+    setIsLoading(false);
+  };
 
-  // Determine if this is a "switch account" scenario
-  const isAlreadyAuthenticated = status === 'authenticated' && session
-  const currentRole = session?.user?.role
-  const roleLabel = currentRole === 'SUPER_ADMIN' || currentRole === 'ACCOUNT_MANAGER' ? 'Admin' : 'Couple'
+  const isAlreadyAuthenticated = status === 'authenticated' && session;
+  const currentRole = session?.user?.role;
+  const roleLabel =
+    currentRole === 'SUPER_ADMIN' || currentRole === 'ACCOUNT_MANAGER'
+      ? 'Admin'
+      : 'Couple';
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[420px] p-0 gap-0 overflow-hidden border-slate-200 bg-white">
-        {/* Header */}
-        <div className="bg-slate-900 px-6 pt-8 pb-6">
-          <DialogHeader className="text-left">
-            <DialogTitle className="text-xl font-semibold text-white">
-              {isAlreadyAuthenticated ? 'Switch Account' : 'Welcome back'}
-            </DialogTitle>
-            <DialogDescription className="text-slate-400 text-sm mt-1.5">
-              {isAlreadyAuthenticated
-                ? 'Sign out first, then sign in with a different account'
-                : 'Sign in to the Dreamweavers CMS'}
-            </DialogDescription>
-          </DialogHeader>
-        </div>
+      <DialogContent
+        overlayClassName="!bg-paper-cream"
+        showCloseButton={false}
+        className="!bg-transparent !border-0 !shadow-none !max-w-[420px] !p-0 !gap-0 !rounded-none"
+      >
+        <div className="bg-white border border-champagne-silk/40 rounded-sm">
+          {/* Gold accent top bar */}
+          <div className="h-[2px] bg-cinematic-gold" />
 
-        {/* Currently signed in — show info + switch button */}
-        {isAlreadyAuthenticated && (
-          <div className="p-6 space-y-4">
-            {/* Current session card */}
-            <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-900 text-white text-sm font-bold">
-                {(session.user?.name ?? 'U').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+          <div className="px-10 pt-10 pb-8">
+            {/* Branding */}
+            <div className="text-center mb-8">
+              {/* Diamond ornament */}
+              <div className="flex items-center justify-center mb-5">
+                <div className="w-8 h-px bg-cinematic-gold/60" />
+                <svg
+                  className="mx-3 text-cinematic-gold"
+                  width="12"
+                  height="12"
+                  viewBox="0 0 12 12"
+                  fill="currentColor"
+                >
+                  <path d="M6 0L12 6L6 12L0 6Z" />
+                </svg>
+                <div className="w-8 h-px bg-cinematic-gold/60" />
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-slate-900 truncate">{session.user?.name}</p>
-                <p className="text-xs text-slate-500 truncate">{session.user?.email}</p>
-              </div>
-              <span className={`shrink-0 text-[11px] font-medium px-2.5 py-1 rounded-full ${
-                currentRole === 'SUPER_ADMIN' || currentRole === 'ACCOUNT_MANAGER'
-                  ? 'bg-slate-900 text-white'
-                  : 'bg-amber-100 text-amber-800'
-              }`}>
-                {roleLabel}
-              </span>
+
+              <DialogHeader className="text-center">
+                <DialogTitle
+                  className="text-[28px] leading-tight text-charcoal-ink"
+                  style={{ fontFamily: "'Playfair Display', serif", fontStyle: 'italic' }}
+                >
+                  {isAlreadyAuthenticated ? 'Switch Account' : 'Welcome Back'}
+                </DialogTitle>
+                <DialogDescription className="text-[13px] text-charcoal-ink/50 mt-2 tracking-wide">
+                  {isAlreadyAuthenticated
+                    ? 'Sign out first, then sign in with a different account'
+                    : 'Sign in to Dreamweavers Digital Heirlooms'}
+                </DialogDescription>
+              </DialogHeader>
             </div>
 
-            {/* Switch Account button */}
-            <Button
-              type="button"
-              onClick={handleSwitchAccount}
-              disabled={isLoading}
-              className="w-full h-10 bg-slate-900 hover:bg-slate-800 text-white font-medium text-sm flex items-center gap-2"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="size-4 animate-spin" />
-                  Signing out…
-                </>
-              ) : (
-                <>
-                  <ArrowRightLeft className="size-4" />
-                  Sign Out & Switch Account
-                </>
-              )}
-            </Button>
-
-            {/* Divider */}
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-slate-200" />
-              </div>
-              <div className="relative flex justify-center text-xs">
-                <span className="bg-white px-2 text-slate-400">or sign in directly</span>
-              </div>
-            </div>
-
-            {/* Inline login form for quick switch */}
-            <form onSubmit={handleSubmit} className="space-y-3">
-              {error && (
-                <div className="rounded-md bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700">
-                  {error}
+            {/* Switch Account — authenticated state */}
+            {isAlreadyAuthenticated && (
+              <div className="space-y-5">
+                {/* Current session card */}
+                <div className="flex items-center gap-4 border border-champagne-silk/30 bg-paper-cream/50 p-4 rounded-sm">
+                  <div
+                    className="flex h-11 w-11 shrink-0 items-center justify-center border border-cinematic-gold/40 text-cinematic-gold text-sm font-bold rounded-sm"
+                    style={{ fontFamily: "'Playfair Display', serif" }}
+                  >
+                    {(session.user?.name ?? 'U')
+                      .split(' ')
+                      .map((n) => n[0])
+                      .join('')
+                      .slice(0, 2)
+                      .toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p
+                      className="text-[15px] font-medium text-charcoal-ink truncate"
+                      style={{ fontFamily: "'Playfair Display', serif" }}
+                    >
+                      {session.user?.name}
+                    </p>
+                    <p className="text-[12px] text-charcoal-ink/50 truncate mt-0.5">
+                      {session.user?.email}
+                    </p>
+                  </div>
+                  <span
+                    className={`shrink-0 text-[10px] font-semibold px-3 py-1.5 rounded-sm uppercase tracking-[0.12em] ${
+                      currentRole === 'SUPER_ADMIN' || currentRole === 'ACCOUNT_MANAGER'
+                        ? 'bg-charcoal-ink text-paper-cream'
+                        : 'bg-cinematic-gold/10 text-cinematic-gold border border-cinematic-gold/30'
+                    }`}
+                  >
+                    {roleLabel}
+                  </span>
                 </div>
-              )}
-              <div className="space-y-2">
-                <Label htmlFor="switch-email" className="text-xs font-medium text-slate-600">
-                  Different email
-                </Label>
-                <Input
-                  id="switch-email"
-                  type="email"
-                  placeholder="other@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={isLoading}
-                  autoComplete="email"
-                  className="h-9 border-slate-300 bg-white text-sm"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="switch-password" className="text-xs font-medium text-slate-600">
-                  Password
-                </Label>
-                <Input
-                  id="switch-password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={isLoading}
-                  autoComplete="current-password"
-                  className="h-9 border-slate-300 bg-white text-sm"
-                />
-              </div>
-              <Button
-                type="submit"
-                disabled={isLoading || !email || !password}
-                variant="outline"
-                className="w-full h-9 border-slate-300 text-slate-700 hover:bg-slate-50 text-sm font-medium"
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="size-3.5 animate-spin" />
-                    Signing in…
-                  </>
-                ) : (
-                  'Sign In'
-                )}
-              </Button>
-            </form>
-          </div>
-        )}
 
-        {/* Standard login form — only when not authenticated */}
-        {!isAlreadyAuthenticated && (
-          <form onSubmit={handleSubmit} className="p-6 space-y-4">
-            {/* Error */}
-            {error && (
-              <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
-                {error}
+                {/* Sign Out button */}
+                <button
+                  type="button"
+                  onClick={handleSwitchAccount}
+                  disabled={isLoading}
+                  className="w-full flex items-center justify-center gap-2.5 bg-charcoal-ink text-paper-cream py-3 rounded-sm text-[13px] font-medium uppercase tracking-[0.08em] hover:bg-charcoal-ink/90 transition-colors duration-300"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="size-4 animate-spin" />
+                      Signing out…
+                    </>
+                  ) : (
+                    <>
+                      <LogOut className="size-3.5" />
+                      Sign Out
+                    </>
+                  )}
+                </button>
+
+                {/* Divider */}
+                <div className="flex items-center gap-4">
+                  <div className="flex-1 border-t border-champagne-silk/30" />
+                  <span className="text-[11px] text-charcoal-ink/30 uppercase tracking-[0.15em]">
+                    or sign in directly
+                  </span>
+                  <div className="flex-1 border-t border-champagne-silk/30" />
+                </div>
+
+                {/* Inline login for quick switch */}
+                <form onSubmit={handleSubmit} className="space-y-5">
+                  {error && (
+                    <div className="bg-cinematic-gold/5 border border-cinematic-gold/20 px-4 py-3 rounded-sm text-[13px] text-charcoal-ink/80">
+                      {error}
+                    </div>
+                  )}
+                  <div>
+                    <label
+                      htmlFor="switch-email"
+                      className="block text-[11px] tracking-[0.18em] uppercase text-charcoal-ink/50 font-semibold mb-2"
+                    >
+                      Different email
+                    </label>
+                    <input
+                      id="switch-email"
+                      type="email"
+                      placeholder="other@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      disabled={isLoading}
+                      autoComplete="email"
+                      className="input-line !text-[15px] !font-sans"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="switch-password"
+                      className="block text-[11px] tracking-[0.18em] uppercase text-charcoal-ink/50 font-semibold mb-2"
+                    >
+                      Password
+                    </label>
+                    <input
+                      id="switch-password"
+                      type="password"
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      disabled={isLoading}
+                      autoComplete="current-password"
+                      className="input-line !text-[15px] !font-sans"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={isLoading || !email || !password}
+                    className="w-full bg-charcoal-ink text-paper-cream py-3 rounded-sm text-[13px] font-medium uppercase tracking-[0.08em] hover:bg-charcoal-ink/90 transition-colors duration-300 disabled:opacity-40"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="size-3.5 animate-spin inline mr-1.5" />
+                        Signing in…
+                      </>
+                    ) : (
+                      'Sign In'
+                    )}
+                  </button>
+                </form>
               </div>
             )}
 
-            {/* Email */}
-            <div className="space-y-2">
-              <Label
-                htmlFor="login-email"
-                className="text-sm font-medium text-slate-700"
-              >
-                Email
-              </Label>
-              <Input
-                id="login-email"
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={isLoading}
-                autoComplete="email"
-                className="h-10 border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus-visible:ring-slate-900/20"
-              />
-            </div>
+            {/* Standard login form */}
+            {!isAlreadyAuthenticated && (
+              <form onSubmit={handleSubmit} className="space-y-5">
+                {error && (
+                  <div className="bg-cinematic-gold/5 border border-cinematic-gold/20 px-4 py-3 rounded-sm text-[13px] text-charcoal-ink/80">
+                    {error}
+                  </div>
+                )}
 
-            {/* Password */}
-            <div className="space-y-2">
-              <Label
-                htmlFor="login-password"
-                className="text-sm font-medium text-slate-700"
-              >
-                Password
-              </Label>
-              <Input
-                id="login-password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                disabled={isLoading}
-                autoComplete="current-password"
-                className="h-10 border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus-visible:ring-slate-900/20"
-              />
-            </div>
+                <div>
+                  <label
+                    htmlFor="login-email"
+                    className="block text-[11px] tracking-[0.18em] uppercase text-charcoal-ink/50 font-semibold mb-2"
+                  >
+                    Email
+                  </label>
+                  <input
+                    id="login-email"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    disabled={isLoading}
+                    autoComplete="email"
+                    className="input-line !text-[15px] !font-sans placeholder:text-charcoal-ink/30"
+                  />
+                </div>
 
-            {/* Submit */}
-            <Button
-              type="submit"
-              disabled={isLoading || !email || !password}
-              className="w-full h-10 bg-slate-900 hover:bg-slate-800 text-white font-medium text-sm mt-2"
+                <div>
+                  <label
+                    htmlFor="login-password"
+                    className="block text-[11px] tracking-[0.18em] uppercase text-charcoal-ink/50 font-semibold mb-2"
+                  >
+                    Password
+                  </label>
+                  <input
+                    id="login-password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    disabled={isLoading}
+                    autoComplete="current-password"
+                    className="input-line !text-[15px] !font-sans placeholder:text-charcoal-ink/30"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isLoading || !email || !password}
+                  className="w-full bg-charcoal-ink text-paper-cream py-3 rounded-sm text-[13px] font-medium uppercase tracking-[0.08em] hover:bg-charcoal-ink/90 transition-colors duration-300 disabled:opacity-40"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="size-3.5 animate-spin inline mr-1.5" />
+                      Signing in…
+                    </>
+                  ) : (
+                    'Sign In'
+                  )}
+                </button>
+              </form>
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="border-t border-champagne-silk/20 px-10 py-5 text-center">
+            <p
+              className="text-[11px] text-charcoal-ink/30 uppercase tracking-[0.12em] font-semibold"
             >
-              {isLoading ? (
-                <>
-                  <Loader2 className="size-4 animate-spin" />
-                  Signing in…
-                </>
-              ) : (
-                'Sign in'
-              )}
-            </Button>
-          </form>
-        )}
-
-        {/* Footer */}
-        <div className="border-t border-slate-100 px-6 py-4 text-center">
-          <p className="text-xs text-slate-400">
-            © 2025 Dreamweavers PTL. All rights reserved.
-          </p>
+              © 2026 DREAMWEAVERS DIGITAL HEIRLOOMS. All rights reserved.
+            </p>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
