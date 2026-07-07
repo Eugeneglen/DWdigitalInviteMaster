@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { Loader2, Trash2, ImagePlus, Upload, GripVertical, Eye, ImageOff, Video, X, Play } from 'lucide-react';
+import { Loader2, Trash2, Upload, GripVertical, Eye, ImageOff, Video, X, Play, ImagePlus } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -30,7 +30,6 @@ const MEDIA_API = '/api/cms/media?XTransformPort=3000';
 const WEDDING_API = '/api/cms/wedding?XTransformPort=3000';
 
 const CATEGORIES = [
-  { value: 'banner', label: 'Banner', color: 'bg-violet-50 text-violet-700 border-violet-200' },
   { value: 'gallery', label: 'Gallery', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
   { value: 'story', label: 'Story', color: 'bg-amber-50 text-amber-700 border-amber-200' },
   { value: 'couple-photo', label: 'Couple Photo', color: 'bg-sky-50 text-sky-700 border-sky-200' },
@@ -62,7 +61,7 @@ function formatFileSize(bytes: number | null): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-/** ─── Hero Visual Section ─────────────────────────────────────────────── */
+/** ─── Hero Visual Section (image OR video) ──────────────────────────── */
 
 function HeroVisualSection({ weddingData }: { weddingData: Record<string, unknown> | null }) {
   const { setWeddingData } = useCoupleCMSStore();
@@ -84,7 +83,6 @@ function HeroVisualSection({ weddingData }: { weddingData: Record<string, unknow
       return;
     }
 
-    // Size limit: 50MB for video, 10MB for image
     if (isVideo && file.size > 50 * 1024 * 1024) {
       toast.error('Video must be under 50 MB');
       return;
@@ -97,7 +95,6 @@ function HeroVisualSection({ weddingData }: { weddingData: Record<string, unknow
     const reader = new FileReader();
     reader.onload = async (e) => {
       const dataUrl = e.target?.result as string;
-      // Uploading a new hero clears the other type
       const updatePayload: Record<string, string | null> = {
         heroImageUrl: isImage ? dataUrl : null,
         heroVideoUrl: isVideo ? dataUrl : null,
@@ -261,6 +258,164 @@ function HeroVisualSection({ weddingData }: { weddingData: Record<string, unknow
   );
 }
 
+/** ─── Banner Section (image only) ───────────────────────────────────── */
+
+function BannerSection({ weddingData }: { weddingData: Record<string, unknown> | null }) {
+  const { setWeddingData } = useCoupleCMSStore();
+  const bannerUrl = (weddingData?.bannerUrl as string) || null;
+  const [saving, setSaving] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileSelect = (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    const file = files[0];
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file for the banner');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('Image must be under 10 MB');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const dataUrl = e.target?.result as string;
+
+      setSaving(true);
+      try {
+        const res = await fetch(WEDDING_API, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bannerUrl: dataUrl }),
+        });
+        if (!res.ok) throw new Error('Failed to save banner');
+        const data = await res.json();
+        setWeddingData(data.wedding);
+        toast.success('Banner updated');
+      } catch {
+        toast.error('Failed to save banner');
+      } finally {
+        setSaving(false);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    handleFileSelect(e.dataTransfer.files);
+  };
+
+  const handleRemoveBanner = async () => {
+    if (!bannerUrl) return;
+    if (!confirm('Remove the current banner?')) return;
+
+    setSaving(true);
+    try {
+      const res = await fetch(WEDDING_API, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bannerUrl: null }),
+      });
+      if (!res.ok) throw new Error('Failed to remove banner');
+      const data = await res.json();
+      setWeddingData(data.wedding);
+      toast.success('Banner removed');
+    } catch {
+      toast.error('Failed to remove banner');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <Card className="border-charcoal-ink/5 shadow-none">
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h3 className="text-sm font-semibold text-charcoal-ink">Banner Design</h3>
+            <p className="text-xs text-charcoal-ink/40 mt-0.5">
+              Upload your custom banner design for the top of your invitation.
+            </p>
+          </div>
+          {bannerUrl && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleRemoveBanner}
+              disabled={saving}
+              className="h-7 text-xs text-charcoal-ink/40 hover:text-red-500 hover:bg-red-50"
+            >
+              {saving ? <Loader2 className="size-3 animate-spin" /> : <X className="size-3.5 mr-1" />}
+              Remove
+            </Button>
+          )}
+        </div>
+
+        <div
+          className={`relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed transition-colors duration-200 cursor-pointer overflow-hidden ${
+            dragOver
+              ? 'border-cinematic-gold bg-cinematic-gold/5'
+              : bannerUrl
+                ? 'border-cinematic-gold/30 bg-cinematic-gold/5'
+                : 'border-charcoal-ink/10 hover:border-champagne-silk'
+          }`}
+          style={{ minHeight: '160px' }}
+          onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={handleDrop}
+          onClick={() => fileInputRef.current?.click()}
+        >
+          {saving && (
+            <div className="absolute inset-0 z-10 bg-white/60 flex items-center justify-center">
+              <Loader2 className="size-6 animate-spin text-cinematic-gold" />
+            </div>
+          )}
+
+          {bannerUrl ? (
+            <div className="relative w-full">
+              <img
+                src={bannerUrl}
+                alt="Current banner"
+                className="w-full max-h-48 object-cover rounded-lg"
+                unoptimized
+              />
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-8 gap-3">
+              <ImagePlus className="size-6 text-champagne-silk" />
+              <p className="text-sm text-charcoal-ink/50 font-medium text-center">
+                Click or drag to upload
+              </p>
+              <p className="text-xs text-charcoal-ink/30 text-center">
+                PNG, JPG, WebP — displayed at full width
+              </p>
+            </div>
+          )}
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => handleFileSelect(e.target.files)}
+          />
+        </div>
+
+        {bannerUrl && (
+          <p className="text-[10px] text-charcoal-ink/30 mt-2 text-center">
+            Click or drag a new image to replace the current banner.
+          </p>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 /** ─── Main Component ──────────────────────────────────────────────────── */
 
 export default function CoupleImages() {
@@ -387,21 +542,6 @@ export default function CoupleImages() {
     }
   };
 
-  const handleSetAs = async (item: MediaItem, type: 'banner') => {
-    try {
-      const res = await fetch(MEDIA_API, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: item.id, setAs: type }),
-      });
-
-      if (!res.ok) throw new Error('Failed to set image');
-      toast.success(`Set as ${type} image`);
-    } catch {
-      toast.error(`Failed to set as ${type}`);
-    }
-  };
-
   const handleMove = async (item: MediaItem, direction: 'up' | 'down') => {
     const idx = media.findIndex((m) => m.id === item.id);
     if (direction === 'up' && idx <= 0) return;
@@ -411,7 +551,6 @@ export default function CoupleImages() {
     const swapItem = media[swapIdx];
 
     try {
-      // Swap sort orders
       await fetch(MEDIA_API, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -445,7 +584,7 @@ export default function CoupleImages() {
         <div>
           <h2 className="text-xl font-semibold text-charcoal-ink">Images & Media</h2>
           <p className="text-sm text-charcoal-ink/50 mt-1">
-            Manage your hero visual and upload images for your invitation.
+            Manage your hero visual, banner, and upload images for your invitation.
           </p>
         </div>
         <Button
@@ -461,6 +600,9 @@ export default function CoupleImages() {
 
       {/* Hero Visual Section */}
       <HeroVisualSection weddingData={weddingData} />
+
+      {/* Banner Section */}
+      <BannerSection weddingData={weddingData} />
 
       <Separator className="bg-champagne-silk" />
 
@@ -544,16 +686,6 @@ export default function CoupleImages() {
                   </p>
                 )}
                 <div className="flex items-center gap-1">
-                  {/* Set as banner */}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleSetAs(item, 'banner')}
-                    className="h-7 w-7 p-0 text-charcoal-ink/40 hover:text-cinematic-gold hover:bg-cinematic-gold/5"
-                    title="Set as banner image"
-                  >
-                    <ImagePlus className="size-3.5" />
-                  </Button>
                   {/* Move up */}
                   <Button
                     variant="ghost"

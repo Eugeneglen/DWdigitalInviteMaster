@@ -63,7 +63,7 @@ export async function GET() {
     const checklist = [
       { key: 'details', label: 'Wedding details filled in', done: !!(wedding.coupleName && wedding.venue && wedding.weddingDate) },
       { key: 'hero_image', label: 'Hero visual uploaded', done: !!(wedding.heroImageUrl || wedding.heroVideoUrl) },
-      { key: 'banner_image', label: 'Banner image uploaded', done: wedding.media.some((m) => m.category === 'banner') },
+      { key: 'banner_image', label: 'Banner design uploaded', done: !!wedding.bannerUrl },
       { key: 'schedule', label: 'Event schedule created', done: wedding.schedules.length > 0 },
       { key: 'story', label: 'Love story added', done: wedding.stories.length > 0 },
       { key: 'faqs', label: 'FAQs created', done: wedding.faqs.length > 0 },
