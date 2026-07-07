@@ -9,12 +9,9 @@ const createWeddingSchema = z.object({
   brideName: z.string().nullable().optional(),
   groomName: z.string().nullable().optional(),
   weddingDate: z.string(),
-  weddingTime: z.string().nullable().optional(),
-  venue: z.string().nullable().optional(),
-  venueAddress: z.string().nullable().optional(),
-  googleMapsUrl: z.string().nullable().optional(),
+  venueAddress: z.string().min(1),
   plan: z.enum(['FREE', 'PREMIUM', 'ENTERPRISE']).default('FREE'),
-  sections: z.array(z.string()).optional(), // optional nav sections to enable
+  sections: z.array(z.string()).optional(),
 });
 
 // GET /api/master/weddings — list all weddings with pagination
@@ -101,10 +98,7 @@ export async function POST(req: NextRequest) {
         brideName: data.brideName,
         groomName: data.groomName,
         weddingDate: new Date(data.weddingDate),
-        weddingTime: data.weddingTime,
-        venue: data.venue,
         venueAddress: data.venueAddress,
-        googleMapsUrl: data.googleMapsUrl,
         plan: data.plan,
         status: 'DRAFT',
       },

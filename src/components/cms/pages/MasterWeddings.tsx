@@ -82,10 +82,7 @@ interface WeddingForm {
   brideName: string;
   groomName: string;
   weddingDate: string;
-  weddingTime: string;
-  venue: string;
   venueAddress: string;
-  googleMapsUrl: string;
   plan: string;
   sections: string[];
 }
@@ -102,10 +99,7 @@ const EMPTY_FORM: WeddingForm = {
   brideName: '',
   groomName: '',
   weddingDate: '',
-  weddingTime: '',
-  venue: '',
   venueAddress: '',
-  googleMapsUrl: '',
   plan: 'FREE',
   sections: [],
 };
@@ -251,10 +245,7 @@ export default function MasterWeddings() {
       brideName: w.brideName ?? '',
       groomName: w.groomName ?? '',
       weddingDate: w.weddingDate ? w.weddingDate.slice(0, 10) : '',
-      weddingTime: w.weddingTime ?? '',
-      venue: w.venue ?? '',
       venueAddress: w.venueAddress ?? '',
-      googleMapsUrl: w.googleMapsUrl ?? '',
       plan: w.plan,
     });
     setDialogOpen(true);
@@ -276,6 +267,10 @@ export default function MasterWeddings() {
       toast({ title: 'Validation Error', description: 'Wedding date is required.', variant: 'destructive' });
       return;
     }
+    if (!form.venueAddress.trim()) {
+      toast({ title: 'Validation Error', description: 'Venue address is required.', variant: 'destructive' });
+      return;
+    }
 
     try {
       setSubmitting(true);
@@ -285,10 +280,7 @@ export default function MasterWeddings() {
         brideName: form.brideName.trim() || null,
         groomName: form.groomName.trim() || null,
         weddingDate: new Date(form.weddingDate).toISOString(),
-        weddingTime: form.weddingTime.trim() || null,
-        venue: form.venue.trim() || null,
-        venueAddress: form.venueAddress.trim() || null,
-        googleMapsUrl: form.googleMapsUrl.trim() || null,
+        venueAddress: form.venueAddress.trim(),
         plan: form.plan,
         sections: form.sections,
       };
@@ -635,61 +627,31 @@ export default function MasterWeddings() {
               </div>
             </div>
 
-            {/* Date & Time — side by side */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="weddingDate">
-                  Wedding Date <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="weddingDate"
-                  type="date"
-                  value={form.weddingDate}
-                  onChange={(e) => setField('weddingDate', e.target.value)}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="weddingTime">Wedding Time</Label>
-                <Input
-                  id="weddingTime"
-                  type="time"
-                  value={form.weddingTime}
-                  onChange={(e) => setField('weddingTime', e.target.value)}
-                />
-              </div>
-            </div>
-
-            {/* Venue */}
+            {/* Wedding Date */}
             <div className="space-y-2">
-              <Label htmlFor="venue">Venue</Label>
+              <Label htmlFor="weddingDate">
+                Wedding Date <span className="text-red-500">*</span>
+              </Label>
               <Input
-                id="venue"
-                placeholder="e.g. The Grand Ballroom"
-                value={form.venue}
-                onChange={(e) => setField('venue', e.target.value)}
+                id="weddingDate"
+                type="date"
+                value={form.weddingDate}
+                onChange={(e) => setField('weddingDate', e.target.value)}
+                required
               />
             </div>
 
             {/* Venue Address */}
             <div className="space-y-2">
-              <Label htmlFor="venueAddress">Venue Address</Label>
+              <Label htmlFor="venueAddress">
+                Venue Address <span className="text-red-500">*</span>
+              </Label>
               <Input
                 id="venueAddress"
                 placeholder="Full venue address"
                 value={form.venueAddress}
                 onChange={(e) => setField('venueAddress', e.target.value)}
-              />
-            </div>
-
-            {/* Google Maps URL */}
-            <div className="space-y-2">
-              <Label htmlFor="googleMapsUrl">Google Maps URL</Label>
-              <Input
-                id="googleMapsUrl"
-                placeholder="https://maps.google.com/..."
-                value={form.googleMapsUrl}
-                onChange={(e) => setField('googleMapsUrl', e.target.value)}
+                required
               />
             </div>
 
