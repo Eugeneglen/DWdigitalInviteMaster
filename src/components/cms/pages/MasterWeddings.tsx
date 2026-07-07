@@ -63,12 +63,10 @@ interface Wedding {
   brideName: string | null;
   groomName: string | null;
   weddingDate: string;
-  weddingTime: string | null;
-  venue: string | null;
   venueAddress: string | null;
-  googleMapsUrl: string | null;
   status: string;
   plan: string;
+  features?: { featureKey: string; isEnabled: boolean }[];
   _count?: {
     rsvps?: number;
     wishes?: number;
@@ -240,6 +238,9 @@ export default function MasterWeddings() {
 
   function openEdit(w: Wedding) {
     setEditingId(w.id);
+    const enabledSections = (w.features ?? [])
+      .filter((f) => f.isEnabled && OPTIONAL_SECTIONS.some((s) => s.key === f.featureKey))
+      .map((f) => f.featureKey);
     setForm({
       coupleName: w.coupleName,
       brideName: w.brideName ?? '',
@@ -247,6 +248,7 @@ export default function MasterWeddings() {
       weddingDate: w.weddingDate ? w.weddingDate.slice(0, 10) : '',
       venueAddress: w.venueAddress ?? '',
       plan: w.plan,
+      sections: enabledSections,
     });
     setDialogOpen(true);
   }
@@ -671,6 +673,42 @@ export default function MasterWeddings() {
                   <SelectItem value="ENTERPRISE">Enterprise</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            <Separator />
+
+            {/* Optional Sections */}
+            <div className="space-y-3">
+              <div>
+                <Label className="text-slate-700 font-semibold">Optional Sections</Label>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Home, Schedule, RSVP &amp; Getting There are always included. Toggle additional sections for this wedding.
+                </p>
+              </div>
+              <div className="space-y-3">
+                {OPTIONAL_SECTIONS.map((section) => {
+                  const checked = form.sections.includes(section.key);
+                  return (
+                    <div key={section.key} className="flex items-center justify-between">
+                      <Label htmlFor={`section-${section.key}`} className="text-sm text-slate-600 cursor-pointer">
+                        {section.label}
+                      </Label>
+                      <Switch
+                        id={`section-${section.key}`}
+                        checked={checked}
+                        onCheckedChange={(checked) => {
+                          setForm((prev) => ({
+                            ...prev,
+                            sections: checked
+                              ? [...prev.sections, section.key]
+                              : prev.sections.filter((s) => s !== section.key),
+                          }));
+                        }}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
             </div>
 
             <DialogFooter className="pt-4">

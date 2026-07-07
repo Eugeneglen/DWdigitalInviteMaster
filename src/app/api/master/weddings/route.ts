@@ -50,6 +50,7 @@ export async function GET(req: NextRequest) {
         orderBy: { createdAt: 'desc' },
         include: {
           owner: { select: { id: true, name: true, email: true } },
+          features: { select: { featureKey: true, isEnabled: true } },
           _count: { select: { rsvps: true, wishes: true, guests: true, contacts: true } },
         },
       }),
