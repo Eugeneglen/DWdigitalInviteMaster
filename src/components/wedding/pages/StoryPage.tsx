@@ -28,7 +28,7 @@ const FALLBACK_STORIES = [
   },
 ];
 
-const TIDBITS = [
+const FALLBACK_TIDBITS = [
   {
     q: 'Who said "I love you" first?',
     a: 'It was mutual, during a particularly chaotic road trip where we got hopelessly lost but completely enjoyed the detour.',
@@ -39,10 +39,28 @@ const TIDBITS = [
   },
 ];
 
-const DESTINATIONS_INIT = [
-  { name: 'Amalfi Coast', votes: 0 },
-  { name: 'Kyoto', votes: 0 },
+const FALLBACK_DESTINATIONS = [
+  { name: 'Amalfi Coast' },
+  { name: 'Kyoto' },
 ];
+
+interface Tidbit {
+  q: string;
+  a: string;
+}
+
+interface Destination {
+  name: string;
+}
+
+function safeParseJSON<T>(str: string | undefined | null, fallback: T): T {
+  if (!str) return fallback;
+  try {
+    return JSON.parse(str) as T;
+  } catch {
+    return fallback;
+  }
+}
 
 function formatStoryDate(dateStr: string | null | undefined): string {
   if (!dateStr) return '';
@@ -57,7 +75,6 @@ function formatStoryDate(dateStr: string | null | undefined): string {
 
 export default function StoryPage() {
   const mainRef = useRef<HTMLElement>(null);
-  const [destinations, setDestinations] = useState(DESTINATIONS_INIT);
   const [votes, setVotes] = useState<Record<number, boolean>>({});
   const [suggestion, setSuggestion] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -66,14 +83,21 @@ export default function StoryPage() {
   const subtitle = getField('story', 'subtitle', FALLBACK_SUBTITLE);
   const stories = (data?.stories && data.stories.length > 0) ? data.stories : FALLBACK_STORIES;
 
+  // Tidbits — read from CMS content, fallback to defaults
+  const tidbits = safeParseJSON<Tidbit[]>(getField('story', 'tidbits', ''), FALLBACK_TIDBITS);
+  const tidbitsTitle = getField('story', 'tidbitsTitle', 'Tidbits');
+  const tidbitsSubtitle = getField('story', 'tidbitsSubtitle', 'A few things you might not know.');
+
+  // Honeymoon — read from CMS content, fallback to defaults
+  const destinations = safeParseJSON<Destination[]>(getField('story', 'honeymoonDestinations', ''), FALLBACK_DESTINATIONS);
+  const honeymoonTitle = getField('story', 'honeymoonTitle', 'Where Next?');
+  const honeymoonSubtitle = getField('story', 'honeymoonSubtitle', 'Help us choose our honeymoon destination. Cast your vote!');
+  const honeymoonVotes = safeParseJSON<Record<string, number>>(getField('story', 'honeymoonVotes', ''), {});
+  const honeymoonEyebrow = getField('story', 'honeymoonEyebrow', "AFTER THE 'I DO'");
+
   const handleVote = useCallback((index: number) => {
     setVotes((prev) => {
       if (prev[index]) return prev;
-      setDestinations((d) => {
-        const updated = [...d];
-        updated[index] = { ...updated[index], votes: updated[index].votes + 1 };
-        return updated;
-      });
       return { ...prev, [index]: true };
     });
   }, []);
@@ -102,6 +126,15 @@ export default function StoryPage() {
     els.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
   }, []);
+
+  // Compute vote counts: DB votes + local session votes
+  const getVoteCount = (index: number) => {
+    const destName = destinations[index]?.name;
+    if (!destName) return 0;
+    const dbVotes = honeymoonVotes[destName] ?? 0;
+    const localVote = votes[index] ? 1 : 0;
+    return dbVotes + localVote;
+  };
 
   return (
     <>
@@ -160,105 +193,112 @@ export default function StoryPage() {
           </div>
         </section>
 
-        {/* Tidbits */}
-        <section className="reveal py-section-gap">
-          <div className="text-center mb-16">
-            <h2 className="text-[32px] md:text-[48px] text-charcoal-ink mb-4" style={{ fontFamily: "'Playfair Display', serif", fontWeight: 600, lineHeight: '56px' }}>
-              Tidbits
-            </h2>
-            <p className="text-charcoal-ink/70 italic" style={{ fontSize: '16px', lineHeight: '24px' }}>
-              A few things you might not know.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {TIDBITS.map((item, i) => (
-              <div
-                key={i}
-                className="p-8 border border-champagne-silk/30 bg-white/50 backdrop-blur-sm hover:shadow-[0_8px_30px_rgba(26,26,26,0.04)] transition-all duration-300"
-              >
-                <h4 className="font-headline-md text-[22px] text-charcoal-ink mb-3 font-semibold">
-                  {item.q}
-                </h4>
-                <p className="text-charcoal-ink/80 italic" style={{ fontSize: '16px', lineHeight: '24px' }}>
-                  {item.a}
-                </p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Honeymoon Widget */}
-        <section className="reveal py-section-gap">
-          <div className="max-w-2xl mx-auto text-center">
-            <p
-              className="text-cinematic-gold uppercase tracking-[0.2em] mb-3"
-              style={{ fontSize: '12px', lineHeight: '16px', letterSpacing: '0.1em', fontWeight: 600 }}
-            >
-              AFTER THE &lsquo;I DO&rsquo;
-            </p>
-            <h2
-              className="text-charcoal-ink mb-3 italic"
-              style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: '40px', lineHeight: '48px' }}
-            >
-              Where Next?
-            </h2>
-            <p
-              className="text-charcoal-ink/60 mb-10 italic"
-              style={{ fontSize: '16px', lineHeight: '24px' }}
-            >
-              Help us choose our honeymoon destination. Cast your vote!
-            </p>
-
-            {/* Destination cards */}
-            <div className="grid grid-cols-2 gap-4 mb-8">
-              {destinations.map((dest, i) => (
-                <button
-                  key={dest.name}
-                  type="button"
-                  className={`bg-white border rounded-lg py-6 px-4 text-center transition-colors duration-200 cursor-pointer ${
-                    votes[i]
-                      ? 'border-cinematic-gold bg-cinematic-gold/5'
-                      : 'border-charcoal-ink/10 hover:border-cinematic-gold/40'
-                  }`}
-                  onClick={() => handleVote(i)}
+        {/* Tidbits — only show if there are tidbits */}
+        {tidbits.length > 0 && (
+          <section className="reveal py-section-gap">
+            <div className="text-center mb-16">
+              <h2 className="text-[32px] md:text-[48px] text-charcoal-ink mb-4" style={{ fontFamily: "'Playfair Display', serif", fontWeight: 600, lineHeight: '56px' }}>
+                {tidbitsTitle}
+              </h2>
+              <p className="text-charcoal-ink/70 italic" style={{ fontSize: '16px', lineHeight: '24px' }}>
+                {tidbitsSubtitle}
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+              {tidbits.map((item, i) => (
+                <div
+                  key={i}
+                  className="p-8 border border-champagne-silk/30 bg-white/50 backdrop-blur-sm hover:shadow-[0_8px_30px_rgba(26,26,26,0.04)] transition-all duration-300"
                 >
-                  <p
-                    className="text-charcoal-ink font-semibold"
-                    style={{ fontFamily: "'Playfair Display', serif", fontSize: '18px', lineHeight: '24px' }}
-                  >
-                    {dest.name}
+                  <h4 className="font-headline-md text-[22px] text-charcoal-ink mb-3 font-semibold">
+                    {item.q}
+                  </h4>
+                  <p className="text-charcoal-ink/80 italic" style={{ fontSize: '16px', lineHeight: '24px' }}>
+                    {item.a}
                   </p>
-                  <p
-                    className="text-charcoal-ink/50 mt-1"
-                    style={{ fontSize: '14px', lineHeight: '20px' }}
-                  >
-                    {dest.votes} {dest.votes === 1 ? 'vote' : 'votes'}
-                  </p>
-                </button>
+                </div>
               ))}
             </div>
+          </section>
+        )}
 
-            {/* Suggest input + submit */}
-            <div className="flex gap-3 items-center">
-              <input
-                type="text"
-                placeholder="Suggest a destination..."
-                value={suggestion}
-                onChange={(e) => setSuggestion(e.target.value)}
-                className="flex-1 bg-white border border-charcoal-ink/10 rounded-lg px-4 py-2.5 text-[14px] text-charcoal-ink placeholder:text-charcoal-ink/40 focus:outline-none focus:border-cinematic-gold/50 transition-colors"
-              />
-              <button
-                type="button"
-                className={`shrink-0 rounded-lg px-6 py-2.5 text-[13px] font-semibold uppercase tracking-[0.08em] transition-opacity duration-300 ${
-                  submitted ? 'bg-charcoal-ink/60 text-paper-cream/60 cursor-default' : 'bg-charcoal-ink text-paper-cream hover:opacity-90 cursor-pointer'
-                }`}
-                onClick={handleSubmit}
+        {/* Honeymoon Widget — only show if there are destinations */}
+        {destinations.length > 0 && (
+          <section className="reveal py-section-gap">
+            <div className="max-w-2xl mx-auto text-center">
+              <p
+                className="text-cinematic-gold uppercase tracking-[0.2em] mb-3"
+                style={{ fontSize: '12px', lineHeight: '16px', letterSpacing: '0.1em', fontWeight: 600 }}
               >
-                {submitted ? 'Submitted' : 'Submit'}
-              </button>
+                {honeymoonEyebrow}
+              </p>
+              <h2
+                className="text-charcoal-ink mb-3 italic"
+                style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: '40px', lineHeight: '48px' }}
+              >
+                {honeymoonTitle}
+              </h2>
+              <p
+                className="text-charcoal-ink/60 mb-10 italic"
+                style={{ fontSize: '16px', lineHeight: '24px' }}
+              >
+                {honeymoonSubtitle}
+              </p>
+
+              {/* Destination cards */}
+              <div className="grid grid-cols-2 gap-4 mb-8">
+                {destinations.map((dest, i) => {
+                  const voteCount = getVoteCount(i);
+                  return (
+                    <button
+                      key={dest.name}
+                      type="button"
+                      className={`bg-white border rounded-lg py-6 px-4 text-center transition-colors duration-200 cursor-pointer ${
+                        votes[i]
+                          ? 'border-cinematic-gold bg-cinematic-gold/5'
+                          : 'border-charcoal-ink/10 hover:border-cinematic-gold/40'
+                      }`}
+                      onClick={() => handleVote(i)}
+                    >
+                      <p
+                        className="text-charcoal-ink font-semibold"
+                        style={{ fontFamily: "'Playfair Display', serif", fontSize: '18px', lineHeight: '24px' }}
+                      >
+                        {dest.name}
+                      </p>
+                      <p
+                        className="text-charcoal-ink/50 mt-1"
+                        style={{ fontSize: '14px', lineHeight: '20px' }}
+                      >
+                        {voteCount} {voteCount === 1 ? 'vote' : 'votes'}
+                      </p>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Suggest input + submit */}
+              <div className="flex gap-3 items-center">
+                <input
+                  type="text"
+                  placeholder="Suggest a destination..."
+                  value={suggestion}
+                  onChange={(e) => setSuggestion(e.target.value)}
+                  className="flex-1 bg-white border border-charcoal-ink/10 rounded-lg px-4 py-2.5 text-[14px] text-charcoal-ink placeholder:text-charcoal-ink/40 focus:outline-none focus:border-cinematic-gold/50 transition-colors"
+                />
+                <button
+                  type="button"
+                  className={`shrink-0 rounded-lg px-6 py-2.5 text-[13px] font-semibold uppercase tracking-[0.08em] transition-opacity duration-300 ${
+                    submitted ? 'bg-charcoal-ink/60 text-paper-cream/60 cursor-default' : 'bg-charcoal-ink text-paper-cream hover:opacity-90 cursor-pointer'
+                  }`}
+                  onClick={handleSubmit}
+                >
+                  {submitted ? 'Submitted' : 'Submit'}
+                </button>
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
       </main>
     </>
   );

@@ -1372,3 +1372,25 @@ Stage Summary:
 - 12 broken links identified, 11 fixed (1 remaining: home/story images — CMS uploads exist but guest pages don't have a clear gallery section for them, deferred as design decision)
 - Lint: 0 errors, 1 expected warning
 - All CMS content fields now flow through: CMS editor → content API → public API → guest page
+---
+Task ID: 1
+Agent: Main Agent
+Task: Add Tidbits and Honeymoon Voting CMS backend management
+
+Work Log:
+- Analyzed uploaded screenshots showing Tidbits Q&A section and Honeymoon Voting "Where Next?" section in guest view
+- Confirmed both features were hardcoded with static data in StoryPage.tsx (lines 31-45)
+- Updated CoupleStory.tsx CMS to add:
+  - Tidbits management: title/subtitle inputs + CRUD for Q&A pairs with dialog
+  - Honeymoon Voting management: title/subtitle inputs + CRUD for destinations with dialog
+  - Auto-save for JSON array fields via content API
+- Updated StoryPage.tsx guest view to read from database (getField + JSON.parse) with fallback defaults
+- Both sections only render when they have items (conditional rendering)
+- Verified in browser: CMS add/edit/delete works, guest view renders CMS data correctly
+
+Stage Summary:
+- Tidbits and Honeymoon Voting are now fully CMS-manageable via the "Our Story" CMS page
+- Data stored in WeddingContent: tidbits/tidbitsTitle/tidbitsSubtitle/honeymoonDestinations/honeymoonTitle/honeymoonSubtitle as JSON or TEXT
+- Guest view reads from database, falls back to original hardcoded defaults if no data saved
+- Also removed "The Fullerton Hotel, Orchard" subtitle from Getting There section banner
+

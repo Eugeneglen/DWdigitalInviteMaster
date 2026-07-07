@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { Loader2, Plus, Pencil, Trash2, BookOpen, ImageIcon, Calendar } from 'lucide-react';
+import { Loader2, Plus, Pencil, Trash2, BookOpen, ImageIcon, Calendar, Lightbulb, Plane } from 'lucide-react';
 import SectionImageUpload from './SectionImageUpload';
 import { toast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
@@ -30,6 +30,15 @@ interface StoryItem {
   sortOrder: number;
 }
 
+interface Tidbit {
+  q: string;
+  a: string;
+}
+
+interface Destination {
+  name: string;
+}
+
 interface FormData {
   title: string;
   date: string;
@@ -44,10 +53,21 @@ const emptyForm: FormData = {
   content: '',
 };
 
+function safeParseJSON<T>(str: string | undefined | null, fallback: T): T {
+  if (!str) return fallback;
+  try {
+    return JSON.parse(str) as T;
+  } catch {
+    return fallback;
+  }
+}
+
 export default function CoupleStory() {
   const [stories, setStories] = useState<StoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogType, setDialogType] = useState<'story' | 'tidbit' | 'destination'>('story');
+  const [editingIdx, setEditingIdx] = useState<number | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormData>(emptyForm);
   const [saving, setSaving] = useState(false);
@@ -58,6 +78,22 @@ export default function CoupleStory() {
   const [originalFields, setOriginalFields] = useState<Record<string, string>>({});
   const [editedFields, setEditedFields] = useState<Record<string, boolean>>({});
   const [savingContent, setSavingContent] = useState(false);
+
+  // Tidbits state
+  const [tidbits, setTidbits] = useState<Tidbit[]>([]);
+  const [originalTidbits, setOriginalTidbits] = useState<Tidbit[]>([]);
+  const [tidbitsEdited, setTidbitsEdited] = useState(false);
+
+  // Honeymoon state
+  const [destinations, setDestinations] = useState<Destination[]>([]);
+  const [originalDestinations, setOriginalDestinations] = useState<Destination[]>([]);
+  const [destinationsEdited, setDestinationsEdited] = useState(false);
+
+  // Tidbit form (for dialog)
+  const [tidbitForm, setTidbitForm] = useState<Tidbit>({ q: '', a: '' });
+
+  // Destination form (for dialog)
+  const [destForm, setDestForm] = useState<Destination>({ name: '' });
 
   const CONTENT_KEYS = [
     { key: 'title', label: 'Section Title', placeholder: 'e.g. Our Story', type: 'input' as const },
@@ -92,6 +128,18 @@ export default function CoupleStory() {
       setContentFields(fields);
       setOriginalFields({ ...fields });
       setEditedFields({});
+
+      // Load tidbits
+      const parsedTidbits = safeParseJSON<Tidbit[]>(fields['tidbits'], []);
+      setTidbits(parsedTidbits);
+      setOriginalTidbits([...parsedTidbits]);
+      setTidbitsEdited(false);
+
+      // Load destinations
+      const parsedDest = safeParseJSON<Destination[]>(fields['honeymoonDestinations'], []);
+      setDestinations(parsedDest);
+      setOriginalDestinations([...parsedDest]);
+      setDestinationsEdited(false);
     } catch {
       // silently fail for content
     }
@@ -102,14 +150,18 @@ export default function CoupleStory() {
     fetchContent();
   }, [fetchStories, fetchContent]);
 
+  // ─── Story Dialog ────────────────────────────────────────────
   const openAddDialog = () => {
-    setEditingId(null);
+    setDialogType('story');
+    setEditingIdx(null);
     setForm(emptyForm);
     setDialogOpen(true);
   };
 
   const openEditDialog = (item: StoryItem) => {
+    setDialogType('story');
     setEditingId(item.id);
+    setEditingIdx(null);
     setForm({
       title: item.title,
       date: item.date ?? '',
@@ -119,6 +171,110 @@ export default function CoupleStory() {
     setDialogOpen(true);
   };
 
+  // ─── Tidbit Dialog ───────────────────────────────────────────
+  const openAddTidbit = () => {
+    setDialogType('tidbit');
+    setEditingIdx(null);
+    setTidbitForm({ q: '', a: '' });
+    setDialogOpen(true);
+  };
+
+  const openEditTidbit = (idx: number) => {
+    setDialogType('tidbit');
+    setEditingIdx(idx);
+    setTidbitForm({ ...tidbits[idx] });
+    setDialogOpen(true);
+  };
+
+  const handleSaveTidbit = () => {
+    if (!tidbitForm.q.trim() || !tidbitForm.a.trim()) {
+      toast({ title: 'Error', description: 'Both question and answer are required', variant: 'destructive' });
+      return;
+    }
+    const updated = [...tidbits];
+    if (editingIdx !== null) {
+      updated[editingIdx] = { q: tidbitForm.q.trim(), a: tidbitForm.a.trim() };
+    } else {
+      updated.push({ q: tidbitForm.q.trim(), a: tidbitForm.a.trim() });
+    }
+    setTidbits(updated);
+    setTidbitsEdited(JSON.stringify(updated) !== JSON.stringify(originalTidbits));
+    setDialogOpen(false);
+    autoSaveContent('tidbits', JSON.stringify(updated), 'TIDBITS');
+  };
+
+  const handleDeleteTidbit = (idx: number) => {
+    if (!confirm('Remove this tidbit?')) return;
+    const updated = tidbits.filter((_, i) => i !== idx);
+    setTidbits(updated);
+    setTidbitsEdited(true);
+    autoSaveContent('tidbits', JSON.stringify(updated), 'TIDBITS');
+  };
+
+  // ─── Destination Dialog ──────────────────────────────────────
+  const openAddDestination = () => {
+    setDialogType('destination');
+    setEditingIdx(null);
+    setDestForm({ name: '' });
+    setDialogOpen(true);
+  };
+
+  const openEditDestination = (idx: number) => {
+    setDialogType('destination');
+    setEditingIdx(idx);
+    setDestForm({ ...destinations[idx] });
+    setDialogOpen(true);
+  };
+
+  const handleSaveDestination = () => {
+    if (!destForm.name.trim()) {
+      toast({ title: 'Error', description: 'Destination name is required', variant: 'destructive' });
+      return;
+    }
+    const updated = [...destinations];
+    if (editingIdx !== null) {
+      updated[editingIdx] = { name: destForm.name.trim() };
+    } else {
+      updated.push({ name: destForm.name.trim() });
+    }
+    setDestinations(updated);
+    setDestinationsEdited(JSON.stringify(updated) !== JSON.stringify(originalDestinations));
+    setDialogOpen(false);
+    autoSaveContent('honeymoonDestinations', JSON.stringify(updated), 'DESTINATIONS');
+  };
+
+  const handleDeleteDestination = (idx: number) => {
+    if (!confirm('Remove this destination?')) return;
+    const updated = destinations.filter((_, i) => i !== idx);
+    setDestinations(updated);
+    setDestinationsEdited(true);
+    autoSaveContent('honeymoonDestinations', JSON.stringify(updated), 'DESTINATIONS');
+  };
+
+  // ─── Auto-save JSON content fields ───────────────────────────
+  const autoSaveContent = async (fieldKey: string, fieldValue: string, label: string) => {
+    try {
+      await fetch('/api/cms/content?XTransformPort=3000', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: [{ section: 'story', fieldKey, fieldValue, fieldType: 'JSON' }],
+        }),
+      });
+      // Update originals so dirty tracking stays correct
+      if (label === 'TIDBITS') {
+        setOriginalTidbits(safeParseJSON(fieldValue, []));
+        setTidbitsEdited(false);
+      } else if (label === 'DESTINATIONS') {
+        setOriginalDestinations(safeParseJSON(fieldValue, []));
+        setDestinationsEdited(false);
+      }
+    } catch {
+      toast({ title: 'Error', description: `Failed to save ${label.toLowerCase()}`, variant: 'destructive' });
+    }
+  };
+
+  // ─── Story CRUD ──────────────────────────────────────────────
   const handleSave = async () => {
     if (!form.title.trim()) {
       toast({ title: 'Error', description: 'Chapter title is required', variant: 'destructive' });
@@ -229,6 +385,8 @@ export default function CoupleStory() {
     }
   };
 
+  const hasContentChanges = Object.values(editedFields).some(Boolean) || tidbitsEdited || destinationsEdited;
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -240,7 +398,7 @@ export default function CoupleStory() {
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          {Object.values(editedFields).some(Boolean) && (
+          {hasContentChanges && (
             <Button
               onClick={handleSaveContent}
               disabled={savingContent}
@@ -260,6 +418,7 @@ export default function CoupleStory() {
       </div>
 
       <SectionImageUpload category="story" label="Story Images" maxImages={3} />
+
       {/* Content Card */}
       <Card className="border-charcoal-ink/5 shadow-none">
         <CardContent className="p-6">
@@ -294,6 +453,191 @@ export default function CoupleStory() {
               </div>
             ))}
           </div>
+        </CardContent>
+      </Card>
+
+      <Separator className="bg-champagne-silk" />
+
+      {/* ═══════════════ Tidbits Section ═══════════════ */}
+      <Card className="border-charcoal-ink/5 shadow-none">
+        <CardContent className="p-6 space-y-5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-cinematic-gold/10 text-cinematic-gold">
+                <Lightbulb className="size-4" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-charcoal-ink">Tidbits</h3>
+                <p className="text-xs text-charcoal-ink/40">Fun Q&amp;A facts about the couple</p>
+              </div>
+            </div>
+            <Button
+              onClick={openAddTidbit}
+              variant="outline"
+              className="border-charcoal-ink/15 text-charcoal-ink hover:border-cinematic-gold hover:text-cinematic-gold rounded px-3 py-1.5 text-xs font-medium transition-colors duration-300 h-8"
+            >
+              <Plus className="size-3.5 mr-1" />
+              Add
+            </Button>
+          </div>
+
+          {/* Tidbit Title & Subtitle */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2">
+                <Label className="text-xs font-medium text-charcoal-ink/50 uppercase tracking-wider">Title</Label>
+                {editedFields['tidbitsTitle'] && <span className="bg-cinematic-gold w-1.5 h-1.5 rounded-full" />}
+              </div>
+              <Input
+                value={contentFields['tidbitsTitle'] ?? ''}
+                onChange={(e) => handleContentChange('tidbitsTitle', e.target.value)}
+                placeholder="Tidbits"
+                className="border-charcoal-ink/10 focus:border-cinematic-gold focus:ring-cinematic-gold/20"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2">
+                <Label className="text-xs font-medium text-charcoal-ink/50 uppercase tracking-wider">Subtitle</Label>
+                {editedFields['tidbitsSubtitle'] && <span className="bg-cinematic-gold w-1.5 h-1.5 rounded-full" />}
+              </div>
+              <Input
+                value={contentFields['tidbitsSubtitle'] ?? ''}
+                onChange={(e) => handleContentChange('tidbitsSubtitle', e.target.value)}
+                placeholder="A few things you might not know."
+                className="border-charcoal-ink/10 focus:border-cinematic-gold focus:ring-cinematic-gold/20"
+              />
+            </div>
+          </div>
+
+          {/* Tidbit List */}
+          {tidbits.length === 0 ? (
+            <div className="py-8 text-center">
+              <p className="text-xs text-charcoal-ink/30">No tidbits yet. Click &quot;Add&quot; to create one.</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {tidbits.map((item, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-start gap-3 p-3 rounded-lg border border-charcoal-ink/5 bg-white/50 hover:border-champagne-silk/50 transition-colors group"
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-charcoal-ink">{item.q}</p>
+                    <p className="text-xs text-charcoal-ink/50 mt-0.5 line-clamp-2">{item.a}</p>
+                  </div>
+                  <div className="flex items-center gap-0.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => openEditTidbit(idx)}
+                      className="h-7 w-7 p-0 text-charcoal-ink/40 hover:text-cinematic-gold hover:bg-cinematic-gold/5"
+                    >
+                      <Pencil className="size-3" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeleteTidbit(idx)}
+                      className="h-7 w-7 p-0 text-charcoal-ink/40 hover:text-red-500 hover:bg-red-50"
+                    >
+                      <Trash2 className="size-3" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Separator className="bg-champagne-silk" />
+
+      {/* ═══════════════ Honeymoon Voting Section ═══════════════ */}
+      <Card className="border-charcoal-ink/5 shadow-none">
+        <CardContent className="p-6 space-y-5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-cinematic-gold/10 text-cinematic-gold">
+                <Plane className="size-4" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-charcoal-ink">Honeymoon Voting</h3>
+                <p className="text-xs text-charcoal-ink/40">Let guests vote on your honeymoon destination</p>
+              </div>
+            </div>
+            <Button
+              onClick={openAddDestination}
+              variant="outline"
+              className="border-charcoal-ink/15 text-charcoal-ink hover:border-cinematic-gold hover:text-cinematic-gold rounded px-3 py-1.5 text-xs font-medium transition-colors duration-300 h-8"
+            >
+              <Plus className="size-3.5 mr-1" />
+              Add
+            </Button>
+          </div>
+
+          {/* Honeymoon Title & Subtitle */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2">
+                <Label className="text-xs font-medium text-charcoal-ink/50 uppercase tracking-wider">Title</Label>
+                {editedFields['honeymoonTitle'] && <span className="bg-cinematic-gold w-1.5 h-1.5 rounded-full" />}
+              </div>
+              <Input
+                value={contentFields['honeymoonTitle'] ?? ''}
+                onChange={(e) => handleContentChange('honeymoonTitle', e.target.value)}
+                placeholder="Where Next?"
+                className="border-charcoal-ink/10 focus:border-cinematic-gold focus:ring-cinematic-gold/20"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2">
+                <Label className="text-xs font-medium text-charcoal-ink/50 uppercase tracking-wider">Subtitle</Label>
+                {editedFields['honeymoonSubtitle'] && <span className="bg-cinematic-gold w-1.5 h-1.5 rounded-full" />}
+              </div>
+              <Input
+                value={contentFields['honeymoonSubtitle'] ?? ''}
+                onChange={(e) => handleContentChange('honeymoonSubtitle', e.target.value)}
+                placeholder="Help us choose our honeymoon destination. Cast your vote!"
+                className="border-charcoal-ink/10 focus:border-cinematic-gold focus:ring-cinematic-gold/20"
+              />
+            </div>
+          </div>
+
+          {/* Destination List */}
+          {destinations.length === 0 ? (
+            <div className="py-8 text-center">
+              <p className="text-xs text-charcoal-ink/30">No destinations yet. Click &quot;Add&quot; to create one.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {destinations.map((item, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-center justify-between gap-2 p-3 rounded-lg border border-charcoal-ink/5 bg-white/50 hover:border-champagne-silk/50 transition-colors group"
+                >
+                  <p className="text-sm font-medium text-charcoal-ink truncate">{item.name}</p>
+                  <div className="flex items-center gap-0.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => openEditDestination(idx)}
+                      className="h-6 w-6 p-0 text-charcoal-ink/40 hover:text-cinematic-gold hover:bg-cinematic-gold/5"
+                    >
+                      <Pencil className="size-3" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeleteDestination(idx)}
+                      className="h-6 w-6 p-0 text-charcoal-ink/40 hover:text-red-500 hover:bg-red-50"
+                    >
+                      <Trash2 className="size-3" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -389,98 +733,191 @@ export default function CoupleStory() {
         </div>
       )}
 
-      {/* Add/Edit Dialog */}
+      {/* ═══════════════ Unified Dialog ═══════════════ */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-charcoal-ink">
-              {editingId ? 'Edit Chapter' : 'Add New Chapter'}
-            </DialogTitle>
-            <DialogDescription className="text-charcoal-ink/50">
-              {editingId ? 'Update this chapter of your love story.' : 'Add a new chapter to your love story timeline.'}
-            </DialogDescription>
-          </DialogHeader>
+          {dialogType === 'story' && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-charcoal-ink">
+                  {editingId ? 'Edit Chapter' : 'Add New Chapter'}
+                </DialogTitle>
+                <DialogDescription className="text-charcoal-ink/50">
+                  {editingId ? 'Update this chapter of your love story.' : 'Add a new chapter to your love story timeline.'}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-2">
+                <div className="space-y-1.5">
+                  <Label htmlFor="story-title" className="text-sm font-medium text-charcoal-ink/70">
+                    Title <span className="text-red-400">*</span>
+                  </Label>
+                  <Input
+                    id="story-title"
+                    value={form.title}
+                    onChange={(e) => setForm({ ...form, title: e.target.value })}
+                    placeholder="e.g. How We Met"
+                    className="border-charcoal-ink/10 focus:border-cinematic-gold focus:ring-cinematic-gold/20"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="story-date" className="text-sm font-medium text-charcoal-ink/70">
+                    Display Date
+                  </Label>
+                  <Input
+                    id="story-date"
+                    value={form.date}
+                    onChange={(e) => setForm({ ...form, date: e.target.value })}
+                    placeholder="e.g. March 2023"
+                    className="border-charcoal-ink/10 focus:border-cinematic-gold focus:ring-cinematic-gold/20"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="story-image" className="text-sm font-medium text-charcoal-ink/70">
+                    Image URL
+                  </Label>
+                  <Input
+                    id="story-image"
+                    value={form.imageUrl}
+                    onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
+                    placeholder="https://example.com/photo.jpg"
+                    className="border-charcoal-ink/10 focus:border-cinematic-gold focus:ring-cinematic-gold/20"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="story-content" className="text-sm font-medium text-charcoal-ink/70">
+                    Content / Story <span className="text-red-400">*</span>
+                  </Label>
+                  <Textarea
+                    id="story-content"
+                    value={form.content}
+                    onChange={(e) => setForm({ ...form, content: e.target.value })}
+                    placeholder="Tell this chapter of your story…"
+                    rows={4}
+                    className="border-charcoal-ink/10 focus:border-cinematic-gold focus:ring-cinematic-gold/20 resize-none min-h-[100px]"
+                  />
+                </div>
+              </div>
+              <DialogFooter className="gap-2 pt-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setDialogOpen(false)}
+                  className="border-charcoal-ink/15 text-charcoal-ink hover:border-cinematic-gold hover:text-cinematic-gold rounded px-6 py-2.5 text-[13px] font-medium uppercase tracking-[0.08em] transition-colors duration-300"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="bg-cinematic-gold text-charcoal-ink hover:bg-cinematic-gold/90 rounded px-6 py-2.5 text-[13px] font-medium uppercase tracking-[0.08em] transition-colors duration-300 disabled:opacity-50"
+                >
+                  {saving ? (
+                    <>
+                      <Loader2 className="size-4 animate-spin mr-2" />
+                      Saving…
+                    </>
+                  ) : editingId ? (
+                    'Update Chapter'
+                  ) : (
+                    'Add Chapter'
+                  )}
+                </Button>
+              </DialogFooter>
+            </>
+          )}
 
-          <div className="space-y-4 py-2">
-            <div className="space-y-1.5">
-              <Label htmlFor="story-title" className="text-sm font-medium text-charcoal-ink/70">
-                Title <span className="text-red-400">*</span>
-              </Label>
-              <Input
-                id="story-title"
-                value={form.title}
-                onChange={(e) => setForm({ ...form, title: e.target.value })}
-                placeholder="e.g. How We Met"
-                className="border-charcoal-ink/10 focus:border-cinematic-gold focus:ring-cinematic-gold/20"
-              />
-            </div>
+          {dialogType === 'tidbit' && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-charcoal-ink">
+                  {editingIdx !== null ? 'Edit Tidbit' : 'Add Tidbit'}
+                </DialogTitle>
+                <DialogDescription className="text-charcoal-ink/50">
+                  {editingIdx !== null ? 'Update this fun fact.' : 'Add a fun Q&A about the couple.'}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-2">
+                <div className="space-y-1.5">
+                  <Label className="text-sm font-medium text-charcoal-ink/70">
+                    Question <span className="text-red-400">*</span>
+                  </Label>
+                  <Input
+                    value={tidbitForm.q}
+                    onChange={(e) => setTidbitForm({ ...tidbitForm, q: e.target.value })}
+                    placeholder="e.g. Who said 'I love you' first?"
+                    className="border-charcoal-ink/10 focus:border-cinematic-gold focus:ring-cinematic-gold/20"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-sm font-medium text-charcoal-ink/70">
+                    Answer <span className="text-red-400">*</span>
+                  </Label>
+                  <Textarea
+                    value={tidbitForm.a}
+                    onChange={(e) => setTidbitForm({ ...tidbitForm, a: e.target.value })}
+                    placeholder="The answer to the question…"
+                    rows={3}
+                    className="border-charcoal-ink/10 focus:border-cinematic-gold focus:ring-cinematic-gold/20 resize-none"
+                  />
+                </div>
+              </div>
+              <DialogFooter className="gap-2 pt-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setDialogOpen(false)}
+                  className="border-charcoal-ink/15 text-charcoal-ink hover:border-cinematic-gold hover:text-cinematic-gold rounded px-6 py-2.5 text-[13px] font-medium uppercase tracking-[0.08em] transition-colors duration-300"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleSaveTidbit}
+                  className="bg-cinematic-gold text-charcoal-ink hover:bg-cinematic-gold/90 rounded px-6 py-2.5 text-[13px] font-medium uppercase tracking-[0.08em] transition-colors duration-300"
+                >
+                  {editingIdx !== null ? 'Update' : 'Add Tidbit'}
+                </Button>
+              </DialogFooter>
+            </>
+          )}
 
-            <div className="space-y-1.5">
-              <Label htmlFor="story-date" className="text-sm font-medium text-charcoal-ink/70">
-                Display Date
-              </Label>
-              <Input
-                id="story-date"
-                value={form.date}
-                onChange={(e) => setForm({ ...form, date: e.target.value })}
-                placeholder="e.g. March 2023"
-                className="border-charcoal-ink/10 focus:border-cinematic-gold focus:ring-cinematic-gold/20"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="story-image" className="text-sm font-medium text-charcoal-ink/70">
-                Image URL
-              </Label>
-              <Input
-                id="story-image"
-                value={form.imageUrl}
-                onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-                placeholder="https://example.com/photo.jpg"
-                className="border-charcoal-ink/10 focus:border-cinematic-gold focus:ring-cinematic-gold/20"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="story-content" className="text-sm font-medium text-charcoal-ink/70">
-                Content / Story <span className="text-red-400">*</span>
-              </Label>
-              <Textarea
-                id="story-content"
-                value={form.content}
-                onChange={(e) => setForm({ ...form, content: e.target.value })}
-                placeholder="Tell this chapter of your story…"
-                rows={4}
-                className="border-charcoal-ink/10 focus:border-cinematic-gold focus:ring-cinematic-gold/20 resize-none min-h-[100px]"
-              />
-            </div>
-          </div>
-
-          <DialogFooter className="gap-2 pt-2">
-            <Button
-              variant="outline"
-              onClick={() => setDialogOpen(false)}
-              className="border-charcoal-ink/15 text-charcoal-ink hover:border-cinematic-gold hover:text-cinematic-gold rounded px-6 py-2.5 text-[13px] font-medium uppercase tracking-[0.08em] transition-colors duration-300"
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSave}
-              disabled={saving}
-              className="bg-cinematic-gold text-charcoal-ink hover:bg-cinematic-gold/90 rounded px-6 py-2.5 text-[13px] font-medium uppercase tracking-[0.08em] transition-colors duration-300 disabled:opacity-50"
-            >
-              {saving ? (
-                <>
-                  <Loader2 className="size-4 animate-spin mr-2" />
-                  Saving…
-                </>
-              ) : editingId ? (
-                'Update Chapter'
-              ) : (
-                'Add Chapter'
-              )}
-            </Button>
-          </DialogFooter>
+          {dialogType === 'destination' && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-charcoal-ink">
+                  {editingIdx !== null ? 'Edit Destination' : 'Add Destination'}
+                </DialogTitle>
+                <DialogDescription className="text-charcoal-ink/50">
+                  {editingIdx !== null ? 'Update this honeymoon destination.' : 'Add a destination option for guests to vote on.'}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-2">
+                <div className="space-y-1.5">
+                  <Label className="text-sm font-medium text-charcoal-ink/70">
+                    Destination Name <span className="text-red-400">*</span>
+                  </Label>
+                  <Input
+                    value={destForm.name}
+                    onChange={(e) => setDestForm({ ...destForm, name: e.target.value })}
+                    placeholder="e.g. Amalfi Coast"
+                    className="border-charcoal-ink/10 focus:border-cinematic-gold focus:ring-cinematic-gold/20"
+                  />
+                </div>
+              </div>
+              <DialogFooter className="gap-2 pt-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setDialogOpen(false)}
+                  className="border-charcoal-ink/15 text-charcoal-ink hover:border-cinematic-gold hover:text-cinematic-gold rounded px-6 py-2.5 text-[13px] font-medium uppercase tracking-[0.08em] transition-colors duration-300"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleSaveDestination}
+                  className="bg-cinematic-gold text-charcoal-ink hover:bg-cinematic-gold/90 rounded px-6 py-2.5 text-[13px] font-medium uppercase tracking-[0.08em] transition-colors duration-300"
+                >
+                  {editingIdx !== null ? 'Update' : 'Add Destination'}
+                </Button>
+              </DialogFooter>
+            </>
+          )}
         </DialogContent>
       </Dialog>
     </div>
