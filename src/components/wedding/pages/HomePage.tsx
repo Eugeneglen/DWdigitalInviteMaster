@@ -83,6 +83,9 @@ export default function HomePage() {
   const teaCeremonyLabel = getField('hero', 'teaCeremonyLabel', 'The Tradition');
   const teaCeremonyTitle = getField('hero', 'teaCeremonyTitle', 'The Tea Ceremony');
 
+  // CMS font — applied ONLY to the master head copy (couple name)
+  const heroFont = getField('hero', 'fontFamily', 'Playfair Display');
+
   // Narrative section
   const narrativeLabel = getField('hero', 'narrativeLabel', 'The Prelude');
   const narrativeTitle = getField('hero', 'narrativeTitle', 'Our Story Begins Here');
@@ -112,7 +115,7 @@ export default function HomePage() {
         style={{ backgroundImage: `url('${bannerUrl}')` }}
       >
         <div className="relative z-10 text-center px-6">
-          <h1 className="font-display-hero text-[44px] md:text-[72px] leading-[1.05] text-charcoal-ink tracking-tight font-bold drop-shadow-sm">
+          <h1 className="font-display-hero text-[44px] md:text-[72px] leading-[1.05] text-charcoal-ink tracking-tight font-bold drop-shadow-sm" style={{ fontFamily: `'${heroFont}', serif` }}>
             {coupleName}
           </h1>
           {heroSubtitle && (

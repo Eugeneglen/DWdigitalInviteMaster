@@ -65,7 +65,6 @@ export default function MobileDrawer() {
                       ? 'text-cinematic-gold font-bold'
                       : 'text-charcoal-ink/60'
                   }`}
-                  style={{ fontFamily: "'Playfair Display', serif" }}
                 >
                   {item.label}
                 </button>

@@ -14,7 +14,6 @@ export default function Footer() {
 
   const footerLinkClass =
     'font-body-md text-body-md leading-body-md text-charcoal-ink/60 hover:text-cinematic-gold underline-offset-4 hover:underline transition-colors cursor-pointer';
-  const footerBrandStyle = { fontFamily: "'Playfair Display', serif" };
 
   return (
     <>
@@ -23,35 +22,31 @@ export default function Footer() {
           <div className="flex flex-col md:flex-row items-center gap-6">
             <button
               className={footerLinkClass}
-              style={footerBrandStyle}
               onClick={() => setContactConciergeOpen(true)}
             >
               Contact Concierge
             </button>
             <button
               className={footerLinkClass}
-              style={footerBrandStyle}
               onClick={() => setPrivacyPolicyOpen(true)}
             >
               Privacy Policy
             </button>
             <button
               className={footerLinkClass}
-              style={footerBrandStyle}
               onClick={() => setDataProtectionOpen(true)}
             >
               Data Protection
             </button>
             <button
               className={footerLinkClass}
-              style={footerBrandStyle}
               onClick={() => setTermsOfServiceOpen(true)}
             >
               Terms of Service
             </button>
           </div>
 
-          <p className="font-label-sm text-label-sm leading-label-sm text-charcoal-ink/40 uppercase tracking-wider font-semibold" style={footerBrandStyle}>
+          <p className="font-label-sm text-label-sm leading-label-sm text-charcoal-ink/40 uppercase tracking-wider font-semibold">
             {footerContent.copyright}
           </p>
         </div>

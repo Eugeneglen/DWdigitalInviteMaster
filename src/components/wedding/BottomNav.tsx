@@ -38,7 +38,7 @@ export default function BottomNav() {
             >
               {getSectionIcon(item.section)}
             </span>
-            <span className="text-[10px] uppercase tracking-wider font-semibold mt-1" style={{ fontFamily: "'Playfair Display', serif" }}>
+            <span className="text-[10px] uppercase tracking-wider font-semibold mt-1">
               {item.label}
             </span>
           </button>
@@ -52,7 +52,7 @@ export default function BottomNav() {
           className="flex flex-col items-center justify-center text-charcoal-ink/50 hover:text-cinematic-gold transition-colors active:scale-90 transition-transform"
         >
           <span className="material-symbols-outlined mb-1" aria-hidden="true">more_horiz</span>
-          <span className="text-[10px] uppercase tracking-wider font-semibold mt-1" style={{ fontFamily: "'Playfair Display', serif" }}>More</span>
+          <span className="text-[10px] uppercase tracking-wider font-semibold mt-1">More</span>
         </button>
       )}
     </nav>
