@@ -17,7 +17,7 @@ export default function Footer() {
 
   return (
     <>
-      <footer className="w-full py-20 bg-paper-cream border-t border-champagne-silk/10 pb-32 md:pb-20">
+      <footer className="w-full py-20 border-t border-champagne-silk/10 pb-32 md:pb-20" style={{ backgroundColor: 'var(--wedding-bg, #FCF9F2)' }}>
         <div className="max-w-[1440px] mx-auto px-4 md:px-canvas-margin flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex flex-col md:flex-row items-center gap-6">
             <button

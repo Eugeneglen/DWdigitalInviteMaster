@@ -13,6 +13,7 @@ import { useCoupleCMSStore } from '@/store/useCoupleCMSStore';
 import { HeroVisualSection, BannerSection } from './CoupleImages';
 import SectionImageUpload from './SectionImageUpload';
 import FontPicker from './FontPicker';
+import BackgroundColorPicker from './BackgroundColorPicker';
 
 const CONTENT_API = '/api/cms/content?XTransformPort=3000';
 
@@ -171,7 +172,17 @@ export default function CoupleHome() {
 
       <Separator className="bg-champagne-silk" />
 
-      {/* 3. Section Image Upload */}
+      {/* 3. Background Colour */}
+      <div className="space-y-2">
+        <Label className="text-xs font-medium text-charcoal-ink/50 uppercase tracking-wider">
+          Background Colour
+        </Label>
+        <BackgroundColorPicker />
+      </div>
+
+      <Separator className="bg-champagne-silk" />
+
+      {/* 4. Section Image Upload */}
       <div className="space-y-2">
         <Label className="text-xs font-medium text-charcoal-ink/50 uppercase tracking-wider">
           Home Images
@@ -185,7 +196,7 @@ export default function CoupleHome() {
 
       <Separator className="bg-champagne-silk" />
 
-      {/* 4. Font Picker */}
+      {/* 5. Font Picker */}
       <div className="space-y-2">
         <Label className="text-xs font-medium text-charcoal-ink/50 uppercase tracking-wider">
           Hero Font
@@ -195,7 +206,7 @@ export default function CoupleHome() {
 
       <Separator className="bg-champagne-silk" />
 
-      {/* 5. Hero Content Fields */}
+      {/* 6. Hero Content Fields */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <Label className="text-xs font-medium text-charcoal-ink/50 uppercase tracking-wider">

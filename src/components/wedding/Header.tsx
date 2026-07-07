@@ -13,8 +13,8 @@ export default function Header({ topOffset }: HeaderProps) {
 
   return (
     <header
-      className="fixed w-full z-50 bg-paper-cream/80 backdrop-blur-md border-b border-champagne-silk/30"
-      style={topOffset ? { top: topOffset } : undefined}
+      className="fixed w-full z-50 backdrop-blur-md border-b border-champagne-silk/30"
+      style={{ backgroundColor: 'var(--wedding-bg, #FCF9F2)', opacity: 0.97, ...(topOffset ? { top: topOffset } : {}) }}
     >
       <div className="flex justify-between items-center px-4 md:px-6 py-3 w-full max-w-[1440px] mx-auto">
         {/* Logo */}

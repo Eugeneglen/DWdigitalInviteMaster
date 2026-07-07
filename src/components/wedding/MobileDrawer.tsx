@@ -30,10 +30,11 @@ export default function MobileDrawer() {
     >
       <nav
         id="mobile-drawer"
-        className={`h-full w-80 bg-paper-cream shadow-2xl flex flex-col p-8 gap-4 transition-transform duration-500 ease-in-out ${
+        className={`h-full w-80 shadow-2xl flex flex-col p-8 gap-4 transition-transform duration-500 ease-in-out ${
           drawerOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
         onClick={(e) => e.stopPropagation()}
+        style={{ backgroundColor: 'var(--wedding-bg, #FCF9F2)' }}
       >
         {/* Top: Logo + Close */}
         <div className="flex justify-between items-center mb-8 border-b border-champagne-silk/30 pb-4">

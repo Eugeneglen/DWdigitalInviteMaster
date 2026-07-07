@@ -12,7 +12,8 @@ export default function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 w-full flex justify-around items-center py-4 px-2 md:hidden bg-paper-cream border-t border-champagne-silk/20 z-50 rounded-t-full shadow-[0_-4px_20px_rgba(26,26,26,0.04)] pb-8 pt-4"
+      className="fixed bottom-0 left-0 w-full flex justify-around items-center py-4 px-2 md:hidden border-t border-champagne-silk/20 z-50 rounded-t-full shadow-[0_-4px_20px_rgba(26,26,26,0.04)] pb-8 pt-4"
+      style={{ backgroundColor: 'var(--wedding-bg, #FCF9F2)' }}
       role="navigation"
       aria-label="Page navigation"
     >

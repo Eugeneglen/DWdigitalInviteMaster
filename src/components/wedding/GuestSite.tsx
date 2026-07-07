@@ -98,9 +98,12 @@ export default function GuestSite({ slug, topOffset, showEditorButton = false }:
   const { open: loginModalOpen, closeModal } = useAuthModalStore();
 
   // Pre-fetch wedding data for this slug so all child pages share the cache
-  const { data: weddingData, loading } = usePublicWedding(slug);
+  const { data: weddingData, loading, getField } = usePublicWedding(slug);
   const { navTabs, loaded: settingsLoaded } = useSiteSettings();
   const { setAvailableTabs } = useNavigationStore();
+
+  // Read the custom background colour (default: DW paper-cream)
+  const backgroundColor = getField('global', 'backgroundColor', '#FCF9F2');
 
   // Compute filtered tabs from global config + wedding feature flags
   // and push into the navigation store for Header/MobileDrawer/BottomNav
@@ -126,7 +129,7 @@ export default function GuestSite({ slug, topOffset, showEditorButton = false }:
   const GuestPageComponent = GUEST_PAGES[currentSection] || HomePage;
 
   return (
-    <div className="min-h-screen flex flex-col bg-paper-cream text-charcoal-ink overflow-x-hidden selection:bg-cinematic-gold selection:text-paper-cream">
+    <div className="min-h-screen flex flex-col bg-paper-cream text-charcoal-ink overflow-x-hidden selection:bg-cinematic-gold selection:text-paper-cream" style={{ '--wedding-bg': backgroundColor } as React.CSSProperties}>
       <GoldDust />
       <Header topOffset={topOffset} />
       <MobileDrawer />
