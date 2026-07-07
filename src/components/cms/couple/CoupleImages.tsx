@@ -444,8 +444,7 @@ export default function CoupleImages() {
   const fetchMedia = useCallback(async () => {
     try {
       setLoading(true);
-      const url = `${MEDIA_API}&category=${filterCategory}`;
-      const res = await fetch(url);
+      const res = await fetch(MEDIA_API);
       if (!res.ok) throw new Error('Failed to load media');
       const data = await res.json();
       setMedia(data.media ?? []);
@@ -454,7 +453,7 @@ export default function CoupleImages() {
     } finally {
       setLoading(false);
     }
-  }, [filterCategory]);
+  }, []);
 
   useEffect(() => {
     fetchMedia();
@@ -605,7 +604,10 @@ export default function CoupleImages() {
           </p>
         </div>
         <Button
-          onClick={() => setUploadDialogOpen(true)}
+          onClick={() => {
+            setUploadForm((f) => ({ ...f, category: filterCategory }));
+            setUploadDialogOpen(true);
+          }}
           className="bg-cinematic-gold text-charcoal-ink hover:bg-cinematic-gold/90 rounded px-4 py-2 text-[13px] font-medium uppercase tracking-[0.08em] transition-colors duration-300 shrink-0"
         >
           <Upload className="size-4 mr-1.5" />
