@@ -50,6 +50,7 @@ const FALLBACK_SHORT_DATE = 'December 25, 2027';
 const FALLBACK_VENUE = 'The Singapore EDITION';
 const FALLBACK_VENUE_ADDRESS = '38 Cuscaden Road, Singapore 249731';
 const FALLBACK_VENUE_DESCRIPTION = 'Nestled in the heart of Orchard Road, The Singapore EDITION is a luxury boutique hotel blending timeless elegance with modern sophistication. Its intimate event spaces and bespoke service make it the perfect setting for an unforgettable celebration.';
+const FALLBACK_VENUE_IMAGE = 'https://sfile.chatglm.cn/images-ppt/4adf4afbb9a2.jpg';
 const FALLBACK_COUPLE_NAME = 'Eleanor & James';
 
 function formatTime(timeStr: string | null | undefined): string {
@@ -229,7 +230,7 @@ export default function SchedulePage() {
               <img
                 alt={`${venueName} — Wedding Venue`}
                 className="w-full h-full object-cover"
-                src="https://sfile.chatglm.cn/images-ppt/4adf4afbb9a2.jpg"
+                src={getField('getting-there', 'venueImage', FALLBACK_VENUE_IMAGE)}
               />
             </div>
           </div>
