@@ -433,7 +433,8 @@ export default function CoupleImages() {
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null); // inline drop zone
+  const dialogInputRef = useRef<HTMLInputElement>(null); // dialog
 
   const [uploadForm, setUploadForm] = useState({
     category: 'home',
@@ -459,33 +460,66 @@ export default function CoupleImages() {
     fetchMedia();
   }, [fetchMedia]);
 
-  const handleFileSelect = (files: FileList | null) => {
-    if (!files || files.length === 0) return;
-    const file = files[0];
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file');
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const dataUrl = e.target?.result as string;
-      setUploadForm({
-        ...uploadForm,
-        url: dataUrl,
-        fileName: file.name,
-      });
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragOver(false);
-    handleFileSelect(e.dataTransfer.files);
-  };
-
   // Helper: count images for a category
   const catCount = (cat: string) => media.filter((m) => m.category === cat).length;
+
+  const handleInlineUpload = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+
+    const currentCount = catCount(filterCategory);
+    const maxAllowed = getCategoryMax(filterCategory);
+    if (currentCount >= maxAllowed) {
+      toast.error(`${getCategoryLabel(filterCategory)} section is full (${maxAllowed} images max).`);
+      return;
+    }
+
+    const toUpload = Array.from(files)
+      .filter((f) => f.type.startsWith('image/'))
+      .slice(0, maxAllowed - currentCount);
+
+    if (toUpload.length === 0) {
+      toast.error('Please select image files (PNG, JPG, GIF, WebP)');
+      return;
+    }
+
+    setUploading(true);
+    for (const file of toUpload) {
+      try {
+        const dataUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target?.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+
+        const res = await fetch(MEDIA_API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            url: dataUrl,
+            fileName: file.name,
+            category: filterCategory,
+            fileType: 'IMAGE',
+          }),
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || 'Failed to upload');
+        }
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : 'Failed to upload image');
+      }
+    }
+    setUploading(false);
+    toast.success(`${toUpload.length} image${toUpload.length > 1 ? 's' : ''} added to ${getCategoryLabel(filterCategory)}`);
+    fetchMedia();
+  };
+
+  const handleInlineDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    handleInlineUpload(e.dataTransfer.files);
+  };
 
   const handleUpload = async () => {
     if (!uploadForm.url) {
@@ -653,16 +687,60 @@ export default function CoupleImages() {
       </div>
 
       {/* Media Grid */}
-      {media.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 gap-3">
-          <ImageOff className="size-10 text-champagne-silk" />
-          <p className="text-sm text-charcoal-ink/40 font-medium">No images yet</p>
-          <p className="text-xs text-charcoal-ink/30">
-            Click &quot;Upload&quot; to add your first image.
-          </p>
+      {media.length === 0 && catCount(filterCategory) === 0 ? (
+        <div
+          className={`flex flex-col items-center justify-center py-16 gap-3 rounded-xl border-2 border-dashed transition-colors duration-200 cursor-pointer ${
+            dragOver ? 'border-cinematic-gold bg-cinematic-gold/5' : 'border-charcoal-ink/10 hover:border-champagne-silk'
+          }`}
+          onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={handleInlineDrop}
+          onClick={() => fileInputRef.current?.click()}
+        >
+          {uploading ? (
+            <Loader2 className="size-8 animate-spin text-cinematic-gold" />
+          ) : (
+            <>
+              <ImagePlus className="size-10 text-champagne-silk" />
+              <p className="text-sm text-charcoal-ink/50 font-medium">
+                Drop images here or click to upload
+              </p>
+              <p className="text-xs text-charcoal-ink/30">
+                {getCategoryLabel(filterCategory)} — up to {getCategoryMax(filterCategory)} images
+              </p>
+            </>
+          )}
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+        <div
+          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"
+          onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={handleInlineDrop}
+        >
+          {/* Inline upload card */}
+          {catCount(filterCategory) < getCategoryMax(filterCategory) && (
+            <Card
+              className={`border-2 border-dashed aspect-square flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors duration-200 ${
+                dragOver
+                  ? 'border-cinematic-gold bg-cinematic-gold/5'
+                  : 'border-charcoal-ink/10 hover:border-champagne-silk hover:bg-champagne-silk/10'
+              }`}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              {uploading ? (
+                <Loader2 className="size-6 animate-spin text-cinematic-gold" />
+              ) : (
+                <>
+                  <ImagePlus className="size-6 text-champagne-silk" />
+                  <p className="text-xs text-charcoal-ink/40 font-medium">Add image</p>
+                  <p className="text-[10px] text-charcoal-ink/25">
+                    {getCategoryMax(filterCategory) - catCount(filterCategory)} remaining
+                  </p>
+                </>
+              )}
+            </Card>
+          )}
           {media.map((item) => (
             <Card key={item.id} className="border-charcoal-ink/5 shadow-none overflow-hidden group hover:border-champagne-silk transition-colors duration-200">
               {/* Thumbnail */}
@@ -759,16 +837,23 @@ export default function CoupleImages() {
             {/* Drop zone */}
             <div
               className={`flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 transition-colors duration-200 cursor-pointer ${
-                dragOver
-                  ? 'border-cinematic-gold bg-cinematic-gold/5'
-                  : uploadForm.url
-                    ? 'border-cinematic-gold/30 bg-cinematic-gold/5'
-                    : 'border-charcoal-ink/10 hover:border-champagne-silk'
+                uploadForm.url
+                  ? 'border-cinematic-gold/30 bg-cinematic-gold/5'
+                  : 'border-charcoal-ink/10 hover:border-champagne-silk'
               }`}
-              onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-              onDragLeave={() => setDragOver(false)}
-              onDrop={handleDrop}
-              onClick={() => fileInputRef.current?.click()}
+              onDragOver={(e) => { e.preventDefault(); }}
+              onDrop={(e) => {
+                e.preventDefault();
+                const files = e.dataTransfer.files;
+                if (files?.[0]?.type.startsWith('image/')) {
+                  const reader = new FileReader();
+                  reader.onload = (ev) => {
+                    setUploadForm((f) => ({ ...f, url: ev.target?.result as string, fileName: files[0].name }));
+                  };
+                  reader.readAsDataURL(files[0]);
+                }
+              }}
+              onClick={() => dialogInputRef.current?.click()}
             >
               {uploadForm.url ? (
                 <div className="relative w-full">
@@ -794,11 +879,19 @@ export default function CoupleImages() {
                 </>
               )}
               <input
-                ref={fileInputRef}
+                ref={dialogInputRef}
                 type="file"
                 accept="image/*"
                 className="hidden"
-                onChange={(e) => handleFileSelect(e.target.files)}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  const reader = new FileReader();
+                  reader.onload = (ev) => {
+                    setUploadForm((f) => ({ ...f, url: ev.target?.result as string, fileName: file.name }));
+                  };
+                  reader.readAsDataURL(file);
+                }}
               />
             </div>
 
@@ -881,6 +974,19 @@ export default function CoupleImages() {
           />
         </DialogContent>
       </Dialog>
+
+      {/* Hidden file input for inline drop zone uploads */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        multiple
+        className="hidden"
+        onChange={(e) => {
+          handleInlineUpload(e.target.files);
+          e.target.value = '';
+        }}
+      />
     </div>
   );
 }
