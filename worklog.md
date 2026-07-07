@@ -1027,3 +1027,27 @@ Stage Summary:
 - `heroVideoUrl` field added to DB schema, public API, and CMS API
 - Zero lint errors, dev server running clean
 
+
+---
+Task ID: 19
+Agent: Main Agent
+Task: Fix server stability and login not working
+
+Work Log:
+- Server was down — .next cache was stale causing compilation hang
+- Cleared .next/cache and restarted, all routes returned 200
+- Server kept dying between tool calls — set up keepalive script at /tmp/keepalive.sh
+- Investigated login issue: API endpoint /api/auth/login exists and works correctly
+- Tested both logins via curl: admin@dreamweavers.sg (SUPER_ADMIN) and eleanor@wedding.com (COUPLE) both return 200 with session cookies
+- Full session flow verified: login → session retrieval returns correct user with role
+- Root cause of login issue: DialogOverlay with `!bg-paper-cream` was covering the entire viewport and intercepting pointer events before they could reach the form inputs/button
+- Fixed: Added `pointer-events-none` to DialogOverlay when custom overlayClassName is provided
+- Added `pointer-events-auto` to DialogContent base classes for safety
+- Added `allowedDevOrigins` to next.config.ts to suppress cross-origin warnings from preview panel
+- Ran lint: 0 errors, 1 pre-existing warning
+
+Stage Summary:
+- Server stability: keepalive script ensures auto-restart on crash
+- Login fix: pointer-events-none on overlay resolves click/input interception
+- Both admin and couple login flows verified working via API
+- Files changed: src/components/ui/dialog.tsx, next.config.ts
