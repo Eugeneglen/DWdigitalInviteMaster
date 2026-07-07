@@ -4,6 +4,8 @@ import { useState, Suspense, useMemo, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { usePublicWedding } from '@/hooks/usePublicWedding';
 
+// Steps: 0=Name, 1=Party Size, 2=Guest Details, 3=Attendance
+
 interface Guest {
   name: string;
   dietary: string[];
@@ -76,20 +78,9 @@ function RSVPPageInner() {
   const [firstName, setFirstName] = useState(autoFill.first);
   const [lastName, setLastName] = useState(autoFill.last);
 
-  // Step 0 — Invitation code lookup state
-  const [inviteCode, setInviteCode] = useState('');
-  const [lookupLoading, setLookupLoading] = useState(false);
-  const [lookupError, setLookupError] = useState('');
-  const [alreadyResponded, setAlreadyResponded] = useState(false);
-  const [alreadyRespondedStatus, setAlreadyRespondedStatus] = useState('');
-
   // Submission state
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
-
-  // Wedding ID from lookup or CMS
-  const [lookupWeddingId, setLookupWeddingId] = useState<string | null>(null);
-  const effectiveWeddingId = lookupWeddingId || weddingId;
 
   const submitStep1 = () => {
     if (!firstName.trim() || !lastName.trim()) return;
@@ -101,7 +92,7 @@ function RSVPPageInner() {
       updated[0] = { ...updated[0], name: fullName };
     }
     setGuests(updated);
-    setStep(2);
+    setStep(1);
   };
 
   const submitStep2 = () => {
@@ -111,7 +102,7 @@ function RSVPPageInner() {
     }
     updated = updated.slice(0, partySize);
     setGuests(updated);
-    setStep(3);
+    setStep(2);
   };
 
   const changeParty = (delta: number) => {
@@ -146,13 +137,13 @@ function RSVPPageInner() {
     setPartySize((p) => Math.min(10, p + 1));
   };
 
-  // Step 3 → Step 4: start per-guest attendance flow
-  const goToStep4 = () => {
+  // Step 2 → Step 3: start per-guest attendance flow
+  const goToStep3 = () => {
     const firstUnresponded = guests.findIndex((g) => !g.responded);
     if (firstUnresponded !== -1) {
       setCurrentGuestIndex(firstUnresponded);
       setAttendance(guests[firstUnresponded].attendance || '');
-      setStep(4);
+      setStep(3);
     }
   };
 
@@ -203,7 +194,7 @@ function RSVPPageInner() {
               attendance: g.attendance || 'no',
               dietary: g.dietary.length > 0 ? g.dietary.join(', ') : undefined,
             })),
-            weddingId: effectiveWeddingId,
+            weddingId: weddingId,
           }),
         });
 
@@ -219,82 +210,7 @@ function RSVPPageInner() {
       setSubmitting(false);
       setResult(rsvpResult);
     }
-  }, [attendance, guests, currentGuestIndex, firstName, effectiveWeddingId]);
-
-  // Step 0 — Look up invitation code
-  const handleLookup = useCallback(async () => {
-    const code = inviteCode.trim();
-    if (!code) return;
-
-    setLookupLoading(true);
-    setLookupError('');
-    setAlreadyResponded(false);
-
-    try {
-      const res = await fetch(`/api/guests/lookup?code=${encodeURIComponent(code)}`);
-      const data = await res.json();
-
-      if (data.found && data.alreadyResponded) {
-        setAlreadyResponded(true);
-        setAlreadyRespondedStatus(data.rsvpStatus || 'responded');
-        setLookupLoading(false);
-        return;
-      }
-
-      if (data.found && !data.alreadyResponded) {
-        const guest = data.guest;
-
-        // Parse name into first/last
-        const nameParts = (guest.name || '').trim().split(/\s+/);
-        const first = nameParts[0] || '';
-        const last = nameParts.slice(1).join(' ') || '';
-
-        setFirstName(first);
-        setLastName(last);
-
-        // Set party size
-        const ps = guest.partySize || 1;
-        setPartySize(ps);
-
-        // Build guests array
-        const newGuests: Guest[] = [{ name: guest.name || '', dietary: [], responded: false }];
-
-        // If plusOneName exists, add second guest
-        if (guest.plusOneName) {
-          newGuests.push({ name: guest.plusOneName, dietary: [], responded: false });
-        }
-
-        // Parse dietary notes into dietary options
-        if (guest.dietaryNotes) {
-          const notes = guest.dietaryNotes.toLowerCase();
-          newGuests[0].dietary = DIETARY_OPTIONS.filter((opt) =>
-            notes.includes(opt.toLowerCase())
-          );
-        }
-
-        setGuests(newGuests);
-
-        // Store wedding ID from lookup
-        if (guest.weddingId) {
-          setLookupWeddingId(guest.weddingId);
-        }
-
-        setLookupLoading(false);
-        setStep(2);
-        return;
-      }
-
-      if (data.error) {
-        setLookupError(data.error);
-        setLookupLoading(false);
-        return;
-      }
-    } catch {
-      setLookupError('Something went wrong. Please try again.');
-    }
-
-    setLookupLoading(false);
-  }, [inviteCode]);
+  }, [attendance, guests, currentGuestIndex, firstName, lastName, weddingId]);
 
   if (result) {
     const validGuests = guests.filter((g) => g.name.trim());
@@ -357,88 +273,15 @@ function RSVPPageInner() {
         <p className="mt-4 text-[15px] text-charcoal-ink/80">{venue}, {venueAddress}</p>
       </div>
 
-      {/* Progress dots — 5 steps (0–4) */}
+      {/* Progress dots — 4 steps (0–3) */}
       <div className="flex items-center justify-center gap-2 mb-10">
-        {[0, 1, 2, 3, 4].map((n) => (
+        {[0, 1, 2, 3].map((n) => (
           <span key={n} className={`step-dot ${n <= step ? 'active' : ''}`} />
         ))}
       </div>
 
-      {/* STEP 0 — Invitation Code Lookup */}
+      {/* STEP 0 — Enter Name */}
       {step === 0 && (
-        <section className="staggered-fade-in" style={{ animationDelay: '0s', opacity: 1 }}>
-          <div className="text-center mb-8">
-            <p className="font-semibold text-[15px] tracking-wide">Look Up Your Invitation</p>
-            <p className="text-[13px] text-charcoal-ink/60 italic mt-2">
-              Enter the code from your invitation to auto-fill your details.
-            </p>
-          </div>
-          <div className="space-y-6">
-            <div>
-              <input
-                className="input-line text-center tracking-[0.15em] uppercase"
-                style={{ fontFamily: "'JetBrains Mono', 'SF Mono', 'Fira Code', monospace" }}
-                value={inviteCode}
-                onChange={(e) => {
-                  setInviteCode(e.target.value.toUpperCase());
-                  setLookupError('');
-                  setAlreadyResponded(false);
-                }}
-                type="text"
-                placeholder="Enter your invitation code"
-                autoComplete="off"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleLookup();
-                }}
-                disabled={lookupLoading}
-              />
-              {lookupError && (
-                <p className="text-red-500/70 text-[13px] mt-2 text-center">{lookupError}</p>
-              )}
-              {alreadyResponded && (
-                <div className="mt-4 text-center">
-                  <span className="material-symbols-outlined text-cinematic-gold text-[36px]">favorite</span>
-                  <p className="text-[14px] text-charcoal-ink/80 mt-2">
-                    You&apos;ve already responded! Your status: <span className="font-semibold">{alreadyRespondedStatus}</span>. Thank you!
-                  </p>
-                </div>
-              )}
-            </div>
-            {!alreadyResponded && (
-              <>
-                <button
-                  className="w-full bg-charcoal-ink text-paper-cream rounded px-8 py-3 text-[13px] font-medium uppercase tracking-[0.08em] hover:opacity-90 transition-opacity duration-300 flex items-center justify-center gap-2"
-                  onClick={handleLookup}
-                  disabled={lookupLoading || !inviteCode.trim()}
-                >
-                  {lookupLoading && (
-                    <span className="material-symbols-outlined text-[18px] animate-spin">progress_activity</span>
-                  )}
-                  {lookupLoading ? 'Looking up…' : 'Look Up'}
-                </button>
-
-                {/* Divider */}
-                <div className="flex items-center gap-4 my-2">
-                  <div className="flex-1 border-t border-charcoal-ink/15" />
-                  <span className="text-[12px] text-charcoal-ink/40 uppercase tracking-[0.15em]">or</span>
-                  <div className="flex-1 border-t border-charcoal-ink/15" />
-                </div>
-
-                {/* Skip link */}
-                <button
-                  className="w-full text-[13px] text-charcoal-ink/50 hover:text-cinematic-gold transition-colors duration-300 py-1"
-                  onClick={() => setStep(1)}
-                >
-                  Skip — RSVP manually
-                </button>
-              </>
-            )}
-          </div>
-        </section>
-      )}
-
-      {/* STEP 1 */}
-      {step === 1 && (
         <section className="staggered-fade-in" style={{ animationDelay: '0s', opacity: 1 }}>
           <div className="text-center mb-8">
             <p className="font-semibold text-[15px] tracking-wide">Enter your name to RSVP</p>
@@ -483,8 +326,8 @@ function RSVPPageInner() {
         </section>
       )}
 
-      {/* STEP 2 */}
-      {step === 2 && (
+      {/* STEP 1 — Party Size */}
+      {step === 1 && (
         <section className="staggered-fade-in" style={{ animationDelay: '0s', opacity: 1 }}>
           <div className="text-center mb-8">
             <p className="font-semibold text-[15px] tracking-wide">How many people are in your party?</p>
@@ -512,7 +355,7 @@ function RSVPPageInner() {
           <div className="flex gap-3">
             <button
               className="flex-1 border border-charcoal-ink/15 bg-white rounded py-3 text-[13px] font-medium uppercase tracking-[0.08em] text-charcoal-ink hover:border-cinematic-gold hover:text-cinematic-gold transition-colors duration-300"
-              onClick={() => setStep(1)}
+              onClick={() => setStep(0)}
             >
               Back
             </button>
@@ -526,8 +369,8 @@ function RSVPPageInner() {
         </section>
       )}
 
-      {/* STEP 3 — Confirm guests & dietary preferences */}
-      {step === 3 && (
+      {/* STEP 2 — Confirm guests & dietary preferences */}
+      {step === 2 && (
         <section className="staggered-fade-in" style={{ animationDelay: '0s', opacity: 1 }}>
           <div className="text-center mb-8">
             <p className="font-semibold text-[15px] tracking-wide">Confirm each guest and their dietary needs.</p>
@@ -589,13 +432,13 @@ function RSVPPageInner() {
           <div className="flex gap-3">
             <button
               className="flex-1 border border-charcoal-ink/15 bg-white rounded py-3 text-[13px] font-medium uppercase tracking-[0.08em] text-charcoal-ink hover:border-cinematic-gold hover:text-cinematic-gold transition-colors duration-300"
-              onClick={() => setStep(2)}
+              onClick={() => setStep(1)}
             >
               Back
             </button>
             <button
               className="flex-[2] bg-charcoal-ink text-paper-cream rounded px-8 py-3 text-[13px] font-medium uppercase tracking-[0.08em] hover:opacity-90 transition-opacity duration-300"
-              onClick={goToStep4}
+              onClick={goToStep3}
             >
               Continue
             </button>
@@ -603,8 +446,8 @@ function RSVPPageInner() {
         </section>
       )}
 
-      {/* STEP 4 — Per-guest attendance response */}
-      {step === 4 && (
+      {/* STEP 3 — Per-guest attendance response */}
+      {step === 3 && (
         <section className="staggered-fade-in" style={{ animationDelay: '0s', opacity: 1 }}>
           {/* Guest header */}
           <div className="text-center mb-6 pb-4 border-b border-charcoal-ink/20">
@@ -644,7 +487,7 @@ function RSVPPageInner() {
           <div className="flex gap-3 mt-10">
             <button
               className="flex-1 border border-charcoal-ink/15 bg-white rounded py-3 text-[13px] font-medium uppercase tracking-[0.08em] text-charcoal-ink hover:border-cinematic-gold hover:text-cinematic-gold transition-colors duration-300"
-              onClick={() => setStep(3)}
+              onClick={() => setStep(2)}
             >
               Back
             </button>
