@@ -323,23 +323,25 @@ function EditTemplateDialog({
                                 key={font.value}
                                 type="button"
                                 onClick={() => updateFont(key, font.value)}
-                                className={`w-full flex items-center justify-between gap-2 px-2.5 py-1 text-left transition-colors duration-150 ${
+                                className={`w-full text-left transition-colors duration-150 ${
                                   isSelected
                                     ? 'bg-slate-100 border-l-2 border-slate-800'
                                     : 'border-l-2 border-transparent hover:bg-slate-50'
                                 }`}
                               >
-                                <span className={`text-xs truncate ${isSelected ? 'text-slate-800 font-medium' : 'text-slate-600'}`}>
-                                  {font.value}
-                                </span>
-                                <div className="flex items-center gap-1.5 shrink-0">
-                                  <span
-                                    className="text-[10px] text-slate-400 max-w-[100px] truncate"
+                                <div className="px-2.5 py-1.5">
+                                  <p
+                                    className="text-sm text-slate-800 leading-snug truncate"
                                     style={{ fontFamily: `'${font.value}', serif` }}
                                   >
-                                    Aa Bb
-                                  </span>
-                                  {isSelected && <Check className="size-3 text-slate-700" strokeWidth={3} />}
+                                    Wedding Title
+                                  </p>
+                                  <div className="flex items-center justify-between mt-0.5">
+                                    <span className={`text-[10px] ${isSelected ? 'text-slate-700 font-semibold' : 'text-slate-400'}`}>
+                                      {font.value}
+                                    </span>
+                                    {isSelected && <Check className="size-3 text-slate-700" strokeWidth={3} />}
+                                  </div>
                                 </div>
                               </button>
                             );

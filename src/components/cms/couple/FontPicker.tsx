@@ -199,25 +199,27 @@ export default function FontPicker({ section }: FontPickerProps) {
                         data-font={font.value}
                         onClick={() => handleChange(font.value)}
                         disabled={saving}
-                        className={`w-full flex items-center justify-between gap-3 px-3 py-1.5 text-left transition-colors duration-150 ${
+                        className={`w-full text-left transition-colors duration-150 ${
                           isSelected
                             ? 'bg-cinematic-gold/10 border-l-2 border-cinematic-gold'
                             : 'border-l-2 border-transparent hover:bg-charcoal-ink/[0.03]'
                         }`}
                       >
-                        <span className={`text-xs truncate ${isSelected ? 'text-charcoal-ink font-medium' : 'text-charcoal-ink/70'}`}>
-                          {font.value}
-                        </span>
-                        <div className="flex items-center gap-2 shrink-0">
-                          <span
-                            className="text-[11px] text-charcoal-ink/40 max-w-[120px] truncate"
+                        <div className="px-3 py-1.5">
+                          <p
+                            className="text-base text-charcoal-ink leading-snug truncate"
                             style={{ fontFamily: `'${font.value}', serif` }}
                           >
-                            Aa Bb Cc
-                          </span>
-                          {isSelected && (
-                            <Check className="size-3 text-cinematic-gold" strokeWidth={3} />
-                          )}
+                            Eleanor & James
+                          </p>
+                          <div className="flex items-center justify-between mt-0.5">
+                            <span className={`text-[10px] ${isSelected ? 'text-cinematic-gold font-semibold' : 'text-charcoal-ink/35'}`}>
+                              {font.value}
+                            </span>
+                            {isSelected && (
+                              <Check className="size-3 text-cinematic-gold" strokeWidth={3} />
+                            )}
+                          </div>
                         </div>
                       </button>
                     );
