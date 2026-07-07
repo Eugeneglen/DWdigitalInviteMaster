@@ -72,7 +72,7 @@ function CMSLogo() {
       <img
         src="/dreamweavers-logo.png"
         alt="Dreamweavers"
-        className={`transition-all duration-200 ${isCollapsed ? 'h-7 w-auto' : 'h-8 w-auto'}`}
+        className={`brightness-0 invert transition-all duration-200 ${isCollapsed ? 'h-[22px] w-auto' : 'h-[26px] w-auto'}`}
       />
     </div>
   );
