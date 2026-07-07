@@ -41,11 +41,11 @@ const NAV_ITEMS: { key: CoupleCMSPage; label: string; icon: React.ElementType }[
   { key: 'getting-there', label: 'Getting There', icon: MapPin },
   { key: 'wishes', label: 'Wishes', icon: MessageSquareHeart },
   { key: 'faqs', label: 'FAQs', icon: HelpCircle },
-  { key: 'features', label: 'Features', icon: ToggleLeft },
   { key: 'guests', label: 'Guests', icon: Users },
   { key: 'analytics', label: 'Analytics', icon: BarChart3 },
   { key: 'audit', label: 'Activity', icon: ScrollText },
   { key: 'sharing', label: 'Sharing', icon: QrCode },
+  { key: 'features', label: 'Features', icon: ToggleLeft },
 ];
 
 export default function CoupleCMSLayout({ children }: { children: React.ReactNode }) {
