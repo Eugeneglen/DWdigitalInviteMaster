@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { signIn, signOut, useSession } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import {
   Dialog,
   DialogContent,
@@ -30,16 +30,22 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
     setIsLoading(true);
 
     try {
-      const result = await signIn('credentials', {
-        email,
-        password,
-        redirect: false,
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
       });
 
-      if (result?.error) {
-        setError('Invalid email or password. Please try again.');
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || 'Invalid email or password. Please try again.');
       } else {
+        // Reload session via NextAuth's internal fetch
+        await fetch('/api/auth/session?update=1');
         useAuthModalStore.getState().closeModal();
+        // Trigger a page reload to pick up the new session
+        window.location.reload();
       }
     } catch {
       setError('An unexpected error occurred. Please try again.');
@@ -50,6 +56,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
 
   const handleSwitchAccount = async () => {
     setIsLoading(true);
+    await fetch('/api/auth/logout', { method: 'POST' });
     await signOut({ redirect: false });
     setIsLoading(false);
   };

@@ -77,6 +77,10 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id!;
         token.role = user.role;
+      } else if (token.sub && !token.id) {
+        // Custom login JWT: map sub → id, extract role
+        token.id = token.sub as string;
+        // role is already on the token from our custom JWT
       }
       return token;
     },
