@@ -1,13 +1,12 @@
 'use client';
 
 import { useNavigationStore } from '@/store/useNavigationStore';
-import { useSiteSettings, type NavTab } from '@/hooks/useSiteSettings';
 import { useEffect } from 'react';
 
 export default function MobileDrawer() {
-  const { drawerOpen, closeDrawer, currentSection, setSection } =
+  const { drawerOpen, closeDrawer, currentSection, setSection, availableTabs } =
     useNavigationStore();
-  const { navTabs } = useSiteSettings();
+  const tabs = availableTabs.length > 0 ? availableTabs : undefined;
 
   // Lock body scroll when drawer is open
   useEffect(() => {
@@ -54,7 +53,7 @@ export default function MobileDrawer() {
 
         {/* Link list */}
         <ul className="flex flex-col gap-6">
-          {navTabs.map((item: NavTab) => {
+          {(tabs ?? []).map((item) => {
             const isActive = currentSection === item.section;
             return (
               <li key={item.id}>

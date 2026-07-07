@@ -1271,3 +1271,22 @@ Stage Summary:
 - Prisma schema default role updated to ADMIN_1
 - Users page confirmed working: no attached account/wedding columns, roles show Super Admin / Admin 1 / Admin 2 / Admin 3
 - All changes compiled and browser-verified successfully
+
+---
+Task ID: fix-infinite-loop
+Agent: Main Agent
+Task: Fix React "Maximum update depth exceeded" error on preview page
+
+Work Log:
+- Analyzed uploaded screenshot showing "Something went wrong" / "Maximum update depth exceeded" React error
+- Identified root cause in `GuestSite.tsx` lines 106-110: `setAvailableTabs()` was called during render (not inside useEffect), creating infinite loop: render → setAvailableTabs → Zustand store update → re-render → setAvailableTabs → ∞
+- Fixed by wrapping the logic in a `useEffect` with proper dependency array and adding a `useRef`-based JSON comparison guard to prevent unnecessary store updates
+- Added `useEffect` and `useRef` imports
+- Verified fix with `bun run lint` (0 errors)
+- Verified in browser with agent-browser: page renders correctly with all nav tabs, wedding content (Eleanor & James), footer links, and zero console errors
+
+Stage Summary:
+- Root cause: Synchronous state setter call during component render body (anti-pattern in React)
+- Fix: Moved `setAvailableTabs()` call into `useEffect` with dependency guard via `useRef`
+- File changed: `src/components/wedding/GuestSite.tsx`
+- Page now renders successfully without errors

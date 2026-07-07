@@ -19,6 +19,8 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
+import { Separator } from '@/components/ui/separator';
 import {
   Table,
   TableBody,
@@ -84,7 +86,15 @@ interface WeddingForm {
   venueAddress: string;
   googleMapsUrl: string;
   plan: string;
+  sections: string[];
 }
+
+const OPTIONAL_SECTIONS = [
+  { key: 'story', label: 'Story' },
+  { key: 'wishes', label: 'Wishes' },
+  { key: 'qa', label: 'Q&A' },
+  { key: 'moments', label: 'Moments' },
+];
 
 const EMPTY_FORM: WeddingForm = {
   coupleName: '',
@@ -96,6 +106,7 @@ const EMPTY_FORM: WeddingForm = {
   venueAddress: '',
   googleMapsUrl: '',
   plan: 'FREE',
+  sections: [],
 };
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -271,6 +282,7 @@ export default function MasterWeddings() {
         venueAddress: form.venueAddress.trim() || null,
         googleMapsUrl: form.googleMapsUrl.trim() || null,
         plan: form.plan,
+        sections: form.sections,
       };
 
       if (editingId) {

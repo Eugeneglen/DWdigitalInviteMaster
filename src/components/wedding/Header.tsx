@@ -1,7 +1,6 @@
 'use client';
 
 import { useNavigationStore } from '@/store/useNavigationStore';
-import { useSiteSettings, type NavTab } from '@/hooks/useSiteSettings';
 
 interface HeaderProps {
   /** CSS top value to push the fixed header below an overlay bar (e.g. "44px") */
@@ -9,8 +8,8 @@ interface HeaderProps {
 }
 
 export default function Header({ topOffset }: HeaderProps) {
-  const { currentSection, setSection, drawerOpen, openDrawer } = useNavigationStore();
-  const { navTabs } = useSiteSettings();
+  const { currentSection, setSection, drawerOpen, openDrawer, availableTabs } = useNavigationStore();
+  const tabs = availableTabs.length > 0 ? availableTabs : undefined;
 
   return (
     <header
@@ -36,7 +35,7 @@ export default function Header({ topOffset }: HeaderProps) {
 
         {/* Desktop navigation (lg+) */}
         <nav className="hidden lg:flex justify-center items-center gap-6 px-4 ml-auto" aria-label="Main navigation">
-          {navTabs.map((item: NavTab) => {
+          {(tabs ?? []).map((item) => {
             const isActive = currentSection === item.section;
             return (
               <button

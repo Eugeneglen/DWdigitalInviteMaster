@@ -14,6 +14,7 @@ const createWeddingSchema = z.object({
   venueAddress: z.string().optional(),
   googleMapsUrl: z.string().optional(),
   plan: z.enum(['FREE', 'PREMIUM', 'ENTERPRISE']).default('FREE'),
+  sections: z.array(z.string()).optional(), // optional nav sections to enable
 });
 
 // GET /api/master/weddings — list all weddings with pagination
@@ -108,13 +109,21 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Enable all features by default for new weddings
+    // Create features — default sections ON, optional sections controlled by `sections` param
+    const requestedSections: string[] = data.sections ?? [];
     const defaultFeatures = [
-      'countdown', 'schedule', 'rsvp', 'story', 'gallery',
-      'wishes', 'getting-there', 'qa', 'moments', 'music',
+      'countdown', 'schedule', 'rsvp', 'getting-there', 'music',
+      'story', 'wishes', 'qa', 'moments', 'gallery',
     ];
+    const optionalFeatureKeys = ['story', 'wishes', 'qa', 'moments'];
     await db.weddingFeature.createMany({
-      data: defaultFeatures.map((key) => ({ weddingId: wedding.id, featureKey: key, isEnabled: true })),
+      data: defaultFeatures.map((key) => ({
+        weddingId: wedding.id,
+        featureKey: key,
+        isEnabled: optionalFeatureKeys.includes(key)
+          ? requestedSections.includes(key)
+          : true,
+      })),
     });
 
     // Audit log
@@ -161,6 +170,18 @@ export async function PATCH(req: NextRequest) {
     if (updates.plan) updateData.plan = updates.plan;
     if (updates.heroImageUrl !== undefined) updateData.heroImageUrl = updates.heroImageUrl;
     if (updates.bannerUrl !== undefined) updateData.bannerUrl = updates.bannerUrl;
+
+    // Handle section toggles
+    if (Array.isArray(updates.sections)) {
+      const optionalFeatureKeys = ['story', 'wishes', 'qa', 'moments'];
+      for (const key of optionalFeatureKeys) {
+        await db.weddingFeature.upsert({
+          where: { weddingId_featureKey: { weddingId: id, featureKey: key } },
+          update: { isEnabled: updates.sections.includes(key) },
+          create: { weddingId: id, featureKey: key, isEnabled: updates.sections.includes(key) },
+        });
+      }
+    }
 
     const wedding = await db.weddingAccount.update({
       where: { id },

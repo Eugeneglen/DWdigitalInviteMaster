@@ -1,15 +1,14 @@
 'use client';
 
 import { useNavigationStore, type Section } from '@/store/useNavigationStore';
-import { useSiteSettings, type NavTab } from '@/hooks/useSiteSettings';
 
 export default function BottomNav() {
-  const { currentSection, setSection, openDrawer } = useNavigationStore();
-  const { navTabs } = useSiteSettings();
+  const { currentSection, setSection, openDrawer, availableTabs } = useNavigationStore();
+  const tabs = availableTabs.length > 0 ? availableTabs : undefined;
 
-  // Show first 4 tabs + More button (same pattern as before)
-  const visibleTabs = navTabs.slice(0, 4);
-  const hasMore = navTabs.length > 4;
+  // Show first 4 tabs + More button
+  const visibleTabs = (tabs ?? []).slice(0, 4);
+  const hasMore = (tabs ?? []).length > 4;
 
   return (
     <nav
@@ -17,7 +16,7 @@ export default function BottomNav() {
       role="navigation"
       aria-label="Page navigation"
     >
-      {visibleTabs.map((item: NavTab) => {
+      {visibleTabs.map((item) => {
         const isActive = currentSection === item.section;
         return (
           <button

@@ -1,10 +1,13 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { useNavigationStore } from '@/store/useNavigationStore';
 import { useCoupleCMSStore } from '@/store/useCoupleCMSStore';
 import { useAuthModalStore } from '@/store/useAuthModalStore';
 import { usePublicWedding } from '@/hooks/usePublicWedding';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
+import { filterTabsByFeatures } from '@/store/useNavigationStore';
 import Header from '@/components/wedding/Header';
 import MobileDrawer from '@/components/wedding/MobileDrawer';
 import BottomNav from '@/components/wedding/BottomNav';
@@ -95,10 +98,26 @@ export default function GuestSite({ slug, topOffset, showEditorButton = false }:
   const { open: loginModalOpen, closeModal } = useAuthModalStore();
 
   // Pre-fetch wedding data for this slug so all child pages share the cache
-  const { loading } = usePublicWedding(slug);
+  const { data: weddingData, loading } = usePublicWedding(slug);
+  const { navTabs, loaded: settingsLoaded } = useSiteSettings();
+  const { setAvailableTabs } = useNavigationStore();
+
+  // Compute filtered tabs from global config + wedding feature flags
+  // and push into the navigation store for Header/MobileDrawer/BottomNav
+  const prevFilteredRef = useRef<string>('');
+  useEffect(() => {
+    if (loading || !settingsLoaded || navTabs.length === 0) return;
+    const featureFlags = weddingData?.featureFlags ?? {};
+    const filtered = filterTabsByFeatures(navTabs, featureFlags);
+    const key = JSON.stringify(filtered);
+    if (key !== prevFilteredRef.current) {
+      prevFilteredRef.current = key;
+      setAvailableTabs(filtered);
+    }
+  }, [loading, settingsLoaded, navTabs, weddingData?.featureFlags, setAvailableTabs]);
 
   // Show full-page skeleton while wedding data is loading
-  if (loading) {
+  if (loading || !settingsLoaded) {
     return <GuestSiteSkeleton />;
   }
 
