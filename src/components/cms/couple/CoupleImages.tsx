@@ -30,10 +30,15 @@ const MEDIA_API = '/api/cms/media?XTransformPort=3000';
 const WEDDING_API = '/api/cms/wedding?XTransformPort=3000';
 
 const CATEGORIES = [
-  { value: 'gallery', label: 'Home', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-  { value: 'story', label: 'Story', color: 'bg-amber-50 text-amber-700 border-amber-200' },
-  { value: 'couple-photo', label: 'Couple Photo', color: 'bg-sky-50 text-sky-700 border-sky-200' },
+  { value: 'home', label: 'Home', color: 'bg-emerald-50 text-emerald-700 border-emerald-200', max: 3 },
+  { value: 'schedule', label: 'Schedule', color: 'bg-blue-50 text-blue-700 border-blue-200', max: 3 },
+  { value: 'story', label: 'Story', color: 'bg-amber-50 text-amber-700 border-amber-200', max: 3 },
+  { value: 'moments', label: 'Moments', color: 'bg-purple-50 text-purple-700 border-purple-200', max: 20 },
 ] as const;
+
+function getCategoryMax(cat: string): number {
+  return CATEGORIES.find((c) => c.value === cat)?.max ?? 3;
+}
 
 interface MediaItem {
   id: string;
@@ -431,7 +436,7 @@ export default function CoupleImages() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [uploadForm, setUploadForm] = useState({
-    category: 'gallery',
+    category: 'home',
     url: '',
     fileName: '',
   });
@@ -480,6 +485,9 @@ export default function CoupleImages() {
     handleFileSelect(e.dataTransfer.files);
   };
 
+  // Helper: count images for a category
+  const catCount = (cat: string) => media.filter((m) => m.category === cat).length;
+
   const handleUpload = async () => {
     if (!uploadForm.url) {
       toast.error('Please select an image');
@@ -487,6 +495,15 @@ export default function CoupleImages() {
     }
     if (!uploadForm.fileName) {
       toast.error('File name is required');
+      return;
+    }
+
+    // Enforce per-category image limit
+    const currentCount = media.filter((m) => m.category === uploadForm.category).length;
+    const maxAllowed = getCategoryMax(uploadForm.category);
+    if (currentCount >= maxAllowed) {
+      const label = getCategoryLabel(uploadForm.category);
+      toast.error(`${label} section is full (${maxAllowed} images max). Remove an image first.`);
       return;
     }
 
@@ -510,7 +527,7 @@ export default function CoupleImages() {
 
       toast.success('Image added successfully');
       setUploadDialogOpen(false);
-      setUploadForm({ category: 'gallery', url: '', fileName: '' });
+      setUploadForm({ category: 'home', url: '', fileName: '' });
       fetchMedia();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Failed to upload image');
@@ -620,7 +637,8 @@ export default function CoupleImages() {
           All ({media.length})
         </button>
         {CATEGORIES.map((cat) => {
-          const count = media.filter((m) => m.category === cat.value).length;
+          const count = catCount(cat.value);
+          const isFull = count >= cat.max;
           return (
             <button
               key={cat.value}
@@ -628,10 +646,12 @@ export default function CoupleImages() {
               className={`rounded-full px-3 py-1 text-xs font-medium transition-colors duration-150 ${
                 filterCategory === cat.value
                   ? 'bg-cinematic-gold text-charcoal-ink'
-                  : 'bg-charcoal-ink/5 text-charcoal-ink/50 hover:bg-charcoal-ink/10'
+                  : isFull
+                    ? 'bg-charcoal-ink/3 text-charcoal-ink/30'
+                    : 'bg-charcoal-ink/5 text-charcoal-ink/50 hover:bg-charcoal-ink/10'
               }`}
             >
-              {cat.label} ({count})
+              {cat.label} ({count}/{cat.max})
             </button>
           );
         })}
@@ -789,7 +809,7 @@ export default function CoupleImages() {
 
             {/* Category select */}
             <div className="space-y-1.5">
-              <Label className="text-sm font-medium text-charcoal-ink/70">Category</Label>
+              <Label className="text-sm font-medium text-charcoal-ink/70">Section</Label>
               <Select
                 value={uploadForm.category}
                 onValueChange={(v) => setUploadForm({ ...uploadForm, category: v })}
@@ -798,11 +818,15 @@ export default function CoupleImages() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {CATEGORIES.map((cat) => (
-                    <SelectItem key={cat.value} value={cat.value}>
-                      {cat.label}
-                    </SelectItem>
-                  ))}
+                  {CATEGORIES.map((cat) => {
+                    const count = catCount(cat.value);
+                    const isFull = count >= cat.max;
+                    return (
+                      <SelectItem key={cat.value} value={cat.value} disabled={isFull}>
+                        {cat.label} — {count}/{cat.max} {isFull ? '(full)' : `(${cat.max - count} remaining)`}
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </div>
@@ -827,7 +851,7 @@ export default function CoupleImages() {
               variant="outline"
               onClick={() => {
                 setUploadDialogOpen(false);
-                setUploadForm({ category: 'gallery', url: '', fileName: '' });
+                setUploadForm({ category: 'home', url: '', fileName: '' });
               }}
               className="border-charcoal-ink/15 text-charcoal-ink hover:border-cinematic-gold hover:text-cinematic-gold rounded px-6 py-2.5 text-[13px] font-medium uppercase tracking-[0.08em] transition-colors duration-300"
             >
