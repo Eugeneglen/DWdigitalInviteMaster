@@ -8,7 +8,7 @@ import { db } from '@/lib/db';
 // ── Robust secret resolution ────────────────────────────────────────────────
 // Turbopack route handlers sometimes don't receive process.env from .env.
 // This fallback reads the .env file directly to guarantee the secret is available.
-function resolveSecret(): string | undefined {
+export function resolveSecret(): string | undefined {
   // 1. Try process.env (normal Next.js behavior)
   if (process.env.NEXTAUTH_SECRET) return process.env.NEXTAUTH_SECRET;
   if (process.env.JWT_SECRET) return process.env.JWT_SECRET;

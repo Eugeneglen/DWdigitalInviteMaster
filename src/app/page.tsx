@@ -97,7 +97,11 @@ export default function Home() {
   const urlView = wantsCMSView && isAdmin ? 'cms' as const
     : wantsCoupleView && isCouple ? 'couple' as const
     : null;
-  const viewMode = manualView ?? urlView ?? (isAdmin ? 'cms' : isCouple ? 'couple' : 'guest');
+  // If an explicit ?view= param was set but doesn't match the user's role,
+  // fall back to guest view (which will show the login modal) instead of
+  // silently showing the role's default view.
+  const explicitViewMismatch = (wantsCMSView || wantsCoupleView) && urlView === null;
+  const viewMode = manualView ?? urlView ?? (explicitViewMismatch ? 'guest' as const : isAdmin ? 'cms' : isCouple ? 'couple' : 'guest');
 
   // Show login modal when ?view= param requires auth but user isn't authenticated
   // Also show when ?view= doesn't match the user's current role (e.g. admin visiting ?view=couple)
@@ -154,7 +158,7 @@ function HomeView({
             <MasterCMSPageRouter />
           </Suspense>
         </MasterCMSLayout>
-        <LoginModal open={showLoginModal} onOpenChange={onLoginModalChange} />
+        <LoginModal open={showLoginModal} onOpenChange={onLoginModalChange} darkOverlay />
       </>
     );
   }

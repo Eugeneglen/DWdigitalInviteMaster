@@ -9,20 +9,23 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { Loader2, LogOut } from 'lucide-react';
+import { Loader2, LogOut, Eye, EyeOff } from 'lucide-react';
 import { useAuthModalStore } from '@/store/useAuthModalStore';
 
 interface LoginModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** When true, the backdrop uses a 30% dark tint (for CMS login) */
+  darkOverlay?: boolean;
 }
 
-export function LoginModal({ open, onOpenChange }: LoginModalProps) {
+export function LoginModal({ open, onOpenChange, darkOverlay }: LoginModalProps) {
   const { data: session, status } = useSession();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,7 +70,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        overlayClassName="!bg-paper-cream"
+        overlayClassName={darkOverlay ? '!bg-charcoal-ink/30' : '!bg-paper-cream'}
         showCloseButton={false}
         className="!bg-transparent !border-0 !shadow-none !max-w-[420px] !p-0 !gap-0 !rounded-none"
         onInteractOutside={(e) => e.preventDefault()}
@@ -210,16 +213,29 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                     >
                       Password
                     </label>
-                    <input
-                      id="switch-password"
-                      type="password"
-                      placeholder="••••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      disabled={isLoading}
-                      autoComplete="current-password"
-                      className="input-line !text-[15px] !font-sans"
-                    />
+                    <div className="relative">
+                      <input
+                        id="switch-password"
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        disabled={isLoading}
+                        autoComplete="current-password"
+                        className="input-line !text-[15px] !font-sans pr-10"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-0 top-1/2 -translate-y-1/2 p-2 text-charcoal-ink/30 hover:text-charcoal-ink/60 transition-colors duration-200"
+                        tabIndex={-1}
+                        aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      >
+                        {showPassword
+                          ? <EyeOff className="size-4" />
+                          : <Eye className="size-4" />}
+                      </button>
+                    </div>
                   </div>
                   <button
                     type="submit"
@@ -275,17 +291,30 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                   >
                     Password
                   </label>
-                  <input
-                    id="login-password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    disabled={isLoading}
-                    autoComplete="current-password"
-                    className="input-line !text-[15px] !font-sans placeholder:text-charcoal-ink/30"
-                  />
+                  <div className="relative">
+                    <input
+                      id="login-password"
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      disabled={isLoading}
+                      autoComplete="current-password"
+                      className="input-line !text-[15px] !font-sans placeholder:text-charcoal-ink/30 pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-0 top-1/2 -translate-y-1/2 p-2 text-charcoal-ink/30 hover:text-charcoal-ink/60 transition-colors duration-200"
+                      tabIndex={-1}
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showPassword
+                        ? <EyeOff className="size-4" />
+                        : <Eye className="size-4" />}
+                    </button>
+                  </div>
                 </div>
 
                 <button

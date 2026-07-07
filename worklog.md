@@ -1151,3 +1151,40 @@ Stage Summary:
 - `page.tsx` fixed: `?view=couple` no longer silently redirects admins to CMS
 - Files changed: `.env`, `src/lib/auth.ts`, `src/app/page.tsx`, `src/components/cms/CoupleCMSLayout.tsx`
 - Removed: `src/app/api/debug-session/` (temporary debug)
+
+---
+Task ID: bugfix-auth-session
+Agent: Main Agent
+Task: Fix CMS dashboard 401 error and /?view=couple redirect bug + UI enhancements
+
+Work Log:
+- Diagnosed Bug #1: `.env` file was missing `NEXTAUTH_SECRET` — only had `DATABASE_URL`
+  - Root cause: `resolveSecret()` in auth.ts returned `undefined`, causing ephemeral secret generation
+  - `getServerSession()` in custom route handlers couldn't decrypt session cookies
+  - Built-in `/api/auth/session` endpoint worked because it has its own secret resolution
+- Fixed Bug #1: Added `NEXTAUTH_SECRET` and `NEXTAUTH_URL` to `.env`
+- Created `src/lib/auth-session.ts` — robust session helper with `getToken()` fallback
+- Updated `src/app/api/master/dashboard/route.ts` to use `getAuthSession()`
+- Exported `resolveSecret()` from `src/lib/auth.ts`
+- Diagnosed Bug #2: `/?view=couple` for admin users fell through to role-based default (CMS view)
+  - `urlView` was `null` when role didn't match, then `viewMode` defaulted to admin's 'cms'
+- Fixed Bug #2: Added `explicitViewMismatch` check — when `?view=` param doesn't match role, force 'guest' view
+- Disabled Prisma query logging to reduce memory pressure
+- Verified both fixes via Python API test (login → session → dashboard all return 200)
+- Verified via Agent Browser: Master CMS dashboard loads with real data, Couple CMS loads with full nav
+
+- Added password visibility toggle (Eye/EyeOff icons) to LoginModal
+  - Applied to both standard login form and switch-account inline form
+  - Uses `showPassword` state, toggles input type between 'password' and 'text'
+  - Eye icon with smooth hover transition, `tabIndex={-1}` to not break form flow
+- Added `darkOverlay` prop to LoginModal for CMS login differentiation
+  - CMS view (`/?view=cms`) passes `darkOverlay` → `bg-charcoal-ink/30` (30% dark tint)
+  - Guest/couple view keeps original `bg-paper-cream` overlay
+- Passed lint check (0 errors)
+
+Stage Summary:
+- Bug #1 FIXED: Dashboard API returns 200 with real stats data
+- Bug #2 FIXED: `/?view=couple` shows guest view + login modal instead of silently redirecting to CMS
+- Password preview toggle added to both login forms
+- Dark overlay on CMS login modal for visual differentiation
+- Key files changed: `.env`, `src/lib/auth.ts`, `src/lib/auth-session.ts`, `src/app/api/master/dashboard/route.ts`, `src/app/page.tsx`, `src/components/cms/LoginModal.tsx`
