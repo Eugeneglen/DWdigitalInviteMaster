@@ -77,39 +77,30 @@ export function LoginModal({ open, onOpenChange, variant = 'default', targetRole
   const roleLabel = currentIsAdmin ? 'Admin' : 'Couple';
 
   // Shared style helpers
-  const darkInputClass = '!text-paper-cream placeholder:!text-paper-cream/25 !border-paper-cream/15';
-  const darkLabelClass = 'text-paper-cream/40';
-  const lightLabelClass = 'text-charcoal-ink/50';
-  const labelClass = isCMS ? darkLabelClass : lightLabelClass;
+  const labelClass = 'text-charcoal-ink/50';
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        overlayClassName={isCMS ? '!bg-[#1A1410]' : '!bg-paper-cream'}
+        overlayClassName='!bg-charcoal-ink/90'
         showCloseButton={false}
         className="!bg-transparent !border-0 !shadow-none !max-w-[420px] !p-0 !gap-0 !rounded-none"
         onInteractOutside={(e) => e.preventDefault()}
         onPointerDownOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
-        <div
-          className={
-            isCMS
-              ? 'bg-[#1E1816] border border-cinematic-gold/20 rounded-sm'
-              : 'bg-white border border-champagne-silk/40 rounded-sm'
-          }
-        >
+        <div className='bg-paper-cream border border-cinematic-gold/30 rounded-sm shadow-[0_0_40px_rgba(212,175,55,0.08)]'>
           {/* Gold accent top bar */}
-          <div className={`h-[2px] ${isCMS ? 'bg-cinematic-gold/60' : 'bg-cinematic-gold'}`} />
+          <div className='h-[2px] bg-cinematic-gold' />
 
           <div className="px-10 pt-10 pb-8">
             {/* Branding */}
             <div className="text-center mb-8">
               {/* Diamond ornament */}
               <div className="flex items-center justify-center mb-5">
-                <div className={`w-8 h-px ${isCMS ? 'bg-cinematic-gold/35' : 'bg-cinematic-gold/60'}`} />
+                <div className="w-8 h-px bg-cinematic-gold/60" />
                 <svg
-                  className={`mx-3 text-cinematic-gold ${isCMS ? 'opacity-60' : ''}`}
+                  className="mx-3 text-cinematic-gold"
                   width="12"
                   height="12"
                   viewBox="0 0 12 12"
@@ -117,17 +108,17 @@ export function LoginModal({ open, onOpenChange, variant = 'default', targetRole
                 >
                   <path d="M6 0L12 6L6 12L0 6Z" />
                 </svg>
-                <div className={`w-8 h-px ${isCMS ? 'bg-cinematic-gold/35' : 'bg-cinematic-gold/60'}`} />
+                <div className="w-8 h-px bg-cinematic-gold/60" />
               </div>
 
               <DialogHeader className="text-center">
                 <DialogTitle
-                  className={`text-[28px] leading-tight ${isCMS ? 'text-paper-cream' : 'text-charcoal-ink'}`}
+                  className="text-[28px] leading-tight text-charcoal-ink"
                   style={{ fontFamily: "'Playfair Display', serif", fontStyle: 'italic' }}
                 >
                   {isAlreadyAuthenticated ? 'Switch Account' : isCMS ? 'Admin Portal' : 'Welcome Back'}
                 </DialogTitle>
-                <DialogDescription className={`text-[13px] mt-2 tracking-wide ${isCMS ? 'text-paper-cream/35' : 'text-charcoal-ink/50'}`}>
+                <DialogDescription className="text-[13px] mt-2 tracking-wide text-charcoal-ink/50">
                   {isAlreadyAuthenticated
                     ? 'Sign out first, then sign in with a different account'
                     : isCMS
@@ -141,9 +132,7 @@ export function LoginModal({ open, onOpenChange, variant = 'default', targetRole
             {isAlreadyAuthenticated && (
               <div className="space-y-5">
                 {/* Current session card */}
-                <div className={`flex items-center gap-4 border p-4 rounded-sm ${
-                  isCMS ? 'border-cinematic-gold/15 bg-paper-cream/5' : 'border-champagne-silk/30 bg-paper-cream/50'
-                }`}>
+                <div className="flex items-center gap-4 border border-champagne-silk/30 bg-paper-cream/50 p-4 rounded-sm">
                   <div
                     className="flex h-11 w-11 shrink-0 items-center justify-center border border-cinematic-gold/40 text-cinematic-gold text-sm font-bold rounded-sm"
                     style={{ fontFamily: "'Playfair Display', serif" }}
@@ -157,21 +146,19 @@ export function LoginModal({ open, onOpenChange, variant = 'default', targetRole
                   </div>
                   <div className="flex-1 min-w-0">
                     <p
-                      className={`text-[15px] font-medium truncate ${isCMS ? 'text-paper-cream' : 'text-charcoal-ink'}`}
+                      className="text-[15px] font-medium truncate text-charcoal-ink"
                       style={{ fontFamily: "'Playfair Display', serif" }}
                     >
                       {session.user?.name}
                     </p>
-                    <p className={`text-[12px] truncate mt-0.5 ${isCMS ? 'text-paper-cream/30' : 'text-charcoal-ink/50'}`}>
+                    <p className="text-[12px] truncate mt-0.5 text-charcoal-ink/50">
                       {session.user?.email}
                     </p>
                   </div>
                   <span
                     className={`shrink-0 text-[10px] font-semibold px-3 py-1.5 rounded-sm uppercase tracking-[0.12em] ${
                       currentIsAdmin
-                        ? isCMS
-                          ? 'bg-cinematic-gold/15 text-cinematic-gold border border-cinematic-gold/30'
-                          : 'bg-charcoal-ink text-paper-cream'
+                        ? 'bg-charcoal-ink text-paper-cream'
                         : 'bg-cinematic-gold/10 text-cinematic-gold border border-cinematic-gold/30'
                     }`}
                   >
@@ -184,11 +171,7 @@ export function LoginModal({ open, onOpenChange, variant = 'default', targetRole
                   type="button"
                   onClick={handleSwitchAccount}
                   disabled={isLoading}
-                  className={`w-full flex items-center justify-center gap-2.5 py-3 rounded-sm text-[13px] font-medium uppercase tracking-[0.08em] transition-colors duration-300 ${
-                    isCMS
-                      ? 'bg-cinematic-gold/15 text-cinematic-gold border border-cinematic-gold/30 hover:bg-cinematic-gold/25'
-                      : 'bg-charcoal-ink text-paper-cream hover:bg-charcoal-ink/90'
-                  }`}
+                  className='w-full flex items-center justify-center gap-2.5 py-3 rounded-sm text-[13px] font-medium uppercase tracking-[0.08em] transition-colors duration-300 bg-charcoal-ink text-paper-cream hover:bg-charcoal-ink/90'
                 >
                   {isLoading ? (
                     <>
@@ -205,19 +188,17 @@ export function LoginModal({ open, onOpenChange, variant = 'default', targetRole
 
                 {/* Divider */}
                 <div className="flex items-center gap-4">
-                  <div className={`flex-1 border-t ${isCMS ? 'border-paper-cream/8' : 'border-champagne-silk/30'}`} />
-                  <span className={`text-[11px] uppercase tracking-[0.15em] ${isCMS ? 'text-paper-cream/18' : 'text-charcoal-ink/30'}`}>
+                  <div className="flex-1 border-t border-champagne-silk/30" />
+                  <span className="text-[11px] uppercase tracking-[0.15em] text-charcoal-ink/30">
                     or sign in directly
                   </span>
-                  <div className={`flex-1 border-t ${isCMS ? 'border-paper-cream/8' : 'border-champagne-silk/30'}`} />
+                  <div className="flex-1 border-t border-champagne-silk/30" />
                 </div>
 
                 {/* Inline login for quick switch */}
                 <form onSubmit={handleSubmit} className="space-y-5">
                   {error && (
-                    <div className={`border px-4 py-3 rounded-sm text-[13px] ${
-                      isCMS ? 'bg-cinematic-gold/10 border-cinematic-gold/25 text-paper-cream/80' : 'bg-cinematic-gold/5 border-cinematic-gold/20 text-charcoal-ink/80'
-                    }`}>
+                    <div className="border border-cinematic-gold/20 px-4 py-3 rounded-sm text-[13px] bg-cinematic-gold/5 text-charcoal-ink/80">
                       {error}
                     </div>
                   )}
@@ -236,7 +217,7 @@ export function LoginModal({ open, onOpenChange, variant = 'default', targetRole
                       onChange={(e) => setEmail(e.target.value)}
                       disabled={isLoading}
                       autoComplete="email"
-                      className={`input-line !text-[15px] !font-sans ${isCMS ? darkInputClass : ''}`}
+                      className="input-line !text-[15px] !font-sans"
                     />
                   </div>
                   <div>
@@ -255,14 +236,12 @@ export function LoginModal({ open, onOpenChange, variant = 'default', targetRole
                         onChange={(e) => setPassword(e.target.value)}
                         disabled={isLoading}
                         autoComplete="current-password"
-                        className={`input-line !text-[15px] !font-sans pr-10 ${isCMS ? darkInputClass : ''}`}
+                        className="input-line !text-[15px] !font-sans pr-10"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className={`absolute right-0 top-1/2 -translate-y-1/2 p-2 transition-colors duration-200 ${
-                          isCMS ? 'text-paper-cream/25 hover:text-paper-cream/50' : 'text-charcoal-ink/30 hover:text-charcoal-ink/60'
-                        }`}
+                        className="absolute right-0 top-1/2 -translate-y-1/2 p-2 transition-colors duration-200 text-charcoal-ink/30 hover:text-charcoal-ink/60"
                         tabIndex={-1}
                         aria-label={showPassword ? 'Hide password' : 'Show password'}
                       >
@@ -275,11 +254,7 @@ export function LoginModal({ open, onOpenChange, variant = 'default', targetRole
                   <button
                     type="submit"
                     disabled={isLoading || !email || !password}
-                    className={`w-full py-3 rounded-sm text-[13px] font-medium uppercase tracking-[0.08em] transition-colors duration-300 disabled:opacity-40 ${
-                      isCMS
-                        ? 'bg-cinematic-gold text-charcoal-ink hover:bg-cinematic-gold/90'
-                        : 'bg-charcoal-ink text-paper-cream hover:bg-charcoal-ink/90'
-                    }`}
+                    className="w-full py-3 rounded-sm text-[13px] font-medium uppercase tracking-[0.08em] transition-colors duration-300 disabled:opacity-40 bg-charcoal-ink text-paper-cream hover:bg-charcoal-ink/90"
                   >
                     {isLoading ? (
                       <>
@@ -299,23 +274,17 @@ export function LoginModal({ open, onOpenChange, variant = 'default', targetRole
               <form onSubmit={handleSubmit} className="space-y-5">
                 {/* Role mismatch info banner */}
                 {roleMismatch && session?.user?.name && (
-                  <div className={`flex items-start gap-3 border px-4 py-3.5 rounded-sm text-[13px] ${
-                    isCMS
-                      ? 'border-cinematic-gold/15 bg-cinematic-gold/5 text-paper-cream/60'
-                      : 'border-champagne-silk/30 bg-paper-cream/80 text-charcoal-ink/60'
-                  }`}>
+                  <div className="flex items-start gap-3 border border-champagne-silk/30 bg-paper-cream/80 px-4 py-3.5 rounded-sm text-[13px] text-charcoal-ink/60">
                     <Info className="size-4 shrink-0 mt-0.5 text-cinematic-gold/70" />
                     <p>
-                      Currently signed in as <strong className={isCMS ? 'text-paper-cream/80' : 'text-charcoal-ink/80'}>{session.user.name}</strong> ({roleLabel}).
+                      Currently signed in as <strong className="text-charcoal-ink/80">{session.user.name}</strong> ({roleLabel}).
                       Sign in below with a different account to continue.
                     </p>
                   </div>
                 )}
 
                 {error && (
-                  <div className={`border px-4 py-3 rounded-sm text-[13px] ${
-                    isCMS ? 'bg-cinematic-gold/10 border-cinematic-gold/25 text-paper-cream/80' : 'bg-cinematic-gold/5 border-cinematic-gold/20 text-charcoal-ink/80'
-                  }`}>
+                  <div className="border border-cinematic-gold/20 px-4 py-3 rounded-sm text-[13px] bg-cinematic-gold/5 text-charcoal-ink/80">
                     {error}
                   </div>
                 )}
@@ -336,7 +305,7 @@ export function LoginModal({ open, onOpenChange, variant = 'default', targetRole
                     required
                     disabled={isLoading}
                     autoComplete="email"
-                    className={`input-line !text-[15px] !font-sans placeholder:text-charcoal-ink/30 ${isCMS ? darkInputClass : ''}`}
+                    className="input-line !text-[15px] !font-sans placeholder:text-charcoal-ink/30"
                   />
                 </div>
 
@@ -357,14 +326,12 @@ export function LoginModal({ open, onOpenChange, variant = 'default', targetRole
                       required
                       disabled={isLoading}
                       autoComplete="current-password"
-                      className={`input-line !text-[15px] !font-sans placeholder:text-charcoal-ink/30 pr-10 ${isCMS ? darkInputClass : ''}`}
+                      className="input-line !text-[15px] !font-sans placeholder:text-charcoal-ink/30 pr-10"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className={`absolute right-0 top-1/2 -translate-y-1/2 p-2 transition-colors duration-200 ${
-                        isCMS ? 'text-paper-cream/25 hover:text-paper-cream/50' : 'text-charcoal-ink/30 hover:text-charcoal-ink/60'
-                      }`}
+                      className="absolute right-0 top-1/2 -translate-y-1/2 p-2 transition-colors duration-200 text-charcoal-ink/30 hover:text-charcoal-ink/60"
                       tabIndex={-1}
                       aria-label={showPassword ? 'Hide password' : 'Show password'}
                     >
@@ -378,11 +345,7 @@ export function LoginModal({ open, onOpenChange, variant = 'default', targetRole
                 <button
                   type="submit"
                   disabled={isLoading || !email || !password}
-                  className={`w-full py-3 rounded-sm text-[13px] font-medium uppercase tracking-[0.08em] transition-colors duration-300 disabled:opacity-40 ${
-                    isCMS
-                      ? 'bg-cinematic-gold text-charcoal-ink hover:bg-cinematic-gold/90'
-                      : 'bg-charcoal-ink text-paper-cream hover:bg-charcoal-ink/90'
-                  }`}
+                  className="w-full py-3 rounded-sm text-[13px] font-medium uppercase tracking-[0.08em] transition-colors duration-300 disabled:opacity-40 bg-charcoal-ink text-paper-cream hover:bg-charcoal-ink/90"
                 >
                   {isLoading ? (
                     <>
@@ -398,14 +361,14 @@ export function LoginModal({ open, onOpenChange, variant = 'default', targetRole
           </div>
 
           {/* Footer */}
-          <div className={`border-t px-10 py-5 text-center ${isCMS ? 'border-paper-cream/8' : 'border-champagne-silk/20'}`}>
+          <div className="border-t border-champagne-silk/20 px-10 py-5 text-center">
             <img
               src="/dreamweavers-logo.png"
               alt="Dreamweavers"
-              className={`h-5 w-auto mx-auto mb-3 ${isCMS ? 'opacity-25 brightness-0 invert' : 'opacity-40'}`}
+              className="h-5 w-auto mx-auto mb-3 opacity-40"
             />
             <p
-              className={`text-[11px] uppercase tracking-[0.12em] font-semibold ${isCMS ? 'text-paper-cream/15' : 'text-charcoal-ink/30'}`}
+              className="text-[11px] uppercase tracking-[0.12em] font-semibold text-charcoal-ink/30"
             >
               © 2026 DREAMWEAVERS DIGITAL HEIRLOOMS. All rights reserved.
             </p>

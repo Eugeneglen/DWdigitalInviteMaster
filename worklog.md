@@ -1311,3 +1311,21 @@ Stage Summary:
 - Files changed: `src/app/api/master/weddings/route.ts`, `src/components/cms/pages/MasterWeddings.tsx`
 - Root cause: Zod `.optional()` doesn't accept `null` — needed `.nullable().optional()`
 - All actions (create/update/archive/status toggle) now show toast feedback
+
+---
+Task ID: 10
+Agent: Main Agent
+Task: Restyle CMS login modal with DW brand colors — dark charcoal background, cream card, gold accents
+
+Work Log:
+- Read `LoginModal.tsx` — identified current styling (paper-cream overlay, white card, champagne-silk border)
+- Identified DW color values: `paper-cream` (#FCF9F2), `charcoal-ink` (#1A1A1A), `cinematic-gold` (#D4AF37)
+- Changed overlay from `!bg-paper-cream` → `!bg-charcoal-ink/90` (dark charcoal, semi-transparent)
+- Changed card from `bg-white border border-champagne-silk/40` → `bg-paper-cream border border-cinematic-gold/30` with subtle gold box-shadow
+- Existing gold accents (top bar, diamond ornament, input focus, buttons) already use cinematic-gold — no changes needed
+- Verified with VLM screenshot analysis: dark overlay ✓, cream card ✓, gold accents ✓, premium feel ✓
+
+Stage Summary:
+- File changed: `src/components/cms/LoginModal.tsx` (2 className edits)
+- Login modal now has dark charcoal overlay + cream card with gold border/accents
+- All existing DW design language elements (Playfair Display, gold ornamental details) preserved

@@ -208,10 +208,18 @@ function HomeView({
   }
 
   // Guest View (default) — includes login modal when ?view= requires auth
+  if (showLoginModal) {
+    // Show login on clean dark background, no wedding site behind it
+    return (
+      <div className="min-h-screen bg-charcoal-ink">
+        <LoginModal open onOpenChange={onLoginModalChange} variant={wantsCMSView ? 'cms' : 'default'} targetRole={wantsCMSView ? 'admin' : wantsCoupleView ? 'couple' : undefined} />
+      </div>
+    );
+  }
+
   return (
     <>
       <GuestSite showEditorButton />
-      <LoginModal open={showLoginModal} onOpenChange={onLoginModalChange} variant={wantsCMSView ? 'cms' : 'default'} targetRole={wantsCMSView ? 'admin' : wantsCoupleView ? 'couple' : undefined} />
     </>
   );
 }
