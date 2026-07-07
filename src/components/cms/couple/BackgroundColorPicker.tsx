@@ -148,7 +148,7 @@ export default function BackgroundColorPicker() {
             {/* Preset swatches grid */}
             <div>
               <p className="text-[11px] text-charcoal-ink/40 mb-2">Presets</p>
-              <div className="grid grid-cols-6 gap-2">
+              <div className="grid grid-cols-3 gap-2">
                 {PRESETS.map((preset) => {
                   const isActive = color.toUpperCase() === preset.value.toUpperCase();
                   return (
