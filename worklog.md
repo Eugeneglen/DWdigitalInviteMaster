@@ -964,3 +964,35 @@ Stage Summary:
 - GitHub Project board: https://github.com/users/Eugeneglen/projects/1
 - 13 of 14 phases completed (Phase 0-12: Done, Phase 13: Todo/Deferred)
 - All build phases complete — only design polish remains
+
+---
+Task ID: video-feature
+Agent: Main Agent
+Task: Add video feature to Phase 10 (Music Player & Live Features)
+
+Work Log:
+- Read existing music player, CMS features, navigation store, GuestSite, Header, BottomNav, MobileDrawer
+- Identified pattern: FEATURE_REGISTRY + inline config panel + usePublicWedding + GUEST_PAGES
+- Added 'video' to FEATURE_REGISTRY and FEATURE_ORDER in CoupleFeatures.tsx with Video, VideoConfig interface, DEFAULT_VIDEO_CONFIG, parseVideoConfig
+- Added video inline settings panel (URL, title, caption, autoplay, muted, showControls toggles, save button)
+- Created VideoPage.tsx guest component with YouTube/Vimeo/MP4 support
+  - toEmbedUrl() converts YouTube/Vimeo watch URLs to embed URLs with params
+  - isDirectVideo() detects .mp4/.webm/.ogg links
+  - 16:9 responsive container with rounded-2xl, champagne-silk border
+  - SectionBanner header, optional caption
+  - Graceful empty state when no video URL configured
+- Added 'video' to Section type union in useNavigationStore.ts
+- Added 'Video' nav item to Header.tsx, MobileDrawer.tsx NAV_ITEMS
+- Added 'video' section to BottomNav.tsx PAGE_NAV_CONFIG
+- Added VideoPage dynamic import + GUEST_PAGES entry in GuestSite.tsx
+- Seeded 'video' WeddingFeature row for existing wedding via direct SQL
+- Updated prisma/seed.ts and /api/master/weddings/route.ts defaultFeatures arrays
+- Updated prisma/schema.prisma comment
+- ESLint: 0 errors, 1 pre-existing warning
+
+Stage Summary:
+- Video is a new guest-facing section (not a floating widget like music)
+- Supports YouTube, Vimeo embed URLs and direct MP4 files
+- CMS: toggle in Features page + inline config panel (URL, title, caption, autoplay, muted, controls)
+- All 9 navigation items updated (Header, MobileDrawer, BottomNav)
+- Feature auto-seeded for existing and new weddings
