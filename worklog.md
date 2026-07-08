@@ -1412,3 +1412,23 @@ Stage Summary:
 - ErrorBoundary no longer leaks error.message — shows correlation ID instead
 - Prisma schema now targets postgresql provider
 - Commit ab1100d pushed to https://github.com/Eugeneglen/DWdigitalInvite/tree/CMS-Phase-1
+---
+Task ID: 7
+Agent: main
+Task: Comprehensive CMS-to-Preview sync audit and fix
+
+Work Log:
+- Ran full audit via Explore agent tracing every data path from CMS controls → API → DB → preview
+- Identified 3 critical, 3 high, 4 medium issues
+- Fixed C1: Page.tsx now derives slug from CoupleCMSStore and passes to GuestSite
+- Fixed C2: Added invalidateWeddingCache() to ALL 15 CMS components with save operations (29 total calls)
+- Fixed C3: CoupleCMSLayout now unwraps {wedding:...} before storing; CoupleSharing accessor updated
+- Fixed H2: SectionBanner now uses usePublicWedding() to read CMS bannerUrl with fallback
+- Fixed H3: CoupleDetails save now calls setWeddingData + invalidateWeddingCache
+- Lint: 0 errors, 1 pre-existing warning
+- Pushed to CMS-Audit-1
+
+Stage Summary:
+- Root cause of "changes not reflecting in preview": invalidateWeddingCache() existed but was never called
+- 19 files changed, 68 insertions, 10 deletions
+- Commit 0b232b3 pushed to https://github.com/Eugeneglen/DWdigitalInvite/tree/CMS-Audit-1
