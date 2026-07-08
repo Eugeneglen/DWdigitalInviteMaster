@@ -17,9 +17,11 @@ model User {
   passwordHash String
   name         String
   role         String   @default("ADMIN_1") // SUPER_ADMIN | ADMIN_1 | ADMIN_2 | ADMIN_3
-  avatarUrl    String?
-  isActive     Boolean  @default(true)
-  lastLoginAt  DateTime?
+  avatarUrl         String?
+  isActive          Boolean  @default(true)
+  resetToken        String?
+  resetTokenExpiry  DateTime?
+  lastLoginAt       DateTime?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
