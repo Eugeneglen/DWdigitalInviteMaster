@@ -4,7 +4,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import {
   Palette, Star, Eye, Pencil, Save, RotateCcw,
 } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -737,9 +737,9 @@ export default function MasterTemplates() {
     try {
       const target = updated.find((t) => t.id === id);
       if (target) await persistTemplate(target);
-      toast.success(`${target?.name} ${target?.isActive ? 'enabled' : 'disabled'}`);
+      toast({ title: 'Success', description: `${target?.name} ${target?.isActive ? 'enabled' : 'disabled'}` });
     } catch (err) {
-      toast.error('Failed to update template');
+      toast({ title: 'Error', description: 'Failed to update template', variant: 'destructive' });
       setTemplates(templates);
     }
   };
@@ -751,9 +751,9 @@ export default function MasterTemplates() {
     try {
       await saveSettings({ default_template: id });
       const name = templates.find((t) => t.id === id)?.name;
-      toast.success(`${name} set as default template`);
+      toast({ title: 'Success', description: `${name} set as default template` });
     } catch (err) {
-      toast.error('Failed to set default template');
+      toast({ title: 'Error', description: 'Failed to set default template', variant: 'destructive' });
       setTemplates(templates);
     }
   };
@@ -765,9 +765,9 @@ export default function MasterTemplates() {
     try {
       setSaving(true);
       await persistTemplate(updated);
-      toast.success(`${updated.name} updated successfully`);
+      toast({ title: 'Success', description: `${updated.name} updated successfully` });
     } catch (err) {
-      toast.error('Failed to save template changes');
+      toast({ title: 'Error', description: 'Failed to save template changes', variant: 'destructive' });
       setTemplates(templates);
     } finally {
       setSaving(false);
@@ -782,9 +782,9 @@ export default function MasterTemplates() {
     setTemplates(newTemplates);
     try {
       await persistTemplate({ ...def, isDefault: newTemplates.find((t) => t.id === id)?.isDefault ?? false });
-      toast.success(`${def.name} reset to defaults`);
+      toast({ title: 'Success', description: `${def.name} reset to defaults` });
     } catch (err) {
-      toast.error('Failed to reset template');
+      toast({ title: 'Error', description: 'Failed to reset template', variant: 'destructive' });
       setTemplates(templates);
     }
   };

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { Loader2, Plus, Pencil, Trash2, Users, Search, Mail, Phone, UserPlus, Download, Upload, FileSpreadsheet, CheckCircle2, AlertCircle } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -182,7 +182,7 @@ export default function CoupleGuests() {
       const data = await res.json();
       setGuests(data.guests ?? []);
     } catch {
-      toast.error('Failed to load guest list');
+      toast({ title: 'Error', description: 'Failed to load guest list', variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -215,7 +215,7 @@ export default function CoupleGuests() {
 
   const handleSave = async () => {
     if (!form.name.trim()) {
-      toast.error('Guest name is required');
+      toast({ title: 'Error', description: 'Guest name is required', variant: 'destructive' });
       return;
     }
 
@@ -253,11 +253,11 @@ export default function CoupleGuests() {
       }
 
       invalidateWeddingCache();
-      toast.success(editingId ? 'Guest updated successfully' : 'Guest added successfully');
+      toast({ title: 'Success', description: editingId ? 'Guest updated successfully' : 'Guest added successfully' });
       setDialogOpen(false);
       fetchGuests();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to save guest');
+      toast({ title: 'Error', description: err instanceof Error ? err.message : 'Failed to save guest', variant: 'destructive' });
     } finally {
       setSaving(false);
     }
@@ -278,10 +278,10 @@ export default function CoupleGuests() {
       }
 
       invalidateWeddingCache();
-      toast.success('Guest deleted');
+      toast({ title: 'Success', description: 'Guest deleted' });
       fetchGuests();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to delete guest');
+      toast({ title: 'Error', description: err instanceof Error ? err.message : 'Failed to delete guest', variant: 'destructive' });
     } finally {
       setDeleting(null);
     }
@@ -307,7 +307,7 @@ export default function CoupleGuests() {
 
   const handleImportFileSelect = (file: File) => {
     if (!file.name.endsWith('.csv')) {
-      toast.error('Please select a .csv file');
+      toast({ title: 'Error', description: 'Please select a .csv file', variant: 'destructive' });
       return;
     }
     setImportFile(file);
@@ -319,14 +319,14 @@ export default function CoupleGuests() {
       const text = await importFile.text();
       const { headers, rows } = parseCSV(text);
       if (rows.length === 0) {
-        toast.error('CSV file is empty or has no data rows');
+        toast({ title: 'Error', description: 'CSV file is empty or has no data rows', variant: 'destructive' });
         return;
       }
       setImportHeaders(headers);
       setImportRows(rows);
       setImportStep('preview');
     } catch {
-      toast.error('Failed to read CSV file');
+      toast({ title: 'Error', description: 'Failed to read CSV file', variant: 'destructive' });
     }
   };
 
@@ -348,7 +348,7 @@ export default function CoupleGuests() {
       setImportStep('result');
       invalidateWeddingCache();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Import failed');
+      toast({ title: 'Error', description: err instanceof Error ? err.message : 'Import failed', variant: 'destructive' });
     } finally {
       setImporting(false);
     }
@@ -378,9 +378,9 @@ export default function CoupleGuests() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      toast.success('Export downloaded');
+      toast({ title: 'Success', description: 'Export downloaded' });
     } catch {
-      toast.error('Export failed');
+      toast({ title: 'Error', description: 'Export failed', variant: 'destructive' });
     } finally {
       setExporting(false);
     }

@@ -33,7 +33,11 @@ const FALLBACK_FAQS = [
 
 export default function QAPage() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const { data } = usePublicWedding();
+  const { data, getField } = usePublicWedding();
+
+  const sectionTitle = getField('qa', 'title', 'Frequently Asked');
+  const sectionSubtitle = getField('qa', 'subtitle', 'Everything you need to know for our celebration.');
+  const contactPrompt = getField('qa', 'contactPrompt', 'Still have questions? Message the couple');
 
   const faqs = (data?.faqs && data.faqs.length > 0) ? data.faqs : FALLBACK_FAQS;
 
@@ -43,7 +47,7 @@ export default function QAPage() {
 
   return (
     <>
-      <SectionBanner title="Frequently Asked" />
+      <SectionBanner title={sectionTitle} />
 
       <main className="pb-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto min-h-screen pt-[20px] md:pt-[40px]">
         {/* Intro */}
@@ -52,7 +56,7 @@ export default function QAPage() {
             className="text-charcoal-ink/70 max-w-2xl mx-auto leading-relaxed italic"
             style={{ fontSize: '18px', lineHeight: '32px' }}
           >
-            Everything you need to know for our celebration.
+            {sectionSubtitle}
           </p>
         </section>
 
@@ -111,7 +115,7 @@ export default function QAPage() {
             className="text-charcoal-ink italic mb-4"
             style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: '32px', lineHeight: '40px' }}
           >
-            Still Seeking Clarity?
+            {contactPrompt}
           </h2>
           <p className="text-charcoal-ink/60 mb-10 max-w-md mx-auto" style={{ fontSize: '16px', lineHeight: '24px' }}>
             Our concierge is standing by to assist with any questions about the event, travel, accommodations, or special arrangements.

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { Loader2, Save, FileText, ChevronDown, ChevronRight } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -144,7 +144,7 @@ export default function CoupleContent() {
       const data = await res.json();
       setContent(data.content ?? []);
     } catch {
-      toast.error('Failed to load content');
+      toast({ title: 'Error', description: 'Failed to load content', variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -192,7 +192,7 @@ export default function CoupleContent() {
       });
 
       if (items.length === 0) {
-        toast.info('No changes to save');
+        toast({ title: 'No changes', description: 'No changes to save' });
         return;
       }
 
@@ -227,9 +227,9 @@ export default function CoupleContent() {
 
       setEditedFields({});
       invalidateWeddingCache();
-      toast.success('Content saved successfully');
+      toast({ title: 'Success', description: 'Content saved successfully' });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to save content');
+      toast({ title: 'Error', description: err instanceof Error ? err.message : 'Failed to save content', variant: 'destructive' });
     } finally {
       setSaving(false);
     }

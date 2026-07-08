@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Loader2, Heart, MapPin, CalendarDays, Clock, Save } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -70,7 +70,7 @@ export default function CoupleDetails() {
       setVenueAddress(w.venueAddress ?? '');
       setGoogleMapsUrl(w.googleMapsUrl ?? '');
     } catch {
-      toast.error('Failed to load wedding details');
+      toast({ title: 'Error', description: 'Failed to load wedding details', variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -82,7 +82,7 @@ export default function CoupleDetails() {
 
   const handleSave = async () => {
     if (!coupleName.trim()) {
-      toast.error('Couple Display Name is required');
+      toast({ title: 'Error', description: 'Couple Display Name is required', variant: 'destructive' });
       return;
     }
 
@@ -113,9 +113,9 @@ export default function CoupleDetails() {
       setWedding(updatedWedding);
       useCoupleCMSStore.getState().setWeddingData(updatedWedding);
       invalidateWeddingCache();
-      toast.success('Wedding details saved successfully');
+      toast({ title: 'Success', description: 'Wedding details saved successfully' });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to save changes');
+      toast({ title: 'Error', description: err instanceof Error ? err.message : 'Failed to save changes', variant: 'destructive' });
     } finally {
       setSaving(false);
     }

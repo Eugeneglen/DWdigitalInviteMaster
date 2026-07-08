@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { Loader2, Timer, CalendarClock, Mail, BookOpen, Image, Heart, MapPin, HelpCircle, Sparkles, Music2, Save } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
@@ -154,7 +154,7 @@ export default function CoupleFeatures() {
       setMusicConfig(parseMusicConfig(musicFeature?.config));
 
     } catch {
-      toast.error('Failed to load features');
+      toast({ title: 'Error', description: 'Failed to load features', variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -216,13 +216,11 @@ export default function CoupleFeatures() {
         const config = getFeatureConfig(key);
         const isEnabled = updatedFeatures.find((f) => f.featureKey === key)?.isEnabled;
         invalidateWeddingCache();
-        toast.success(
-          `${config.displayName} ${isEnabled ? 'enabled' : 'disabled'}`
-        );
+        toast({ title: 'Success', description: `${config.displayName} ${isEnabled ? 'enabled' : 'disabled'}` });
       } catch {
         // Revert optimistic update
         setFeatures(features);
-        toast.error('Failed to save feature changes');
+        toast({ title: 'Error', description: 'Failed to save feature changes', variant: 'destructive' });
       } finally {
         setSavingKey(null);
       }
@@ -250,9 +248,9 @@ export default function CoupleFeatures() {
       if (!res.ok) throw new Error('Failed to save music settings');
       setFeatures(updatedFeatures);
       invalidateWeddingCache();
-      toast.success('Music settings saved');
+      toast({ title: 'Success', description: 'Music settings saved' });
     } catch {
-      toast.error('Failed to save music settings');
+      toast({ title: 'Error', description: 'Failed to save music settings', variant: 'destructive' });
     } finally {
       setSavingMusic(false);
     }

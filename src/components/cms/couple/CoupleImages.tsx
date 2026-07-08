@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { Loader2, Trash2, Upload, GripVertical, Eye, ImageOff, Video, X, Play, ImagePlus } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -85,16 +85,16 @@ export function HeroVisualSection({ weddingData }: { weddingData: Record<string,
     const isImage = file.type.startsWith('image/');
 
     if (!isVideo && !isImage) {
-      toast.error('Please select an image or video file');
+      toast({ title: 'Error', description: 'Please select an image or video file', variant: 'destructive' });
       return;
     }
 
     if (isVideo && file.size > 50 * 1024 * 1024) {
-      toast.error('Video must be under 50 MB');
+      toast({ title: 'Error', description: 'Video must be under 50 MB', variant: 'destructive' });
       return;
     }
     if (isImage && file.size > 10 * 1024 * 1024) {
-      toast.error('Image must be under 10 MB');
+      toast({ title: 'Error', description: 'Image must be under 10 MB', variant: 'destructive' });
       return;
     }
 
@@ -117,9 +117,9 @@ export function HeroVisualSection({ weddingData }: { weddingData: Record<string,
         const data = await res.json();
         setWeddingData(data.wedding);
         invalidateWeddingCache();
-        toast.success(`Hero ${isVideo ? 'video' : 'image'} updated`);
+        toast({ title: 'Success', description: `Hero ${isVideo ? 'video' : 'image'} updated` });
       } catch {
-        toast.error('Failed to save hero visual');
+        toast({ title: 'Error', description: 'Failed to save hero visual', variant: 'destructive' });
       } finally {
         setSaving(false);
       }
@@ -148,9 +148,9 @@ export function HeroVisualSection({ weddingData }: { weddingData: Record<string,
       const data = await res.json();
       setWeddingData(data.wedding);
       invalidateWeddingCache();
-      toast.success('Hero visual removed');
+      toast({ title: 'Success', description: 'Hero visual removed' });
     } catch {
-      toast.error('Failed to remove hero visual');
+      toast({ title: 'Error', description: 'Failed to remove hero visual', variant: 'destructive' });
     } finally {
       setSaving(false);
     }
@@ -280,11 +280,11 @@ export function BannerSection({ weddingData }: { weddingData: Record<string, unk
     const file = files[0];
 
     if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file for the banner');
+      toast({ title: 'Error', description: 'Please select an image file for the banner', variant: 'destructive' });
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
-      toast.error('Image must be under 10 MB');
+      toast({ title: 'Error', description: 'Image must be under 10 MB', variant: 'destructive' });
       return;
     }
 
@@ -303,9 +303,9 @@ export function BannerSection({ weddingData }: { weddingData: Record<string, unk
         const data = await res.json();
         setWeddingData(data.wedding);
         invalidateWeddingCache();
-        toast.success('Banner updated');
+        toast({ title: 'Success', description: 'Banner updated' });
       } catch {
-        toast.error('Failed to save banner');
+        toast({ title: 'Error', description: 'Failed to save banner', variant: 'destructive' });
       } finally {
         setSaving(false);
       }
@@ -334,9 +334,9 @@ export function BannerSection({ weddingData }: { weddingData: Record<string, unk
       const data = await res.json();
       setWeddingData(data.wedding);
       invalidateWeddingCache();
-      toast.success('Banner removed');
+      toast({ title: 'Success', description: 'Banner removed' });
     } catch {
-      toast.error('Failed to remove banner');
+      toast({ title: 'Error', description: 'Failed to remove banner', variant: 'destructive' });
     } finally {
       setSaving(false);
     }
@@ -455,7 +455,7 @@ export default function CoupleImages() {
       const data = await res.json();
       setMedia(data.media ?? []);
     } catch {
-      toast.error('Failed to load media');
+      toast({ title: 'Error', description: 'Failed to load media', variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -474,7 +474,7 @@ export default function CoupleImages() {
     const currentCount = catCount(filterCategory);
     const maxAllowed = getCategoryMax(filterCategory);
     if (currentCount >= maxAllowed) {
-      toast.error(`${getCategoryLabel(filterCategory)} section is full (${maxAllowed} images max).`);
+      toast({ title: 'Error', description: `${getCategoryLabel(filterCategory)} section is full (${maxAllowed} images max).`, variant: 'destructive' });
       return;
     }
 
@@ -483,7 +483,7 @@ export default function CoupleImages() {
       .slice(0, maxAllowed - currentCount);
 
     if (toUpload.length === 0) {
-      toast.error('Please select image files (PNG, JPG, GIF, WebP)');
+      toast({ title: 'Error', description: 'Please select image files (PNG, JPG, GIF, WebP)', variant: 'destructive' });
       return;
     }
 
@@ -512,11 +512,11 @@ export default function CoupleImages() {
           throw new Error(err.error || 'Failed to upload');
         }
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : 'Failed to upload image');
+        toast({ title: 'Error', description: err instanceof Error ? err.message : 'Failed to upload image', variant: 'destructive' });
       }
     }
     setUploading(false);
-    toast.success(`${toUpload.length} image${toUpload.length > 1 ? 's' : ''} added to ${getCategoryLabel(filterCategory)}`);
+    toast({ title: 'Success', description: `${toUpload.length} image${toUpload.length > 1 ? 's' : ''} added to ${getCategoryLabel(filterCategory)}` });
     fetchMedia();
   };
 
@@ -528,11 +528,11 @@ export default function CoupleImages() {
 
   const handleUpload = async () => {
     if (!uploadForm.url) {
-      toast.error('Please select an image');
+      toast({ title: 'Error', description: 'Please select an image', variant: 'destructive' });
       return;
     }
     if (!uploadForm.fileName) {
-      toast.error('File name is required');
+      toast({ title: 'Error', description: 'File name is required', variant: 'destructive' });
       return;
     }
 
@@ -541,7 +541,7 @@ export default function CoupleImages() {
     const maxAllowed = getCategoryMax(uploadForm.category);
     if (currentCount >= maxAllowed) {
       const label = getCategoryLabel(uploadForm.category);
-      toast.error(`${label} section is full (${maxAllowed} images max). Remove an image first.`);
+      toast({ title: 'Error', description: `${label} section is full (${maxAllowed} images max). Remove an image first.`, variant: 'destructive' });
       return;
     }
 
@@ -563,12 +563,12 @@ export default function CoupleImages() {
         throw new Error(err.error || 'Failed to upload image');
       }
 
-      toast.success('Image added successfully');
+      toast({ title: 'Success', description: 'Image added successfully' });
       setUploadDialogOpen(false);
       setUploadForm({ category: 'home', url: '', fileName: '' });
       fetchMedia();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to upload image');
+      toast({ title: 'Error', description: err instanceof Error ? err.message : 'Failed to upload image', variant: 'destructive' });
     } finally {
       setUploading(false);
     }
@@ -588,10 +588,10 @@ export default function CoupleImages() {
         throw new Error(err.error || 'Failed to delete image');
       }
 
-      toast.success('Image deleted');
+      toast({ title: 'Success', description: 'Image deleted' });
       fetchMedia();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to delete image');
+      toast({ title: 'Error', description: err instanceof Error ? err.message : 'Failed to delete image', variant: 'destructive' });
     } finally {
       setDeleting(null);
     }
@@ -619,7 +619,7 @@ export default function CoupleImages() {
 
       fetchMedia();
     } catch {
-      toast.error('Failed to reorder image');
+      toast({ title: 'Error', description: 'Failed to reorder image', variant: 'destructive' });
     }
   };
 

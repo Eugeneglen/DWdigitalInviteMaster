@@ -1432,3 +1432,55 @@ Stage Summary:
 - Root cause of "changes not reflecting in preview": invalidateWeddingCache() existed but was never called
 - 19 files changed, 68 insertions, 10 deletions
 - Commit 0b232b3 pushed to https://github.com/Eugeneglen/DWdigitalInvite/tree/CMS-Audit-1
+---
+Task ID: 8a
+Agent: fix-sonner-features
+Task: Fix sonner toast calls in CoupleFeatures.tsx
+
+Work Log:
+- Replaced sonner import with use-toast
+- Converted all toast.error() and toast.success() calls
+
+Stage Summary:
+- CoupleFeatures.tsx now uses @/hooks/use-toast consistently
+
+---
+Task ID: 8c
+Agent: fix-sonner-sharing-guests-audit
+Task: Fix sonner toast calls in CoupleSharing, CoupleGuests, CoupleAuditLog
+
+Work Log:
+- Fixed CoupleSharing.tsx: replaced sonner import, converted 6 toast calls
+- Fixed CoupleGuests.tsx: replaced sonner import, converted 12 toast calls
+- Fixed CoupleAuditLog.tsx: replaced sonner import, converted 1 toast call
+
+Stage Summary:
+- All three files now use @/hooks/use-toast consistently
+- Zero remaining toast.error/toast.success calls across all CMS couple components
+
+---
+Task ID: 8b
+Agent: fix-sonner-images
+Task: Fix sonner toast calls in CoupleImages.tsx
+
+Work Log:
+- Replaced `import { toast } from "sonner"` with `import { toast } from "@/hooks/use-toast"`
+- Converted 12 `toast.error(...)` calls to `toast({ title: "Error", description: ..., variant: "destructive" })`
+- Converted 8 `toast.success(...)` calls to `toast({ title: "Success", description: ... })`
+- Verified zero remaining `toast.error`, `toast.success`, or `sonner` references
+
+Stage Summary:
+- CoupleImages.tsx now uses @/hooks/use-toast consistently
+
+---
+Task ID: 8d
+Agent: fix-sonner-templates
+Task: Fix sonner toast calls in MasterTemplates.tsx
+
+Work Log:
+- Replaced sonner import with use-toast
+- Converted all toast.error() and toast.success() calls
+
+Stage Summary:
+- MasterTemplates.tsx now uses @/hooks/use-toast consistently
+- Zero remaining sonner imports in the entire src/ directory

@@ -9,7 +9,7 @@ import {
   TrendingUp,
   FileText,
 } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -153,7 +153,7 @@ export default function CoupleAuditLog() {
       setLogs(data.logs ?? []);
       setPagination(data.pagination ?? { page: 1, limit: 20, total: 0, pages: 0 });
     } catch {
-      toast.error('Failed to load activity log');
+      toast({ title: 'Error', description: 'Failed to load activity log', variant: 'destructive' });
     } finally {
       setLoading(false);
     }

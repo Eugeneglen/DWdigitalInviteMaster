@@ -14,7 +14,7 @@ import {
   Loader2,
   X,
 } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { useNotificationStore } from '@/store/useNotificationStore';
 import { useCoupleCMSStore } from '@/store/useCoupleCMSStore';
@@ -140,9 +140,9 @@ export function NotificationBell({ variant = 'master' }: { variant?: 'master' | 
         body: JSON.stringify({ markAll: true }),
       });
       markAllRead();
-      toast.success('All notifications marked as read');
+      toast({ title: 'Success', description: 'All notifications marked as read' });
     } catch {
-      toast.error('Failed to mark all as read');
+      toast({ title: 'Error', description: 'Failed to mark all as read', variant: 'destructive' });
     } finally {
       setMarkingAll(false);
     }
@@ -168,9 +168,9 @@ export function NotificationBell({ variant = 'master' }: { variant?: 'master' | 
         method: 'DELETE',
       });
       clearAll();
-      toast.success('All notifications cleared');
+      toast({ title: 'Success', description: 'All notifications cleared' });
     } catch {
-      toast.error('Failed to clear notifications');
+      toast({ title: 'Error', description: 'Failed to clear notifications', variant: 'destructive' });
     } finally {
       setClearingAll(false);
     }

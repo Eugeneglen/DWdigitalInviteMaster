@@ -33,13 +33,16 @@ export default function RSVPPage() {
 
 function RSVPPageInner() {
   const searchParams = useSearchParams();
-  const { data } = usePublicWedding();
+  const { data, getField } = usePublicWedding();
 
-  // CMS data with fallbacks
+  // CMS content with fallbacks
   const coupleName = data?.wedding.coupleName || 'Eleanor & James';
   const venue = data?.wedding.venue || 'The Singapore EDITION';
   const venueAddress = data?.wedding.venueAddress || '38 Cuscaden Road';
   const weddingId = data?.wedding.id;
+  const rsvpDeadline = getField('rsvp', 'deadline', '');
+  const rsvpThankYou = getField('rsvp', 'thankYouMessage', '');
+  const rsvpDeclined = getField('rsvp', 'declinedMessage', '');
 
   // Parse URL params for auto-fill
   const autoFill = useMemo(() => {
@@ -233,20 +236,28 @@ function RSVPPageInner() {
       title = 'We\'ll Miss You';
       icon = 'mail';
       if (totalCount === 1) {
-        message = `We\'re sorry you can\'t make it, ${primaryGuest}. Your kind response means a lot to us \u2014 we\'ll keep you in our thoughts and share the joy of the day with you in spirit.`;
+        message = rsvpDeclined
+          ? rsvpDeclined.replace('{name}', primaryGuest)
+          : `We\'re sorry you can\'t make it, ${primaryGuest}. Your kind response means a lot to us \u2014 we\'ll keep you in our thoughts and share the joy of the day with you in spirit.`;
       } else {
         const nameList = declinedNames.join(' & ');
-        message = `We\'re sorry ${nameList} can\'t make it. Your kind responses mean a lot to us \u2014 we\'ll keep you in our thoughts and share the joy of the day with you in spirit.`;
+        message = rsvpDeclined
+          ? rsvpDeclined.replace('{name}', nameList)
+          : `We\'re sorry ${nameList} can\'t make it. Your kind responses mean a lot to us \u2014 we\'ll keep you in our thoughts and share the joy of the day with you in spirit.`;
       }
     } else if (result === 'mixed') {
       title = 'Thank you';
       icon = 'favorite';
       const dList = declinedNames.join(' & ');
       const aList = attendingNames.join(' & ');
-      message = `We\'re sorry ${dList} can\'t make it, but we\'re so glad ${aList} will be joining us! We\'ll keep everyone in our thoughts on our special day.`;
+      message = rsvpThankYou
+        ? rsvpThankYou.replace('{name}', aList)
+        : `We\'re sorry ${dList} can\'t make it, but we\'re so glad ${aList} will be joining us! We\'ll keep everyone in our thoughts on our special day.`;
     } else {
       // all-attending
-      message = `Your RSVP has been received. We can\'t wait to celebrate with you.`;
+      message = rsvpThankYou
+        ? rsvpThankYou.replace('{name}', primaryGuest)
+        : `Your RSVP has been received. We can\'t wait to celebrate with you.`;
     }
 
     return (
@@ -271,6 +282,11 @@ function RSVPPageInner() {
       <div className="text-center mb-10">
         <h1 className="font-serif italic text-[40px] md:text-[52px] leading-tight text-charcoal-ink">{coupleName}</h1>
         <p className="mt-4 text-[15px] text-charcoal-ink/80">{venue}, {venueAddress}</p>
+        {rsvpDeadline && (
+          <p className="mt-3 text-[13px] text-cinematic-gold/80 italic">
+            Kindly respond by {rsvpDeadline}
+          </p>
+        )}
       </div>
 
       {/* Progress dots — 4 steps (0–3) */}

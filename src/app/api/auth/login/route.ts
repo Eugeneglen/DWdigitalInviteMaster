@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { encode } from 'next-auth/jwt';
 import { db } from '@/lib/db';
+import { resolveSecret } from '@/lib/auth';
 
 export async function POST(request: Request) {
   try {
@@ -40,7 +41,7 @@ export async function POST(request: Request) {
         iat: Math.floor(Date.now() / 1000),
         exp: Math.floor(Date.now() / 1000) + 24 * 60 * 60,
       },
-      secret: process.env.NEXTAUTH_SECRET || process.env.JWT_SECRET || '',
+      secret: resolveSecret() || '',
     });
 
     const response = NextResponse.json({

@@ -47,7 +47,14 @@ interface LocalWish {
 }
 
 export default function WishesPage() {
-  const { data } = usePublicWedding();
+  const { data, getField } = usePublicWedding();
+
+  const sectionTitle = getField('wishes', 'title', 'Wishes & Blessings');
+  const sectionSubtitle = getField('wishes', 'subtitle', 'A curated sanctuary of wisdom and love from those we cherish most.');
+  const nameLabel = getField('wishes', 'nameLabel', 'Full Name');
+  const messageLabel = getField('wishes', 'messageLabel', 'Your Message');
+  const relationshipLabel = getField('wishes', 'relationshipLabel', 'Relationship');
+  const submitLabel = getField('wishes', 'submitLabel', 'Weave into Archive');
 
   const [localWishes, setLocalWishes] = useState<LocalWish[]>([]);
   const [name, setName] = useState('');
@@ -172,7 +179,7 @@ export default function WishesPage() {
 
   return (
     <>
-      <SectionBanner title="Wishes & Blessings" />
+      <SectionBanner title={sectionTitle} />
 
       <main className="pb-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto min-h-screen pt-[20px] md:pt-[40px]">
         {/* Intro */}
@@ -181,7 +188,7 @@ export default function WishesPage() {
             The Living Heirloom
           </span>
           <p className="max-w-2xl mx-auto text-lg md:text-xl text-charcoal-ink/70 leading-relaxed italic">
-            A curated sanctuary of wisdom and love from those we cherish most.
+            {sectionSubtitle}
           </p>
         </section>
 
@@ -292,7 +299,7 @@ export default function WishesPage() {
               {/* Full Name */}
               <input
                 type="text"
-                placeholder="Full Name"
+                placeholder={nameLabel}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="input-line"
@@ -301,7 +308,7 @@ export default function WishesPage() {
               {/* Relationship */}
               <input
                 type="text"
-                placeholder="Relationship"
+                placeholder={relationshipLabel}
                 value={relationship}
                 onChange={(e) => setRelationship(e.target.value)}
                 className="input-line"
@@ -309,7 +316,7 @@ export default function WishesPage() {
 
               {/* Your Message */}
               <textarea
-                placeholder="Your Message"
+                placeholder={messageLabel}
                 rows={4}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
@@ -339,7 +346,7 @@ export default function WishesPage() {
                     : 'bg-charcoal-ink text-paper-cream hover:opacity-90 cursor-pointer'
                 }`}
               >
-                {submitting ? 'Submitting...' : submitted ? 'Woven' : 'Weave into Archive'}
+                {submitting ? 'Submitting...' : submitted ? 'Woven' : submitLabel}
               </button>
             </form>
           </div>

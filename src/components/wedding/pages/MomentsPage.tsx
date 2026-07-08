@@ -64,6 +64,7 @@ export default function MomentsPage() {
   const { ref, visible } = useReveal();
   const { data, getField } = usePublicWedding();
 
+  const sectionTitle = getField('moments', 'title', 'Moments');
   const subtitle = getField('moments', 'subtitle', FALLBACK_SUBTITLE);
 
   const galleryMedia = (data?.mediaByCategory?.moments && data.mediaByCategory.moments.length > 0)
@@ -76,7 +77,7 @@ export default function MomentsPage() {
 
   return (
     <>
-      <SectionBanner title="Moments" />
+      <SectionBanner title={sectionTitle} />
 
       <main className="pb-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto min-h-screen pt-[20px] md:pt-[40px]">
         {/* Intro */}

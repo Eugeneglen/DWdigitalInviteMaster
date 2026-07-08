@@ -13,7 +13,7 @@ import {
   Search,
   Loader2,
 } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -67,9 +67,9 @@ function CopyButton({
       await navigator.clipboard.writeText(text);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-      toast.success('Copied to clipboard');
+      toast({ title: 'Success', description: 'Copied to clipboard' });
     } catch {
-      toast.error('Failed to copy');
+      toast({ title: 'Error', description: 'Failed to copy', variant: 'destructive' });
     }
   }, [text]);
 
@@ -152,9 +152,9 @@ export default function CoupleSharing() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      toast.success('QR code downloaded');
+      toast({ title: 'Success', description: 'QR code downloaded' });
     } catch {
-      toast.error('Failed to download QR code');
+      toast({ title: 'Error', description: 'Failed to download QR code', variant: 'destructive' });
     }
   }, [qrApiUrl, slug]);
 
@@ -168,9 +168,9 @@ export default function CoupleSharing() {
       await navigator.clipboard.write([
         new ClipboardItem({ 'image/png': blob }),
       ]);
-      toast.success('QR code copied to clipboard');
+      toast({ title: 'Success', description: 'QR code copied to clipboard' });
     } catch {
-      toast.error('Failed to copy QR code — try downloading instead');
+      toast({ title: 'Error', description: 'Failed to copy QR code — try downloading instead', variant: 'destructive' });
     }
   }, [qrApiUrl]);
 
