@@ -72,9 +72,9 @@ export default function CoupleCMSLayout({ children }: { children: React.ReactNod
           throw new Error('Failed to load wedding data');
         }
         const data = await res.json();
-        setWeddingData(data);
-        if (data?.id) {
-          setWeddingId(String(data.id));
+        setWeddingData(data.wedding ?? data);
+        if (data?.wedding?.id) {
+          setWeddingId(String(data.wedding.id));
         }
       } catch (err) {
         setError('Something went wrong. Please try again later.');

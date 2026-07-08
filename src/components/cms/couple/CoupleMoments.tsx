@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { invalidateWeddingCache } from '@/hooks/usePublicWedding';
 import SectionImageUpload from './SectionImageUpload';
 
 const API_BASE = '/api/cms/content?XTransformPort=3000';
@@ -112,6 +113,7 @@ export default function CoupleMoments() {
       });
 
       setEditedFields({});
+      invalidateWeddingCache();
       toast({
         title: 'Success',
         description: 'Content saved successfully',

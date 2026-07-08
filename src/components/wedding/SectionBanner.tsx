@@ -1,18 +1,25 @@
 'use client';
 
-const SECTION_BG =
+import { usePublicWedding } from '@/hooks/usePublicWedding';
+
+const FALLBACK_BG =
   'https://lh3.googleusercontent.com/aida-public/AB6AXuA-OyKfcsxXAmZDArHbDXl1cVCgGUG5liFPzyHdVvMG6_4jN9pNTrN9GCrkdnegli9UPJUSPs39KJRsRP7AiLem4xYS-q1ZYq1T3DAIqyvn3wAvbdkoMVkufft0SpQw4gDTPSnIml6k62lRYobUrNu70UGIILiMZQ0fAydTXXwVZ1oswQZ-mjPT8H9mDDqfhxsMSI5zla8GKz_ILXbmdRjtRUk682dPEDBD6I81DzEx7dITgjb6vxQoee5599jkYf_vCYP7npydvxqx';
 
 interface SectionBannerProps {
   title: string;
   subtitle?: string;
+  /** Override banner image URL. If omitted, reads from wedding data. */
+  bannerUrl?: string | null;
 }
 
-export default function SectionBanner({ title, subtitle }: SectionBannerProps) {
+export default function SectionBanner({ title, subtitle, bannerUrl: bannerUrlProp }: SectionBannerProps) {
+  const { data } = usePublicWedding();
+  const bannerUrl = bannerUrlProp ?? data?.wedding.bannerUrl ?? FALLBACK_BG;
+
   return (
     <div
       className="w-full h-[360px] md:h-[420px] bg-cover bg-center mt-[54px] md:mt-[64px] relative z-40 border-b border-champagne-silk/20 flex items-center justify-center"
-      style={{ backgroundImage: `url('${SECTION_BG}')` }}
+      style={{ backgroundImage: `url('${bannerUrl}')` }}
     >
       {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-paper-cream/30 via-paper-cream/10 to-paper-cream/60" />

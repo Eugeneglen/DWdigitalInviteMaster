@@ -18,6 +18,7 @@ import {
   DialogFooter,
   DialogDescription,
 } from '@/components/ui/dialog';
+import { invalidateWeddingCache } from '@/hooks/usePublicWedding';
 
 const API_BASE = '/api/cms/stories?XTransformPort=3000';
 
@@ -261,6 +262,7 @@ export default function CoupleStory() {
           items: [{ section: 'story', fieldKey, fieldValue, fieldType: 'JSON' }],
         }),
       });
+      invalidateWeddingCache();
       // Update originals so dirty tracking stays correct
       if (label === 'TIDBITS') {
         setOriginalTidbits(safeParseJSON(fieldValue, []));
@@ -314,6 +316,7 @@ export default function CoupleStory() {
         throw new Error(err.error || 'Failed to save chapter');
       }
 
+      invalidateWeddingCache();
       toast({ title: 'Success', description: editingId ? 'Chapter updated successfully' : 'Chapter added successfully' });
       setDialogOpen(false);
       fetchStories();
@@ -352,6 +355,7 @@ export default function CoupleStory() {
         body: JSON.stringify({ items }),
       });
       if (!res.ok) throw new Error('Failed to save content');
+      invalidateWeddingCache();
       toast({ title: 'Success', description: 'Content saved successfully' });
       setOriginalFields({ ...contentFields });
       setEditedFields({});
@@ -376,6 +380,7 @@ export default function CoupleStory() {
         throw new Error(err.error || 'Failed to delete chapter');
       }
 
+      invalidateWeddingCache();
       toast({ title: 'Success', description: 'Chapter deleted' });
       fetchStories();
     } catch (err) {

@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
+import { invalidateWeddingCache } from '@/hooks/usePublicWedding';
 
 const API_BASE = '/api/cms/content?XTransformPort=3000';
 
@@ -225,6 +226,7 @@ export default function CoupleContent() {
       });
 
       setEditedFields({});
+      invalidateWeddingCache();
       toast.success('Content saved successfully');
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Failed to save content');

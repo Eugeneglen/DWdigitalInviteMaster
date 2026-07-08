@@ -11,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { invalidateWeddingCache } from '@/hooks/usePublicWedding';
 
 const MEDIA_API = '/api/cms/media?XTransformPort=3000';
 
@@ -120,6 +121,7 @@ export default function SectionImageUpload({ category, label, maxImages }: Secti
     }
     setUploading(false);
     if (toUpload.length > 0) {
+      invalidateWeddingCache();
       toast({
         title: 'Success',
         description: `${toUpload.length} image${toUpload.length > 1 ? 's' : ''} added to ${label}`,
@@ -146,6 +148,7 @@ export default function SectionImageUpload({ category, label, maxImages }: Secti
         const err = await res.json().catch(() => ({}));
         throw new Error((err as { error?: string }).error || 'Failed to delete image');
       }
+      invalidateWeddingCache();
       toast({
         title: 'Deleted',
         description: 'Image removed successfully',

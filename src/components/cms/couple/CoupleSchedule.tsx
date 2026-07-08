@@ -26,6 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { invalidateWeddingCache } from '@/hooks/usePublicWedding';
 
 const API_BASE = '/api/cms/schedule?XTransformPort=3000';
 
@@ -219,6 +220,7 @@ export default function CoupleSchedule() {
         throw new Error(err.error || 'Failed to save event');
       }
 
+      invalidateWeddingCache();
       toast({ title: 'Success', description: editingId ? 'Event updated successfully' : 'Event added successfully' });
       setDialogOpen(false);
       fetchSchedules();
@@ -265,6 +267,7 @@ export default function CoupleSchedule() {
         body: JSON.stringify({ items }),
       });
       if (!res.ok) throw new Error('Failed to save venue content');
+      invalidateWeddingCache();
       toast({ title: 'Success', description: 'Venue content saved' });
       setVenueOriginals({ ...venueFields });
       setVenueEdited({});
@@ -295,6 +298,7 @@ export default function CoupleSchedule() {
         body: JSON.stringify({ items }),
       });
       if (!res.ok) throw new Error('Failed to save content');
+      invalidateWeddingCache();
       toast({ title: 'Success', description: 'Content saved successfully' });
       setOriginalFields({ ...contentFields });
       setEditedFields({});
@@ -319,6 +323,7 @@ export default function CoupleSchedule() {
         throw new Error(err.error || 'Failed to delete event');
       }
 
+      invalidateWeddingCache();
       toast({ title: 'Success', description: 'Event deleted' });
       fetchSchedules();
     } catch (err) {

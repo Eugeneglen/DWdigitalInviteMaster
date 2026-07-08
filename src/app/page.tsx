@@ -173,6 +173,10 @@ function HomeView({
 
   // Preview Mode — couple user previewing their wedding as a guest
   if (previewMode && isCouple) {
+    const previewSlug = useCoupleCMSStore.getState().weddingData
+      ? (useCoupleCMSStore.getState().weddingData as Record<string, string>)?.slug
+      : undefined;
+
     return (
       <div className="min-h-screen flex flex-col bg-paper-cream text-charcoal-ink overflow-x-hidden selection:bg-cinematic-gold selection:text-paper-cream">
         {/* Floating CMS Toggle Bar */}
@@ -190,7 +194,7 @@ function HomeView({
             Open Editor
           </button>
         </div>
-        <GuestSite topOffset="44px" showEditorButton />
+        <GuestSite slug={previewSlug} topOffset="44px" showEditorButton />
       </div>
     );
   }

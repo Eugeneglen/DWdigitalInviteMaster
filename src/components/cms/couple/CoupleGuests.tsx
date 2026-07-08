@@ -25,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { invalidateWeddingCache } from '@/hooks/usePublicWedding';
 
 const API_BASE = '/api/cms/guests?XTransformPort=3000';
 
@@ -251,6 +252,7 @@ export default function CoupleGuests() {
         throw new Error(err.error || 'Failed to save guest');
       }
 
+      invalidateWeddingCache();
       toast.success(editingId ? 'Guest updated successfully' : 'Guest added successfully');
       setDialogOpen(false);
       fetchGuests();
@@ -275,6 +277,7 @@ export default function CoupleGuests() {
         throw new Error(err.error || 'Failed to delete guest');
       }
 
+      invalidateWeddingCache();
       toast.success('Guest deleted');
       fetchGuests();
     } catch (err) {
@@ -343,6 +346,7 @@ export default function CoupleGuests() {
       const data: ImportResult = await res.json();
       setImportResult(data);
       setImportStep('result');
+      invalidateWeddingCache();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Import failed');
     } finally {

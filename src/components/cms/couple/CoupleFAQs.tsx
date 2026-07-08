@@ -18,6 +18,7 @@ import {
   DialogFooter,
   DialogDescription,
 } from '@/components/ui/dialog';
+import { invalidateWeddingCache } from '@/hooks/usePublicWedding';
 
 const API_BASE = '/api/cms/faqs?XTransformPort=3000';
 
@@ -122,6 +123,7 @@ export default function CoupleFAQs() {
         throw new Error(err.error || 'Failed to save FAQ');
       }
 
+      invalidateWeddingCache();
       toast({ title: 'Success', description: editingId ? 'FAQ updated successfully' : 'FAQ added successfully' });
       setDialogOpen(false);
       fetchFAQs();
@@ -146,6 +148,7 @@ export default function CoupleFAQs() {
         throw new Error(err.error || 'Failed to delete FAQ');
       }
 
+      invalidateWeddingCache();
       toast({ title: 'Success', description: 'FAQ deleted' });
       fetchFAQs();
     } catch (err) {
@@ -178,6 +181,7 @@ export default function CoupleFAQs() {
         throw new Error('Failed to update FAQ status');
       }
 
+      invalidateWeddingCache();
       toast({ title: 'Success', description: newActive ? 'FAQ activated' : 'FAQ deactivated' });
     } catch {
       // Revert optimistic update

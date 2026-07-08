@@ -25,6 +25,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useCoupleCMSStore } from '@/store/useCoupleCMSStore';
+import { invalidateWeddingCache } from '@/hooks/usePublicWedding';
 
 const MEDIA_API = '/api/cms/media?XTransformPort=3000';
 const WEDDING_API = '/api/cms/wedding?XTransformPort=3000';
@@ -115,6 +116,7 @@ export function HeroVisualSection({ weddingData }: { weddingData: Record<string,
         if (!res.ok) throw new Error('Failed to save hero visual');
         const data = await res.json();
         setWeddingData(data.wedding);
+        invalidateWeddingCache();
         toast.success(`Hero ${isVideo ? 'video' : 'image'} updated`);
       } catch {
         toast.error('Failed to save hero visual');
@@ -145,6 +147,7 @@ export function HeroVisualSection({ weddingData }: { weddingData: Record<string,
       if (!res.ok) throw new Error('Failed to remove hero visual');
       const data = await res.json();
       setWeddingData(data.wedding);
+      invalidateWeddingCache();
       toast.success('Hero visual removed');
     } catch {
       toast.error('Failed to remove hero visual');
@@ -299,6 +302,7 @@ export function BannerSection({ weddingData }: { weddingData: Record<string, unk
         if (!res.ok) throw new Error('Failed to save banner');
         const data = await res.json();
         setWeddingData(data.wedding);
+        invalidateWeddingCache();
         toast.success('Banner updated');
       } catch {
         toast.error('Failed to save banner');
@@ -329,6 +333,7 @@ export function BannerSection({ weddingData }: { weddingData: Record<string, unk
       if (!res.ok) throw new Error('Failed to remove banner');
       const data = await res.json();
       setWeddingData(data.wedding);
+      invalidateWeddingCache();
       toast.success('Banner removed');
     } catch {
       toast.error('Failed to remove banner');

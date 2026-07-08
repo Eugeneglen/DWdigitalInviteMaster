@@ -14,6 +14,7 @@ import { HeroVisualSection, BannerSection } from './CoupleImages';
 import SectionImageUpload from './SectionImageUpload';
 import FontPicker from './FontPicker';
 import BackgroundColorPicker from './BackgroundColorPicker';
+import { invalidateWeddingCache } from '@/hooks/usePublicWedding';
 
 const CONTENT_API = '/api/cms/content?XTransformPort=3000';
 
@@ -135,6 +136,7 @@ export default function CoupleHome() {
       });
 
       setEditedFields({});
+      invalidateWeddingCache();
       toast({
         title: 'Saved',
         description: 'Hero content updated successfully',

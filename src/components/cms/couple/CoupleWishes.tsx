@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { invalidateWeddingCache } from '@/hooks/usePublicWedding';
 
 const API_BASE = '/api/cms/wishes?XTransformPort=3000';
 
@@ -114,6 +115,7 @@ export default function CoupleWishes() {
         throw new Error(err.error || 'Failed to delete wish');
       }
 
+      invalidateWeddingCache();
       toast({ title: 'Success', description: 'Wish deleted' });
       fetchWishes();
     } catch (err) {

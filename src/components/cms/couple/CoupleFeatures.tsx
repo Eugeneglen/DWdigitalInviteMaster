@@ -9,6 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { invalidateWeddingCache } from '@/hooks/usePublicWedding';
 
 const API_BASE = '/api/cms/features?XTransformPort=3000';
 
@@ -214,6 +215,7 @@ export default function CoupleFeatures() {
 
         const config = getFeatureConfig(key);
         const isEnabled = updatedFeatures.find((f) => f.featureKey === key)?.isEnabled;
+        invalidateWeddingCache();
         toast.success(
           `${config.displayName} ${isEnabled ? 'enabled' : 'disabled'}`
         );
@@ -247,6 +249,7 @@ export default function CoupleFeatures() {
 
       if (!res.ok) throw new Error('Failed to save music settings');
       setFeatures(updatedFeatures);
+      invalidateWeddingCache();
       toast.success('Music settings saved');
     } catch {
       toast.error('Failed to save music settings');

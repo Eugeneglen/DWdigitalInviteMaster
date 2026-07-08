@@ -5,6 +5,7 @@ import { Loader2, Palette } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import { invalidateWeddingCache } from '@/hooks/usePublicWedding';
 
 const CONTENT_API = '/api/cms/content?XTransformPort=3000';
 
@@ -74,6 +75,7 @@ export default function BackgroundColorPicker() {
         }),
       });
       if (!res.ok) throw new Error('Failed to save');
+      invalidateWeddingCache();
     } catch {
       toast({
         title: 'Error',

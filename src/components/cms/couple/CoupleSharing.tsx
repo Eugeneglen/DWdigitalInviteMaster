@@ -96,8 +96,7 @@ function CopyButton({
 
 export default function CoupleSharing() {
   const { weddingData } = useCoupleCMSStore();
-  const wedding = weddingData as Record<string, Record<string, string>> | null;
-  const slug = wedding?.wedding?.slug ?? '';
+  const slug = (weddingData as Record<string, string>)?.slug ?? '';
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
   const weddingUrl = slug ? `${origin}/${slug}` : '';
   const qrApiUrl = weddingUrl

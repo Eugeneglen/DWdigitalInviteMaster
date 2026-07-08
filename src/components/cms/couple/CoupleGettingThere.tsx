@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { invalidateWeddingCache } from '@/hooks/usePublicWedding';
 
 const API_BASE = '/api/cms/content?XTransformPort=3000';
 
@@ -116,6 +117,7 @@ export default function CoupleGettingThere() {
       });
 
       setEditedFields({});
+      invalidateWeddingCache();
       toast({
         title: 'Success',
         description: 'Content saved successfully',

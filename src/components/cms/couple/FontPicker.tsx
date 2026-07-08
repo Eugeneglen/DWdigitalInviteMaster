@@ -5,6 +5,7 @@ import { Loader2, Check, Type } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import { invalidateWeddingCache } from '@/hooks/usePublicWedding';
 
 const CONTENT_API = '/api/cms/content?XTransformPort=3000';
 
@@ -129,6 +130,7 @@ export default function FontPicker({ section }: FontPickerProps) {
         }),
       });
       if (!res.ok) throw new Error('Failed to save font');
+      invalidateWeddingCache();
     } catch {
       toast({
         title: 'Error',

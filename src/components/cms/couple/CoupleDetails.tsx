@@ -9,6 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
+import { useCoupleCMSStore } from '@/store/useCoupleCMSStore';
+import { invalidateWeddingCache } from '@/hooks/usePublicWedding';
 
 interface WeddingData {
   id: string;
@@ -107,7 +109,10 @@ export default function CoupleDetails() {
       }
 
       const data = await res.json();
-      setWedding(data.wedding as WeddingData);
+      const updatedWedding = data.wedding as WeddingData;
+      setWedding(updatedWedding);
+      useCoupleCMSStore.getState().setWeddingData(updatedWedding);
+      invalidateWeddingCache();
       toast.success('Wedding details saved successfully');
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Failed to save changes');
