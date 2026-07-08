@@ -30,7 +30,7 @@ export default function GettingTherePage() {
 
   return (
     <>
-      <SectionBanner title={getField('getting-there', 'title', 'Getting There')} />
+      <SectionBanner title={getField('getting-there', 'title', 'Getting There')} subtitle={getField('getting-there', 'subtitle', '')} />
 
       <main className="pb-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto min-h-screen pt-[20px] md:pt-[40px] flex flex-col gap-8">
         {/* Address */}

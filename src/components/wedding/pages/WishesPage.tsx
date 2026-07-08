@@ -5,38 +5,6 @@ import SectionBanner from '../SectionBanner';
 import { usePublicWedding } from '@/hooks/usePublicWedding';
 import { io as socketIO, Socket } from 'socket.io-client';
 
-const WISHES = [
-  {
-    type: 'image',
-    img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDQpPVCF_wPzxdxviXS1bA23h7owYEOhf8AdYzMj_9jEhL197yuR1FrPrxvhn8i0gQx_ymdPaeHz3E8o7hG3AHyFVtie3Ui4Q7e3Y7tWj8eWMC9uLbZaroGba27vEWYBtLypksUMnUEVnsJvTPDmX7a3aCGjrA47IJolG5FRrKbLKsgAciiRlNYqm7pd6PrtyvEWphw6Ckas_Jp6jkE_Fef5mfQjdt3OlTJfsQOfoWCnSC-IJteEQ0KFrwWITuhjo5_5VS7RL34j_kO',
-    role: 'Maid of Honor',
-    quote: '"To a love that feels like home and looks like poetry."',
-    author: 'Elena Vance',
-  },
-  {
-    type: 'text-card',
-    quote: '"Watching you both grow together has been the highlight of our decade. May your journey ahead be as vibrant as the silk of your traditions and as strong as the ink of your vows."',
-    author: 'The Harrison Family',
-  },
-  {
-    type: 'dark-card',
-    quote: 'The art of a good marriage is in the small details. The morning coffee, the shared silence, and the unwavering support.',
-    author: 'Grandmother Rose',
-  },
-  {
-    type: 'image',
-    img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCIo9FSsp1H3KemSnsHFN9Kmplyilf5vqvEHyiSIYJ6mNQ_hui1SEYOFDn6v2uALIWIavlJXtaHgWhZv0splzeYjWkFMFD027D3ka96IvNt1dOhulLE26YW7l7o9lC4K28JT_IuNibN880fHxpwDCqPBdksFEn_7hwZwxDaI41SyFIRhOMnwfqk3VJ8L7NhuZz-4mfhWoPzjmF2azXU5Oze4LXPJZLNG4V8fSg6PF-rPn_nLB0vXqpaf1CjMyalpUE0LOvcDn7-PIjA',
-    role: 'Brother & Confidant',
-    quote: '"May your quiet moments be as beautiful as your loudest celebrations."',
-    author: 'Marcus Thorne',
-  },
-  {
-    type: 'minimal',
-    quote: 'Distance could never diminish the joy we feel today. Sending all our blessings from across the ocean. We are there with you in spirit.',
-    author: 'SOPHIE & LIAM · COUSINS',
-  },
-];
-
 interface LocalWish {
   id: string;
   name: string;
@@ -55,6 +23,9 @@ export default function WishesPage() {
   const messageLabel = getField('wishes', 'messageLabel', 'Your Message');
   const relationshipLabel = getField('wishes', 'relationshipLabel', 'Relationship');
   const submitLabel = getField('wishes', 'submitLabel', 'Weave into Archive');
+  const heirloomLabel = getField('wishes', 'heirloomLabel', 'The Living Heirloom');
+  const formEyebrow = getField('wishes', 'formEyebrow', 'YOUR TURN');
+  const formHeading = getField('wishes', 'formHeading', 'Contribute to the Heirloom');
 
   const [localWishes, setLocalWishes] = useState<LocalWish[]>([]);
   const [name, setName] = useState('');
@@ -127,7 +98,7 @@ export default function WishesPage() {
       quote: w.message,
       author: w.name,
     })),
-    ...WISHES,
+    // No hardcoded fallback wishes
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -185,7 +156,7 @@ export default function WishesPage() {
         {/* Intro */}
         <section className="max-w-[1440px] mx-auto px-8 md:px-canvas-margin mb-24 text-center">
           <span className="text-cinematic-gold uppercase mb-4 block tracking-[0.4em]" style={{ fontSize: '12px', lineHeight: '16px', letterSpacing: '0.1em', fontWeight: 600, fontFamily: "'Inter', sans-serif" }}>
-            The Living Heirloom
+            {heirloomLabel}
           </span>
           <p className="max-w-2xl mx-auto text-lg md:text-xl text-charcoal-ink/70 leading-relaxed italic">
             {sectionSubtitle}
@@ -285,13 +256,13 @@ export default function WishesPage() {
                 className="text-cinematic-gold uppercase tracking-[0.2em] mb-3"
                 style={{ fontSize: '12px', lineHeight: '16px', letterSpacing: '0.1em', fontWeight: 600 }}
               >
-                YOUR TURN
+                {formEyebrow}
               </p>
               <h2
                 className="text-charcoal-ink italic"
                 style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: '32px', lineHeight: '40px' }}
               >
-                Contribute to the Heirloom
+                {formHeading}
               </h2>
             </div>
 

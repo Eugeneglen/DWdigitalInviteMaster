@@ -1484,3 +1484,87 @@ Work Log:
 Stage Summary:
 - MasterTemplates.tsx now uses @/hooks/use-toast consistently
 - Zero remaining sonner imports in the entire src/ directory
+---
+Task ID: fix-rsvp-content
+Agent: fix-rsvp-content
+Task: Make all RSVP form text CMS-editable (ceremony name, attendance options, dietary options, step text, result titles)
+
+Work Log:
+- Made ceremony name, 3 attendance option labels CMS-editable
+- Made dietary options CMS-editable (comma-separated string)
+- Made all 5 step headings/subtitles CMS-editable
+- Made result page titles CMS-editable
+- Added all 12 new fields to CoupleContent.tsx RSVP section
+- All fallback defaults preserved so nothing breaks for existing weddings
+
+Stage Summary:
+- RSVP page is now fully CMS-customizable
+- No hardcoded ceremony-specific text remains
+- Lint passes
+---
+Task ID: fix-wishes-qa
+Agent: fix-wishes-qa
+Task: Fix WishesPage nameLabel bug, remove hardcoded demo data, add QA CTA CMS fields, add Wishes form CMS fields
+
+Work Log:
+- Fixed nameLabel key mismatch (leading space) in CoupleContent.tsx
+- Removed 5 hardcoded demo wishes from WishesPage
+- Removed 4 hardcoded fallback FAQs from QAPage, added empty state
+- Added QA CTA CMS fields: contactEmail, ctaEyebrow, ctaDescription, ctaButtonLabel
+- Added Wishes form CMS fields: heirloomLabel, formEyebrow, formHeading
+- All guest-facing text now reads from CMS with fallback defaults
+
+Stage Summary:
+- Zero hardcoded demo data remaining (wishes, FAQs)
+- All CTA/contact text now CMS-editable
+- Lint passes
+
+---
+Task ID: cms-audit-2
+Agent: main
+Task: Comprehensive CMS page audit — audit all pages, identify gaps, fix all issues
+
+Work Log:
+- Ran 4 parallel audit agents to compare every guest preview page with its CMS editor
+- Identified 30+ gaps across 9 pages (Home, Schedule, Story, GettingThere, RSVP, Wishes, QA, Moments, Video)
+- Fixed WishesPage nameLabel key mismatch bug (leading space in CoupleContent.tsx)
+- Removed 5 hardcoded demo wishes from WishesPage
+- Removed 4 hardcoded fallback FAQs from QAPage, added empty state
+- Added 4 QA CTA CMS fields (contactEmail, ctaEyebrow, ctaDescription, ctaButtonLabel)
+- Added 3 Wishes form CMS fields (heirloomLabel, formEyebrow, formHeading)
+- Made all RSVP form text CMS-editable (12 new fields: ceremonyName, optYes, optPartial, optNo, dietaryOptions, step texts, result titles)
+- Added Video CMS editor to CoupleFeatures (URL, title, caption, autoplay, muted, showControls)
+- Wired StoryPage hero image to read from mediaByCategory.story[0] with fallback
+- Fixed Schedule Google Calendar details to use actual schedule items dynamically
+- Wired "The Celebration" heading to schedule.subtitle CMS field
+- Added honeymoonEyebrow input to CoupleStory CMS editor
+- Wired getting-there.subtitle to SectionBanner subtitle prop
+- Removed dead story.recommendationPrompt CMS field
+
+Stage Summary:
+- Zero hardcoded demo data remaining (wishes, FAQs)
+- All user-facing text is now CMS-editable with sensible fallback defaults
+- Video feature fully CMS-configurable (was completely broken before)
+- Google Calendar link now shows real schedule data
+- Lint: 0 errors, 1 pre-existing warning
+- Files modified: WishesPage.tsx, QAPage.tsx, RSVPPage.tsx, SchedulePage.tsx, StoryPage.tsx, GettingTherePage.tsx, CoupleContent.tsx, CoupleStory.tsx, CoupleFeatures.tsx
+
+---
+Task ID: cms-audit-2b
+Agent: main
+Task: Wire Content Editor into CMS navigation (was unreachable)
+
+Work Log:
+- Discovered CoupleContent.tsx was not in COUPLE_CMS_PAGES map or nav
+- Added 'content' to CoupleCMSPage type union
+- Added 'Content' nav item with FileText icon to CoupleCMSLayout.tsx
+- Added CoupleContent dynamic import and page map entry in page.tsx
+- Verified Content tab appears and all sections expand correctly in browser
+- Verified RSVP attendance question uses new defaults (no "lunch reception")
+- Verified guest pages render with zero errors
+
+Stage Summary:
+- Content Editor is now accessible from CMS sidebar as "Content" tab
+- All 30+ new CMS fields are reachable and editable
+- Guest RSVP page: "lunch reception" → "reception" (more generic default)
+- Zero lint errors, zero browser console errors

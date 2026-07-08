@@ -13,11 +13,11 @@ interface Guest {
   responded: boolean;
 }
 
-const DIETARY_OPTIONS = ['Halal', 'Vegetarian', 'No Seafood'];
+const DIETARY_OPTIONS_DEFAULT = ['Halal', 'Vegetarian', 'No Seafood'];
 
-const ATTENDANCE_OPTIONS = [
+const ATTENDANCE_OPTIONS_DEFAULT = [
   { val: 'yes', label: 'Yes!' },
-  { val: 'partial', label: "Yes, but I won't be staying for the lunch reception" },
+  { val: 'partial', label: "Yes, but I won't be staying for the reception" },
   { val: 'no', label: "I'm sorry, I won't be able to make it" },
 ];
 
@@ -43,6 +43,25 @@ function RSVPPageInner() {
   const rsvpDeadline = getField('rsvp', 'deadline', '');
   const rsvpThankYou = getField('rsvp', 'thankYouMessage', '');
   const rsvpDeclined = getField('rsvp', 'declinedMessage', '');
+  const ceremonyName = getField('rsvp', 'ceremonyName', 'Wedding Solemnisation');
+  const optYes = getField('rsvp', 'optYes', 'Yes!');
+  const optPartial = getField('rsvp', 'optPartial', "Yes, but I won't be staying for the reception");
+  const optNo = getField('rsvp', 'optNo', "I'm sorry, I won't be able to make it");
+  const dietaryOptions = getField('rsvp', 'dietaryOptions', 'Halal,Vegetarian,No Seafood').split(',').map(s => s.trim()).filter(Boolean);
+  const step0Title = getField('rsvp', 'step0Title', 'Enter your name to RSVP');
+  const step0Subtext = getField('rsvp', 'step0Subtext', 'You can respond for more guests in the following steps.');
+  const step1Title = getField('rsvp', 'step1Title', 'How many people are in your party?');
+  const step2Title = getField('rsvp', 'step2Title', 'Confirm each guest and their dietary needs.');
+  const step2Subtext = getField('rsvp', 'step2Subtext', 'Dietary selections are optional.');
+  const resultThankYou = getField('rsvp', 'resultThankYou', 'Thank you');
+  const resultDeclined = getField('rsvp', 'resultWeMissYou', "We'll Miss You");
+
+  const DIETARY_OPTIONS = dietaryOptions.length > 0 ? dietaryOptions : DIETARY_OPTIONS_DEFAULT;
+  const ATTENDANCE_OPTIONS = [
+    { val: 'yes', label: optYes },
+    { val: 'partial', label: optPartial },
+    { val: 'no', label: optNo },
+  ];
 
   // Parse URL params for auto-fill
   const autoFill = useMemo(() => {
@@ -228,12 +247,12 @@ function RSVPPageInner() {
     const attendingNames = attending.map((g) => g.name.trim().split(' ')[0]).filter(Boolean);
 
     // Build personalized message based on result
-    let title = 'Thank you';
+    let title = resultThankYou;
     let icon = 'favorite';
     let message = '';
 
     if (result === 'all-declined') {
-      title = 'We\'ll Miss You';
+      title = resultDeclined;
       icon = 'mail';
       if (totalCount === 1) {
         message = rsvpDeclined
@@ -300,9 +319,9 @@ function RSVPPageInner() {
       {step === 0 && (
         <section className="staggered-fade-in" style={{ animationDelay: '0s', opacity: 1 }}>
           <div className="text-center mb-8">
-            <p className="font-semibold text-[15px] tracking-wide">Enter your name to RSVP</p>
+            <p className="font-semibold text-[15px] tracking-wide">{step0Title}</p>
             <p className="text-[13px] text-charcoal-ink/60 italic mt-2">
-              You can respond for more guests in the following steps.
+              {step0Subtext}
             </p>
           </div>
           <div className="space-y-6">
@@ -346,7 +365,7 @@ function RSVPPageInner() {
       {step === 1 && (
         <section className="staggered-fade-in" style={{ animationDelay: '0s', opacity: 1 }}>
           <div className="text-center mb-8">
-            <p className="font-semibold text-[15px] tracking-wide">How many people are in your party?</p>
+            <p className="font-semibold text-[15px] tracking-wide">{step1Title}</p>
           </div>
           <div className="flex items-center justify-center gap-3 mb-4">
             <button
@@ -389,9 +408,9 @@ function RSVPPageInner() {
       {step === 2 && (
         <section className="staggered-fade-in" style={{ animationDelay: '0s', opacity: 1 }}>
           <div className="text-center mb-8">
-            <p className="font-semibold text-[15px] tracking-wide">Confirm each guest and their dietary needs.</p>
+            <p className="font-semibold text-[15px] tracking-wide">{step2Title}</p>
             <p className="text-[13px] text-charcoal-ink/50 mt-1">
-              Dietary selections are optional.
+              {step2Subtext}
             </p>
           </div>
 
@@ -478,7 +497,7 @@ function RSVPPageInner() {
           {/* Attendance question */}
           <div>
             <p className="text-[14px] mb-4">
-              Will you be able to join us for our Wedding Solemnisation?<span className="text-cinematic-gold">*</span>
+              {`Will you be able to join us for our ${ceremonyName}?`}<span className="text-cinematic-gold">*</span>
             </p>
             <div className="space-y-3">
               {ATTENDANCE_OPTIONS.map((opt) => (

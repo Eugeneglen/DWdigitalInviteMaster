@@ -580,8 +580,31 @@ export default function CoupleStory() {
             </Button>
           </div>
 
-          {/* Honeymoon Title & Subtitle */}
+          {/* Honeymoon Eyebrow */}
+          <div className="space-y-1.5">
+            <Label>Honeymoon Eyebrow</Label>
+            <Input
+              value={contentFields['honeymoonEyebrow'] ?? ''}
+              onChange={(e) => handleContentChange('honeymoonEyebrow', e.target.value)}
+              placeholder="AFTER THE 'I DO'"
+              className="border-charcoal-ink/10 focus:border-cinematic-gold focus:ring-cinematic-gold/20"
+            />
+          </div>
+
+          {/* Honeymoon Eyebrow, Title & Subtitle */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2">
+                <Label className="text-xs font-medium text-charcoal-ink/50 uppercase tracking-wider">Eyebrow</Label>
+                {editedFields['honeymoonEyebrow'] && <span className="bg-cinematic-gold w-1.5 h-1.5 rounded-full" />}
+              </div>
+              <Input
+                value={contentFields['honeymoonEyebrow'] ?? ''}
+                onChange={(e) => handleContentChange('honeymoonEyebrow', e.target.value)}
+                placeholder="AFTER THE 'I DO'"
+                className="border-charcoal-ink/10 focus:border-cinematic-gold focus:ring-cinematic-gold/20"
+              />
+            </div>
             <div className="space-y-1.5">
               <div className="flex items-center gap-2">
                 <Label className="text-xs font-medium text-charcoal-ink/50 uppercase tracking-wider">Title</Label>

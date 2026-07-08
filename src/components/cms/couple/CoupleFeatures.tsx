@@ -1,12 +1,13 @@
 'use client';
 
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { Loader2, Timer, CalendarClock, Mail, BookOpen, Image, Heart, MapPin, HelpCircle, Sparkles, Music2, Save } from 'lucide-react';
+import { Loader2, Timer, CalendarClock, Mail, BookOpen, Image, Heart, MapPin, HelpCircle, Sparkles, Video, Music2, Save } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { invalidateWeddingCache } from '@/hooks/usePublicWedding';
@@ -75,6 +76,12 @@ const FEATURE_REGISTRY: Record<string, FeatureConfig> = {
     description: 'Share special moments captured on your journey',
     icon: Sparkles,
   },
+  video: {
+    featureKey: 'video',
+    displayName: 'Wedding Video',
+    description: 'Embed a wedding video on your page',
+    icon: Video,
+  },
   music: {
     featureKey: 'music',
     displayName: 'Background Music',
@@ -93,6 +100,7 @@ const FEATURE_ORDER = [
   'getting-there',
   'qa',
   'moments',
+  'video',
   'music',
 ];
 
@@ -127,6 +135,33 @@ function parseMusicConfig(config: string | null | undefined): MusicConfig {
   }
 }
 
+interface VideoConfig {
+  url: string;
+  title: string;
+  caption: string;
+  autoplay: boolean;
+  muted: boolean;
+  showControls: boolean;
+}
+
+const DEFAULT_VIDEO_CONFIG: VideoConfig = {
+  url: '',
+  title: '',
+  caption: '',
+  autoplay: false,
+  muted: true,
+  showControls: true,
+};
+
+function parseVideoConfig(config: string | null | undefined): VideoConfig {
+  if (!config) return { ...DEFAULT_VIDEO_CONFIG };
+  try {
+    return { ...DEFAULT_VIDEO_CONFIG, ...JSON.parse(config) };
+  } catch {
+    return { ...DEFAULT_VIDEO_CONFIG };
+  }
+}
+
 
 
 export default function CoupleFeatures() {
@@ -138,6 +173,10 @@ export default function CoupleFeatures() {
   // Music config local state
   const [musicConfig, setMusicConfig] = useState<MusicConfig>(DEFAULT_MUSIC_CONFIG);
   const [savingMusic, setSavingMusic] = useState(false);
+
+  // Video config local state
+  const [videoConfig, setVideoConfig] = useState<VideoConfig>(DEFAULT_VIDEO_CONFIG);
+  const [savingVideo, setSavingVideo] = useState(false);
 
 
 
@@ -152,6 +191,9 @@ export default function CoupleFeatures() {
       // Load music config from features
       const musicFeature = rawFeatures.find((f) => f.featureKey === 'music');
       setMusicConfig(parseMusicConfig(musicFeature?.config));
+
+      const videoFeature = rawFeatures.find((f) => f.featureKey === 'video');
+      setVideoConfig(parseVideoConfig(videoFeature?.config));
 
     } catch {
       toast({ title: 'Error', description: 'Failed to load features', variant: 'destructive' });
@@ -253,6 +295,35 @@ export default function CoupleFeatures() {
       toast({ title: 'Error', description: 'Failed to save music settings', variant: 'destructive' });
     } finally {
       setSavingMusic(false);
+    }
+  };
+
+  const handleSaveVideoConfig = async () => {
+    setSavingVideo(true);
+    try {
+      const currentVideoFeature = features.find((f) => f.featureKey === 'video');
+      if (!currentVideoFeature) return;
+
+      const updatedFeatures = features.map((f) =>
+        f.featureKey === 'video'
+          ? { ...f, config: JSON.stringify(videoConfig) }
+          : f
+      );
+
+      const res = await fetch(API_BASE, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ features: updatedFeatures }),
+      });
+
+      if (!res.ok) throw new Error('Failed to save video settings');
+      setFeatures(updatedFeatures);
+      invalidateWeddingCache();
+      toast({ title: 'Success', description: 'Video settings saved' });
+    } catch {
+      toast({ title: 'Error', description: 'Failed to save video settings', variant: 'destructive' });
+    } finally {
+      setSavingVideo(false);
     }
   };
 
@@ -393,6 +464,76 @@ export default function CoupleFeatures() {
                         <Save className="size-3 mr-1.5" />
                       )}
                       Save Music Settings
+                    </Button>
+                  </div>
+                )}
+
+                {/* Video inline settings */}
+                {key === 'video' && isEnabled && (
+                  <div className="mt-4 pt-4 border-t border-champagne-silk/60 space-y-3">
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-medium text-charcoal-ink/70">Video URL</Label>
+                      <Input
+                        type="url"
+                        placeholder="YouTube, Vimeo, or direct video URL"
+                        value={videoConfig.url}
+                        onChange={(e) => setVideoConfig((prev) => ({ ...prev, url: e.target.value }))}
+                        className="h-8 text-xs"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-medium text-charcoal-ink/70">Video Title</Label>
+                      <Input
+                        placeholder="Our Wedding Video"
+                        value={videoConfig.title}
+                        onChange={(e) => setVideoConfig((prev) => ({ ...prev, title: e.target.value }))}
+                        className="h-8 text-xs"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-medium text-charcoal-ink/70">Caption</Label>
+                      <Textarea
+                        placeholder="A short description..."
+                        value={videoConfig.caption}
+                        onChange={(e) => setVideoConfig((prev) => ({ ...prev, caption: e.target.value }))}
+                        className="h-16 text-xs resize-none"
+                      />
+                    </div>
+                    <div className="flex items-center gap-6">
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={videoConfig.autoplay}
+                          onCheckedChange={(checked) => setVideoConfig((prev) => ({ ...prev, autoplay: checked }))}
+                        />
+                        <Label className="text-xs text-charcoal-ink/60">Autoplay</Label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={videoConfig.muted}
+                          onCheckedChange={(checked) => setVideoConfig((prev) => ({ ...prev, muted: checked }))}
+                        />
+                        <Label className="text-xs text-charcoal-ink/60">Muted</Label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={videoConfig.showControls}
+                          onCheckedChange={(checked) => setVideoConfig((prev) => ({ ...prev, showControls: checked }))}
+                        />
+                        <Label className="text-xs text-charcoal-ink/60">Show Controls</Label>
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      onClick={handleSaveVideoConfig}
+                      disabled={savingVideo || !videoConfig.url}
+                      className="h-7 text-xs mt-1"
+                    >
+                      {savingVideo ? (
+                        <Loader2 className="size-3 animate-spin mr-1.5" />
+                      ) : (
+                        <Save className="size-3 mr-1.5" />
+                      )}
+                      Save Video Settings
                     </Button>
                   </div>
                 )}

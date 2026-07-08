@@ -116,6 +116,7 @@ export default function SchedulePage() {
   const fullDateText = formatFullDate(data?.wedding.weddingDate);
   const shortDateText = formatShortDate(data?.wedding.weddingDate);
   const sectionTitle = getField('schedule', 'title', 'The Schedule');
+  const timelineHeading = getField('schedule', 'subtitle', 'The Celebration');
   const venueName = data?.wedding.venue || FALLBACK_VENUE;
   const venueAddress = data?.wedding.venueAddress || FALLBACK_VENUE_ADDRESS;
   const coupleName = data?.wedding.coupleName || FALLBACK_COUPLE_NAME;
@@ -133,12 +134,22 @@ export default function SchedulePage() {
       action: 'TEMPLATE',
       text: `${coupleName} Wedding`,
       dates: calendarDates,
-      details: 'Join us for our wedding celebration!\n\n4:00 PM — The Ceremony\n5:30 PM — Cocktail Hour\n7:00 PM — Dinner & Dancing\n\nFormal attire requested.',
+      details: (() => {
+        const scheduleDetails = schedules
+          .filter((s) => s.startTime)
+          .sort((a, b) => new Date(a.startTime!).getTime() - new Date(b.startTime!).getTime())
+          .map((s) => {
+            const time = formatTime(s.startTime);
+            return `${time} — ${s.title}`;
+          })
+          .join('\n');
+        return `Join us for our wedding celebration!\n\n${scheduleDetails}\n\n${venueName}\n${venueAddress}`;
+      })() as string,
       location: venueName,
       sprop: `name:${coupleName}`,
     });
     window.open(`https://calendar.google.com/calendar/render?${params.toString()}`, '_blank', 'noopener');
-  }, [coupleName, venueName, data?.wedding.weddingDate]);
+  }, [coupleName, venueName, venueAddress, schedules, data?.wedding.weddingDate]);
 
   return (
     <>
@@ -174,7 +185,7 @@ export default function SchedulePage() {
           <div className="mb-24 stagger-3">
             {/* Sticky heading */}
             <div className="sticky top-24 md:top-40 bg-paper-cream/90 backdrop-blur-sm z-30 py-4 mb-12 border-b border-champagne-silk/30 flex items-baseline gap-4">
-              <h2 className="font-display-hero text-headline-md leading-headline-md font-medium md:text-headline-lg md:leading-headline-lg md:font-semibold text-charcoal-ink">The Celebration</h2>
+              <h2 className="font-display-hero text-headline-md leading-headline-md font-medium md:text-headline-lg md:leading-headline-lg md:font-semibold text-charcoal-ink">{timelineHeading}</h2>
               <span className="font-utility-mono text-utility-mono leading-utility-mono font-medium text-charcoal-ink/60 italic tracking-wider uppercase">{shortDateText}</span>
             </div>
 

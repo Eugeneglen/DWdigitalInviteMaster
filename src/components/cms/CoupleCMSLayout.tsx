@@ -22,6 +22,7 @@ import {
   ImageIcon,
   MapPin,
   Camera,
+  FileText,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { NotificationBell } from '@/components/cms/NotificationBell';
@@ -33,6 +34,7 @@ import { useAuthModalStore } from '@/store/useAuthModalStore';
 const NAV_ITEMS: { key: CoupleCMSPage; label: string; icon: React.ElementType }[] = [
   { key: 'overview', label: 'Overview', icon: Home },
   { key: 'details', label: 'Your Details', icon: Heart },
+  { key: 'content', label: 'Content', icon: FileText },
   { key: 'home', label: 'Home', icon: ImageIcon },
   { key: 'schedule', label: 'Schedule', icon: Calendar },
   { key: 'rsvps', label: 'RSVPs', icon: Mail },

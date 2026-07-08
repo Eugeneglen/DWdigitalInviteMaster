@@ -82,6 +82,8 @@ export default function StoryPage() {
 
   const subtitle = getField('story', 'subtitle', FALLBACK_SUBTITLE);
   const stories = (data?.stories && data.stories.length > 0) ? data.stories : FALLBACK_STORIES;
+  const storyImages = data?.mediaByCategory?.story ?? [];
+  const heroImg = storyImages[0]?.url || HERO_IMG;
 
   // Tidbits — read from CMS content, fallback to defaults
   const tidbits = safeParseJSON<Tidbit[]>(getField('story', 'tidbits', ''), FALLBACK_TIDBITS);
@@ -147,7 +149,7 @@ export default function StoryPage() {
             {subtitle}
           </p>
           <div className="w-full max-w-4xl aspect-[16/9] inner-frame bg-surface-container-high overflow-hidden shadow-[0_20px_40px_rgba(26,26,26,0.08)]">
-            <img alt="Our Story Hero" className="w-full h-full object-cover object-center" src={HERO_IMG} />
+            <img alt="Our Story Hero" className="w-full h-full object-cover object-center" src={heroImg} />
           </div>
         </section>
 

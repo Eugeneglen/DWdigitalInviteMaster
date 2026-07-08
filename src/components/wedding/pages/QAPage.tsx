@@ -4,33 +4,6 @@ import { useState } from 'react';
 import SectionBanner from '../SectionBanner';
 import { usePublicWedding } from '@/hooks/usePublicWedding';
 
-const FALLBACK_FAQS = [
-  {
-    id: 'fallback-1',
-    question: 'What is the dress code for the evening reception?',
-    answer: 'The evening calls for Black Tie Optional. We encourage our guests to embrace the elegance of the venue. For gentlemen, a dark suit or tuxedo is appropriate. For ladies, floor-length gowns or sophisticated cocktail attire is preferred.',
-    sortOrder: 0,
-  },
-  {
-    id: 'fallback-2',
-    question: 'Is transportation provided to the venue?',
-    answer: 'Yes. For guests staying at our recommended hotels, dedicated luxury shuttles will depart from the main lobbies at exactly 4:15 PM on Saturday. Return transport will run every thirty minutes from 11:00 PM onwards.',
-    sortOrder: 1,
-  },
-  {
-    id: 'fallback-3',
-    question: 'Are children invited to the celebration?',
-    answer: "While we adore the little ones in our lives, our wedding weekend will be an adult-only affair (18+), allowing everyone to relax and fully immerse themselves in the evening's festivities.",
-    sortOrder: 2,
-  },
-  {
-    id: 'fallback-4',
-    question: 'How should I inform you of dietary requirements?',
-    answer: 'Our culinary team is prepared to accommodate all medical and ethical dietary restrictions. You will be prompted to detail any specific allergies or preferences when completing the formal RSVP process.',
-    sortOrder: 3,
-  },
-];
-
 export default function QAPage() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const { data, getField } = usePublicWedding();
@@ -38,8 +11,12 @@ export default function QAPage() {
   const sectionTitle = getField('qa', 'title', 'Frequently Asked');
   const sectionSubtitle = getField('qa', 'subtitle', 'Everything you need to know for our celebration.');
   const contactPrompt = getField('qa', 'contactPrompt', 'Still have questions? Message the couple');
+  const contactEmail = getField('qa', 'contactEmail', 'concierge@dreamweavers.events');
+  const ctaDescription = getField('qa', 'ctaDescription', 'Our concierge is standing by to assist with any questions about the event, travel, accommodations, or special arrangements.');
+  const ctaButtonLabel = getField('qa', 'ctaButtonLabel', 'Message the Couple');
+  const ctaEyebrow = getField('qa', 'ctaEyebrow', 'NEED MORE HELP?');
 
-  const faqs = (data?.faqs && data.faqs.length > 0) ? data.faqs : FALLBACK_FAQS;
+  const faqs = data?.faqs ?? [];
 
   const toggle = (idx: number) => {
     setOpenIndex(openIndex === idx ? null : idx);
@@ -103,13 +80,19 @@ export default function QAPage() {
           </div>
         </section>
 
+        {faqs.length === 0 && (
+          <section className="max-w-[800px] mx-auto mb-section-gap text-center py-12">
+            <p className="text-charcoal-ink/30 italic">No questions have been added yet.</p>
+          </section>
+        )}
+
         {/* CTA */}
         <section className="animate-orchestral delay-400 max-w-2xl mx-auto bg-paper-cream/40 py-16 px-8 text-center">
           <p
             className="text-cinematic-gold uppercase tracking-[0.2em] mb-3"
             style={{ fontSize: '12px', lineHeight: '16px', letterSpacing: '0.1em', fontWeight: 600 }}
           >
-            NEED MORE HELP?
+            {ctaEyebrow}
           </p>
           <h2
             className="text-charcoal-ink italic mb-4"
@@ -118,14 +101,14 @@ export default function QAPage() {
             {contactPrompt}
           </h2>
           <p className="text-charcoal-ink/60 mb-10 max-w-md mx-auto" style={{ fontSize: '16px', lineHeight: '24px' }}>
-            Our concierge is standing by to assist with any questions about the event, travel, accommodations, or special arrangements.
+            {ctaDescription}
           </p>
           <a
-            href="mailto:concierge@dreamweavers.events?subject=Wedding%20Inquiry"
+            href={`mailto:${contactEmail}?subject=Wedding%20Inquiry`}
             className="bg-charcoal-ink text-paper-cream rounded px-8 py-3.5 text-[13px] font-semibold uppercase tracking-[0.08em] hover:opacity-90 transition-opacity duration-300 inline-flex items-center gap-2.5 no-underline"
           >
             <span className="material-symbols-outlined text-paper-cream" style={{ fontSize: '18px' }}>mail</span>
-            Message the Couple
+            {ctaButtonLabel}
           </a>
         </section>
       </main>
