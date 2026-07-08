@@ -1394,3 +1394,21 @@ Stage Summary:
 - Guest view reads from database, falls back to original hardcoded defaults if no data saved
 - Also removed "The Fullerton Hotel, Orchard" subtitle from Getting There section banner
 
+---
+Task ID: 6
+Agent: main
+Task: Pre-Flight Checklist — ErrorBoundary hardening + PostgreSQL provider switch
+
+Work Log:
+- Read current ErrorBoundary.tsx — identified critical flaw: line 53-56 rendered `error.message` to DOM
+- Read current prisma/schema.prisma — confirmed SQLite provider
+- Read global-error.tsx — confirmed it was already clean (no leak)
+- Verified all field types are PostgreSQL-compatible (String, Int, Boolean, DateTime)
+- Wrote production-hardened ErrorBoundary.tsx with: crypto-based correlation ID, no error details in DOM, optional onError callback for Sentry, dual action buttons
+- Updated prisma/schema.prisma provider from "sqlite" to "postgresql"
+- Committed and pushed to CMS-Phase-1
+
+Stage Summary:
+- ErrorBoundary no longer leaks error.message — shows correlation ID instead
+- Prisma schema now targets postgresql provider
+- Commit ab1100d pushed to https://github.com/Eugeneglen/DWdigitalInvite/tree/CMS-Phase-1
