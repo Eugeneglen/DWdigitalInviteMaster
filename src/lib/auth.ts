@@ -77,11 +77,15 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        // Update last login
-        await db.user.update({
-          where: { id: user.id },
-          data: { lastLoginAt: new Date() },
-        });
+        // Update last login (non-critical — don't block login on write failure)
+        try {
+          await db.user.update({
+            where: { id: user.id },
+            data: { lastLoginAt: new Date() },
+          });
+        } catch {
+          // Ignore — DB may be read-only in some environments
+        }
 
         return {
           id: user.id,

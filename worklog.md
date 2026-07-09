@@ -1818,3 +1818,25 @@ Stage Summary:
 - Sandbox workaround is local-only: postcss.config.mjs and layout.tsx are patched at runtime, tailwind-output.css is gitignored
 - Dev server running on port 3000, serving 200s
 - To regenerate sandbox CSS after adding new Tailwind classes: `NODE_OPTIONS="--max-old-space-size=768" bunx @tailwindcss/cli -i src/app/globals.css -o src/app/tailwind-output.css --minify`
+
+---
+Task ID: 1
+Agent: Main Agent
+Task: Fix CMS login authentication failure for both couple and admin portals
+
+Work Log:
+- Investigated database state: db/custom.db exists (172KB) with both users present
+- Verified bcrypt hashes are correct for both accounts via standalone script
+- Added temporary debug logging to NextAuth authorize function
+- Discovered root cause: `db.user.update()` for `lastLoginAt` throws SQLite error 1032 ("attempt to write a readonly database") because db file had 644 permissions
+- The uncaught exception propagated through NextAuth's authorize function, returning null (treated as invalid credentials)
+- Fixed database file permissions: chmod 666 db/custom.db
+- Wrapped `lastLoginAt` update in try-catch in both auth.ts (NextAuth authorize) and /api/auth/login/route.ts (custom login endpoint) so write failures don't block authentication
+- Removed all debug logging
+- Verified both logins via curl: both return 302 → / (success)
+
+Stage Summary:
+- Root cause: SQLite readonly error on non-critical lastLoginAt update was crashing the entire login flow
+- Files changed: src/lib/auth.ts (line 80-88), src/app/api/auth/login/route.ts (line 28-36)
+- Both admin (admin@dreamweavers.sg / Admin@2024) and couple (eleanor@wedding.com / Couple@2024) logins verified working
+- Note: Sandbox OOM (4GB limit) causes Turbopack auth compilation to spike to 2.5GB and get killed when browser is open simultaneously — this is a sandbox constraint, not a code issue

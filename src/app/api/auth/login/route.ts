@@ -25,11 +25,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
     }
 
-    // Update last login
-    await db.user.update({
-      where: { id: user.id },
-      data: { lastLoginAt: new Date() },
-    });
+    // Update last login (non-critical — don't block login on write failure)
+    try {
+      await db.user.update({
+        where: { id: user.id },
+        data: { lastLoginAt: new Date() },
+      });
+    } catch {
+      // Ignore — DB may be read-only in some environments
+    }
 
     // Create a NextAuth-compatible JWT using its own encode function
     const token = await encode({
