@@ -1739,3 +1739,30 @@ Stage Summary:
 - Each section shows "Edit in [Tab Name]" button for quick navigation
 - Empty states provide clear guidance on where to upload
 - Named exports HeroVisualSection and BannerSection preserved for CoupleHome.tsx
+
+---
+Task ID: images-tab-show-live-frontend
+Agent: Main Agent
+Task: Make Images tab show all actual images from the frontend (including fallbacks and per-item images)
+
+Work Log:
+- Audited all 6 guest-facing pages (Home, Schedule, Story, Moments, Getting There, Wishes) for every image source
+- Found 23 image instances across the frontend from 6 data source types
+- Discovered the key gap: frontend uses fallback images when nothing is uploaded, but Images tab showed "No image set" instead
+- Identified missing image categories: story chapter images (StoryItem.imageUrl), wish card images (Wish.imageUrl), moments fallback photos (7)
+- Rewrote Images tab to fetch from the SAME public API the frontend uses (`/api/wedding/public`)
+- Applied identical fallback logic as each frontend page component
+- Organized by page (Home, Schedule, Story, Moments, Wishes) to match guest experience
+- Added Custom/Default badge system to clearly indicate uploaded vs placeholder images
+- Added "6 pages" badge on banner to show it appears on 6 different pages
+- Added page-level section headers (Home Page, Schedule Page, Story Page, Moments Page, Wishes Page)
+- Wishes section only renders when guest-submitted wish images exist
+- Verified via agent-browser: 14 images display correctly across 5 pages, all badges correct, preview dialog works
+- Hero: Custom, Banner: Custom + 6 pages, Tea Ceremony: Default, Ceremony: Default, Celebration: Default, Venue: Default, Story Hero: Default, 7 Moments: Default
+
+Stage Summary:
+- Images tab now mirrors exactly what the guest sees on the live frontend
+- Every image shows with Custom (gold) or Default (outline) badge
+- Page-centric organization matches guest navigation flow
+- Story chapter images and wish images dynamically appear when present
+- Total image count in header updates based on what's actually rendered

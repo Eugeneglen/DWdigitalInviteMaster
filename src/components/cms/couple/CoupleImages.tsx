@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { Loader2, Upload, Video, X, ImageIcon, MapPin, BookOpen, Calendar, Camera, Sparkles, Eye, ArrowUpRight, ImageOff } from 'lucide-react';
+import { Loader2, Upload, Video, X, ImageIcon, MapPin, BookOpen, Calendar, Camera, Sparkles, Eye, ArrowUpRight, ImageOff, Heart, MessageCircle, Home, Clock, Users } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -15,29 +15,48 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useCoupleCMSStore } from '@/store/useCoupleCMSStore';
-import { invalidateWeddingCache } from '@/hooks/usePublicWedding';
+import { invalidateWeddingCache, type PublicWeddingData } from '@/hooks/usePublicWedding';
 
 const WEDDING_API = '/api/cms/wedding?XTransformPort=3000';
-const CONTENT_API = '/api/cms/content?XTransformPort=3000';
-const MEDIA_API = '/api/cms/media?XTransformPort=3000';
+const PUBLIC_API = '/api/wedding/public?XTransformPort=3000';
 
-interface ContentItem {
-  id: string;
-  section: string;
-  fieldKey: string;
-  fieldValue: string;
-  fieldType: string;
-}
+/* ─── Fallback image constants (mirrors the frontend exactly) ────────── */
 
-interface MediaItem {
-  id: string;
-  url: string;
-  fileName: string;
-  fileType: string;
-  fileSize: number | null;
-  category: string;
-  sortOrder: number;
-}
+const FALLBACK_HERO_IMG =
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuBeAe38AA5-0h4B5MmgQCqv54oQXyPMGznDKaw2sJI_FnTbB_yXXWOpirFlFycj_2VI02IVLouUTt86Y1J7Ls-bRsMOHPAcfSqruVoh87sfhw3vi2Z6t1C7ogCLtkvF6QbJkwuV0av8pXTrUeAAi6ymnZpvyOr8qVjTNNorAOmqRrW_fohX_xlkscmBh39K4Wtvs6TH0Nvb_X3LQQRD9W_sySN_iWbWw9O0au8u1jO-hSekE9pSGNo5zsTz3o9PWy5xbzc6lq3knkIy';
+
+const FALLBACK_BANNER_BG =
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuA-OyKfcsxXAmZDArHbDXl1cVCgGUG5liFPzyHdVvMG6_4jN9pNTrN9GCrkdnegli9UPJUSPs39KJRsRP7AiLem4xYS-q1ZYq1T3DAIqyvn3wAvbdkoMVkufft0SpQw4gDTPSnIml6k62lRYobUrNu70UGIILiMZQ0fAydTXXwVZ1oswQZ-mjPT8H9mDDqfhxsMSI5zla8GKz_ILXbmdRjtRUk682dPEDBD6I81DzEx7dITgjb6vxQoee5599jkYf_vCYP7npydvxqx';
+
+const FALLBACK_TEA_IMG =
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuA6SiJt49KQCmMAhF-X_tmX1Y1NKhTieT6ApO53PD9gYuvLO0e78WTxzg8BV7Wnhe6oJ6sG4SwJ4U-nH2m33dv7I89IhLgrHDkabts7ws-QwPlv-ycUzhyuBN0c04ka2inAyysumlM1w-sR8stBZ51HJOGZkQO6cAtfrn9RXWZRFlHJlUp8Jqzi-nBu3xGs57xm7L2Le06Put3xBDMAe39zkMMsdcuUkbeyw5c4Q6VxvXkSmMbcpLM-HJK1iMgYVLkn2kzqUPEALYpH';
+
+const CEREMONY_IMG =
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuAsLNSEjy771owdkkDbKTl1nE5oEzBQFVHob_HKiQb9eJb1X7I79-CxGjCPeKwCSHhwswJRqSrt3ox_aktMQUGlyzg6Eoo5R0aH6CYxxKj5f3uZCWdaDfZEIqmxwZd5DgdvCUWZfIdnNvixcYvcspOOFnGM2ThX9BPZz-ftetacA-b6CkxEEp9BdSatnTG55-e8tZz1jlG1euZgtw17iI67tcMGtR2azzCg8GvNH-xQPfUJlAXxGC3jU9Q7dbVZPK-xnHwtTl5eRNknueI';
+
+const CELEBRATION_IMG =
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuC01POr_eFI2RUG86kAb7dHs-q12Kj6HzxEoXpnzTnJ9n_VB9_BJL6Iy8vtGixOWTn1jVNZKDjXNQkHSy9Gsa8KI5IomZe3968VCNWHhXNZ44gbgs5LCBp4_Axjbj72RJwN0BWAIEmrqH8lgR-_j2_9Ci79wI4t583OCS4YuDca-s2xldrzBhBM-KeS4GFVFDSQdzWRY-4chmwkFfFgO3g-S4VS_jae416SCd-357i_ix3m68zwnHtpBSxyXFSjZISZ_Z66Jlxj6Npv_Lo';
+
+const FALLBACK_VENUE_IMAGE = 'https://sfile.chatglm.cn/images-ppt/4adf4afbb9a2.jpg';
+
+const STORY_HERO_IMG =
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuBZxkwieg-SjxgRYOZxJlQ1v05okmlTqzvosp-ANHaaCSQStncGv3ORTlPiE-uSYP7mQcE_wcB5Povhsm25x-eThbTLAYPt1XD-14RTSL9R5a1etGsU54CUWIwAK_4ckHoB-gD85mc-uqQwOckXVYmn0J7u0r6WkNQ2eFKKTBWBJ8yU_nirHHy8GC7vKRVnGPL6P_TymHuuKnjM3ERN9Zvho_5v7pICElncd6F8dHF-lVKppvz4kKyQe9je7CIDwOSBlcyxaGU6yY-D';
+
+const FALLBACK_PHOTOS = [
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuAm-8WDgkq_3PeNjdM4_SPcbdyPc4j1BN1NYWpstlUalLgRDkOi-VrJG2ZcdDt04YwBhlSegxOEQ4dbw-6zr2xKHQeTO5gJe67RlcYJ2IkUn3Dp8ZbTzfL8aD2Tq8rbse4QsZBGuz1fOPmW42rjorV-F8aY14aRHg_wk_TAMAaeqaBllL8Qpx_POk9EP9b5wjS_YXtMBnKH7-nGAPwIbuNCwetnkUm6A1gonIw4KTEsPRqq2sW_1A3jAX6wnSIeZTPdzM3VYkva56VG',
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuAaySYsDYGyX6N9CoV24yS9bjuLYqQWIJwG8qS2qCMj2do69ncL22s286MrboC8HGtgl1tP6_JTj85seIO4TolelvHDIqTInWBTwFyuk_MJZN0a5w6P0QX4AQUVLx2oCOPDelyGCdOmRviKG1bD4nqPr3zkgUKWgXNmnGP5a0b4U2k-nDG2Hl_lDM2moRehiYXKnwB872KgPkaI7Br6uq1DHIKKb34AY9ybXoB9pT-x3W5PKHguLL3DaI6VsnfHWT18OAeoVAgwQsvH',
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuCSIFjFy2YecMgyEcWPUwcxc0x0aeave6t83lRrx9I562NRYIPDn8I7lAYE1hLalBtCsq22XBSUM5UIQ9O7SG4LZbJXDpn7Y8iUaVW7FNVdfMuTbn2uGLOQCl3MV6EgnxcpYOsswCptEyKegR8_YCSeNk438RKjHVC3xs4HkIvlq5kEe3f5OTdP36lsirovgw_07Ry4YwVm06xv8uZ5GmhrX-oU02i7OASDM7Gdr1UkxL2NiOdyce7PSAl_0UW-xZMxl1DFIStbWdaU',
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuC8RAoFnH7L9tFmSjN3sfNRhKNcQZhi5ysusn41rPRCnxgkRdC7gmZSPZ0XoULR83j3q0uqgavwoBitCxAoF2KF-DzsGg34B0pCMslmkusZodhIipUFKpkQj-cr4FRMLcyDdy5SzxPsOAi7OKQa4uioJSi0KhKwePpXNmReV2WzTMoSRUP-wqNUrofcUas0L_WwXeNwan3c9CMIkxBHHWhkKwYOKyjXd51ixRMzL_X37bZqgP1DUhrpEUz27iNPB8XgvhtSDOiH4Pd2',
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuAo_iwupchnJHvXMl5E17TFsoHJ23KgUb5kI8vnFt1NyIODCLIK9tSJ-5NmvdWcdS21fueeNi-8HX5FPWZ-rXZPyru8V-DUKsc_aEK6yGqTQyOAJubhxaZWj_07HSUyF0yvxVn5G5WmJtNxLq9EZh0X8EJ5Q_4ZMQ7HMh_FQqAIW6OofZZw4zhAhwyIOyrlVwaURh_XvFES7-3dVvxz2sJ0iTNmt9VV0roh3t83hM1Vam0FV-9y9b3d4c46RZVcBv84AwjC1tew60c7',
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuA6yfZZlKuOgc7f9BoIGCAh3JLsOmPBPPzDUbciYvBGuEIyibR3sGWAMVAKm1otVVQWGI5yGzzdXPiiZbtmXiSvQY5Mk_ZQI-pJjKHbsc3qcwpp3mK6LwLmHQQyCZYIp1ELY6UEftahE-61i-LgWdRzahJMkrnhPI9bwahxFIRLxhjIoG9HE-FPNqZI_2KBnRoblo5SKLkW6SreAOLXOETB3qeo3ymZ6wtPqOZTBpRsIId11CRKbr1xaKqF1sqRtv0N5vQHlAWhlHqA',
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuCXe37633UXErQ8VKr_s7lNWN-MZNVGtupB_D1WmBY3PqnOFWIYr8BqlsYPPX-k-mJA8AbmrOauWIohhltVLnmMvLgbkjNALuIFpdEGRiKe3wDFCRt21tZvTIc3SMgCtoDnEBZOx7_HGu5RSa3uuFbCugmJpXpDg-QE9vxZG9QXDgqETu3c1_QmYtU8K41OyOTkwqFdFlYxdRj_WCCBTKgLSI4NchqgRYqQv4_xZQICoqEfBOB1aMyFqVS4OSA6-X7VuOvui4qjJnc_',
+];
+
+const FALLBACK_STORY_IMAGES = [
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuAQPSczTWgJLZS_vzNbN6wuPsTVw72YpOY0ldIaXb2nEM0DjbAoH__IyOfEvlXkIvif3k6TiVwdgbsAPvCUuustCXJ5ogM8o9Mf8qfnHNM052duEcCK8KPbJVfqn8sOuo9cpUPx6XWqHpBxvEfinvKzqiiI7zy3XkVYQ7w0ElfPw1kVlE-oTiwbdti2a6Q3pUBuogYx0KyKtviULD2olRj3ZTd29I37Yi80hUtQtS9LWTuKEtFJvAKUdLp2wmjdEM8om4Ku67LEDI4t',
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuBzzvAxvGICtmDJ5Ase_8SKR0gvAAqXe_96pLSdSUEjYyVgenag3qekxDbjpLG_SXknWJEoOXPP_XcdU4WMSloZvzj9Pn-dxdG0BBlp0lglCSzzoxLL3-2CaKrawuVRqBglPiiimHDNTlMHai2pnrr404Xg8EgQq8tdW5qRhs-bx2k6N52M80DDUW27KtR0Nc4-WkNjwCsNX8XuiyHBZTqdhpBqml323YRMNj-0offH-_Sn3jp1yxw-EAZs939pzoyGzEfpRwsteoXv',
+];
+
 
 /** ─── Hero Visual Section (image OR video) — used by CoupleHome ──────────── */
 
@@ -85,7 +104,6 @@ export function HeroVisualSection({ weddingData }: { weddingData: Record<string,
 
       if (!res.ok) throw new Error('Failed to upload');
 
-      // Refresh wedding data
       const weddingRes = await fetch(WEDDING_API);
       if (weddingRes.ok) {
         const data = await weddingRes.json();
@@ -210,7 +228,6 @@ export function HeroVisualSection({ weddingData }: { weddingData: Record<string,
         </CardContent>
       </Card>
 
-      {/* Preview Dialog */}
       <Dialog open={!!previewUrl} onOpenChange={() => setPreviewUrl(null)}>
         <DialogContent className="sm:max-w-3xl p-2">
           <DialogHeader>
@@ -372,7 +389,6 @@ export function BannerSection({ weddingData }: { weddingData: Record<string, unk
         </CardContent>
       </Card>
 
-      {/* Preview Dialog */}
       <Dialog open={!!previewUrl} onOpenChange={() => setPreviewUrl(null)}>
         <DialogContent className="sm:max-w-3xl p-2">
           <DialogHeader>
@@ -385,20 +401,26 @@ export function BannerSection({ weddingData }: { weddingData: Record<string, unk
   );
 }
 
-/** ─── View-only single image card ──────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════
+   View-Only Gallery — mirrors exactly what the guest frontend renders
+   ═══════════════════════════════════════════════════════════════════════ */
 
-function ReadOnlyImage({
+/** ─── Shared view-only image card ──────────────────────────────────────── */
+
+function LiveImage({
   src,
   alt,
-  aspectClass,
-  onPreview,
+  isCustom,
+  aspectClass = 'aspect-video',
   badge,
+  onPreview,
 }: {
   src: string;
   alt: string;
-  aspectClass: string;
-  onPreview: () => void;
+  isCustom: boolean;
+  aspectClass?: string;
   badge?: string;
+  onPreview: () => void;
 }) {
   return (
     <Card className="border-charcoal-ink/5 shadow-none overflow-hidden group hover:border-champagne-silk transition-colors duration-200">
@@ -406,31 +428,35 @@ function ReadOnlyImage({
         className={`relative ${aspectClass} bg-charcoal-ink/5 cursor-pointer`}
         onClick={onPreview}
       >
-        <img
-          src={src}
-          alt={alt}
-          className="w-full h-full object-cover"
-          loading="lazy"
-          unoptimized
-        />
+        <img src={src} alt={alt} className="w-full h-full object-cover" loading="lazy" unoptimized />
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200 flex items-center justify-center">
           <Eye className="size-5 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
         </div>
-        {badge && (
-          <div className="absolute top-2 left-2">
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/50 text-white text-[10px] font-medium">
+        {/* Top-left: custom/default badge */}
+        <div className="absolute top-2 left-2 flex items-center gap-1.5">
+          {isCustom ? (
+            <Badge className="bg-cinematic-gold/90 text-charcoal-ink text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 hover:bg-cinematic-gold/90">
+              Custom
+            </Badge>
+          ) : (
+            <Badge variant="outline" className="bg-white/80 text-charcoal-ink/50 text-[9px] font-medium uppercase tracking-wider px-1.5 py-0.5 border-charcoal-ink/15 hover:bg-white/80">
+              Default
+            </Badge>
+          )}
+          {badge && (
+            <Badge className="bg-black/50 text-white text-[9px] font-medium px-1.5 py-0.5 hover:bg-black/50">
               {badge}
-            </span>
-          </div>
-        )}
+            </Badge>
+          )}
+        </div>
       </div>
     </Card>
   );
 }
 
-/** ─── View-only section wrapper ────────────────────────────────────────── */
+/** ─── Page section wrapper ────────────────────────────────────────────── */
 
-function ImageSection({
+function PageSection({
   icon: Icon,
   label,
   description,
@@ -472,61 +498,26 @@ function ImageSection({
   );
 }
 
-/** ─── Empty state placeholder ──────────────────────────────────────────── */
-
-function EmptyState({ message }: { message: string }) {
-  return (
-    <div className="flex flex-col items-center justify-center py-8 gap-2 rounded-lg border border-dashed border-charcoal-ink/10 bg-charcoal-ink/[0.02]">
-      <ImageOff className="size-5 text-charcoal-ink/20" />
-      <p className="text-xs text-charcoal-ink/35 font-medium">{message}</p>
-    </div>
-  );
-}
-
-/** ─── Main Images Page (view-only gallery) ─────────────────────────────── */
+/** ─── Main Images Page ─────────────────────────────────────────────────── */
 
 export default function CoupleImages() {
-  const { weddingData, setPage } = useCoupleCMSStore();
-
-  // Data fetching states
-  const [content, setContent] = useState<ContentItem[]>([]);
-  const [scheduleMedia, setScheduleMedia] = useState<MediaItem[]>([]);
-  const [storyMedia, setStoryMedia] = useState<MediaItem[]>([]);
-  const [momentsMedia, setMomentsMedia] = useState<MediaItem[]>([]);
+  const { setPage } = useCoupleCMSStore();
+  const [data, setData] = useState<PublicWeddingData | null>(null);
   const [loading, setLoading] = useState(true);
-
-  // Preview dialog
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [previewTitle, setPreviewTitle] = useState<string>('');
 
+  // Fetch the same public data the frontend uses
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const [contentRes, scheduleRes, storyRes, momentsRes] = await Promise.all([
-        fetch(CONTENT_API),
-        fetch(`${MEDIA_API}&category=schedule`),
-        fetch(`${MEDIA_API}&category=story`),
-        fetch(`${MEDIA_API}&category=moments`),
-      ]);
-
-      if (contentRes.ok) {
-        const data = await contentRes.json();
-        setContent(data.content ?? []);
-      }
-      if (scheduleRes.ok) {
-        const data = await scheduleRes.json();
-        setScheduleMedia(data.media ?? []);
-      }
-      if (storyRes.ok) {
-        const data = await storyRes.json();
-        setStoryMedia(data.media ?? []);
-      }
-      if (momentsRes.ok) {
-        const data = await momentsRes.json();
-        setMomentsMedia(data.media ?? []);
+      const res = await fetch(PUBLIC_API);
+      if (res.ok) {
+        const json = await res.json();
+        setData(json);
       }
     } catch {
-      // Silent fail for view-only page
+      // Silent
     } finally {
       setLoading(false);
     }
@@ -536,25 +527,68 @@ export default function CoupleImages() {
     fetchData();
   }, [fetchData]);
 
-  // Extract values from content
-  const teaCeremonyImage = content.find((c) => c.section === 'hero' && c.fieldKey === 'teaCeremonyImage')?.fieldValue ?? '';
-  const venueImage = content.find((c) => c.section === 'getting-there' && c.fieldKey === 'venueImage')?.fieldValue ?? '';
+  // Helper: get content field (mirrors usePublicWedding.getField)
+  const getField = (section: string, fieldKey: string, fallback = ''): string => {
+    if (!data) return fallback;
+    return data.content[section]?.[fieldKey] ?? fallback;
+  };
 
-  // Extract from wedding data
-  const heroImgUrl = (weddingData as Record<string, string>)?.heroImageUrl || '';
-  const heroVideoUrl = (weddingData as Record<string, string>)?.heroVideoUrl || '';
-  const bannerUrl = (weddingData as Record<string, string>)?.bannerUrl || '';
+  // Media by category
+  const scheduleImages = data?.mediaByCategory?.schedule ?? [];
+  const storyImages = data?.mediaByCategory?.story ?? [];
+  const momentsMedia = data?.mediaByCategory?.moments ?? [];
 
-  // Count total images
-  const totalImages = [
-    heroImgUrl || heroVideoUrl ? 1 : 0,
-    bannerUrl ? 1 : 0,
-    teaCeremonyImage ? 1 : 0,
-    scheduleMedia.length,
-    storyMedia.length,
-    venueImage ? 1 : 0,
-    momentsMedia.length,
-  ].reduce((a, b) => a + b, 0);
+  // ── Compute what the guest actually sees (with fallbacks) ──
+
+  // Home Page
+  const heroImg = data?.wedding.heroImageUrl || FALLBACK_HERO_IMG;
+  const heroVideo = data?.wedding.heroVideoUrl || null;
+  const bannerImg = data?.wedding.bannerUrl || FALLBACK_BANNER_BG;
+  const teaCeremonyImg = getField('hero', 'teaCeremonyImage', FALLBACK_TEA_IMG);
+
+  // Schedule Page
+  const ceremonyImg = scheduleImages[0]?.url || CEREMONY_IMG;
+  const celebrationImg = scheduleImages[1]?.url || CELEBRATION_IMG;
+  const venueImg = getField('getting-there', 'venueImage', FALLBACK_VENUE_IMAGE);
+
+  // Story Page
+  const storyHeroImg = storyImages[0]?.url || STORY_HERO_IMG;
+  const stories = (data?.stories && data.stories.length > 0) ? data.stories : null;
+  const storyChapterImages = stories
+    ? stories.filter((s) => s.imageUrl).map((s) => ({ url: s.imageUrl!, title: s.title, isCustom: true }))
+    : FALLBACK_STORY_IMAGES.map((url, i) => ({ url, title: `Default Story ${i + 1}`, isCustom: false }));
+
+  // Moments Page
+  const momentsPhotos = (momentsMedia.length > 0)
+    ? momentsMedia.map((m) => ({ src: m.url, alt: m.fileName || 'Gallery Photo', isCustom: true }))
+    : FALLBACK_PHOTOS.map((src) => ({ src, alt: 'Default Gallery Photo', isCustom: false }));
+
+  // Wishes Page
+  const wishImages = (data?.wishes ?? []).filter((w) => w.imageUrl).map((w) => ({
+    url: w.imageUrl!,
+    name: w.name,
+  }));
+
+  // Custom flags (did the couple upload their own?)
+  const hasCustomHero = !!data?.wedding.heroImageUrl;
+  const hasCustomBanner = !!data?.wedding.bannerUrl;
+  const hasCustomTea = !!data?.content?.hero?.teaCeremonyImage;
+  const hasCustomCeremony = scheduleImages.length > 0 && !!scheduleImages[0]?.url;
+  const hasCustomCelebration = scheduleImages.length > 1 && !!scheduleImages[1]?.url;
+  const hasCustomVenue = !!data?.content?.['getting-there']?.venueImage;
+  const hasCustomStoryHero = storyImages.length > 0 && !!storyImages[0]?.url;
+  const hasCustomMoments = momentsMedia.length > 0;
+
+  // Total unique images the guest sees
+  const totalImages = 1 // hero (image or video)
+    + 1 // banner
+    + 1 // tea ceremony
+    + 2 // ceremony + celebration
+    + 1 // venue
+    + 1 // story hero
+    + storyChapterImages.length
+    + momentsPhotos.length
+    + wishImages.length;
 
   const openPreview = (url: string, title: string) => {
     setPreviewUrl(url);
@@ -567,10 +601,16 @@ export default function CoupleImages() {
       <div>
         <h2 className="text-xl font-semibold text-charcoal-ink">Images & Media</h2>
         <p className="text-sm text-charcoal-ink/50 mt-1">
-          View all images currently live on your invitation.{' '}
+          Live preview of all images your guests see.{' '}
           <span className="text-charcoal-ink/35">
-            {totalImages} image{totalImages !== 1 ? 's' : ''} across 7 sections.
+            {totalImages} image{totalImages !== 1 ? 's' : ''} across 5 pages.
           </span>
+        </p>
+        <p className="text-[11px] text-charcoal-ink/30 mt-0.5">
+          <Badge variant="outline" className="bg-cinematic-gold/10 text-cinematic-gold text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0 border-cinematic-gold/20 mr-1.5">Custom</Badge>
+          Your upload{' '}
+          <Badge variant="outline" className="bg-charcoal-ink/5 text-charcoal-ink/40 text-[9px] font-medium uppercase tracking-wider px-1.5 py-0 border-charcoal-ink/10 ml-3 mr-1.5">Default</Badge>
+          System placeholder shown to guests
         </p>
       </div>
 
@@ -579,185 +619,260 @@ export default function CoupleImages() {
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20 gap-4">
           <Loader2 className="size-8 animate-spin text-cinematic-gold" />
-          <p className="text-sm text-charcoal-ink/50 font-medium">Loading images…</p>
+          <p className="text-sm text-charcoal-ink/50 font-medium">Loading live images…</p>
         </div>
       ) : (
         <div className="space-y-8">
-          {/* ── 1. Hero Visual ───────────────────────────── */}
-          <ImageSection
-            icon={Sparkles}
-            label="Hero Visual"
-            description="Full-bleed hero image or video on the Home page"
-            editTab="Home"
-            onEditTab={() => setPage('home')}
-          >
-            {heroVideoUrl ? (
-              <div className="relative aspect-video rounded-lg overflow-hidden border border-charcoal-ink/10">
-                <video src={heroVideoUrl} className="w-full h-full object-cover" controls />
-                <div className="absolute bottom-2 left-2">
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/50 text-white text-[10px] font-medium">
-                    <Video className="size-3" /> Video
-                  </span>
+
+          {/* ═══ HOME PAGE ═══════════════════════════════════════════ */}
+          <div className="space-y-5">
+            <div className="flex items-center gap-2">
+              <Home className="size-4 text-charcoal-ink/40" />
+              <Label className="text-xs font-semibold text-charcoal-ink/50 uppercase tracking-wider">Home Page</Label>
+              <div className="flex-1 border-t border-charcoal-ink/10" />
+            </div>
+
+            {/* Hero */}
+            <PageSection
+              icon={Sparkles}
+              label="Hero Visual"
+              description="Full-bleed hero at the top of the home page"
+              editTab="Home"
+              onEditTab={() => setPage('home')}
+            >
+              {heroVideo ? (
+                <div className="relative aspect-video rounded-lg overflow-hidden border border-charcoal-ink/10">
+                  <video src={heroVideo} className="w-full h-full object-cover" controls />
+                  <div className="absolute bottom-2 left-2 flex items-center gap-1.5">
+                    <Badge className="bg-cinematic-gold/90 text-charcoal-ink text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 hover:bg-cinematic-gold/90">Custom</Badge>
+                    <Badge className="bg-black/50 text-white text-[9px] font-medium px-1.5 py-0.5 hover:bg-black/50"><Video className="size-2.5 mr-1 inline" />Video</Badge>
+                  </div>
                 </div>
-              </div>
-            ) : heroImgUrl ? (
-              <ReadOnlyImage
-                src={heroImgUrl}
-                alt="Hero image"
-                aspectClass="aspect-video"
-                onPreview={() => openPreview(heroImgUrl, 'Hero Image')}
-              />
-            ) : (
-              <EmptyState message="No hero image set — upload in Home tab" />
-            )}
-          </ImageSection>
+              ) : (
+                <LiveImage
+                  src={heroImg}
+                  alt="Hero image"
+                  isCustom={hasCustomHero}
+                  aspectClass="aspect-video"
+                  onPreview={() => openPreview(heroImg, 'Hero Image')}
+                />
+              )}
+            </PageSection>
 
-          <Separator className="bg-champagne-silk" />
-
-          {/* ── 2. Banner Design ────────────────────────── */}
-          <ImageSection
-            icon={ImageIcon}
-            label="Banner Design"
-            description="Top banner shown across all section pages"
-            editTab="Home"
-            onEditTab={() => setPage('home')}
-          >
-            {bannerUrl ? (
-              <ReadOnlyImage
-                src={bannerUrl}
-                alt="Banner image"
+            {/* Banner */}
+            <PageSection
+              icon={ImageIcon}
+              label="Banner"
+              description="Top banner — also shown on Schedule, Story, Moments, Getting There, Wishes pages"
+              editTab="Home"
+              onEditTab={() => setPage('home')}
+            >
+              <LiveImage
+                src={bannerImg}
+                alt="Banner"
+                isCustom={hasCustomBanner}
                 aspectClass="aspect-[21/9]"
-                onPreview={() => openPreview(bannerUrl, 'Banner')}
+                badge="6 pages"
+                onPreview={() => openPreview(bannerImg, 'Banner')}
               />
-            ) : (
-              <EmptyState message="No banner set — upload in Home tab" />
-            )}
-          </ImageSection>
+            </PageSection>
 
-          <Separator className="bg-champagne-silk" />
-
-          {/* ── 3. Tea Ceremony Image ───────────────────── */}
-          <ImageSection
-            icon={Calendar}
-            label="Tea Ceremony Image"
-            description="Displayed in the tea ceremony section on the Home page"
-            editTab="Home"
-            onEditTab={() => setPage('home')}
-          >
-            {teaCeremonyImage ? (
-              <ReadOnlyImage
-                src={teaCeremonyImage}
+            {/* Tea Ceremony */}
+            <PageSection
+              icon={Calendar}
+              label="Tea Ceremony"
+              description="Portrait in the tea ceremony section on the home page"
+              editTab="Home"
+              onEditTab={() => setPage('home')}
+            >
+              <LiveImage
+                src={teaCeremonyImg}
                 alt="Tea ceremony image"
+                isCustom={hasCustomTea}
                 aspectClass="aspect-[2/3]"
-                onPreview={() => openPreview(teaCeremonyImage, 'Tea Ceremony')}
+                onPreview={() => openPreview(teaCeremonyImg, 'Tea Ceremony')}
               />
-            ) : (
-              <EmptyState message="No tea ceremony image set — upload in Home tab" />
-            )}
-          </ImageSection>
+            </PageSection>
+          </div>
 
           <Separator className="bg-champagne-silk" />
 
-          {/* ── 4. Schedule Images ──────────────────────── */}
-          <ImageSection
-            icon={Calendar}
-            label="Schedule Images"
-            description={`Ceremony & celebration intro images on the Schedule page (${scheduleMedia.length}/3)`}
-            editTab="Schedule"
-            onEditTab={() => setPage('schedule')}
-          >
-            {scheduleMedia.length > 0 ? (
-              <div className="grid grid-cols-3 gap-3">
-                {scheduleMedia.map((item) => (
-                  <ReadOnlyImage
-                    key={item.id}
-                    src={item.url}
-                    alt={item.fileName}
-                    aspectClass="aspect-video"
-                    onPreview={() => openPreview(item.url, item.fileName)}
-                  />
-                ))}
+          {/* ═══ SCHEDULE PAGE ═════════════════════════════════════════ */}
+          <div className="space-y-5">
+            <div className="flex items-center gap-2">
+              <Clock className="size-4 text-charcoal-ink/40" />
+              <Label className="text-xs font-semibold text-charcoal-ink/50 uppercase tracking-wider">Schedule Page</Label>
+              <div className="flex-1 border-t border-charcoal-ink/10" />
+            </div>
+
+            {/* Ceremony & Celebration intro images */}
+            <PageSection
+              icon={Calendar}
+              label="Event Intro Images"
+              description={`Ceremony & celebration section images (${scheduleImages.length}/3 uploaded)`}
+              editTab="Schedule"
+              onEditTab={() => setPage('schedule')}
+            >
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <LiveImage
+                  src={ceremonyImg}
+                  alt="Ceremony intro image"
+                  isCustom={hasCustomCeremony}
+                  badge="Ceremony"
+                  onPreview={() => openPreview(ceremonyImg, 'Ceremony Image')}
+                />
+                <LiveImage
+                  src={celebrationImg}
+                  alt="Celebration intro image"
+                  isCustom={hasCustomCelebration}
+                  badge="Celebration"
+                  onPreview={() => openPreview(celebrationImg, 'Celebration Image')}
+                />
               </div>
-            ) : (
-              <EmptyState message="No schedule images — upload in Schedule tab" />
-            )}
-          </ImageSection>
+            </PageSection>
 
-          <Separator className="bg-champagne-silk" />
-
-          {/* ── 5. Story Images ─────────────────────────── */}
-          <ImageSection
-            icon={BookOpen}
-            label="Story Images"
-            description={`Story section gallery images (${storyMedia.length}/3)`}
-            editTab="Story"
-            onEditTab={() => setPage('story')}
-          >
-            {storyMedia.length > 0 ? (
-              <div className="grid grid-cols-3 gap-3">
-                {storyMedia.map((item) => (
-                  <ReadOnlyImage
-                    key={item.id}
-                    src={item.url}
-                    alt={item.fileName}
-                    aspectClass="aspect-video"
-                    onPreview={() => openPreview(item.url, item.fileName)}
-                  />
-                ))}
-              </div>
-            ) : (
-              <EmptyState message="No story images — upload in Story tab" />
-            )}
-          </ImageSection>
-
-          <Separator className="bg-champagne-silk" />
-
-          {/* ── 6. Venue Image ──────────────────────────── */}
-          <ImageSection
-            icon={MapPin}
-            label="Venue Image"
-            description="Venue photo displayed on the Schedule and Getting There pages"
-            editTab="Getting There"
-            onEditTab={() => setPage('getting-there')}
-          >
-            {venueImage ? (
-              <ReadOnlyImage
-                src={venueImage}
+            {/* Venue */}
+            <PageSection
+              icon={MapPin}
+              label="Venue Photo"
+              description="Venue image displayed at the bottom of the Schedule page and on the Getting There page"
+              editTab="Getting There"
+              onEditTab={() => setPage('getting-there')}
+            >
+              <LiveImage
+                src={venueImg}
                 alt="Venue image"
+                isCustom={hasCustomVenue}
                 aspectClass="aspect-[4/3]"
-                onPreview={() => openPreview(venueImage, 'Venue')}
+                onPreview={() => openPreview(venueImg, 'Venue')}
               />
-            ) : (
-              <EmptyState message="No venue image set — upload in Getting There tab" />
-            )}
-          </ImageSection>
+            </PageSection>
+          </div>
 
           <Separator className="bg-champagne-silk" />
 
-          {/* ── 7. Moments Gallery ──────────────────────── */}
-          <ImageSection
-            icon={Camera}
-            label="Moments Gallery"
-            description={`Photo gallery in the Moments section (${momentsMedia.length}/20)`}
-            editTab="Moments"
-            onEditTab={() => setPage('moments')}
-          >
-            {momentsMedia.length > 0 ? (
+          {/* ═══ STORY PAGE ════════════════════════════════════════════ */}
+          <div className="space-y-5">
+            <div className="flex items-center gap-2">
+              <BookOpen className="size-4 text-charcoal-ink/40" />
+              <Label className="text-xs font-semibold text-charcoal-ink/50 uppercase tracking-wider">Story Page</Label>
+              <div className="flex-1 border-t border-charcoal-ink/10" />
+            </div>
+
+            {/* Story hero */}
+            <PageSection
+              icon={BookOpen}
+              label="Story Hero"
+              description="16:9 hero image at the top of the story page"
+              editTab="Story"
+              onEditTab={() => setPage('story')}
+            >
+              <LiveImage
+                src={storyHeroImg}
+                alt="Story hero image"
+                isCustom={hasCustomStoryHero}
+                onPreview={() => openPreview(storyHeroImg, 'Story Hero')}
+              />
+            </PageSection>
+
+            {/* Per-chapter story images */}
+            {storyChapterImages.length > 0 && (
+              <PageSection
+                icon={BookOpen}
+                label="Chapter Images"
+                description={`${storyChapterImages.length} timeline chapter image${storyChapterImages.length !== 1 ? 's' : ''}`}
+                editTab="Story"
+                onEditTab={() => setPage('story')}
+              >
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {storyChapterImages.map((img, i) => (
+                    <LiveImage
+                      key={i}
+                      src={img.url}
+                      alt={img.title}
+                      isCustom={img.isCustom}
+                      aspectClass="aspect-[4/3]"
+                      badge={img.title}
+                      onPreview={() => openPreview(img.url, img.title)}
+                    />
+                  ))}
+                </div>
+              </PageSection>
+            )}
+          </div>
+
+          <Separator className="bg-champagne-silk" />
+
+          {/* ═══ MOMENTS PAGE ══════════════════════════════════════════ */}
+          <div className="space-y-5">
+            <div className="flex items-center gap-2">
+              <Camera className="size-4 text-charcoal-ink/40" />
+              <Label className="text-xs font-semibold text-charcoal-ink/50 uppercase tracking-wider">Moments Page</Label>
+              <div className="flex-1 border-t border-charcoal-ink/10" />
+            </div>
+
+            <PageSection
+              icon={Camera}
+              label="Photo Gallery"
+              description={`Masonry gallery — ${hasCustomMoments ? `${momentsPhotos.length} uploaded` : `${momentsPhotos.length} default photos shown`}`}
+              editTab="Moments"
+              onEditTab={() => setPage('moments')}
+            >
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                {momentsMedia.map((item) => (
-                  <ReadOnlyImage
-                    key={item.id}
-                    src={item.url}
-                    alt={item.fileName}
+                {momentsPhotos.map((photo, i) => (
+                  <LiveImage
+                    key={i}
+                    src={photo.src}
+                    alt={photo.alt}
+                    isCustom={photo.isCustom}
                     aspectClass="aspect-square"
-                    onPreview={() => openPreview(item.url, item.fileName)}
+                    onPreview={() => openPreview(photo.src, photo.alt)}
                   />
                 ))}
               </div>
-            ) : (
-              <EmptyState message="No moments images — upload in Moments tab" />
-            )}
-          </ImageSection>
+            </PageSection>
+          </div>
+
+          {/* ═══ WISHES PAGE (only if wish images exist) ════════════ */}
+          {wishImages.length > 0 && (
+            <>
+              <Separator className="bg-champagne-silk" />
+              <div className="space-y-5">
+                <div className="flex items-center gap-2">
+                  <Heart className="size-4 text-charcoal-ink/40" />
+                  <Label className="text-xs font-semibold text-charcoal-ink/50 uppercase tracking-wider">Wishes Page</Label>
+                  <div className="flex-1 border-t border-charcoal-ink/10" />
+                </div>
+
+                <section className="space-y-3">
+                  <div className="flex items-start gap-2.5">
+                    <div className="flex items-center justify-center h-7 w-7 rounded-lg bg-cinematic-gold/10 shrink-0 mt-0.5">
+                      <Heart className="size-3.5 text-cinematic-gold" />
+                    </div>
+                    <div>
+                      <Label className="text-xs font-medium text-charcoal-ink/70 uppercase tracking-wider">Guest Wish Photos</Label>
+                      <p className="text-[11px] text-charcoal-ink/40 mt-0.5">
+                        {wishImages.length} photo{wishImages.length !== 1 ? 's' : ''} submitted by guests with their wishes
+                      </p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                    {wishImages.map((w) => (
+                      <LiveImage
+                        key={w.url}
+                        src={w.url}
+                        alt={`Wish from ${w.name}`}
+                        isCustom={true}
+                        badge={w.name}
+                        aspectClass="aspect-square"
+                        onPreview={() => openPreview(w.url, `Wish from ${w.name}`)}
+                      />
+                    ))}
+                  </div>
+                </section>
+              </div>
+            </>
+          )}
         </div>
       )}
 
@@ -768,12 +883,7 @@ export default function CoupleImages() {
             <DialogTitle className="sr-only">{previewTitle} Preview</DialogTitle>
           </DialogHeader>
           {previewUrl && (
-            <img
-              src={previewUrl}
-              alt={previewTitle}
-              className="w-full rounded-lg"
-              unoptimized
-            />
+            <img src={previewUrl} alt={previewTitle} className="w-full rounded-lg" unoptimized />
           )}
         </DialogContent>
       </Dialog>
