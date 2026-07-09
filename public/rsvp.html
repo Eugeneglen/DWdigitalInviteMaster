@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DREAMWEAVERS - RSVP</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "charcoal-ink": "#1A1A1A",
+                        "paper-cream": "#FDF9F3",
+                        "cinematic-gold": "#D4AF37",
+                        "champagne-silk": "#E8D5B5"
+                    },
+                    fontFamily: {
+                        sans: ["'Playfair Display'", "serif"],
+                        serif: ["'Playfair Display'", "serif"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { min-height: 100dvh; font-family: 'Playfair Display', serif; }
+        .stagger { animation: fadeIn 0.5s ease-out both; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .input-line {
+            width: 100%; border: none; border-bottom: 1px solid #1A1A1A;
+            background: transparent; padding: 12px 0 8px 0; outline: none;
+            font-family: 'Playfair Display', serif; font-size: 18px;
+            transition: border-color 0.3s ease;
+        }
+        .input-line:focus { border-color: #D4AF37; }
+        .step-dot { width: 6px; height: 6px; border-radius: 9999px; background: #1A1A1A33; transition: all 0.3s; }
+        .step-dot.active { background: #D4AF37; width: 24px; border-radius: 3px; }
+        .opt-btn {
+            width: 100%; padding: 14px 20px; border: 1px solid #1A1A1A33;
+            background: transparent; text-align: center; font-size: 15px;
+            transition: all 0.25s ease; cursor: pointer;
+        }
+        .opt-btn:hover { border-color: #1A1A1A; }
+        .opt-btn.selected { border-color: #1A1A1A; border-width: 2px; background: #FDF9F3; }
+    </style>
+</head>
+<body class="bg-paper-cream text-charcoal-ink antialiased min-h-screen flex flex-col">
+
+<header class="fixed top-0 w-full z-50 bg-paper-cream/80 backdrop-blur-md border-b border-champagne-silk/30">
+<div class="flex justify-between items-center px-4 md:px-6 py-3 w-full max-w-[1440px] mx-auto">
+<div class="flex-shrink-0">
+<img alt="Dreamweavers Logo" class="h-4 md:h-5 w-auto object-contain" src="/assets/dreamweavers-logo.png"/>
+</div>
+<nav class="hidden lg:flex justify-center items-center gap-6 px-4 ml-auto">
+<a class="font-medium text-[11px] tracking-[0.2em] uppercase text-charcoal-ink/40 hover:text-cinematic-gold transition-colors duration-300 pb-1 border-b-2 border-transparent h-[26px] flex items-center" href="/home.html">Home</a>
+<a class="font-medium text-[11px] tracking-[0.2em] uppercase text-charcoal-ink/40 hover:text-cinematic-gold transition-colors duration-300 pb-1 border-b-2 border-transparent h-[26px] flex items-center" href="/schedule.html">Schedule</a>
+<a class="font-medium text-[11px] tracking-[0.2em] uppercase text-cinematic-gold border-b-2 border-cinematic-gold pb-1 h-[26px] flex items-center" href="/rsvp.html">RSVP</a>
+<a class="font-medium text-[11px] tracking-[0.2em] uppercase text-charcoal-ink/40 hover:text-cinematic-gold transition-colors duration-300 pb-1 border-b-2 border-transparent h-[26px] flex items-center" href="/getting-there.html">Getting There</a>
+<a class="font-medium text-[11px] tracking-[0.2em] uppercase text-charcoal-ink/40 hover:text-cinematic-gold transition-colors duration-300 pb-1 border-b-2 border-transparent h-[26px] flex items-center" href="/story.html">Story</a>
+<a class="font-medium text-[11px] tracking-[0.2em] uppercase text-charcoal-ink/40 hover:text-cinematic-gold transition-colors duration-300 pb-1 border-b-2 border-transparent h-[26px] flex items-center" href="/wishes.html">Wishes</a>
+<a class="font-medium text-[11px] tracking-[0.2em] uppercase text-charcoal-ink/40 hover:text-cinematic-gold transition-colors duration-300 pb-1 border-b-2 border-transparent h-[26px] flex items-center" href="/qa.html">Q&amp;A</a>
+<a class="font-medium text-[11px] tracking-[0.2em] uppercase text-charcoal-ink/40 hover:text-cinematic-gold transition-colors duration-300 pb-1 border-b-2 border-transparent h-[26px] flex items-center" href="/moments.html">Moments</a>
+</nav>
+<div class="lg:hidden ml-auto">
+<button class="text-charcoal-ink p-2" id="mobile-menu-trigger">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+</div>
+</header>
+
+<main class="flex-1 w-full max-w-xl mx-auto px-6 pt-32 pb-20 flex flex-col">
+
+<!-- Event header (persistent) -->
+<div class="text-center mb-10">
+<h1 class="font-serif italic text-[40px] md:text-[52px] leading-tight text-charcoal-ink">Eleanor &amp; James</h1>
+<p class="mt-4 text-[15px] text-charcoal-ink/80">The Singapore EDITION, 38 Cuscaden Road</p>
+<p class="text-[15px] text-charcoal-ink/80">Singapore 249731</p>
+</div>
+
+<!-- Progress dots -->
+<div class="flex items-center justify-center gap-2 mb-10">
+<span class="step-dot active" id="dot-1"></span>
+<span class="step-dot" id="dot-2"></span>
+<span class="step-dot" id="dot-3"></span>
+<span class="step-dot" id="dot-4"></span>
+</div>
+
+<!-- STEP 1: Name -->
+<section class="stagger" id="step-1">
+<div class="text-center mb-8">
+<p class="font-semibold text-[15px] tracking-wide">Enter your name to RSVP</p>
+<p class="text-[13px] text-charcoal-ink/60 italic mt-2">You can respond for more guests in the following steps.</p>
+</div>
+<form class="space-y-6" onsubmit="event.preventDefault(); submitStep1();">
+<div class="grid grid-cols-2 gap-5">
+<div>
+<label class="text-[11px] tracking-[0.18em] uppercase text-charcoal-ink/60 font-semibold">First Name</label>
+<input class="input-line" id="first-name" required type="text"/>
+</div>
+<div>
+<label class="text-[11px] tracking-[0.18em] uppercase text-charcoal-ink/60 font-semibold">Last Name</label>
+<input class="input-line" id="last-name" required type="text"/>
+</div>
+</div>
+<button class="w-full bg-charcoal-ink text-paper-cream py-4 mt-4 text-[12px] tracking-[0.25em] uppercase font-semibold hover:bg-black transition-colors" type="submit">Next</button>
+</form>
+</section>
+
+<!-- STEP 2: Party size -->
+<section class="stagger hidden" id="step-2">
+<div class="text-center mb-8">
+<p class="font-semibold text-[15px] tracking-wide">How many people are in your party?</p>
+</div>
+<div class="flex items-center justify-center gap-3 mb-4">
+<button class="w-12 h-12 border border-charcoal-ink/30 flex items-center justify-center hover:border-charcoal-ink transition-colors text-2xl" onclick="changeParty(-1)" type="button">−</button>
+<div class="w-24 h-12 border border-charcoal-ink/30 flex items-center justify-center text-xl font-semibold" id="party-count">1</div>
+<button class="w-12 h-12 border border-charcoal-ink/30 flex items-center justify-center hover:border-charcoal-ink transition-colors text-2xl" onclick="changeParty(1)" type="button">+</button>
+</div>
+<p class="text-center text-[13px] text-charcoal-ink/60 italic mb-8">Include yourself and anyone attending with you.</p>
+<div class="flex gap-3">
+<button class="flex-1 border border-charcoal-ink/30 py-4 text-[12px] tracking-[0.25em] uppercase font-semibold hover:border-charcoal-ink transition-colors" onclick="goStep(1)" type="button">Back</button>
+<button class="flex-[2] bg-charcoal-ink text-paper-cream py-4 text-[12px] tracking-[0.25em] uppercase font-semibold hover:bg-black transition-colors" onclick="submitStep2()" type="button">Next</button>
+</div>
+</section>
+
+<!-- STEP 3: Guest list -->
+<section class="stagger hidden" id="step-3">
+<div id="guest-list" class="space-y-3 mb-6"></div>
+<button class="flex items-center gap-2 text-[13px] text-charcoal-ink/70 hover:text-cinematic-gold transition-colors mb-8" onclick="addGuest()" type="button">
+<span class="material-symbols-outlined text-[20px]">add_circle</span>
+<span class="uppercase tracking-[0.18em] text-[11px] font-semibold">Add Another Guest</span>
+</button>
+<div class="flex gap-3">
+<button class="flex-1 border border-charcoal-ink/30 py-4 text-[12px] tracking-[0.25em] uppercase font-semibold hover:border-charcoal-ink transition-colors" onclick="goStep(2)" type="button">Back</button>
+<button class="flex-[2] bg-charcoal-ink text-paper-cream py-4 text-[12px] tracking-[0.25em] uppercase font-semibold hover:bg-black transition-colors disabled:opacity-40" id="continue-btn" onclick="goStep(4)" type="button">Continue</button>
+</div>
+</section>
+
+<!-- STEP 4: Per-guest questions -->
+<section class="stagger hidden" id="step-4">
+<div class="text-center mb-6 pb-4 border-b border-charcoal-ink/20">
+<p class="font-semibold text-[16px]">Responding for <span id="responding-for"></span></p>
+<p class="text-[12px] text-charcoal-ink/50 mt-1" id="guest-progress"></p>
+</div>
+<div class="space-y-8">
+<div>
+<p class="text-[14px] mb-4"><span class="text-charcoal-ink/60">1.</span> Will you be able to join us for our Wedding Solemnisation?<span class="text-cinematic-gold">*</span></p>
+<div class="space-y-3" id="attendance-options">
+<button class="opt-btn rounded-full" data-val="yes" onclick="selectAttendance(this)" type="button">Yes!</button>
+<button class="opt-btn rounded-full" data-val="no" onclick="selectAttendance(this)" type="button">I'm sorry, I won't be able to make it</button>
+<button class="opt-btn rounded-full" data-val="partial" onclick="selectAttendance(this)" type="button">Yes, but I won't be staying for the lunch reception</button>
+</div>
+</div>
+<div>
+<p class="text-[14px] mb-3"><span class="text-charcoal-ink/60">2.</span> Do you have any dietary restrictions?</p>
+<textarea class="w-full border border-charcoal-ink/30 p-4 text-[14px] outline-none focus:border-cinematic-gold transition-colors min-h-[110px] bg-transparent" id="dietary-input" placeholder="Write your answer here."></textarea>
+</div>
+</div>
+<div class="flex gap-3 mt-10">
+<button class="flex-1 border border-charcoal-ink/30 py-4 text-[12px] tracking-[0.25em] uppercase font-semibold hover:border-charcoal-ink transition-colors" onclick="goStep(3)" type="button">Back</button>
+<button class="flex-[2] bg-charcoal-ink text-paper-cream py-4 text-[12px] tracking-[0.25em] uppercase font-semibold hover:bg-black transition-colors disabled:opacity-40" id="submit-guest-btn" onclick="submitGuestResponse()" type="button">Save &amp; Continue</button>
+</div>
+</section>
+
+<!-- DONE -->
+<section class="stagger hidden text-center py-12" id="step-done">
+<span class="material-symbols-outlined text-cinematic-gold text-[64px]">favorite</span>
+<h2 class="font-serif italic text-[36px] mt-4">Thank you</h2>
+<p class="text-[14px] text-charcoal-ink/70 mt-3 italic">Your RSVP has been received.<br/>We can't wait to celebrate with you.</p>
+</section>
+
+</main>
+
+<footer class="w-full py-12 bg-paper-cream border-t border-champagne-silk/10">
+<div class="max-w-[1440px] mx-auto px-4 md:px-16 flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="flex flex-col md:flex-row items-center gap-6">
+<a class="text-[14px] text-charcoal-ink/60 hover:text-cinematic-gold underline-offset-4 hover:underline transition-colors" href="mailto:concierge@dreamweavers.events">Contact Concierge</a>
+</div>
+<p class="text-[11px] tracking-wider text-charcoal-ink/40 uppercase font-semibold">© 2024 DREAMWEAVERS DIGITAL HEIRLOOMS</p>
+</div>
+</footer>
+
+<script>
+let state = {
+  step: 1,
+  partySize: 1,
+  guests: [], // [{name, responded, attendance, dietary}]
+  currentGuestIndex: 0
+};
+
+function goStep(n) {
+  state.step = n;
+  for (let i = 1; i <= 4; i++) {
+    document.getElementById('step-' + i).classList.toggle('hidden', i !== n);
+    document.getElementById('dot-' + i).classList.toggle('active', i <= n);
+  }
+  document.getElementById('step-done').classList.add('hidden');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function submitStep1() {
+  const first = document.getElementById('first-name').value.trim();
+  const last = document.getElementById('last-name').value.trim();
+  if (!first || !last) return;
+  const fullName = first + ' ' + last;
+  if (state.guests.length === 0) {
+    state.guests.push({ name: fullName, responded: false });
+  } else {
+    state.guests[0].name = fullName;
+  }
+  goStep(2);
+}
+
+function changeParty(delta) {
+  state.partySize = Math.max(1, Math.min(10, state.partySize + delta));
+  document.getElementById('party-count').textContent = state.partySize;
+}
+
+function submitStep2() {
+  // Pad/trim guests to partySize
+  while (state.guests.length < state.partySize) {
+    state.guests.push({ name: 'Guest ' + (state.guests.length + 1), responded: false });
+  }
+  state.guests = state.guests.slice(0, state.partySize);
+  renderGuestList();
+  goStep(3);
+}
+
+function renderGuestList() {
+  const list = document.getElementById('guest-list');
+  list.innerHTML = '';
+  state.guests.forEach((g, i) => {
+    const row = document.createElement('div');
+    row.className = 'flex items-center justify-between gap-3 py-3 border-b border-charcoal-ink/15';
+    row.innerHTML = `
+      <div class="flex-1 min-w-0">
+        <input class="w-full bg-transparent outline-none text-[15px] border-b border-transparent focus:border-cinematic-gold py-1" value="${g.name.replace(/"/g,'&quot;')}" oninput="updateGuestName(${i}, this.value)" />
+        ${g.responded ? '<span class="text-[10px] tracking-[0.18em] uppercase text-cinematic-gold font-semibold">Response saved</span>' : ''}
+      </div>
+      <button class="border ${g.responded ? 'border-cinematic-gold text-cinematic-gold' : 'border-charcoal-ink/40 text-charcoal-ink'} px-5 py-2 text-[11px] tracking-[0.2em] uppercase font-semibold hover:border-charcoal-ink transition-colors" onclick="respondFor(${i})" type="button">${g.responded ? 'Edit' : 'Respond'}</button>
+    `;
+    list.appendChild(row);
+  });
+  const allDone = state.guests.every(g => g.responded);
+  document.getElementById('continue-btn').disabled = !allDone;
+  document.getElementById('continue-btn').textContent = allDone ? 'Continue' : 'Respond for all guests';
+}
+
+function updateGuestName(i, val) {
+  state.guests[i].name = val;
+}
+
+function addGuest() {
+  state.guests.push({ name: 'Guest ' + (state.guests.length + 1), responded: false });
+  state.partySize = state.guests.length;
+  renderGuestList();
+}
+
+function respondFor(i) {
+  state.currentGuestIndex = i;
+  const g = state.guests[i];
+  document.getElementById('responding-for').textContent = g.name + '.';
+  document.getElementById('guest-progress').textContent = `Guest ${i + 1} of ${state.guests.length}`;
+  // restore selection
+  document.querySelectorAll('#attendance-options .opt-btn').forEach(b => {
+    b.classList.toggle('selected', b.dataset.val === g.attendance);
+  });
+  document.getElementById('dietary-input').value = g.dietary || '';
+  document.getElementById('submit-guest-btn').disabled = !g.attendance;
+  goStep(4);
+}
+
+function selectAttendance(btn) {
+  document.querySelectorAll('#attendance-options .opt-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  state.guests[state.currentGuestIndex].attendance = btn.dataset.val;
+  document.getElementById('submit-guest-btn').disabled = false;
+}
+
+function submitGuestResponse() {
+  const g = state.guests[state.currentGuestIndex];
+  if (!g.attendance) return;
+  g.dietary = document.getElementById('dietary-input').value.trim();
+  g.responded = true;
+  renderGuestList();
+  // Move to next un-responded, else back to list
+  const next = state.guests.findIndex(x => !x.responded);
+  if (next !== -1) {
+    respondFor(next);
+  } else {
+    goStep(3);
+  }
+}
+
+function finish() {
+  document.querySelectorAll('section.stagger').forEach(s => s.classList.add('hidden'));
+  document.getElementById('step-done').classList.remove('hidden');
+}
+
+// Hook final submit: when all responded AND user clicks Continue on step 3, finish.
+document.getElementById('continue-btn').addEventListener('click', () => {
+  if (state.guests.every(g => g.responded)) {
+    setTimeout(finish, 50);
+  }
+});
+</script>
+<script src="/nav.js" defer></script>
+</body></html>

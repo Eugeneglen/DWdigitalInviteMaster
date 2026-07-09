@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dreamweavers - The Digital Keepsake</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-tint": "#5f5e5e",
+                        "secondary-fixed-dim": "#e9c349",
+                        "status-error": "#8B1E1E",
+                        "charcoal-ink": "#1A1A1A",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed-dim": "#c9c6c1",
+                        "surface-dim": "#ddd9d8",
+                        "on-tertiary-fixed": "#1c1c18",
+                        "surface-bright": "#fdf8f8",
+                        "tertiary-fixed": "#e6e2dc",
+                        "on-surface": "#1c1b1b",
+                        "surface-container-low": "#f7f3f2",
+                        "on-error-container": "#93000a",
+                        "on-surface-variant": "#444748",
+                        "on-secondary": "#ffffff",
+                        "paper-cream": "#FCF9F2",
+                        "on-primary-fixed-variant": "#474746",
+                        "inverse-surface": "#313030",
+                        "secondary-fixed": "#ffe088",
+                        "surface-container-highest": "#e5e2e1",
+                        "status-success": "#2D4B3A",
+                        "on-tertiary-fixed-variant": "#484743",
+                        "primary-fixed": "#e5e2e1",
+                        "tertiary": "#000000",
+                        "on-secondary-fixed-variant": "#574500",
+                        "error": "#ba1a1a",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed": "#1c1b1b",
+                        "on-secondary-container": "#745c00",
+                        "primary": "#000000",
+                        "cinematic-gold": "#C5A059",
+                        "inverse-primary": "#c8c6c5",
+                        "inverse-on-surface": "#f4f0ef",
+                        "on-background": "#1c1b1b",
+                        "outline": "#747878",
+                        "on-primary-container": "#858383",
+                        "champagne-silk": "#E8D5B5",
+                        "error-container": "#ffdad6",
+                        "on-primary": "#ffffff",
+                        "surface": "#fdf8f8",
+                        "secondary-container": "#fed65b",
+                        "surface-container": "#f1edec",
+                        "surface-variant": "#e5e2e1",
+                        "primary-container": "#1c1b1b",
+                        "outline-variant": "#c4c7c7",
+                        "tertiary-container": "#1c1c18",
+                        "on-tertiary-container": "#86847f",
+                        "surface-container-lowest": "#ffffff",
+                        "background": "#FCF9F2",
+                        "on-secondary-fixed": "#241a00",
+                        "primary-fixed-dim": "#c8c6c5",
+                        "surface-container-high": "#ebe7e6",
+                        "secondary": "#735c00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "section-gap": "8rem",
+                        "canvas-margin": "4rem",
+                        "gutter": "2rem"
+                    },
+                    "fontFamily": {
+                        "display-hero": ["Playfair Display", "serif"],
+                        "label-sm": ["Playfair Display", "serif"],
+                        "body-md": ["Playfair Display", "serif"],
+                        "headline-lg-mobile": ["Playfair Display", "serif"],
+                        "headline-lg": ["Playfair Display", "serif"],
+                        "headline-md": ["Playfair Display", "serif"],
+                        "body-lg": ["Playfair Display", "serif"],
+                        "utility-mono": ["Playfair Display", "serif"]
+                    },
+                    "fontSize": {
+                        "display-hero": ["84px", { "lineHeight": "100px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "headline-lg": ["48px", { "lineHeight": "56px", "fontWeight": "600" }],
+                        "headline-md": ["32px", { "lineHeight": "40px", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "32px", "fontWeight": "400" }],
+                        "utility-mono": ["14px", { "lineHeight": "20px", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .animate-fade-in {
+            animation: fadeIn 1.2s ease-out forwards;
+            opacity: 0;
+        }
+        .animate-slide-up {
+            animation: slideUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+        .delay-300 { animation-delay: 300ms; }
+        .delay-400 { animation-delay: 400ms; }
+        
+        .hero-gradient {
+            background: linear-gradient(to bottom, rgba(252, 249, 242, 0.1) 0%, rgba(26, 26, 26, 0.8) 100%);
+        }
+        
+        .inner-frame {
+            position: relative;
+        }
+        .inner-frame::after {
+            content: '';
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            right: 16px;
+            bottom: 16px;
+            border: 1px solid theme('colors.cinematic-gold');
+            opacity: 0.6;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        body {
+            font-family: 'Playfair Display', serif;
+        }
+    </style>
+</head>
+<body class="bg-paper-cream text-charcoal-ink antialiased selection:bg-cinematic-gold selection:text-paper-cream overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-paper-cream/80 backdrop-blur-md border-b border-champagne-silk/30">
+<div class="flex justify-between items-center px-4 md:px-6 py-3 w-full max-w-[1440px] mx-auto">
+<!-- Logo -->
+<div class="flex-shrink-0">
+<img alt="Dreamweavers Logo" class="h-4 md:h-5 w-auto object-contain" src="/assets/dreamweavers-logo.png"/>
+</div>
+<!-- Center-aligned navigation menu -->
+<nav class="hidden lg:flex justify-center items-center gap-6 px-4 ml-auto">
+<a class="font-medium text-[11px] tracking-[0.2em] uppercase text-cinematic-gold border-b-2 border-cinematic-gold pb-1 h-[26px] flex items-center" href="/home.html">Home</a>
+<a class="font-medium text-[11px] tracking-[0.2em] uppercase text-charcoal-ink/40 hover:text-cinematic-gold transition-colors duration-300 pb-1 border-b-2 border-transparent h-[26px] flex items-center" href="/schedule.html">Schedule</a>
+<a class="font-medium text-[11px] tracking-[0.2em] uppercase text-charcoal-ink/40 hover:text-cinematic-gold transition-colors duration-300 pb-1 border-b-2 border-transparent h-[26px] flex items-center" href="/rsvp.html">RSVP</a>
+<a class="font-medium text-[11px] tracking-[0.2em] uppercase text-charcoal-ink/40 hover:text-cinematic-gold transition-colors duration-300 pb-1 border-b-2 border-transparent h-[26px] flex items-center" href="/getting-there.html">Getting There</a>
+<a class="font-medium text-[11px] tracking-[0.2em] uppercase text-charcoal-ink/40 hover:text-cinematic-gold transition-colors duration-300 pb-1 border-b-2 border-transparent h-[26px] flex items-center" href="/story.html">Story</a>
+<a class="font-medium text-[11px] tracking-[0.2em] uppercase text-charcoal-ink/40 hover:text-cinematic-gold transition-colors duration-300 pb-1 border-b-2 border-transparent h-[26px] flex items-center" href="/wishes.html">Wishes</a>
+<a class="font-medium text-[11px] tracking-[0.2em] uppercase text-charcoal-ink/40 hover:text-cinematic-gold transition-colors duration-300 pb-1 border-b-2 border-transparent h-[26px] flex items-center" href="/qa.html">Q&amp;A</a>
+<a class="font-medium text-[11px] tracking-[0.2em] uppercase text-charcoal-ink/40 hover:text-cinematic-gold transition-colors duration-300 pb-1 border-b-2 border-transparent h-[26px] flex items-center" href="/moments.html">Moments</a>
+</nav>
+<!-- Mobile Menu Trigger -->
+<div class="lg:hidden ml-auto">
+<button class="text-charcoal-ink p-2" id="mobile-menu-trigger">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+<!-- Desktop RSVP Button Placeholder to maintain spacing -->
+</div>
+</header><div class="w-full h-[360px] md:h-[420px] bg-cover bg-center mt-[54px] md:mt-[64px] relative z-40 border-b border-champagne-silk/20 flex items-center justify-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA-OyKfcsxXAmZDArHbDXl1cVCgGUG5liFPzyHdVvMG6_4jN9pNTrN9GCrkdnegli9UPJUSPs39KJRsRP7AiLem4xYS-q1ZYq1T3DAIqyvn3wAvbdkoMVkufft0SpQw4gDTPSnIml6k62lRYobUrNu70UGIILiMZQ0fAydTXXwVZ1oswQZ-mjPT8H9mDDqfhxsMSI5zla8GKz_ILXbmdRjtRUk682dPEDBD6I81DzEx7dITgjb6vxQoee5599jkYf_vCYP7npydvxqx');"><div class="absolute inset-0 bg-gradient-to-b from-paper-cream/30 via-paper-cream/10 to-paper-cream/60"></div><div class="relative z-10 text-center px-6"><h1 class="font-display-hero text-[44px] md:text-[72px] leading-[1.05] text-charcoal-ink tracking-tight font-bold drop-shadow-sm">Eleanor &amp; James</h1></div></div>
+<!-- Mobile Navigation Drawer -->
+<div class="fixed inset-0 z-[60] bg-charcoal-ink/20 backdrop-blur-sm hidden transition-opacity duration-300 opacity-0" id="nav-drawer">
+<nav class="h-full w-80 bg-paper-cream shadow-2xl flex flex-col p-8 gap-4 transform -translate-x-full transition-transform duration-500 ease-in-out">
+<div class="flex justify-between items-center mb-8 border-b border-champagne-silk/30 pb-4">
+<img alt="Dreamweavers" class="h-3" src="/assets/dreamweavers-logo.png"/>
+<button class="text-charcoal-ink" id="close-drawer">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</div>
+<ul class="flex flex-col gap-6">
+<li class=""><a class="flex items-center gap-4 text-cinematic-gold font-bold hover:pl-2 transition-all duration-300" href="/home.html"><span class="text-xs uppercase tracking-widest font-bold">Home</span></a></li>
+<li class=""><a class="flex items-center gap-4 text-charcoal-ink/60 hover:pl-2 transition-all duration-300" href="/schedule.html"><span class="text-xs uppercase tracking-widest">Schedule</span></a></li>
+<li class=""><a class="flex items-center gap-4 text-charcoal-ink/60 hover:pl-2 transition-all duration-300" href="/rsvp.html"><span class="text-xs uppercase tracking-widest">RSVP</span></a></li>
+<li class=""><a class="flex items-center gap-4 text-charcoal-ink/60 hover:pl-2 transition-all duration-300" href="/getting-there.html"><span class="text-xs uppercase tracking-widest">Getting There</span></a></li>
+<li class=""><a class="flex items-center gap-4 text-charcoal-ink/60 hover:pl-2 transition-all duration-300" href="/story.html"><span class="text-xs uppercase tracking-widest">Story</span></a></li>
+<li class=""><a class="flex items-center gap-4 text-charcoal-ink/60 hover:pl-2 transition-all duration-300" href="/wishes.html"><span class="text-xs uppercase tracking-widest">Wishes</span></a></li>
+<li class=""><a class="flex items-center gap-4 text-charcoal-ink/60 hover:pl-2 transition-all duration-300" href="/qa.html"><span class="text-xs uppercase tracking-widest">Q &amp; A</span></a></li>
+<li class=""><a class="flex items-center gap-4 text-charcoal-ink/60 hover:pl-2 transition-all duration-300" href="/moments.html"><span class="text-xs uppercase tracking-widest">Moments</span></a></li>
+</ul>
+</nav>
+</div>
+<!-- Main Content Canvas -->
+<main class="pb-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto min-h-screen pt-[20px] md:pt-[40px]">
+<!-- Hero Section -->
+<section class="relative h-[795px] md:h-screen w-full flex flex-col justify-end overflow-hidden">
+<!-- Background Image -->
+<div class="absolute inset-0 z-0 inner-frame m-4 md:m-8">
+<img alt="Hero Wedding Portrait" class="w-full h-full object-cover object-center rounded-lg shadow-[0_-4px_20px_rgba(26,26,26,0.04)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBeAe38AA5-0h4B5MmgQCqv54oQXyPMGznDKaw2sJI_FnTbB_yXXWOpirFlFycj_2VI02IVLouUTt86Y1J7Ls-bRsMOHPAcfSqruVoh87sfhw3vi2Z6t1C7ogCLtkvF6QbJkwuV0av8pXTrUeAAi6ymnZpvyOr8qVjTNNorAOmqRrW_fohX_xlkscmBh39K4Wtvs6TH0Nvb_X3LQQRD9W_sySN_iWbWw9O0au8u1jO-hSekE9pSGNo5zsTz3o9PWy5xbzc6lq3knkIy"/>
+<div class="absolute inset-0 hero-gradient rounded-lg"></div>
+</div>
+<!-- Content Overlay -->
+<div class="relative z-10 w-full px-8 md:px-24 pb-20 md:pb-32 flex flex-col items-center text-center">
+<!-- Master Date Badge -->
+<div class="animate-fade-in delay-100 mb-8 inline-flex items-center justify-center border border-champagne-silk px-6 py-2 rounded-full bg-paper-cream/10 backdrop-blur-sm">
+<span class="font-label-sm text-label-sm text-paper-cream tracking-[0.2em] uppercase font-semibold">October 24, 2025</span>
+</div>
+<!-- Couple Names Typography -->
+<h2 class="animate-slide-up delay-200 font-display-hero text-[48px] leading-[1.1] md:text-display-hero text-paper-cream mb-6 tracking-tight drop-shadow-lg">
+                Eleanor<br class="md:hidden"/><span class="italic font-light mx-4 text-cinematic-gold">&amp;</span><br class="md:hidden"/>James
+            </h2>
+<p class="animate-slide-up delay-300 font-body-md text-body-md text-paper-cream/90 max-w-md mx-auto mb-12 italic">
+                Join us in celebrating our journey. A weekend of joy, laughter, and lifelong memories in the heart of the countryside.
+            </p>
+<!-- Countdown Component -->
+<div class="animate-slide-up delay-400 grid grid-cols-4 gap-4 md:gap-8 w-full max-w-xl mx-auto border-t border-b border-champagne-silk/30 py-6 backdrop-blur-sm bg-charcoal-ink/20">
+<div class="flex flex-col items-center">
+<span class="font-display-hero text-headline-lg-mobile md:text-headline-lg text-paper-cream" id="days">245</span>
+<span class="font-label-sm text-[10px] md:text-label-sm text-cinematic-gold tracking-widest uppercase mt-2 font-semibold">Days</span>
+</div>
+<div class="flex flex-col items-center">
+<span class="font-display-hero text-headline-lg-mobile md:text-headline-lg text-paper-cream" id="hours">14</span>
+<span class="font-label-sm text-[10px] md:text-label-sm text-cinematic-gold tracking-widest uppercase mt-2 font-semibold">Hours</span>
+</div>
+<div class="flex flex-col items-center">
+<span class="font-display-hero text-headline-lg-mobile md:text-headline-lg text-paper-cream" id="minutes">31</span>
+<span class="font-label-sm text-[10px] md:text-label-sm text-cinematic-gold tracking-widest uppercase mt-2 font-semibold">Mins</span>
+</div>
+<div class="flex flex-col items-center">
+<span class="font-display-hero text-headline-lg-mobile md:text-headline-lg text-paper-cream" id="seconds">47</span>
+<span class="font-label-sm text-[10px] md:text-label-sm text-cinematic-gold tracking-widest uppercase mt-2 font-semibold">Secs</span>
+</div>
+</div>
+</div>
+<!-- Scroll Indicator -->
+<div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 animate-fade-in delay-400 flex flex-col items-center opacity-70">
+<span class="font-label-sm text-[10px] text-paper-cream tracking-widest mb-2 uppercase font-semibold">Discover</span>
+<span class="material-symbols-outlined text-paper-cream animate-bounce">arrow_downward</span>
+</div>
+</section>
+<!-- Tea Ceremony Section -->
+<section class="py-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto bg-paper-cream">
+<div class="max-w-4xl mx-auto flex flex-col items-center">
+<div class="relative w-full aspect-[2/3] md:aspect-auto md:h-[800px] overflow-hidden rounded-lg shadow-xl mb-8 group">
+<img alt="The Tea Ceremony" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6SiJt49KQCmMAhF-X_tmX1Y1NKhTieT6ApO53PD9gYuvLO0e78WTxzg8BV7Wnhe6oJ6sG4SwJ4U-nH2m33dv7I89IhLgrHDkabts7ws-QwPlv-ycUzhyuBN0c04ka2inAyysumlM1w-sR8stBZ51HJOGZkQO6cAtfrn9RXWZRFlHJlUp8Jqzi-nBu3xGs57xm7L2Le06Put3xBDMAe39zkMMsdcuUkbeyw5c4Q6VxvXkSmMbcpLM-HJK1iMgYVLkn2kzqUPEALYpH"/>
+<div class="absolute inset-0 bg-gradient-to-t from-charcoal-ink/40 to-transparent pointer-events-none"></div>
+</div>
+<div class="text-center">
+<span class="font-label-sm text-label-sm text-cinematic-gold tracking-[0.2em] uppercase block mb-2 font-semibold">The Tradition</span>
+<h3 class="font-display-hero text-headline-lg-mobile md:text-headline-lg text-charcoal-ink">The Tea Ceremony</h3>
+</div>
+</div>
+</section>
+<!-- Narrative Section -->
+<section class="py-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto bg-paper-cream">
+<div class="max-w-3xl mx-auto text-center space-y-8">
+<span class="font-label-sm text-label-sm text-cinematic-gold tracking-[0.2em] uppercase block font-semibold">The Prelude</span>
+<h3 class="font-display-hero text-headline-lg-mobile md:text-headline-lg text-charcoal-ink">Our Story Begins Here</h3>
+<p class="font-body-md text-body-md text-charcoal-ink/80 leading-relaxed">
+                Every great romance is a narrative woven over time. Ours began with a serendipitous meeting and has evolved into a tapestry of shared adventures, quiet moments, and a profound commitment to one another.
+            </p>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center py-4 px-2 md:hidden bg-paper-cream border-t border-champagne-silk/20 z-50 rounded-t-full shadow-[0_-4px_20px_rgba(26,26,26,0.04)] pb-8 pt-4">
+<a class="flex flex-col items-center justify-center text-cinematic-gold active:scale-90 transition-transform" href="/home.html">
+<span class="material-symbols-outlined mb-1" data-icon="home" data-weight="fill" style='font-variation-settings: "FILL" 1;'>home</span>
+<span class="font-label-sm text-[10px] uppercase tracking-wider font-semibold">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-charcoal-ink/50 hover:text-cinematic-gold transition-colors active:scale-90" href="/rsvp.html">
+<span class="material-symbols-outlined mb-1" data-icon="favorite">favorite</span>
+<span class="font-label-sm text-[10px] uppercase tracking-wider font-semibold">RSVP</span>
+</a>
+<a class="flex flex-col items-center justify-center text-charcoal-ink/50 hover:text-cinematic-gold transition-colors active:scale-90" href="/story.html">
+<span class="material-symbols-outlined mb-1" data-icon="auto_stories">auto_stories</span>
+<span class="font-label-sm text-[10px] uppercase tracking-wider font-semibold">Story</span>
+</a>
+<a class="flex flex-col items-center justify-center text-charcoal-ink/50 hover:text-cinematic-gold transition-colors active:scale-90" href="/moments.html">
+<span class="material-symbols-outlined mb-1" data-icon="photo_library">photo_library</span>
+<span class="font-label-sm text-[10px] uppercase tracking-wider font-semibold">Moments</span>
+</a>
+<a class="flex flex-col items-center justify-center text-charcoal-ink/50 hover:text-cinematic-gold transition-colors active:scale-90" href="#" onclick="event.preventDefault(); document.getElementById('mobile-menu-trigger')?.click();">
+<span class="material-symbols-outlined mb-1" data-icon="more_horiz">more_horiz</span>
+<span class="font-label-sm text-[10px] uppercase tracking-wider font-semibold">More</span>
+</a>
+</nav>
+<!-- Floating Action Button -->
+<div class="fixed bottom-24 right-6 md:bottom-12 md:right-12 z-[55] transition-transform duration-300 transform translate-y-20 opacity-0" id="fab">
+<button class="bg-charcoal-ink text-paper-cream w-16 h-16 rounded-full shadow-[0_8px_30px_rgba(26,26,26,0.12)] flex items-center justify-center hover:scale-105 active:scale-95 transition-all border border-cinematic-gold/30">
+<span class="material-symbols-outlined" data-icon="edit_calendar">edit_calendar</span>
+</button>
+</div>
+<!-- Footer -->
+<footer class="w-full py-20 bg-paper-cream border-t border-champagne-silk/10 pb-32 md:pb-20">
+    <div class="max-w-[1440px] mx-auto px-4 md:px-canvas-margin flex flex-col md:flex-row justify-between items-center gap-8">
+        <div class="flex flex-col md:flex-row items-center gap-6">
+            <a class="font-body-md text-body-md text-charcoal-ink/60 hover:text-cinematic-gold underline-offset-4 hover:underline transition-colors" href="mailto:concierge@dreamweavers.events">Contact Concierge</a>
+            <span class="font-body-md text-body-md text-charcoal-ink/60 underline-offset-4 transition-colors opacity-40 cursor-not-allowed" aria-disabled="true" title="Coming soon">Privacy Policy</span>
+            <span class="font-body-md text-body-md text-charcoal-ink/60 underline-offset-4 transition-colors opacity-40 cursor-not-allowed" aria-disabled="true" title="Coming soon">Technical Support</span>
+        </div>
+        <p class="font-label-sm text-label-sm text-charcoal-ink/40 uppercase tracking-wider font-semibold">© 2024 DREAMWEAVERS DIGITAL HEIRLOOMS</p>
+    </div>
+</footer>
+<script>
+    // Drawer Logic
+    const menuBtn = document.getElementById('mobile-menu-trigger');
+    const drawer = document.getElementById('nav-drawer');
+    const closeBtn = document.getElementById('close-drawer');
+    const drawerNav = drawer.querySelector('nav');
+
+    menuBtn.addEventListener('click', () => {
+        drawer.classList.remove('hidden');
+        setTimeout(() => {
+            drawer.classList.remove('opacity-0');
+            drawerNav.classList.remove('-translate-x-full');
+        }, 10);
+    });
+
+    const closeDrawer = () => {
+        drawer.classList.add('opacity-0');
+        drawerNav.classList.add('-translate-x-full');
+        setTimeout(() => {
+            drawer.classList.add('hidden');
+        }, 300);
+    };
+
+    closeBtn.addEventListener('click', closeDrawer);
+    drawer.addEventListener('click', (e) => {
+        if (e.target === drawer) closeDrawer();
+    });
+
+    // FAB Scroll Logic
+    const fab = document.getElementById('fab');
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+            fab.classList.remove('translate-y-20', 'opacity-0');
+        } else {
+            fab.classList.add('translate-y-20', 'opacity-0');
+        }
+    });
+
+    // Simple Countdown Logic
+    const updateCountdown = () => {
+        const secEl = document.getElementById('seconds');
+        if (secEl) {
+            let secs = parseInt(secEl.innerText);
+            if (secs > 0) {
+                secs--;
+                secEl.innerText = secs < 10 ? '0' + secs : secs;
+            } else {
+                secEl.innerText = '59';
+            }
+        }
+    };
+    setInterval(updateCountdown, 1000);
+</script>
+</body></html>

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en" style=""><head></head><body class="bg-paper-cream text-charcoal-ink font-body-md antialiased min-h-screen relative pb-32 font-['Playfair_Display']">```html
+
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dreamweavers - Getting There</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        /* Custom Toggle Switch */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #D4AF37;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #1A1A1A;
+        }
+        
+        /* Hide scrollbar for pills */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-tint": "#5f5e5e",
+                        "secondary-fixed-dim": "#e9c349",
+                        "status-error": "#8B1E1E",
+                        "charcoal-ink": "#1A1A1A",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed-dim": "#c9c6c1",
+                        "surface-dim": "#ddd9d8",
+                        "on-tertiary-fixed": "#1c1c18",
+                        "surface-bright": "#fdf8f8",
+                        "tertiary-fixed": "#e6e2dc",
+                        "on-surface": "#1c1b1b",
+                        "surface-container-low": "#f7f3f2",
+                        "on-error-container": "#93000a",
+                        "on-surface-variant": "#444748",
+                        "on-secondary": "#ffffff",
+                        "paper-cream": "#FDF9F3",
+                        "on-primary-fixed-variant": "#474746",
+                        "inverse-surface": "#313030",
+                        "secondary-fixed": "#ffe088",
+                        "surface-container-highest": "#e5e2e1",
+                        "status-success": "#2D4B3A",
+                        "on-tertiary-fixed-variant": "#484743",
+                        "primary-fixed": "#e5e2e1",
+                        "tertiary": "#000000",
+                        "on-secondary-fixed-variant": "#574500",
+                        "error": "#ba1a1a",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed": "#1c1b1b",
+                        "on-secondary-container": "#745c00",
+                        "primary": "#000000",
+                        "cinematic-gold": "#D4AF37",
+                        "inverse-primary": "#c8c6c5",
+                        "inverse-on-surface": "#f4f0ef",
+                        "on-background": "#1c1b1b",
+                        "outline": "#747878",
+                        "on-primary-container": "#858383",
+                        "champagne-silk": "#E8D5B5",
+                        "error-container": "#ffdad6",
+                        "on-primary": "#ffffff",
+                        "surface": "#fdf8f8",
+                        "secondary-container": "#fed65b",
+                        "surface-container": "#f1edec",
+                        "surface-variant": "#e5e2e1",
+                        "primary-container": "#1c1b1b",
+                        "outline-variant": "#c4c7c7",
+                        "tertiary-container": "#1c1c18",
+                        "on-tertiary-container": "#86847f",
+                        "surface-container-lowest": "#ffffff",
+                        "background": "#fdf8f8",
+                        "on-secondary-fixed": "#241a00",
+                        "primary-fixed-dim": "#c8c6c5",
+                        "surface-container-high": "#ebe7e6",
+                        "secondary": "#735c00"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    spacing: {
+                        "unit": "4px",
+                        "section-gap": "8rem",
+                        "canvas-margin": "4rem",
+                        "gutter": "2rem"
+                    },
+                    fontFamily: {
+                        "display-hero": ["Playfair Display", "serif"],
+                        "label-sm": ["Playfair Display", "serif"],
+                        "body-md": ["Playfair Display", "serif"],
+                        "headline-lg-mobile": ["Playfair Display", "serif"],
+                        "headline-lg": ["Playfair Display", "serif"],
+                        "headline-md": ["Playfair Display", "serif"],
+                        "body-lg": ["Playfair Display", "serif"],
+                        "utility-mono": ["Playfair Display", "serif"]
+                    },
+                    fontSize: {
+                        "display-hero": ["84px", { lineHeight: "100px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "label-sm": ["12px", { lineHeight: "16px", letterSpacing: "0.1em", fontWeight: "600" }],
+                        "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+                        "headline-lg-mobile": ["32px", { lineHeight: "40px", fontWeight: "600" }],
+                        "headline-lg": ["48px", { lineHeight: "56px", fontWeight: "600" }],
+                        "headline-md": ["32px", { lineHeight: "40px", fontWeight: "500" }],
+                        "body-lg": ["18px", { lineHeight: "32px", fontWeight: "400" }],
+                        "utility-mono": ["14px", { lineHeight: "20px", fontWeight: "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            min-height: max(884px, 100dvh);
+            font-family: 'Playfair Display', serif;
+        }
+    </style>
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-paper-cream/80 backdrop-blur-md border-b border-champagne-silk/30">
+<div class="flex justify-between items-center px-4 md:px-6 py-3 w-full max-w-[1440px] mx-auto">
+<div class="flex-shrink-0">
+<img alt="Dreamweavers Logo" class="h-4 md:h-5 w-auto object-contain" src="/assets/dreamweavers-logo.png"/>
+</div>
+<nav class="hidden lg:flex justify-center items-center gap-6 px-4 ml-auto">
+<a class="font-medium text-[11px] tracking-[0.2em] uppercase text-charcoal-ink/40 hover:text-cinematic-gold transition-colors duration-300 pb-1 border-b-2 border-transparent h-[26px] flex items-center" href="/home.html">Home</a>
+<a class="font-medium text-[11px] tracking-[0.2em] uppercase text-charcoal-ink/40 hover:text-cinematic-gold transition-colors duration-300 pb-1 border-b-2 border-transparent h-[26px] flex items-center" href="/schedule.html">Schedule</a>
+<a class="font-medium text-[11px] tracking-[0.2em] uppercase text-charcoal-ink/40 hover:text-cinematic-gold transition-colors duration-300 pb-1 border-b-2 border-transparent h-[26px] flex items-center" href="/rsvp.html">RSVP</a>
+<a class="font-medium text-[11px] tracking-[0.2em] uppercase text-cinematic-gold border-b-2 border-cinematic-gold pb-1 h-[26px] flex items-center" href="/getting-there.html">Getting There</a>
+<a class="font-medium text-[11px] tracking-[0.2em] uppercase text-charcoal-ink/40 hover:text-cinematic-gold transition-colors duration-300 pb-1 border-b-2 border-transparent h-[26px] flex items-center" href="/story.html">Story</a>
+<a class="font-medium text-[11px] tracking-[0.2em] uppercase text-charcoal-ink/40 hover:text-cinematic-gold transition-colors duration-300 pb-1 border-b-2 border-transparent h-[26px] flex items-center" href="/wishes.html">Wishes</a>
+<a class="font-medium text-[11px] tracking-[0.2em] uppercase text-charcoal-ink/40 hover:text-cinematic-gold transition-colors duration-300 pb-1 border-b-2 border-transparent h-[26px] flex items-center" href="/qa.html">Q&amp;A</a>
+<a class="font-medium text-[11px] tracking-[0.2em] uppercase text-charcoal-ink/40 hover:text-cinematic-gold transition-colors duration-300 pb-1 border-b-2 border-transparent h-[26px] flex items-center" href="/moments.html">Moments</a>
+</nav>
+<div class="lg:hidden ml-auto">
+<button class="text-charcoal-ink p-2" id="mobile-menu-trigger">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+</div>
+</header><div class="w-full h-[360px] md:h-[420px] bg-cover bg-center mt-[54px] md:mt-[64px] relative z-40 border-b border-champagne-silk/20 flex items-center justify-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA-OyKfcsxXAmZDArHbDXl1cVCgGUG5liFPzyHdVvMG6_4jN9pNTrN9GCrkdnegli9UPJUSPs39KJRsRP7AiLem4xYS-q1ZYq1T3DAIqyvn3wAvbdkoMVkufft0SpQw4gDTPSnIml6k62lRYobUrNu70UGIILiMZQ0fAydTXXwVZ1oswQZ-mjPT8H9mDDqfhxsMSI5zla8GKz_ILXbmdRjtRUk682dPEDBD6I81DzEx7dITgjb6vxQoee5599jkYf_vCYP7npydvxqx');"><div class="absolute inset-0 bg-gradient-to-b from-paper-cream/30 via-paper-cream/10 to-paper-cream/60"></div><div class="relative z-10 text-center px-6"><h1 class="font-display-hero text-[44px] md:text-[72px] leading-[1.05] text-charcoal-ink tracking-tight font-bold drop-shadow-sm">Getting There</h1><p class="mt-3 font-label-sm text-[11px] md:text-xs uppercase tracking-[0.25em] text-cinematic-gold font-semibold drop-shadow">The Singapore EDITION, Orchard</p></div></div>
+<div class="fixed inset-0 z-[60] bg-charcoal-ink/20 backdrop-blur-sm hidden transition-opacity duration-300 opacity-0" id="nav-drawer">
+<nav class="h-full w-80 bg-paper-cream shadow-2xl flex flex-col p-8 gap-4 transform -translate-x-full transition-transform duration-500 ease-in-out">
+<div class="flex justify-between items-center mb-8 border-b border-champagne-silk/30 pb-4">
+<img alt="Dreamweavers" class="h-3" src="/assets/dreamweavers-logo.png"/>
+<button class="text-charcoal-ink" id="close-drawer">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</div>
+<ul class="flex flex-col gap-6">
+<li class=""><a class="flex items-center gap-4 text-charcoal-ink/60 hover:pl-2 transition-all duration-300" href="/home.html"><span class="text-xs uppercase tracking-widest">Home</span></a></li>
+<li class=""><a class="flex items-center gap-4 text-charcoal-ink/60 hover:pl-2 transition-all duration-300" href="/schedule.html"><span class="text-xs uppercase tracking-widest">Schedule</span></a></li>
+<li class=""><a class="flex items-center gap-4 text-charcoal-ink/60 hover:pl-2 transition-all duration-300" href="/rsvp.html"><span class="text-xs uppercase tracking-widest">RSVP</span></a></li>
+<li class=""><a class="flex items-center gap-4 text-cinematic-gold font-bold hover:pl-2 transition-all duration-300" href="/getting-there.html"><span class="text-xs uppercase tracking-widest font-bold">Getting There</span></a></li>
+<li class=""><a class="flex items-center gap-4 text-charcoal-ink/60 hover:pl-2 transition-all duration-300" href="/story.html"><span class="text-xs uppercase tracking-widest">Story</span></a></li>
+<li class=""><a class="flex items-center gap-4 text-charcoal-ink/60 hover:pl-2 transition-all duration-300" href="/wishes.html"><span class="text-xs uppercase tracking-widest">Wishes</span></a></li>
+<li class=""><a class="flex items-center gap-4 text-charcoal-ink/60 hover:pl-2 transition-all duration-300" href="/qa.html"><span class="text-xs uppercase tracking-widest">Q &amp; A</span></a></li>
+<li class=""><a class="flex items-center gap-4 text-charcoal-ink/60 hover:pl-2 transition-all duration-300" href="/moments.html"><span class="text-xs uppercase tracking-widest">Moments</span></a></li>
+</ul>
+</nav>
+</div>
+<!-- Main Content Canvas -->
+<main class="pb-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto min-h-screen pt-[20px] md:pt-[40px] flex flex-col gap-8">
+<!-- Header & Tabs Section -->
+      <section class="flex flex-col gap-6 max-w-md mx-auto w-full">
+        <!-- Address (always visible above tabs) -->
+        <div class="space-y-4 text-center pb-2 pt-1">
+          <h3 class="font-label-sm text-xs uppercase tracking-[0.2em] text-cinematic-gold font-bold">ADDRESS</h3>
+          <div>
+            <p class="font-headline-md text-xl text-charcoal-ink font-semibold">The Singapore EDITION</p>
+            <p class="font-body-md text-charcoal-ink/70 italic mt-1">38 Cuscaden Road, Singapore 249731</p>
+          </div>
+        </div>
+
+        <!-- Tabbed Navigation Pills -->
+            <div class="flex gap-3 overflow-x-auto no-scrollbar pb-2 pt-1 border-b border-champagne-silk/30">
+              <button id="tab-car" class="flex-1 text-charcoal-ink/40 pb-4 font-label-sm text-xs uppercase tracking-[0.2em] font-medium transition-colors duration-300" onclick="switchTab('car')">BY CAR</button>
+              <button id="tab-transit" class="flex-1 text-charcoal-ink border-b-2 border-charcoal-ink pb-4 font-label-sm text-xs uppercase tracking-[0.2em] font-bold transition-colors duration-300" onclick="switchTab('transit')">PUBLIC TRANSIT</button>
+            </div>
+</section>
+    <!-- Tab Content: By Car -->
+    <section id="content-car" class="hidden grid grid-cols-2 gap-4 max-w-md mx-auto w-full">
+      <div class="col-span-2 space-y-8 py-4">
+        <div class="space-y-4">
+          <h3 class="font-label-sm text-xs uppercase tracking-[0.2em] text-cinematic-gold font-bold">PARKING</h3>
+          <div class="space-y-2">
+            <p class="font-body-md text-charcoal-ink/80 leading-relaxed">Valet parking is available at the hotel entrance. Alternatively, guests may utilise the hotel's basement car park, subject to availability.</p>
+            <p class="font-body-md text-sm text-charcoal-ink/60 leading-relaxed">Kindly inform the concierge that you are attending the Dreamweavers event.</p>
+          </div>
+        </div>
+        <div class="border-t border-champagne-silk/30 pt-8 space-y-4">
+          <h3 class="font-label-sm text-xs uppercase tracking-[0.2em] text-cinematic-gold font-bold">FROM THE AIRPORT</h3>
+          <p class="font-body-md text-charcoal-ink/80 leading-relaxed">Via CTE / Orchard Road, the journey from Singapore Changi Airport is approximately 25–30 minutes, subject to traffic conditions.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab Content: Public Transit -->
+    <section id="content-transit" class="grid grid-cols-2 gap-4 max-w-md mx-auto w-full">
+      <div class="col-span-2 space-y-8 py-4">
+        <div class="space-y-4">
+          <h3 class="font-label-sm text-xs uppercase tracking-[0.2em] text-cinematic-gold font-bold">MRT</h3>
+          <div class="space-y-4">
+            <div>
+              <p class="font-headline-md text-xl text-charcoal-ink font-semibold">Orchard Boulevard MRT Station <span class="text-charcoal-ink/50 font-body-md text-base not-italic">(TE13)</span></p>
+              <p class="font-body-md text-charcoal-ink/70 italic mt-1">Approximately 4–5 minutes' walk to the venue.</p>
+            </div>
+            <div>
+              <p class="font-headline-md text-xl text-charcoal-ink font-semibold">Orchard MRT Station <span class="text-charcoal-ink/50 font-body-md text-base not-italic">(NS22/TE14)</span></p>
+              <p class="font-body-md text-charcoal-ink/70 italic mt-1">Approximately 8–10 minutes' walk to the venue.</p>
+            </div>
+          </div>
+        </div>
+        <div class="border-t border-champagne-silk/30 pt-8 space-y-4">
+          <h3 class="font-label-sm text-xs uppercase tracking-[0.2em] text-cinematic-gold font-bold">BUS</h3>
+          <div class="space-y-2">
+            <p class="font-body-md text-charcoal-ink/80 leading-relaxed">Guests may alight at <span class="font-semibold text-charcoal-ink">Bef Tomlinson Rd (09121)</span> or <span class="font-semibold text-charcoal-ink">Opp Four Seasons Hotel (09111)</span>, both of which are about a 2-minute walk from the venue.</p>
+            <p class="font-body-md text-sm text-charcoal-ink/60 leading-relaxed">Available bus services: <span class="italic">7, 36, 36A, 36B, 77, 105, 106, 111, 123, 132, 174, and 174e</span>.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      function switchTab(tab) {
+        const carBtn = document.getElementById('tab-car');
+        const transitBtn = document.getElementById('tab-transit');
+        const carContent = document.getElementById('content-car');
+        const transitContent = document.getElementById('content-transit');
+
+        if (tab === 'car') {
+          carBtn.classList.remove('text-charcoal-ink/40', 'font-medium');
+          carBtn.classList.add('text-charcoal-ink', 'border-b-2', 'border-charcoal-ink', 'font-bold');
+          transitBtn.classList.remove('text-charcoal-ink', 'border-b-2', 'border-charcoal-ink', 'font-bold');
+          transitBtn.classList.add('text-charcoal-ink/40', 'font-medium');
+          carContent.classList.remove('hidden');
+          transitContent.classList.add('hidden');
+        } else {
+          transitBtn.classList.remove('text-charcoal-ink/40', 'font-medium');
+          transitBtn.classList.add('text-charcoal-ink', 'border-b-2', 'border-charcoal-ink', 'font-bold');
+          carBtn.classList.remove('text-charcoal-ink', 'border-b-2', 'border-charcoal-ink', 'font-bold');
+          carBtn.classList.add('text-charcoal-ink/40', 'font-medium');
+          transitContent.classList.remove('hidden');
+          carContent.classList.add('hidden');
+        }
+      }
+    </script>
+</main>
+<!-- BottomNavBar (Mobile) -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center py-4 px-2 md:hidden bg-paper-cream/95 backdrop-blur-md rounded-t-[24px] border-t border-cinematic-gold/10 shadow-[0_-4px_20px_rgba(26,26,26,0.04)] z-50"><a class="flex flex-col items-center justify-center text-charcoal-ink/40 hover:text-cinematic-gold transition-all" href="/home.html"><span class="material-symbols-outlined mb-1">home</span><span class="font-label-sm text-[9px] tracking-[0.1em] uppercase font-semibold">HOME</span></a><a class="flex flex-col items-center justify-center text-charcoal-ink/40 hover:text-cinematic-gold transition-all" href="/rsvp.html"><span class="material-symbols-outlined mb-1">favorite</span><span class="font-label-sm text-[9px] tracking-[0.1em] uppercase font-semibold">RSVP</span></a><a class="flex flex-col items-center justify-center text-charcoal-ink/40 hover:text-cinematic-gold transition-all" href="/story.html"><span class="material-symbols-outlined mb-1">auto_stories</span><span class="font-label-sm text-[9px] tracking-[0.1em] uppercase font-semibold">STORY</span></a><a class="flex flex-col items-center justify-center text-charcoal-ink/40 hover:text-cinematic-gold transition-all" href="/moments.html"><span class="material-symbols-outlined mb-1">photo_library</span><span class="font-label-sm text-[9px] tracking-[0.1em] uppercase font-semibold">MOMENTS</span></a><a class="flex flex-col items-center justify-center text-cinematic-gold relative" href="#" onclick="event.preventDefault(); document.getElementById('mobile-menu-trigger')?.click();"><span class="material-symbols-outlined mb-1 icon-fill">more_horiz</span><span class="font-label-sm text-[9px] tracking-[0.1em] uppercase font-bold">MORE</span><div class="absolute -top-2 w-1 h-1 bg-cinematic-gold rounded-full"></div></a></nav>
+<!-- Footer -->
+<footer class="w-full py-20 bg-paper-cream border-t border-champagne-silk/10 pb-32 md:pb-20">
+    <div class="max-w-[1440px] mx-auto px-4 md:px-canvas-margin flex flex-col md:flex-row justify-between items-center gap-8">
+        <div class="flex flex-col md:flex-row items-center gap-6">
+            <a class="font-body-md text-body-md text-charcoal-ink/60 hover:text-cinematic-gold underline-offset-4 hover:underline transition-colors" href="mailto:concierge@dreamweavers.events">Contact Concierge</a>
+            <span class="font-body-md text-body-md text-charcoal-ink/60 underline-offset-4 transition-colors opacity-40 cursor-not-allowed" aria-disabled="true" title="Coming soon">Privacy Policy</span>
+            <span class="font-body-md text-body-md text-charcoal-ink/60 underline-offset-4 transition-colors opacity-40 cursor-not-allowed" aria-disabled="true" title="Coming soon">Technical Support</span>
+        </div>
+        <p class="font-label-sm text-label-sm text-charcoal-ink/40 uppercase tracking-wider font-semibold">© 2024 DREAMWEAVERS DIGITAL HEIRLOOMS</p>
+    </div>
+</footer>
+```
+
+<script src="/nav.js" defer></script>
+</body></html>
