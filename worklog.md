@@ -1766,3 +1766,33 @@ Stage Summary:
 - Page-centric organization matches guest navigation flow
 - Story chapter images and wish images dynamically appear when present
 - Total image count in header updates based on what's actually rendered
+
+---
+Task ID: infra-fix-oom
+Agent: Main Agent (Senior Infrastructure/DevOps)
+Task: Diagnose and fix Turbopack PostCSS worker OOM in 3.9GB sandbox
+
+Work Log:
+- Read panic log /tmp/next-panic-*.log: revealed PostCSS worker IPC crash ("failed to receive message / unexpected end of file")
+- Confirmed via dmesg: PostCSS worker (MainThread) OOM-killed with 3.1GB RSS in 3.9GB environment (zero swap)
+- Ruled out CSS content as cause: replaced globals.css with 12-line file → identical crash
+- Ruled out file scanning scope: @source with single file → identical 3.1GB OOM
+- Ruled out PostCSS plugins: empty postcss.config + plain CSS → server works (200)
+- Root cause: @tailwindcss/postcss PostCSS worker has ~3.1GB baseline RSS regardless of workload
+- Webpack also OOMs (14.7GB virtual, 3.5GB RSS) — double confirmation memory is the constraint
+- Solution: Pre-generate Tailwind CSS via @tailwindcss/cli (23s, 178KB output, no OOM)
+- Installed @tailwindcss/cli, created tailwind-input.css from original globals.css
+- Generated tailwind-output.css (static 178KB CSS with all utilities + custom styles)
+- Emptied postcss.config.mjs (no plugins — PostCSS worker never spawns)
+- Updated layout.tsx to import tailwind-output.css instead of globals.css
+- Set NODE_OPTIONS="--max-old-space-size=512" in dev.sh to cap V8 heap
+- Verified: GET / → 200 (8.8s first compile, <100ms subsequent), all API routes 200
+- Confirmed zero new OOM kills after fix
+- Note: sandbox kills processes between tool invocations; server must be started within each invocation
+
+Stage Summary:
+- Files created: src/app/tailwind-input.css, src/app/tailwind-output.css, dev.sh
+- Files modified: postcss.config.mjs (emptied), src/app/layout.tsx (import path), package.json (dev script)
+- To regenerate CSS: NODE_OPTIONS="--max-old-space-size=768" npx tailwindcss -i src/app/tailwind-input.css -o src/app/tailwind-output.css --minify
+- Trade-off: adding new Tailwind classes requires manual CSS regeneration (no hot reload for utility classes)
+- PostCSS worker OOM is permanently eliminated; Turbopack compiles in ~9s first load, <100ms incremental
