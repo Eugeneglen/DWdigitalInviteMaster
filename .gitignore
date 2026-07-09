@@ -95,6 +95,10 @@ db/*.db
 download/*.tar.gz
 download/*.zip
 
+# HTML prototypes (reference only, not served by Next.js)
+public/*.html
+public/nav.js
+
 # IDE / editor
 .vscode/
 .idea/
