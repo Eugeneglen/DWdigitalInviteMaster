@@ -100,14 +100,14 @@ export default function GuestSite({ slug, topOffset, showEditorButton = false }:
 
   // Pre-fetch wedding data for this slug so all child pages share the cache
   const { data: weddingData, loading, getField } = usePublicWedding(slug);
-  const { navTabs, loaded: settingsLoaded } = useSiteSettings();
+  const { navTabs, headerBgColor: platformHeaderBg, loaded: settingsLoaded } = useSiteSettings();
   const { setAvailableTabs } = useNavigationStore();
 
   // Read the custom background colour (default: DW paper-cream)
   const backgroundColor = getField('global', 'backgroundColor', '#FCF9F2');
 
-  // Header background — separate from page bg (empty = same as page)
-  const headerBgRaw = getField('global', 'headerBackgroundColor', '');
+  // Header background — per-wedding > platform-wide (Master Admin) > page bg
+  const headerBgRaw = getField('global', 'headerBackgroundColor', '') || platformHeaderBg;
   const headerBg = headerBgRaw || backgroundColor;
 
   // Text & border colours — auto-detect from page bg unless manually overridden

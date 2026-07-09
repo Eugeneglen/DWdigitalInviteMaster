@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { Save, GripVertical, Plus, Trash2, ChevronUp, ChevronDown, FileText } from 'lucide-react';
+import { Save, GripVertical, Plus, Trash2, ChevronUp, ChevronDown, FileText, Palette } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { invalidateSiteSettingsCache } from '@/hooks/useSiteSettings';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -280,6 +281,7 @@ export default function MasterSettings() {
 
       setInitialSettings({ ...allSettings });
       setInitialTabs([...tabs]);
+      invalidateSiteSettingsCache();
       toast({ title: 'Settings Saved', description: `${json.updated} ${json.updated === 1 ? 'value' : 'values'} updated` });
     } catch (err) {
       toast({ title: 'Save Failed', description: err instanceof Error ? err.message : 'Failed to save settings', variant: 'destructive' });
@@ -400,6 +402,56 @@ export default function MasterSettings() {
               </CardContent>
             </Card>
           ))}
+
+          <Separator />
+
+          {/* ── Appearance Defaults (Admin-only) ────────────────────────── */}
+          <Card className="border-slate-200 rounded-xl bg-white shadow-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                <Palette className="h-5 w-5 text-slate-400" />
+                Appearance
+              </CardTitle>
+              <p className="text-sm text-slate-400">Platform-wide appearance defaults. These override couple settings.</p>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              {/* Header Background Colour */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-slate-700">Header Background Colour</Label>
+                <p className="text-xs text-slate-400">Sets the header bar background for ALL wedding sites. Leave empty to use each wedding's page background.</p>
+                <div className="flex items-center gap-3 mt-1">
+                  <div
+                    className="relative h-10 w-20 rounded-lg border border-slate-200 overflow-hidden cursor-pointer transition-colors"
+                    style={{ backgroundColor: settings['site_header_bg_color'] || '#FCF9F2' }}
+                  >
+                    <input
+                      type="color"
+                      value={settings['site_header_bg_color'] || '#FCF9F2'}
+                      onChange={(e) => updateField('site_header_bg_color', e.target.value)}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      title="Pick header background colour"
+                    />
+                  </div>
+                  <Input
+                    value={settings['site_header_bg_color'] || ''}
+                    onChange={(e) => updateField('site_header_bg_color', e.target.value)}
+                    placeholder="e.g. #1A1A1A — leave empty to use page bg"
+                    className="max-w-xs font-mono text-sm"
+                    maxLength={7}
+                  />
+                  {settings['site_header_bg_color'] && (
+                    <button
+                      type="button"
+                      onClick={() => updateField('site_header_bg_color', '')}
+                      className="text-xs text-slate-400 hover:text-red-500 transition-colors whitespace-nowrap"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
           <Separator />
 

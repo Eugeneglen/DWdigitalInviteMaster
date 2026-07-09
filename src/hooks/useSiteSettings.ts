@@ -22,6 +22,7 @@ export interface FooterContent {
 export interface SiteSettings {
   navTabs: NavTab[];
   footerContent: FooterContent;
+  headerBgColor: string;
 }
 
 // ── Defaults (match API defaults) ────────────────────────────────────────
@@ -65,7 +66,7 @@ async function fetchSiteSettings(): Promise<SiteSettings> {
     })
     .catch(() => {
       cachedPromise = null;
-      return { navTabs: DEFAULT_NAV_TABS, footerContent: DEFAULT_FOOTER };
+      return { navTabs: DEFAULT_NAV_TABS, footerContent: DEFAULT_FOOTER, headerBgColor: '' };
     });
 
   return cachedPromise;
@@ -83,6 +84,7 @@ export function useSiteSettings() {
   const [settings, setSettings] = useState<SiteSettings>({
     navTabs: DEFAULT_NAV_TABS,
     footerContent: DEFAULT_FOOTER,
+    headerBgColor: '',
   });
   const [loaded, setLoaded] = useState(false);
 

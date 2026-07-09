@@ -27,7 +27,7 @@ export async function GET() {
     const settings = await db.systemSetting.findMany({
       where: {
         key: {
-          in: ['site_nav_tabs', 'footer_copyright', 'footer_privacy_policy', 'footer_data_protection', 'footer_terms_of_service'],
+          in: ['site_nav_tabs', 'footer_copyright', 'footer_privacy_policy', 'footer_data_protection', 'footer_terms_of_service', 'site_header_bg_color'],
         },
       },
     });
@@ -61,13 +61,14 @@ export async function GET() {
       termsOfService: kv['footer_terms_of_service'] || DEFAULT_FOOTER.termsOfService,
     };
 
-    return NextResponse.json({ navTabs: enabledTabs, footerContent });
+    return NextResponse.json({ navTabs: enabledTabs, footerContent, headerBgColor: kv['site_header_bg_color'] || '' });
   } catch (error) {
     console.error('Site settings GET error:', error);
     // Return defaults even on error so the guest site never breaks
     return NextResponse.json({
       navTabs: DEFAULT_NAV_TABS.filter((t) => t.enabled !== false),
       footerContent: DEFAULT_FOOTER,
+      headerBgColor: '',
     });
   }
 }

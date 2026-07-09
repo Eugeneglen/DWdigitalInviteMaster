@@ -114,15 +114,26 @@ export default function HomePage() {
         className="w-full h-[360px] md:h-[420px] bg-cover bg-center mt-[54px] md:mt-[64px] relative z-40 flex items-center justify-center"
         style={{ backgroundImage: `url('${bannerUrl}')` }}
       >
+        {/* Frosted glass card — ensures headline readability on ANY banner image,
+            independent of the page-level auto-contrast system which only
+            considers the page background colour, not this image. */}
         <div className="relative z-10 text-center px-6">
-          <h1 className="font-display-hero text-[44px] md:text-[72px] leading-[1.05] text-charcoal-ink tracking-tight font-bold drop-shadow-sm" style={{ fontFamily: `'${heroFont}', serif` }}>
-            {coupleName}
-          </h1>
-          {heroSubtitle && (
-            <p className="mt-2 text-sm md:text-base text-charcoal-ink/70 italic tracking-wide">
-              {heroSubtitle}
-            </p>
-          )}
+          <div className="inline-block rounded-2xl px-8 md:px-12 py-4 md:py-5 bg-white/60 backdrop-blur-md shadow-lg border border-white/50">
+            <h1
+              className="font-display-hero text-[44px] md:text-[72px] leading-[1.05] tracking-tight font-bold"
+              style={{ fontFamily: `'${heroFont}', serif`, color: '#1A1A1A' }}
+            >
+              {coupleName}
+            </h1>
+            {heroSubtitle && (
+              <p
+                className="mt-2 text-sm md:text-base italic tracking-wide"
+                style={{ color: 'rgba(26, 26, 26, 0.7)' }}
+              >
+                {heroSubtitle}
+              </p>
+            )}
+          </div>
         </div>
       </div>
 

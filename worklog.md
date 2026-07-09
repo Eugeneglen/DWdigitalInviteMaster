@@ -1612,3 +1612,27 @@ Stage Summary:
 - Couple CMS now shows only a simple 12-preset colour grid + native picker
 - Auto-contrast works silently when couples pick dark backgrounds
 - Advanced controls (header bg, text/border override) reserved for Master Admin via API
+---
+Task ID: 4
+Agent: Main Agent
+Task: Fix headline color contrast issue + Add header bg control to Master Admin CMS
+
+Work Log:
+- Analyzed the user's screenshot showing poor headline contrast: light text on light banner image
+- Root cause: auto-contrast system uses page background color (dark) to determine text color (light), but the TOP BANNER has its own background IMAGE (light/cream), creating a mismatch
+- Fixed by adding a frosted glass card (`bg-white/60 backdrop-blur-md`) behind the headline in HomePage.tsx
+- Used inline `style={{ color: '#1A1A1A' }}` to bypass the page-level auto-contrast system for the banner text
+- This ensures headline readability on ANY banner image, regardless of page background color
+- Added `site_header_bg_color` to the public site-settings API (`/api/site-settings/route.ts`)
+- Added `headerBgColor` to the `SiteSettings` interface in `useSiteSettings.ts`
+- Added an "Appearance" card section to `MasterSettings.tsx` with a color picker for header background
+- This setting is SUPER_ADMIN-only (protected by the master settings API guard)
+- Updated `GuestSite.tsx` fallback chain: per-wedding → platform-wide (Master Admin) → page background
+- Added `invalidateSiteSettingsCache()` call after admin saves settings
+- Verified with agent-browser: frosted glass card visible, text readable on desktop and mobile, no runtime errors, footer properly positioned, lint clean (0 errors)
+
+Stage Summary:
+- Headline contrast issue solved with frosted glass card approach (works on any banner image)
+- Master Admin can now set a platform-wide header background color from Settings > Appearance
+- Couples only see the simplified page background picker (no header controls)
+- Files modified: HomePage.tsx, site-settings/route.ts, useSiteSettings.ts, GuestSite.tsx, MasterSettings.tsx
