@@ -81,7 +81,17 @@ function CoupleCMSPageRouter() {
   return <PageComponent />;
 }
 
-export default function Home() {
+// ── Page root — Suspense boundary required because HomeContent uses useSearchParams() ──
+
+export default function Page() {
+  return (
+    <Suspense>
+      <HomeContent />
+    </Suspense>
+  );
+}
+
+function HomeContent() {
   const { data: session, status } = useSession();
   const { previewMode, togglePreview } = useCoupleCMSStore();
   const { open: loginModalOpen, closeModal } = useAuthModalStore();
