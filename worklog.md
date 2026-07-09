@@ -1595,3 +1595,20 @@ Stage Summary:
 - Browser-verified: default Paper Cream theme unchanged, zero artifacts
 - All 5 guest pages (Home, Schedule, RSVP, Story, Wishes, Q&A, Getting There) verified on dark bg
 - Lint: 0 errors (1 pre-existing font warning)
+
+---
+Task ID: 4
+Agent: Main Agent
+Task: Simplify color picker UX — hide advanced controls from couples
+
+Work Log:
+- Reverted `BackgroundColorPicker.tsx` to couple-friendly single-section UI: only "Background Colour" with presets + custom picker
+- Removed Header Background, Text & Border Contrast, and Live Preview sections from couple-facing UI
+- Restored 2-column layout (BackgroundColorPicker + FontPicker) in CoupleHome.tsx
+- Auto-contrast infrastructure (GuestSite CSS vars, dynamic style injection, header bg support) remains fully functional — just invisible to couples
+- Header background field (`global/headerBackgroundColor`) can still be set via Master Admin API
+
+Stage Summary:
+- Couple CMS now shows only a simple 12-preset colour grid + native picker
+- Auto-contrast works silently when couples pick dark backgrounds
+- Advanced controls (header bg, text/border override) reserved for Master Admin via API
