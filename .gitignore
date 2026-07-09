@@ -56,3 +56,7 @@ server.log
 # Agent artifacts
 tool-results/
 upload/
+
+# Sandbox-only: pre-generated Tailwind CSS (bypasses PostCSS OOM in memory-constrained env)
+src/app/tailwind-output.css
+dev.sh

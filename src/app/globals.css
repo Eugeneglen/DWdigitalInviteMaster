@@ -1,8 +1,375 @@
-/* 
- * This file is intentionally left minimal.
- * All Tailwind utilities and custom CSS are pre-generated in tailwind-output.css
- * via the Tailwind CLI to avoid Turbopack's PostCSS worker OOM in this environment.
- * 
- * To regenerate: npx tailwindcss -i src/app/tailwind-input.css -o src/app/tailwind-output.css
- * To watch:     npx tailwindcss -i src/app/tailwind-input.css -o src/app/tailwind-output.css --watch
- */
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: "Playfair Display", serif;
+  --font-mono: "Playfair Display", serif;
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+
+  /* Border Radius — matching original DWdigitalInvite config exactly */
+  --radius: 0.125rem;
+  --radius-sm: 0.125rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.25rem;
+  --radius-xl: 0.5rem;
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
+  --radius-full: 0.75rem;
+
+  /* Wedding Design System Colors */
+  --color-paper-cream: #FCF9F2;
+  --color-surface-container-low: #f7f3f2;
+  --color-surface-container: #f1edec;
+  --color-surface-container-high: #ebe7e6;
+  --color-surface-container-highest: #e5e2e1;
+  --color-surface-container-lowest: #ffffff;
+  --color-charcoal-ink: #1A1A1A;
+  --color-cinematic-gold: #D4AF37;
+  --color-champagne-silk: #E8D5B5;
+  --color-surface: #fdf8f8;
+  --color-on-surface: #1c1b1b;
+
+  /* Custom spacing */
+  --spacing-section-gap: 8rem;
+  --spacing-canvas-margin: 4rem;
+  --spacing-gutter: 2rem;
+
+  /* ========================================
+     Font Sizes — matching original tailwind fontSize config.
+     These create proper Tailwind text-* utilities in the utilities layer,
+     so arbitrary values like text-[10px] can override them correctly.
+     ======================================== */
+  --text-display-hero: 84px;
+  --text-headline-lg: 48px;
+  --text-headline-lg-mobile: 32px;
+  --text-headline-md: 32px;
+  --text-label-sm: 12px;
+  --text-body-md: 16px;
+  --text-body-lg: 18px;
+  --text-utility-mono: 14px;
+
+  /* Line heights — matching original tailwind fontSize lineHeight values */
+  --leading-display-hero: 100px;
+  --leading-headline-lg: 56px;
+  --leading-headline-lg-mobile: 40px;
+  --leading-headline-md: 40px;
+  --leading-label-sm: 16px;
+  --leading-body-md: 24px;
+  --leading-body-lg: 32px;
+  --leading-utility-mono: 20px;
+}
+
+:root {
+  --background: #FCF9F2;
+  --foreground: #1A1A1A;
+  --card: #ffffff;
+  --card-foreground: #1A1A1A;
+  --popover: #ffffff;
+  --popover-foreground: #1A1A1A;
+  --primary: #1A1A1A;
+  --primary-foreground: #FCF9F2;
+  --secondary: #E8D5B5;
+  --secondary-foreground: #1A1A1A;
+  --muted: #F3EFE6;
+  --muted-foreground: #747878;
+  --accent: #E8D5B5;
+  --accent-foreground: #1A1A1A;
+  --destructive: #ba1a1a;
+  --border: #E8D5B5;
+  --input: #E8D5B5;
+  --ring: #D4AF37;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-paper-cream text-charcoal-ink;
+    font-family: "Playfair Display", serif;
+  }
+}
+
+/* ============================================
+   Font Family Utility — matching original fontFamily config
+   All fontFamily entries in the original map to Playfair Display.
+   ============================================ */
+.font-display-hero {
+  font-family: 'Playfair Display', serif;
+}
+.font-label-sm {
+  font-family: 'Playfair Display', serif;
+}
+.font-body-md {
+  font-family: 'Playfair Display', serif;
+}
+.font-utility-mono {
+  font-family: 'Playfair Display', serif;
+}
+
+/* ============================================
+   Material Symbols
+   ============================================ */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+.material-symbols-outlined[data-weight="fill"] {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+.material-symbols-filled {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* ============================================
+   Animations — matching original DWdigitalInvite
+   ============================================ */
+.animate-fade-in {
+  animation: fadeIn 1.2s ease-out forwards;
+  opacity: 0;
+}
+.animate-slide-up {
+  animation: slideUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+.animate-orchestral {
+  animation: orchestralFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+@keyframes slideUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes orchestralFadeIn {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Staggered fade-in — from schedule.html */
+@keyframes staggeredFade {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.stagger-1 { animation: staggeredFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards; opacity: 0; }
+.stagger-2 { animation: staggeredFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards; opacity: 0; }
+.stagger-3 { animation: staggeredFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards; opacity: 0; }
+.stagger-4 { animation: staggeredFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards; opacity: 0; }
+
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+
+/* ============================================
+   Layout Effects
+   ============================================ */
+
+/* Hero gradient overlay */
+.hero-gradient {
+  background: linear-gradient(to bottom, rgba(252, 249, 242, 0.1) 0%, rgba(26, 26, 26, 0.8) 100%);
+}
+
+/* Inner frame effect for images */
+.inner-frame {
+  position: relative;
+}
+.inner-frame::after {
+  content: '';
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  border: 1px solid #D4AF37;
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Drawer overlay — adapts to page background */
+.drawer-overlay {
+  backdrop-filter: blur(12px);
+  background-color: rgba(252, 249, 242, 0.7);
+}
+
+/* ============================================
+   UI Components
+   ============================================ */
+
+/* Accordion */
+.accordion-content {
+  transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease-in-out;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+}
+.accordion-content.open {
+  max-height: 500px;
+  opacity: 1;
+}
+.accordion-icon {
+  transition: transform 0.4s ease;
+}
+.accordion-icon.open {
+  transform: rotate(180deg);
+}
+
+/* RSVP input styling */
+.input-line {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid var(--color-charcoal-ink, #1A1A1A);
+  background: transparent;
+  padding: 12px 0 8px 0;
+  outline: none;
+  font-family: "Playfair Display", serif;
+  font-size: 18px;
+  transition: border-color 0.3s ease;
+  color: var(--color-charcoal-ink, #1A1A1A);
+}
+.input-line:focus {
+  border-color: #D4AF37;
+}
+
+/* Step dots */
+.step-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: rgba(26, 26, 26, 0.2);
+  transition: all 0.3s;
+}
+.step-dot.active {
+  background: #D4AF37;
+  width: 24px;
+  border-radius: 3px;
+}
+
+/* Option buttons */
+.opt-btn {
+  width: 100%;
+  padding: 14px 20px;
+  border: 1px solid rgba(26, 26, 26, 0.2);
+  background: transparent;
+  text-align: center;
+  font-size: 15px;
+  transition: all 0.25s ease;
+  cursor: pointer;
+  font-family: "Playfair Display", serif;
+  color: var(--color-charcoal-ink, #1A1A1A);
+}
+.opt-btn:hover {
+  border-color: var(--color-charcoal-ink, #1A1A1A);
+}
+.opt-btn.selected {
+  border-color: var(--color-charcoal-ink, #1A1A1A);
+  border-width: 2px;
+  background: var(--wedding-bg, #FCF9F2);
+}
+
+/* ============================================
+   Utility Classes
+   ============================================ */
+
+/* No scrollbar */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Reveal animation */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+}
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Staggered fade in (generic with inline delay) */
+.staggered-fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.8s ease forwards;
+}
+@keyframes fadeInUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Wishes masonry */
+.masonry-grid {
+  columns: 1;
+  column-gap: 2.5rem;
+}
+@media (min-width: 768px) {
+  .masonry-grid { columns: 2; }
+}
+.wish-card {
+  break-inside: avoid;
+  margin-bottom: 2.5rem;
+  transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+.wish-card:hover {
+  transform: translateY(-8px);
+}
+
+/* Cinematic gradient (for overlays) */
+.cinematic-gradient {
+  background: linear-gradient(to top, rgba(26, 26, 26, 0.8) 0%, rgba(26, 26, 26, 0) 100%);
+}
+
+/* Custom scrollbar for admin */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #FCF9F2;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #D4AF37;
+  border-radius: 10px;
+}
+
+/* Gold leaf dot (schedule timeline) */
+.gold-leaf-dot {
+  background: linear-gradient(135deg, #D4AF37 0%, #F5E6AD 50%, #B8860B 100%);
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+}
+
+/* Selection */
+::selection {
+  background-color: #D4AF37;
+  color: #FCF9F2;
+}
+
+/* Scroll behavior */
+html {
+  scroll-behavior: smooth;
+}

@@ -1796,3 +1796,25 @@ Stage Summary:
 - To regenerate CSS: NODE_OPTIONS="--max-old-space-size=768" npx tailwindcss -i src/app/tailwind-input.css -o src/app/tailwind-output.css --minify
 - Trade-off: adding new Tailwind classes requires manual CSS regeneration (no hot reload for utility classes)
 - PostCSS worker OOM is permanently eliminated; Turbopack compiles in ~9s first load, <100ms incremental
+
+---
+Task ID: 1
+Agent: Main Agent
+Task: Revert sandbox OOM workaround from codebase, keep it as local-only concern, restart dev server
+
+Work Log:
+- Read current state of all modified files (postcss.config.mjs, layout.tsx, globals.css, tailwind-input.css, .gitignore, dev.sh)
+- Restored postcss.config.mjs to original `@tailwindcss/postcss` plugin config
+- Restored globals.css with full Tailwind v4 source (from tailwind-input.css content)
+- Restored layout.tsx import from `tailwind-output.css` back to `globals.css`
+- Deleted temporary files: tailwind-input.css, tailwind-output.css, dev.sh
+- Added tailwind-output.css and dev.sh to .gitignore with explanatory comment
+- Re-applied sandbox workaround locally: regenerated tailwind-output.css (182KB, 24s via CLI), patched postcss.config.mjs and layout.tsx
+- Started dev server — confirmed 200 on `/` and `/?view=couple`
+- Verified with Agent Browser: full page renders with navigation, hero ("Eleanor & James"), content sections, footer
+
+Stage Summary:
+- Codebase is now clean and GitHub-safe — standard Tailwind v4 pipeline restored
+- Sandbox workaround is local-only: postcss.config.mjs and layout.tsx are patched at runtime, tailwind-output.css is gitignored
+- Dev server running on port 3000, serving 200s
+- To regenerate sandbox CSS after adding new Tailwind classes: `NODE_OPTIONS="--max-old-space-size=768" bunx @tailwindcss/cli -i src/app/globals.css -o src/app/tailwind-output.css --minify`
