@@ -1840,3 +1840,28 @@ Stage Summary:
 - Files changed: src/lib/auth.ts (line 80-88), src/app/api/auth/login/route.ts (line 28-36)
 - Both admin (admin@dreamweavers.sg / Admin@2024) and couple (eleanor@wedding.com / Couple@2024) logins verified working
 - Note: Sandbox OOM (4GB limit) causes Turbopack auth compilation to spike to 2.5GB and get killed when browser is open simultaneously — this is a sandbox constraint, not a code issue
+
+---
+Task ID: 2
+Agent: Main Agent
+Task: Remove Images tab from CMS and improve Story thumbnails
+
+Work Log:
+- Analyzed CoupleCMSLayout sidebar (17 items), page.tsx router, useCoupleCMSStore type
+- Discovered CoupleImages.tsx exports HeroVisualSection and BannerSection used by CoupleHome.tsx
+- Created CoupleHeroBanner.tsx extracting HeroVisualSection + BannerSection (lines 63-401)
+- Updated CoupleHome.tsx import from CoupleImages → CoupleHeroBanner
+- Removed 'images' from CoupleCMSPage type in useCoupleCMSStore.ts
+- Removed Images nav item and ImageIcon import from CoupleCMSLayout.tsx (17 → 16 items)
+- Removed CoupleImages dynamic import and router entry from page.tsx
+- Deleted CoupleImages.tsx (892 lines removed)
+- Replaced "Photo attached" text with actual thumbnail preview in CoupleStory.tsx CMS list
+- Improved StoryPage.tsx public timeline: text-centered layout when no image, full-width text instead of empty space
+
+Stage Summary:
+- Files created: src/components/cms/couple/CoupleHeroBanner.tsx
+- Files deleted: src/components/cms/couple/CoupleImages.tsx
+- Files modified: useCoupleCMSStore.ts, CoupleCMSLayout.tsx, page.tsx, CoupleHome.tsx, CoupleStory.tsx, StoryPage.tsx
+- CMS sidebar reduced from 17 to 16 items
+- Story CMS now shows image thumbnails with hover-to-edit overlay
+- Public StoryPage handles no-image chapters gracefully (centered text, no empty space)

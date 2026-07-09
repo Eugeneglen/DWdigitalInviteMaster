@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { useCoupleCMSStore } from '@/store/useCoupleCMSStore';
-import { HeroVisualSection, BannerSection } from './CoupleImages';
+import { HeroVisualSection, BannerSection } from './CoupleHeroBanner';
 import InlineImageUpload from './InlineImageUpload';
 import FontPicker from './FontPicker';
 import BackgroundColorPicker from './BackgroundColorPicker';

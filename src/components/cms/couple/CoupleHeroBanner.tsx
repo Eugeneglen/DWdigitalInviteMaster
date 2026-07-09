@@ -1,0 +1,360 @@
+'use client';
+
+import React, { useState, useRef } from 'react';
+import { Loader2, Upload, Video, X, ImageIcon, Sparkles } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
+import { Card, CardContent } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { useCoupleCMSStore } from '@/store/useCoupleCMSStore';
+import { invalidateWeddingCache } from '@/hooks/usePublicWedding';
+
+const WEDDING_API = '/api/cms/wedding?XTransformPort=3000';
+
+/** ─── Hero Visual Section (image OR video) — used by CoupleHome ──────────── */
+
+export function HeroVisualSection({ weddingData }: { weddingData: Record<string, unknown> | null }) {
+  const [uploading, setUploading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const heroImgUrl = (weddingData as Record<string, string>)?.heroImageUrl || '';
+  const heroVideoUrl = (weddingData as Record<string, string>)?.heroVideoUrl || '';
+
+  const handleFile = async (file: File) => {
+    const isVideo = file.type.startsWith('video/');
+    if (!isVideo && !file.type.startsWith('image/')) {
+      toast({ title: 'Error', description: 'Please select an image or video file', variant: 'destructive' });
+      return;
+    }
+
+    const maxSize = isVideo ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
+    if (file.size > maxSize) {
+      toast({ title: 'Error', description: `File too large. Max ${isVideo ? '50 MB' : '10 MB'}.`, variant: 'destructive' });
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target?.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+
+      const fieldKey = isVideo ? 'heroVideoUrl' : 'heroImageUrl';
+      const clearKey = isVideo ? 'heroImageUrl' : 'heroVideoUrl';
+
+      const res = await fetch(WEDDING_API, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          [fieldKey]: dataUrl,
+          [clearKey]: '',
+        }),
+      });
+
+      if (!res.ok) throw new Error('Failed to upload');
+
+      const weddingRes = await fetch(WEDDING_API);
+      if (weddingRes.ok) {
+        const data = await weddingRes.json();
+        useCoupleCMSStore.getState().setWeddingData(data.wedding ?? data);
+      }
+      invalidateWeddingCache();
+      toast({ title: 'Success', description: `${isVideo ? 'Video' : 'Image'} updated` });
+    } catch {
+      toast({ title: 'Error', description: 'Failed to upload', variant: 'destructive' });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleRemove = async (type: 'image' | 'video') => {
+    try {
+      const res = await fetch(WEDDING_API, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ [type === 'image' ? 'heroImageUrl' : 'heroVideoUrl']: '' }),
+      });
+      if (!res.ok) throw new Error('Failed to remove');
+
+      const weddingRes = await fetch(WEDDING_API);
+      if (weddingRes.ok) {
+        const data = await weddingRes.json();
+        useCoupleCMSStore.getState().setWeddingData(data.wedding ?? data);
+      }
+      invalidateWeddingCache();
+      toast({ title: 'Removed', description: `${type === 'image' ? 'Image' : 'Video'} removed` });
+    } catch {
+      toast({ title: 'Error', description: 'Failed to remove', variant: 'destructive' });
+    }
+  };
+
+  return (
+    <>
+      <Card className="border-charcoal-ink/5 shadow-none">
+        <CardContent className="p-4 space-y-3">
+          <div className="flex items-center gap-2">
+            <div className="flex items-center justify-center h-7 w-7 rounded-lg bg-cinematic-gold/10">
+              <Sparkles className="size-3.5 text-cinematic-gold" />
+            </div>
+            <div>
+              <Label className="text-xs font-medium text-charcoal-ink/70 uppercase tracking-wider">Hero Visual</Label>
+              <p className="text-[11px] text-charcoal-ink/40">Full-bleed hero image or video on the home page</p>
+            </div>
+          </div>
+
+          {heroVideoUrl ? (
+            <div className="relative aspect-video rounded-lg overflow-hidden border border-charcoal-ink/10 group">
+              <video src={heroVideoUrl} className="w-full h-full object-cover" controls />
+              <button
+                type="button"
+                onClick={() => handleRemove('video')}
+                className="absolute top-2 right-2 p-1.5 rounded-full bg-black/50 text-white hover:bg-red-500 transition-colors"
+                title="Remove video"
+              >
+                <X className="size-3.5" />
+              </button>
+              <div className="absolute bottom-2 left-2">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/50 text-white text-[10px] font-medium">
+                  <Video className="size-3" /> Video
+                </span>
+              </div>
+            </div>
+          ) : heroImgUrl ? (
+            <div
+              className="relative aspect-video rounded-lg overflow-hidden border border-charcoal-ink/10 group cursor-pointer"
+              onClick={() => setPreviewUrl(heroImgUrl)}
+            >
+              <img src={heroImgUrl} alt="Hero" className="w-full h-full object-cover" unoptimized />
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); handleRemove('image'); }}
+                className="absolute top-2 right-2 p-1.5 rounded-full bg-black/50 text-white hover:bg-red-500 transition-colors"
+                title="Remove image"
+              >
+                <X className="size-3.5" />
+              </button>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                  Click to preview · Drag to replace
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div
+              className="relative aspect-video rounded-lg border-2 border-dashed border-charcoal-ink/10 hover:border-cinematic-gold hover:bg-cinematic-gold/5 transition-colors duration-200 cursor-pointer flex flex-col items-center justify-center gap-2"
+              onClick={() => fileRef.current?.click()}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => {
+                e.preventDefault();
+                const file = e.dataTransfer.files[0];
+                if (file) handleFile(file);
+              }}
+            >
+              {uploading ? (
+                <Loader2 className="size-6 animate-spin text-cinematic-gold" />
+              ) : (
+                <>
+                  <Upload className="size-6 text-charcoal-ink/25" />
+                  <p className="text-xs text-charcoal-ink/40 font-medium">Upload hero image or video</p>
+                  <p className="text-[10px] text-charcoal-ink/25">Image (max 10 MB) or Video (max 50 MB)</p>
+                </>
+              )}
+            </div>
+          )}
+
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*,video/mp4,video/webm,video/ogg"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleFile(file);
+              e.target.value = '';
+            }}
+          />
+        </CardContent>
+      </Card>
+
+      <Dialog open={!!previewUrl} onOpenChange={() => setPreviewUrl(null)}>
+        <DialogContent className="sm:max-w-3xl p-2">
+          <DialogHeader>
+            <DialogTitle className="sr-only">Hero Preview</DialogTitle>
+          </DialogHeader>
+          <img src={previewUrl ?? ''} alt="Preview" className="w-full rounded-lg" unoptimized />
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
+/** ─── Banner Section — used by CoupleHome ─────────────────────────────── */
+
+export function BannerSection({ weddingData }: { weddingData: Record<string, unknown> | null }) {
+  const [uploading, setUploading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const bannerUrl = (weddingData as Record<string, string>)?.bannerUrl || '';
+
+  const handleFile = async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      toast({ title: 'Error', description: 'Please select an image file', variant: 'destructive' });
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      toast({ title: 'Error', description: 'File too large. Max 10 MB.', variant: 'destructive' });
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target?.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+
+      const res = await fetch(WEDDING_API, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bannerUrl: dataUrl }),
+      });
+
+      if (!res.ok) throw new Error('Failed to upload');
+
+      const weddingRes = await fetch(WEDDING_API);
+      if (weddingRes.ok) {
+        const data = await weddingRes.json();
+        useCoupleCMSStore.getState().setWeddingData(data.wedding ?? data);
+      }
+      invalidateWeddingCache();
+      toast({ title: 'Success', description: 'Banner updated' });
+    } catch {
+      toast({ title: 'Error', description: 'Failed to upload', variant: 'destructive' });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleRemove = async () => {
+    try {
+      const res = await fetch(WEDDING_API, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bannerUrl: '' }),
+      });
+      if (!res.ok) throw new Error('Failed to remove');
+
+      const weddingRes = await fetch(WEDDING_API);
+      if (weddingRes.ok) {
+        const data = await weddingRes.json();
+        useCoupleCMSStore.getState().setWeddingData(data.wedding ?? data);
+      }
+      invalidateWeddingCache();
+      toast({ title: 'Removed', description: 'Banner removed' });
+    } catch {
+      toast({ title: 'Error', description: 'Failed to remove', variant: 'destructive' });
+    }
+  };
+
+  return (
+    <>
+      <Card className="border-charcoal-ink/5 shadow-none">
+        <CardContent className="p-4 space-y-3">
+          <div className="flex items-center gap-2">
+            <div className="flex items-center justify-center h-7 w-7 rounded-lg bg-cinematic-gold/10">
+              <ImageIcon className="size-3.5 text-cinematic-gold" />
+            </div>
+            <div>
+              <Label className="text-xs font-medium text-charcoal-ink/70 uppercase tracking-wider">Banner Design</Label>
+              <p className="text-[11px] text-charcoal-ink/40">Top banner shown across all pages</p>
+            </div>
+          </div>
+
+          {bannerUrl ? (
+            <div
+              className="relative aspect-[21/9] rounded-lg overflow-hidden border border-charcoal-ink/10 group cursor-pointer"
+              onClick={() => setPreviewUrl(bannerUrl)}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => {
+                e.preventDefault();
+                const file = e.dataTransfer.files[0];
+                if (file) handleFile(file);
+              }}
+            >
+              <img src={bannerUrl} alt="Banner" className="w-full h-full object-cover" unoptimized />
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); handleRemove(); }}
+                className="absolute top-2 right-2 p-1.5 rounded-full bg-black/50 text-white hover:bg-red-500 transition-colors"
+                title="Remove banner"
+              >
+                <X className="size-3.5" />
+              </button>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                  Click to preview · Drag to replace
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div
+              className="relative aspect-[21/9] rounded-lg border-2 border-dashed border-charcoal-ink/10 hover:border-cinematic-gold hover:bg-cinematic-gold/5 transition-colors duration-200 cursor-pointer flex flex-col items-center justify-center gap-2"
+              onClick={() => fileRef.current?.click()}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => {
+                e.preventDefault();
+                const file = e.dataTransfer.files[0];
+                if (file) handleFile(file);
+              }}
+            >
+              {uploading ? (
+                <Loader2 className="size-6 animate-spin text-cinematic-gold" />
+              ) : (
+                <>
+                  <Upload className="size-6 text-charcoal-ink/25" />
+                  <p className="text-xs text-charcoal-ink/40 font-medium">Upload banner image</p>
+                  <p className="text-[10px] text-charcoal-ink/25">Max 10 MB · Wide aspect ratio recommended</p>
+                </>
+              )}
+            </div>
+          )}
+
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleFile(file);
+              e.target.value = '';
+            }}
+          />
+        </CardContent>
+      </Card>
+
+      <Dialog open={!!previewUrl} onOpenChange={() => setPreviewUrl(null)}>
+        <DialogContent className="sm:max-w-3xl p-2">
+          <DialogHeader>
+            <DialogTitle className="sr-only">Banner Preview</DialogTitle>
+          </DialogHeader>
+          <img src={previewUrl ?? ''} alt="Preview" className="w-full rounded-lg" unoptimized />
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
