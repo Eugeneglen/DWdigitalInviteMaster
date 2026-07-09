@@ -24,6 +24,7 @@ const MasterSettings = dynamic(() => import('@/components/cms/pages/MasterSettin
 const MasterTemplates = dynamic(() => import('@/components/cms/pages/MasterTemplates'), { ssr: false });
 
 // Couple CMS pages — dynamic imports
+const CoupleImages = dynamic(() => import('@/components/cms/couple/CoupleImages'), { ssr: false });
 const CoupleOverview = dynamic(() => import('@/components/cms/couple/CoupleOverview'), { ssr: false });
 const CoupleDetails = dynamic(() => import('@/components/cms/couple/CoupleDetails'), { ssr: false });
 const CoupleContent = dynamic(() => import('@/components/cms/couple/CoupleContent'), { ssr: false });
@@ -54,6 +55,7 @@ const COUPLE_CMS_PAGES: Record<CoupleCMSPage, React.ComponentType> = {
   overview: CoupleOverview,
   details: CoupleDetails,
   content: CoupleContent,
+  images: CoupleImages,
   home: CoupleHome,
   schedule: CoupleSchedule,
   story: CoupleStory,

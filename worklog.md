@@ -1683,3 +1683,35 @@ Stage Summary:
 - Every frontend image now has a matching CMS control with file upload capability
 - New file: src/components/cms/couple/InlineImageUpload.tsx
 - Modified: CoupleGettingThere.tsx, CoupleHome.tsx, CoupleStory.tsx
+
+---
+Task ID: CMS-Image-Alignment
+Agent: Main Agent
+Task: Create centralized "Images" tab in CMS that consolidates ALL image management across the entire wedding site, so every frontend image is viewable, manageable, and replaceable from one place.
+
+Work Log:
+- Audited all 15+ images displayed on the guest-facing frontend across HomePage, SchedulePage, StoryPage, MomentsPage, GettingTherePage, and shared components
+- Audited all existing CMS image controls across CoupleHome, CoupleSchedule, CoupleStory, CoupleMoments, CoupleGettingThere
+- Identified that image controls were scattered across 5+ CMS tabs (Home, Schedule, Story, Moments, Getting There), making them hard to discover
+- Found that the unused `CoupleImages` component was designed as a media hub but was never wired into the navigation
+- Added `'images'` to the `CoupleCMSPage` type in `useCoupleCMSStore.ts`
+- Added "Images" nav item to `CoupleCMSLayout.tsx` with `ImageIcon` (changed Home tab to use `LayoutDashboard` icon)
+- Wired `CoupleImages` into the page router in `page.tsx` via dynamic import
+- Completely rewrote `CoupleImages.tsx` default export as a comprehensive image management hub containing:
+  1. Hero Visual (hero image OR video) — via HeroVisualSection
+  2. Banner Design (shared across all pages) — via BannerSection  
+  3. Tea Ceremony Image — NEW, via InlineImageUpload saving to hero/teaCeremonyImage
+  4. Schedule Images (ceremony + celebration) — via SectionImageUpload category "schedule"
+  5. Story Images (hero image) — via SectionImageUpload category "story"
+  6. Venue Image (shown on Schedule page) — NEW, via InlineImageUpload saving to getting-there/venueImage
+  7. Moments Gallery — via SectionImageUpload category "moments"
+- Kept HeroVisualSection and BannerSection as named exports (used by CoupleHome.tsx)
+- Added proper save functionality for content-based images (Tea Ceremony, Venue) with IMAGE_URL fieldType
+- Each section has a descriptive label, icon, and explanation of where the image appears on the frontend
+
+Stage Summary:
+- All 7 image slots across the frontend are now manageable from a single "Images" tab in the CMS
+- The "Images" tab appears between "Content" and "Home" in the sidebar navigation
+- Tea Ceremony and Venue Image were previously only accessible in their respective section tabs (Home, Getting There) — now consolidated
+- Schedule, Story, and Moments gallery images use the existing SectionImageUpload component
+- Zero lint errors, zero new TypeScript errors
