@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { Loader2, Plus, Pencil, Trash2, BookOpen, ImageIcon, Calendar, Lightbulb, Plane } from 'lucide-react';
+import { Loader2, Plus, Pencil, Trash2, BookOpen, Calendar, Lightbulb, Plane } from 'lucide-react';
 import SectionImageUpload from './SectionImageUpload';
+import InlineImageUpload from './InlineImageUpload';
 import { toast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -720,8 +721,8 @@ export default function CoupleStory() {
 
                       {item.imageUrl && (
                         <div className="flex items-center gap-1.5 text-xs text-charcoal-ink/40 mb-2">
-                          <ImageIcon className="size-3" />
-                          <span className="truncate max-w-[200px]">{item.imageUrl}</span>
+                          <svg className="size-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                          <span className="truncate max-w-[200px]">Photo attached</span>
                         </div>
                       )}
 
@@ -800,15 +801,15 @@ export default function CoupleStory() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="story-image" className="text-sm font-medium text-charcoal-ink/70">
-                    Image URL
+                  <Label className="text-sm font-medium text-charcoal-ink/70">
+                    Story Image
                   </Label>
-                  <Input
-                    id="story-image"
+                  <InlineImageUpload
                     value={form.imageUrl}
-                    onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-                    placeholder="https://example.com/photo.jpg"
-                    className="border-charcoal-ink/10 focus:border-cinematic-gold focus:ring-cinematic-gold/20"
+                    onChange={(dataUrl) => setForm({ ...form, imageUrl: dataUrl })}
+                    onRemove={() => setForm({ ...form, imageUrl: '' })}
+                    label="Upload story photo"
+                    aspectClass="aspect-[16/9]"
                   />
                 </div>
                 <div className="space-y-1.5">

@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { useCoupleCMSStore } from '@/store/useCoupleCMSStore';
 import { HeroVisualSection, BannerSection } from './CoupleImages';
-import SectionImageUpload from './SectionImageUpload';
+import InlineImageUpload from './InlineImageUpload';
 import FontPicker from './FontPicker';
 import BackgroundColorPicker from './BackgroundColorPicker';
 import { invalidateWeddingCache } from '@/hooks/usePublicWedding';
@@ -35,7 +35,6 @@ const HERO_FIELDS = [
 ];
 
 const TEA_CEREMONY_FIELDS = [
-  { key: 'teaCeremonyImage', label: 'Image URL', type: 'text' as const, placeholder: 'https://example.com/tea-ceremony.jpg' },
   { key: 'teaCeremonyLabel', label: 'Label', type: 'text' as const, placeholder: 'e.g. The Tradition' },
   { key: 'teaCeremonyTitle', label: 'Title', type: 'text' as const, placeholder: 'e.g. The Tea Ceremony' },
 ];
@@ -194,21 +193,7 @@ export default function CoupleHome() {
 
       <Separator className="bg-champagne-silk" />
 
-      {/* 5. Image Upload */}
-      <div className="space-y-2">
-        <Label className="text-xs font-medium text-charcoal-ink/50 uppercase tracking-wider">
-          Images
-        </Label>
-        <Card className="border-charcoal-ink/5 shadow-none">
-          <CardContent className="p-4">
-            <SectionImageUpload category="home" label="Images" maxImages={3} />
-          </CardContent>
-        </Card>
-      </div>
-
-      <Separator className="bg-champagne-silk" />
-
-      {/* 6. Hero Content Fields */}
+      {/* Hero Content Fields */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <Label className="text-xs font-medium text-charcoal-ink/50 uppercase tracking-wider">
@@ -295,6 +280,22 @@ export default function CoupleHome() {
         </Label>
         <Card className="border-charcoal-ink/5 shadow-none">
           <CardContent className="p-4 space-y-4">
+            {/* Tea Ceremony Image — file upload instead of text URL */}
+            <div className="space-y-2">
+              <Label className="text-xs font-medium text-charcoal-ink/50 uppercase tracking-wider flex items-center gap-1.5">
+                Image
+                {editedFields[`hero/teaCeremonyImage`] !== undefined && (
+                  <span className="inline-flex h-1.5 w-1.5 rounded-full bg-cinematic-gold" />
+                )}
+              </Label>
+              <InlineImageUpload
+                value={getFieldValue('teaCeremonyImage')}
+                onChange={(dataUrl) => setFieldValue('teaCeremonyImage', dataUrl)}
+                onRemove={() => setFieldValue('teaCeremonyImage', '')}
+                label="Upload tea ceremony photo"
+                aspectClass="aspect-[2/3]"
+              />
+            </div>
             {TEA_CEREMONY_FIELDS.map((field) => {
               const value = getFieldValue(field.key);
               const isChanged = editedFields[`hero/${field.key}`] !== undefined;
