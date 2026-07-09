@@ -1663,3 +1663,23 @@ Stage Summary:
 - Same WCAG luminance algorithm, just applied to the banner IMAGE instead of the page background color
 - Files created: src/hooks/useImageAutoContrast.ts
 - Files modified: src/lib/contrast.ts, src/components/wedding/pages/HomePage.tsx
+---
+Task ID: 6
+Agent: Main Agent
+Task: Complete CMS-to-frontend image alignment audit and fix
+
+Work Log:
+- Ran comprehensive audit of all 21 image slots across guest-facing pages
+- Audited all 9 image control areas in the CMS
+- Identified 4 critical gaps between frontend and CMS
+- Created reusable `InlineImageUpload.tsx` component (single-image drag-and-drop picker with base64 output)
+- GAP 1: Added venueImage upload to CoupleGettingThere (was completely missing)
+- GAP 2: Replaced teaCeremonyImage text URL input with file upload in CoupleHome
+- GAP 3: Replaced story item imageUrl text URL input with file upload in CoupleStory
+- GAP 4: Removed orphaned "home" category media uploads from CoupleHome (no frontend consumer)
+- Lint: 0 errors, pushed to both cms and main branches
+
+Stage Summary:
+- Every frontend image now has a matching CMS control with file upload capability
+- New file: src/components/cms/couple/InlineImageUpload.tsx
+- Modified: CoupleGettingThere.tsx, CoupleHome.tsx, CoupleStory.tsx
