@@ -208,10 +208,10 @@
   z-index: 10;
 }
 
-/* Drawer overlay — cream-colored blur from schedule.html */
+/* Drawer overlay — adapts to page background */
 .drawer-overlay {
   backdrop-filter: blur(12px);
-  background-color: rgba(253, 249, 243, 0.7);
+  background-color: color-mix(in srgb, var(--wedding-bg, #FCF9F2) 70%, transparent);
 }
 
 /* ============================================
@@ -240,13 +240,14 @@
 .input-line {
   width: 100%;
   border: none;
-  border-bottom: 1px solid #1A1A1A;
+  border-bottom: 1px solid var(--color-charcoal-ink, #1A1A1A);
   background: transparent;
   padding: 12px 0 8px 0;
   outline: none;
   font-family: "Playfair Display", serif;
   font-size: 18px;
   transition: border-color 0.3s ease;
+  color: var(--color-charcoal-ink, #1A1A1A);
 }
 .input-line:focus {
   border-color: #D4AF37;
@@ -257,7 +258,7 @@
   width: 6px;
   height: 6px;
   border-radius: 9999px;
-  background: #1A1A1A33;
+  background: color-mix(in srgb, var(--color-charcoal-ink, #1A1A1A) 20%, transparent);
   transition: all 0.3s;
 }
 .step-dot.active {
@@ -270,21 +271,22 @@
 .opt-btn {
   width: 100%;
   padding: 14px 20px;
-  border: 1px solid #1A1A1A33;
+  border: 1px solid color-mix(in srgb, var(--color-charcoal-ink, #1A1A1A) 20%, transparent);
   background: transparent;
   text-align: center;
   font-size: 15px;
   transition: all 0.25s ease;
   cursor: pointer;
   font-family: "Playfair Display", serif;
+  color: var(--color-charcoal-ink, #1A1A1A);
 }
 .opt-btn:hover {
-  border-color: #1A1A1A;
+  border-color: var(--color-charcoal-ink, #1A1A1A);
 }
 .opt-btn.selected {
-  border-color: #1A1A1A;
+  border-color: var(--color-charcoal-ink, #1A1A1A);
   border-width: 2px;
-  background: #FCF9F2;
+  background: var(--wedding-bg, #FCF9F2);
 }
 
 /* ============================================

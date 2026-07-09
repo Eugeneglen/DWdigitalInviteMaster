@@ -186,11 +186,13 @@ export default function CoupleHome() {
 
       <Separator className="bg-champagne-silk" />
 
-      {/* 3. Colour & Font — 2-column layout */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <BackgroundColorPicker />
-        <FontPicker section="hero" />
-      </div>
+      {/* 3. Colour Settings */}
+      <BackgroundColorPicker />
+
+      <Separator className="bg-champagne-silk" />
+
+      {/* 4. Font */}
+      <FontPicker section="hero" />
 
       <Separator className="bg-champagne-silk" />
 

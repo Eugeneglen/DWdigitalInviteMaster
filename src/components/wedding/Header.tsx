@@ -5,16 +5,26 @@ import { useNavigationStore } from '@/store/useNavigationStore';
 interface HeaderProps {
   /** CSS top value to push the fixed header below an overlay bar (e.g. "44px") */
   topOffset?: string;
+  /** Override text colour for header — needed when header bg differs from page bg */
+  headerTextColor?: string;
 }
 
-export default function Header({ topOffset }: HeaderProps) {
+export default function Header({ topOffset, headerTextColor }: HeaderProps) {
   const { currentSection, setSection, drawerOpen, openDrawer, availableTabs } = useNavigationStore();
   const tabs = availableTabs.length > 0 ? availableTabs : undefined;
 
   return (
     <header
+      data-wedding-header=""
       className="fixed w-full z-50 backdrop-blur-md border-b border-champagne-silk/30"
-      style={{ backgroundColor: 'var(--wedding-bg, #FCF9F2)', opacity: 0.97, ...(topOffset ? { top: topOffset } : {}) }}
+      style={{
+        backgroundColor: 'var(--wedding-header-bg, var(--wedding-bg, #FCF9F2))',
+        opacity: 0.97,
+        ...(topOffset ? { top: topOffset } : {}),
+        // CSS variable override for any raw-CSS references (e.g. globals.css).
+        // The <style> tag from generateThemeOverrideStyle handles Tailwind classes.
+        ...(headerTextColor ? { '--color-charcoal-ink': headerTextColor } : {}),
+      } as React.CSSProperties}
     >
       <div className="flex justify-between items-center px-4 md:px-6 py-3 w-full max-w-[1440px] mx-auto">
         {/* Logo */}

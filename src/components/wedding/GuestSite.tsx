@@ -7,6 +7,7 @@ import { useCoupleCMSStore } from '@/store/useCoupleCMSStore';
 import { useAuthModalStore } from '@/store/useAuthModalStore';
 import { usePublicWedding } from '@/hooks/usePublicWedding';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
+import { getAutoTextColor, getAutoBorderColor, generateThemeOverrideStyle } from '@/lib/contrast';
 import { filterTabsByFeatures } from '@/store/useNavigationStore';
 import Header from '@/components/wedding/Header';
 import MobileDrawer from '@/components/wedding/MobileDrawer';
@@ -105,6 +106,20 @@ export default function GuestSite({ slug, topOffset, showEditorButton = false }:
   // Read the custom background colour (default: DW paper-cream)
   const backgroundColor = getField('global', 'backgroundColor', '#FCF9F2');
 
+  // Header background — separate from page bg (empty = same as page)
+  const headerBgRaw = getField('global', 'headerBackgroundColor', '');
+  const headerBg = headerBgRaw || backgroundColor;
+
+  // Text & border colours — auto-detect from page bg unless manually overridden
+  const textColorOverride = getField('global', 'textColor', '');
+  const borderColorOverride = getField('global', 'borderColor', '');
+  const textColor = textColorOverride || getAutoTextColor(backgroundColor);
+  const borderColor = borderColorOverride || getAutoBorderColor(backgroundColor);
+
+  // Header text — may differ if header bg contrasts differently from page bg
+  const headerTextOverride = getField('global', 'headerTextColor', '');
+  const headerTextColor = headerTextOverride || (headerBgRaw ? getAutoTextColor(headerBg) : textColor);
+
   // Compute filtered tabs from global config + wedding feature flags
   // and push into the navigation store for Header/MobileDrawer/BottomNav
   const prevFilteredRef = useRef<string>('');
@@ -128,10 +143,28 @@ export default function GuestSite({ slug, topOffset, showEditorButton = false }:
   const isCouple = session?.user?.role === 'COUPLE';
   const GuestPageComponent = GUEST_PAGES[currentSection] || HomePage;
 
+  // Generate dynamic <style> to override Tailwind's hardcoded colour values.
+  // Tailwind 4 resolves @theme colours at build time, so CSS variable
+   // overrides alone don't affect utility classes like text-charcoal-ink.
+  const themeOverrideCSS = generateThemeOverrideStyle(textColor, borderColor, headerTextColor, headerBg);
+
   return (
-    <div className="min-h-screen flex flex-col text-charcoal-ink overflow-x-hidden selection:bg-cinematic-gold selection:text-paper-cream" style={{ backgroundColor, '--wedding-bg': backgroundColor } as React.CSSProperties}>
+    <div
+      data-wedding-root=""
+      className="min-h-screen flex flex-col text-charcoal-ink overflow-x-hidden selection:bg-cinematic-gold selection:text-paper-cream"
+      style={{
+        backgroundColor,
+        color: textColor,
+        '--wedding-bg': backgroundColor,
+        '--wedding-header-bg': headerBg,
+        '--color-charcoal-ink': textColor,
+        '--color-champagne-silk': borderColor,
+      } as React.CSSProperties}
+    >
+      {/* Dynamic theme overrides — must be first child for cascade order */}
+      <style dangerouslySetInnerHTML={{ __html: themeOverrideCSS }} />
       <GoldDust />
-      <Header topOffset={topOffset} />
+      <Header topOffset={topOffset} headerTextColor={headerTextColor} />
       <MobileDrawer />
 
       <div className="flex-1" style={topOffset ? { paddingTop: '44px' } : undefined}>

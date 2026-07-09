@@ -1568,3 +1568,30 @@ Stage Summary:
 - All 30+ new CMS fields are reachable and editable
 - Guest RSVP page: "lunch reception" → "reception" (more generic default)
 - Zero lint errors, zero browser console errors
+
+---
+Task ID: 3
+Agent: Main Agent
+Task: Header background decoupling + dark background text readability
+
+Work Log:
+- Explored full color architecture: GuestSite → CSS vars → Header/Footer/BottomNav/MobileDrawer
+- Discovered Tailwind 4 resolves `@theme inline` colors to hardcoded rgb/oklch at build time
+- Created `src/lib/contrast.ts` with WCAG 2.0 luminance calculation, auto-text/border detection, and `generateThemeOverrideStyle()` for dynamic CSS injection
+- Updated `GuestSite.tsx`: added `data-wedding-root` attribute, injects `<style>` tag with all Tailwind class overrides scoped under `[data-wedding-root]`
+- Updated `Header.tsx`: uses `--wedding-header-bg` CSS var (falls back to `--wedding-bg`), added `data-wedding-header` attribute, accepts `headerTextColor` prop
+- Expanded `BackgroundColorPicker.tsx` from page-bg-only to full theme control: Page Background (12 presets), Header Background (linked/unlinked toggle), Text & Border Contrast (auto/manual)
+- Updated `CoupleHome.tsx`: full-width color picker layout
+- Updated `globals.css`: replaced hardcoded `#1A1A1A` in `.input-line`, `.step-dot`, `.opt-btn`, `.drawer-overlay` with CSS variables
+- Handled self-referencing CSS selectors (elements that have both scope attr AND Tailwind class)
+- Header-specific border overrides when header bg differs from page bg
+
+Stage Summary:
+- New file: `src/lib/contrast.ts` — luminance calculation, auto-contrast, dynamic CSS generator
+- Modified: `GuestSite.tsx`, `Header.tsx`, `BackgroundColorPicker.tsx`, `CoupleHome.tsx`, `globals.css`
+- CMS fields: `global/headerBackgroundColor`, `global/textColor`, `global/borderColor` (all optional, auto-detected)
+- Browser-verified: dark bg (#1A1A1A) auto-switches text to #E8E0D0, borders to #3A3428
+- Browser-verified: light header on dark page — header text stays dark, borders use light champagne
+- Browser-verified: default Paper Cream theme unchanged, zero artifacts
+- All 5 guest pages (Home, Schedule, RSVP, Story, Wishes, Q&A, Getting There) verified on dark bg
+- Lint: 0 errors (1 pre-existing font warning)
