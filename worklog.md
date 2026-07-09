@@ -1715,3 +1715,27 @@ Stage Summary:
 - Tea Ceremony and Venue Image were previously only accessible in their respective section tabs (Home, Getting There) — now consolidated
 - Schedule, Story, and Moments gallery images use the existing SectionImageUpload component
 - Zero lint errors, zero new TypeScript errors
+
+---
+Task ID: images-tab-view-only
+Agent: Main Agent
+Task: Convert Images tab from upload-enabled to view-only gallery, keeping upload controls in section tabs
+
+Work Log:
+- Read current CoupleImages.tsx (had upload controls: HeroVisualSection, BannerSection, InlineImageUpload for tea ceremony/venue, SectionImageUpload for schedule/story/moments)
+- Verified all section tabs have their own upload controls: CoupleHome (hero, banner, tea ceremony), CoupleSchedule (SectionImageUpload schedule), CoupleStory (SectionImageUpload story + per-chapter InlineImageUpload), CoupleMoments (SectionImageUpload moments), CoupleGettingThere (InlineImageUpload venue)
+- Rewrote CoupleImages.tsx default export as a view-only gallery
+- Kept named exports (HeroVisualSection, BannerSection) unchanged for CoupleHome.tsx imports
+- View-only gallery fetches from 3 data sources: weddingData store (hero, banner), content API (tea ceremony, venue), media API (schedule, story, moments)
+- Each section shows: icon, label, description of where it appears on frontend, live image(s) or empty state, "Edit in [Tab]" navigation button
+- Image preview dialog for clicking on any image
+- Total image count displayed in page header
+- Verified via agent-browser: Images tab renders all 7 sections correctly, preview dialog opens on click, "Edit in Home" navigates to Home tab, Home tab upload controls intact, Schedule tab "Add image" intact, Getting There tab venue upload intact
+- Lint clean (0 new errors)
+
+Stage Summary:
+- Images tab is now a view-only overview of all live images across 7 sections
+- Upload controls remain in their respective section tabs (Home, Schedule, Story, Moments, Getting There)
+- Each section shows "Edit in [Tab Name]" button for quick navigation
+- Empty states provide clear guidance on where to upload
+- Named exports HeroVisualSection and BannerSection preserved for CoupleHome.tsx
