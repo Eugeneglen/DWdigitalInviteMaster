@@ -1636,3 +1636,30 @@ Stage Summary:
 - Master Admin can now set a platform-wide header background color from Settings > Appearance
 - Couples only see the simplified page background picker (no header controls)
 - Files modified: HomePage.tsx, site-settings/route.ts, useSiteSettings.ts, GuestSite.tsx, MasterSettings.tsx
+---
+Task ID: 5
+Agent: Main Agent
+Task: Replace frosted glass card with independent image auto-contrast for banner headline
+
+Work Log:
+- User rejected the frosted glass card approach, wanted independent auto-contrast for the banner image
+- Created `src/hooks/useImageAutoContrast.ts` — a React hook that:
+  - Loads the banner image into an off-screen canvas
+  - Samples the centre region pixels (where the headline sits)
+  - Computes average RGB and passes it through WCAG luminance (same algorithm as page-level contrast)
+  - Returns textColor, subtitleColor, and textShadow — all auto-adapted to the IMAGE, not the page bg
+  - Uses a slightly higher threshold (0.18 vs 0.12) to account for tonal variation in images
+  - Handles CORS gracefully (falls back to dark text if canvas is tainted)
+  - Deferred 50ms to avoid blocking initial paint
+- Added `getAutoTextColorFromRGB(r, g, b)` to `src/lib/contrast.ts` for direct RGB→text color conversion
+- Updated `src/components/wedding/pages/HomePage.tsx`:
+  - Removed frosted glass card div entirely
+  - Text now sits directly on the banner image with inline `color` and `textShadow`
+  - Completely independent from the page-level auto-contrast system
+- Verified: light banner → dark text (#1A1A1A) with subtle shadow, no frosted glass, zero runtime errors, lint clean
+
+Stage Summary:
+- Banner headline now has its own independent auto-contrast that samples the actual image pixels
+- Same WCAG luminance algorithm, just applied to the banner IMAGE instead of the page background color
+- Files created: src/hooks/useImageAutoContrast.ts
+- Files modified: src/lib/contrast.ts, src/components/wedding/pages/HomePage.tsx

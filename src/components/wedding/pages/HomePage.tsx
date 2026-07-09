@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useNavigationStore } from '@/store/useNavigationStore';
 import { usePublicWedding } from '@/hooks/usePublicWedding';
 import { useLiveWeddingData } from '@/hooks/useLiveWeddingData';
+import { useImageAutoContrast } from '@/hooks/useImageAutoContrast';
 
 const FALLBACK_HERO_IMG =
   'https://lh3.googleusercontent.com/aida-public/AB6AXuBeAe38AA5-0h4B5MmgQCqv54oQXyPMGznDKaw2sJI_FnTbB_yXXWOpirFlFycj_2VI02IVLouUTt86Y1J7Ls-bRsMOHPAcfSqruVoh87sfhw3vi2Z6t1C7ogCLtkvF6QbJkwuV0av8pXTrUeAAi6ymnZpvyOr8qVjTNNorAOmqRrW_fohX_xlkscmBh39K4Wtvs6TH0Nvb_X3LQQRD9W_sySN_iWbWw9O0au8u1jO-hSekE9pSGNo5zsTz3o9PWy5xbzc6lq3knkIy';
@@ -68,6 +69,10 @@ export default function HomePage() {
 
   const bannerUrl = data?.wedding.bannerUrl || FALLBACK_BANNER_BG;
   const heroImgUrl = data?.wedding.heroImageUrl || FALLBACK_HERO_IMG;
+
+  // Independent auto-contrast for the banner headline — samples the actual
+  // banner IMAGE pixels (not the page background) to pick text colour.
+  const { textColor: bannerTextColor, subtitleColor: bannerSubtitleColor, textShadow: bannerTextShadow } = useImageAutoContrast(bannerUrl);
   const heroVideoUrl = data?.wedding.heroVideoUrl || null;
   const coupleName = getField('hero', 'title') || data?.wedding.coupleName || FALLBACK_COUPLE_NAME;
   const heroSubtitle = getField('hero', 'subtitle', '');
@@ -114,26 +119,25 @@ export default function HomePage() {
         className="w-full h-[360px] md:h-[420px] bg-cover bg-center mt-[54px] md:mt-[64px] relative z-40 flex items-center justify-center"
         style={{ backgroundImage: `url('${bannerUrl}')` }}
       >
-        {/* Frosted glass card — ensures headline readability on ANY banner image,
-            independent of the page-level auto-contrast system which only
-            considers the page background colour, not this image. */}
         <div className="relative z-10 text-center px-6">
-          <div className="inline-block rounded-2xl px-8 md:px-12 py-4 md:py-5 bg-white/60 backdrop-blur-md shadow-lg border border-white/50">
-            <h1
-              className="font-display-hero text-[44px] md:text-[72px] leading-[1.05] tracking-tight font-bold"
-              style={{ fontFamily: `'${heroFont}', serif`, color: '#1A1A1A' }}
+          <h1
+            className="font-display-hero text-[44px] md:text-[72px] leading-[1.05] tracking-tight font-bold"
+            style={{
+              fontFamily: `'${heroFont}', serif`,
+              color: bannerTextColor,
+              textShadow: bannerTextShadow,
+            }}
+          >
+            {coupleName}
+          </h1>
+          {heroSubtitle && (
+            <p
+              className="mt-2 text-sm md:text-base italic tracking-wide"
+              style={{ color: bannerSubtitleColor }}
             >
-              {coupleName}
-            </h1>
-            {heroSubtitle && (
-              <p
-                className="mt-2 text-sm md:text-base italic tracking-wide"
-                style={{ color: 'rgba(26, 26, 26, 0.7)' }}
-              >
-                {heroSubtitle}
-              </p>
-            )}
-          </div>
+              {heroSubtitle}
+            </p>
+          )}
         </div>
       </div>
 

@@ -35,6 +35,19 @@ export function getAutoBorderColor(bgHex: string): string {
   return isDarkBackground(bgHex) ? '#3A3428' : '#E8D5B5';
 }
 
+/**
+ * Auto-detect text colour directly from average RGB values (0–255).
+ * Useful when sampling pixels from a canvas (avoids hex round-trip).
+ */
+export function getAutoTextColorFromRGB(r: number, g: number, b: number): string {
+  const toLinear = (v: number) =>
+    v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+  const luminance = 0.2126 * toLinear(r / 255) + 0.7152 * toLinear(g / 255) + 0.0722 * toLinear(b / 255);
+  // Slightly higher threshold (0.18) for images vs solid colours (0.12)
+  // to account for tonal variation in photographs/patterns
+  return luminance < 0.18 ? '#E8E0D0' : '#1A1A1A';
+}
+
 /** Quick perceived luminance (0–1) — used for UI pickers only */
 export function getPerceivedLuminance(hex: string): number {
   const c = hex.replace('#', '');
