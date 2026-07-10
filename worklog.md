@@ -1891,3 +1891,26 @@ Stage Summary:
 - No functionality changed — only performance/efficiency improvements
 - Pre-existing TS errors in admin/tenant routes (unrelated, different schema)
 - Turbopack OOM (4GB sandbox limit) remains — not a code issue
+---
+Task ID: 1
+Agent: Main
+Task: Restore preview page stability and fix build compatibility issues
+
+Work Log:
+- Switched to cms-2 branch (B1-B7 fixes already committed)
+- Verified database seeded (10 features, 2 users, 1 wedding account)
+- Found production build failed due to missing exports in auth.ts
+- Added to auth.ts: verifyToken, extractBearerToken, getIpAddress, getUserAgent, getServerSession, hashPassword, FEATURE_KEYS, FEATURE_LABELS, GLOBAL_FEATURE_LABELS, ROLE_LABELS, TENANT_ROLE_LABELS
+- Fixed tenant.ts: replaced non-existent db.account/db.accountMember with db.weddingAccount
+- Fixed auth-middleware.ts: replaced db.tenantUser with db.weddingAccount
+- Completed successful production build (next build)
+- Discovered sandbox has 3.9GB RAM, no swap — Turbopack compilation of full page (24 dynamic imports) causes OOM during concurrent requests
+- Pre-compiled routes sequentially to stay within memory budget
+- Guest preview verified working: wedding data, all 8 nav tabs (home, schedule, rsvp, getting-there, story, wishes, qa, moments)
+
+Stage Summary:
+- Production build succeeds
+- Guest-facing preview works with all nav tabs visible
+- Full CMS page (24 dynamic imports) exceeds sandbox memory when compiled concurrently
+- Committed auth/tenant/build compatibility fixes to cms-2
+- Root cause of instability: 3.9GB sandbox RAM with no swap, Turbopack compilation spikes
