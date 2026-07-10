@@ -27,10 +27,18 @@ interface UseLiveWeddingDataOptions {
 export function useLiveWeddingData({ weddingId }: UseLiveWeddingDataOptions) {
   const socketRef = useRef<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
-  const [latestWish, setLatestWish] = useState<LiveWish | null>(null);
+  const [liveWishes, setLiveWishes] = useState<LiveWish[]>([]);
   const [latestRsvp, setLatestRsvp] = useState<LiveRsvp | null>(null);
   const [rsvpFlash, setRsvpFlash] = useState(false);
   const [liveRsvpIncrement, setLiveRsvpIncrement] = useState(0);
+
+  // Add a wish to the accumulated list with dedup (used by socket listener & optimistic adds)
+  const addWish = useCallback((wish: LiveWish) => {
+    setLiveWishes((prev) => {
+      if (wish.id && prev.some((w) => w.id === wish.id)) return prev;
+      return [wish, ...prev];
+    });
+  }, []);
 
   const handleNewRsvp = useCallback((data: LiveRsvp) => {
     setLatestRsvp(data);
@@ -59,7 +67,7 @@ export function useLiveWeddingData({ weddingId }: UseLiveWeddingDataOptions) {
     });
 
     socket.on('new_wish', (data: LiveWish) => {
-      setLatestWish(data);
+      addWish(data);
     });
 
     socket.on('new_rsvp', handleNewRsvp);
@@ -68,7 +76,10 @@ export function useLiveWeddingData({ weddingId }: UseLiveWeddingDataOptions) {
       socket.disconnect();
       socketRef.current = null;
     };
-  }, [weddingId, handleNewRsvp]);
+  }, [weddingId, handleNewRsvp, addWish]);
 
-  return { latestWish, latestRsvp, isConnected, rsvpFlash, liveRsvpIncrement };
+  // Derived: most recent wish for consumers that only need the latest
+  const latestWish = liveWishes.length > 0 ? liveWishes[0] : null;
+
+  return { latestWish, liveWishes, addWish, latestRsvp, isConnected, rsvpFlash, liveRsvpIncrement };
 }

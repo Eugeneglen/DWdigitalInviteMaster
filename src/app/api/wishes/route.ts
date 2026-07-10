@@ -85,6 +85,7 @@ export async function GET(req: Request) {
     const wishes = await db.wish.findMany({
       where: weddingId ? { weddingId } : undefined,
       orderBy: { createdAt: 'desc' },
+      take: 50,
     });
 
     return NextResponse.json({ wishes });

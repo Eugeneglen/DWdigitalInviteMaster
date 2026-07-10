@@ -25,6 +25,7 @@ export async function GET(req: NextRequest) {
     const media = await db.weddingMedia.findMany({
       where,
       orderBy: { sortOrder: 'asc' },
+      take: 200,
     });
 
     return NextResponse.json({ media });

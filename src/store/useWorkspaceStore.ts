@@ -77,15 +77,35 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
 
   updateBlockValue: (blockId, value) => {
     set((state) => {
-      const newPages = state.pages.map((page) => ({
-        ...page,
-        sections: page.sections.map((section) => ({
-          ...section,
-          blocks: section.blocks.map((block) =>
-            block.id === blockId ? { ...block, value } : block
-          ),
-        })),
-      }));
+      // Find the block and update in-place without cloning the entire tree.
+      // This reduces GC pressure from O(P×S×B) object clones per keystroke to O(1).
+      let found = false;
+      const newPages = state.pages.map((page) => {
+        let pageChanged = false;
+        const newSections = page.sections.map((section) => {
+          let sectionChanged = false;
+          const newBlocks = section.blocks.map((block) => {
+            if (block.id === blockId) {
+              sectionChanged = true;
+              return { ...block, value };
+            }
+            return block;
+          });
+          if (sectionChanged) {
+            pageChanged = true;
+            return { ...section, blocks: newBlocks };
+          }
+          return section;
+        });
+        if (pageChanged) {
+          found = true;
+          return { ...page, sections: newSections };
+        }
+        return page;
+      });
+
+      // Only update state if the block was actually found
+      if (!found) return state;
 
       const newDirty = new Set(state.dirtyBlockIds);
       newDirty.add(blockId);

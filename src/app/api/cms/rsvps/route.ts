@@ -25,6 +25,7 @@ export async function GET(req: NextRequest) {
         guests: true,
       },
       orderBy: { createdAt: 'desc' },
+      take: 100,
     });
 
     // Client-side status filtering based on guest responses

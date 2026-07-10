@@ -14,9 +14,8 @@ export async function GET() {
     const wedding = await db.weddingAccount.findFirst({
       where: { ownerId: session.user.id },
       include: {
-        guests: true,
-        rsvps: { include: { guests: true } },
-        wishes: true,
+        _count: { select: { guests: true, rsvps: true, wishes: true, contacts: true, media: true } },
+        wishes: { take: 5, orderBy: { createdAt: 'desc' } },
         content: true,
         schedules: true,
         stories: true,
@@ -38,19 +37,36 @@ export async function GET() {
     const daysUntil = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
     const isPast = diffMs < 0;
 
-    // Guest stats
-    const totalGuests = wedding.guests.length;
+    // Guest stats — aggregated queries avoid loading all guest records
+    const totalGuests = wedding._count.guests;
+
+    const [guestStatusGroups, guestGroupRows, totalWithPlusOne] = await Promise.all([
+      db.guest.groupBy({
+        by: ['rsvpStatus'],
+        where: { weddingId: wedding.id },
+        _count: { id: true },
+      }),
+      db.guest.groupBy({
+        by: ['groupName'],
+        where: { weddingId: wedding.id },
+        _count: { id: true },
+      }),
+      db.guest.count({
+        where: { weddingId: wedding.id, plusOne: true },
+      }),
+    ]);
+
     const guestsByStatus: Record<string, number> = { PENDING: 0, ATTENDING: 0, DECLINED: 0, PARTIAL: 0 };
-    for (const g of wedding.guests) {
-      const s = g.rsvpStatus || 'PENDING';
-      guestsByStatus[s] = (guestsByStatus[s] || 0) + 1;
+    for (const group of guestStatusGroups) {
+      const s = group.rsvpStatus || 'PENDING';
+      guestsByStatus[s] = (guestsByStatus[s] || 0) + group._count.id;
     }
     const respondedGuests = totalGuests - (guestsByStatus.PENDING || 0);
     const attendanceRate = totalGuests > 0 ? Math.round((guestsByStatus.ATTENDING / totalGuests) * 100) : 0;
 
-    // RSVP submissions
-    const totalRSVPs = wedding.rsvps.length;
-    const totalWishes = wedding.wishes.length;
+    // Counts from _count (avoids loading full records)
+    const totalRSVPs = wedding._count.rsvps;
+    const totalWishes = wedding._count.wishes;
     const totalContacts = wedding.contacts.length;
 
     // Content completion — check which sections have content
@@ -83,16 +99,11 @@ export async function GET() {
       take: 15,
     });
 
-    // Guest group distribution (top 5 groups)
-    const groupCounts: Record<string, number> = {};
-    for (const g of wedding.guests) {
-      const group = g.groupName || 'Ungrouped';
-      groupCounts[group] = (groupCounts[group] || 0) + 1;
-    }
-    const guestGroups = Object.entries(groupCounts)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5)
-      .map(([name, count]) => ({ name, count }));
+    // Guest group distribution (top 5 groups) — from pre-fetched groupBy
+    const guestGroups = guestGroupRows
+      .map((row) => ({ name: row.groupName || 'Ungrouped', count: row._count.id }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
 
     return NextResponse.json({
       daysUntil,
@@ -107,7 +118,7 @@ export async function GET() {
         responded: respondedGuests,
         attendanceRate,
         groups: guestGroups,
-        totalWithPlusOne: wedding.guests.filter((g) => g.plusOne).length,
+        totalWithPlusOne,
       },
       rsvps: { total: totalRSVPs },
       wishes: { total: totalWishes },

@@ -112,6 +112,7 @@ export async function GET(req: NextRequest) {
     const guests = await db.guest.findMany({
       where,
       orderBy: { createdAt: 'desc' },
+      take: 200,
       include: {
         _count: { select: { rsvps: true } },
       },

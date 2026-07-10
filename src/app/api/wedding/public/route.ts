@@ -19,10 +19,11 @@ export async function GET(req: Request) {
         schedules: { orderBy: { sortOrder: 'asc' } },
         faqs: { where: { isActive: true }, orderBy: { sortOrder: 'asc' } },
         stories: { orderBy: { sortOrder: 'asc' } },
-        media: { orderBy: { sortOrder: 'asc' } },
+        media: { orderBy: { sortOrder: 'asc' }, take: 100 },
         features: true,
-        wishes: { orderBy: { createdAt: 'desc' } },
-        rsvps: { select: { id: true, firstName: true, lastName: true, partySize: true, createdAt: true } },
+        wishes: { orderBy: { createdAt: 'desc' }, take: 50 },
+        rsvps: { select: { id: true, firstName: true, lastName: true, partySize: true, createdAt: true }, orderBy: { createdAt: 'desc' }, take: 20 },
+        _count: { select: { wishes: true, rsvps: true } },
       },
     });
 
@@ -82,8 +83,10 @@ export async function GET(req: Request) {
       mediaByCategory,
       featureFlags,
       featureConfigs,
-      rsvpCount: wedding.rsvps.length,
+      rsvpCount: wedding._count.rsvps,
       totalGuestCount: wedding.rsvps.reduce((sum, r) => sum + r.partySize, 0),
+      totalWishCount: wedding._count.wishes,
+      totalRsvpCount: wedding._count.rsvps,
       wishes: wedding.wishes.map((w) => ({
         id: w.id,
         name: w.name,
