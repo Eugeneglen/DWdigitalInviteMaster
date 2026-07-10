@@ -39,7 +39,13 @@ const SECTION_TO_FEATURE: Partial<Record<Section, string>> = {
   moments: 'moments',
 };
 
-/** Filter global nav tabs by wedding feature flags */
+/** Filter global nav tabs by wedding feature flags.
+ *
+ *  Resolution:
+ *    - "home" is always visible.
+ *    - If the feature key is NOT in the map at all → show the tab (assume enabled).
+ *    - Only hide when the flag is explicitly set to `false`.
+ */
 export function filterTabsByFeatures(
   tabs: NavTab[],
   featureFlags: Record<string, boolean>,
@@ -48,6 +54,8 @@ export function filterTabsByFeatures(
     if (tab.section === 'home') return true; // always shown
     const featureKey = SECTION_TO_FEATURE[tab.section];
     if (!featureKey) return true; // unknown section → show
+    // Key absent from map  → default to enabled (new weddings w/o seeded flags)
+    if (!(featureKey in featureFlags)) return true;
     return featureFlags[featureKey] === true;
   });
 }
