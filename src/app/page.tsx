@@ -1,20 +1,21 @@
 'use client';
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import GuestSite from '@/components/wedding/GuestSite';
-import AdminLoginPage from '@/app/admin/login/page';
-import WorkspaceLoginPage from '@/app/workspace/login/page';
+import { useAuthModalStore } from '@/store/useAuthModalStore';
 
 function ViewRouter() {
   const searchParams = useSearchParams();
   const view = searchParams.get('view');
+  const openModal = useAuthModalStore((s) => s.openModal);
 
-  if (view === 'cms') {
-    return <AdminLoginPage />;
-  }
-  if (view === 'couple') {
-    return <WorkspaceLoginPage />;
-  }
+  useEffect(() => {
+    if (view === 'cms') {
+      openModal('cms');
+    } else if (view === 'couple') {
+      openModal('default');
+    }
+  }, [view, openModal]);
 
   return <GuestSite showEditorButton />;
 }

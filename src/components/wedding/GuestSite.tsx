@@ -114,7 +114,7 @@ export default function GuestSite({ slug, topOffset, showEditorButton = false }:
   const { data: session } = useSession();
   const { currentSection } = useNavigationStore();
   const { togglePreview } = useCoupleCMSStore();
-  const { open: loginModalOpen, closeModal } = useAuthModalStore();
+  const { open: loginModalOpen, variant: loginVariant, closeModal } = useAuthModalStore();
 
   // Pre-fetch wedding data for this slug so all child pages share the cache
   const { data: weddingData, loading, getField } = usePublicWedding(slug);
@@ -220,6 +220,7 @@ export default function GuestSite({ slug, topOffset, showEditorButton = false }:
 
       <LoginModal
         open={loginModalOpen}
+        variant={loginVariant}
         onOpenChange={(open) => { if (!open) closeModal(); }}
       />
     </div>
