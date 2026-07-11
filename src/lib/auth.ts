@@ -1,14 +1,48 @@
 import type { NextAuthOptions } from 'next-auth';
-import { getServerSession as _getServerSession } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import { getToken } from 'next-auth/jwt';
 import bcrypt from 'bcryptjs';
 import { readFileSync } from 'fs';
 import path from 'path';
 import jwt from 'jsonwebtoken';
 import { db } from '@/lib/db';
+import { cookies } from 'next/headers';
 
-// ── Re-export getServerSession with our authOptions ──────────────────────────
-export const getServerSession = () => _getServerSession(authOptions);
+// ── getServerSession replacement ───────────────────────────────────────────
+// NextAuth v4's built-in getServerSession is broken in Next.js 16 App Router
+// route handlers (Turbopack).  This wrapper reads the session cookie manually
+// and decrypts it with next-auth/jwt's getToken(), then runs the session
+// callback to produce a Session object.
+export async function getServerSession() {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('next-auth.session-token')?.value;
+    if (!token) return null;
+
+    const jwtToken = await getToken({
+      req: { cookies: { get: (name: string) => ({ value: token }) } } as unknown as Request,
+      secret: resolveSecret(),
+      salt: undefined,
+      secureCookie: process.env.NODE_ENV === 'production',
+    });
+
+    if (!jwtToken) return null;
+
+    // Run the session callback from authOptions
+    const session = await authOptions.callbacks!.session!({
+      session: {
+        user: { id: '', email: '', name: '', role: '' },
+        expires: new Date((jwtToken.exp ?? 0) * 1000).toISOString(),
+      },
+      token: jwtToken,
+      user: undefined as never,
+    });
+
+    return session ?? null;
+  } catch {
+    return null;
+  }
+}
 
 // ── JWT Payload type ────────────────────────────────────────────────────────
 export interface JWTPayload {
@@ -169,53 +203,5 @@ export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 12);
 }
 
-// ── Feature keys & labels ───────────────────────────────────────────────────
-export const FEATURE_KEYS = {
-  RSVP: 'rsvp',
-  WISHES: 'wishes',
-  STORY: 'story',
-  GALLERY: 'gallery',
-  SCHEDULE: 'schedule',
-  FAQ: 'faq',
-  MOMENTS: 'moments',
-  GETTING_THERE: 'getting-there',
-  COUNTDOWN: 'countdown',
-  MUSIC: 'music',
-  VIDEO: 'video',
-  QA: 'qa',
-} as const;
-
-export const FEATURE_LABELS: Record<string, string> = {
-  rsvp: 'RSVP',
-  wishes: 'Wishes',
-  story: 'Our Story',
-  gallery: 'Photo Gallery',
-  schedule: 'Event Schedule',
-  faq: 'FAQ',
-  moments: 'Moments',
-  'getting-there': 'Getting There',
-  countdown: 'Countdown',
-  music: 'Background Music',
-  video: 'Video',
-  qa: 'Q&A',
-};
-
-export const GLOBAL_FEATURE_LABELS: Record<string, string> = {
-  ...FEATURE_LABELS,
-};
-
-// ── Role labels ─────────────────────────────────────────────────────────────
-export const ROLE_LABELS: Record<string, string> = {
-  SUPER_ADMIN: 'Super Admin',
-  ACCOUNT_MANAGER: 'Account Manager',
-  COUPLE: 'Couple',
-  ADMIN_1: 'Admin 1',
-  ADMIN_2: 'Admin 2',
-  ADMIN_3: 'Admin 3',
-};
-
-export const TENANT_ROLE_LABELS: Record<string, string> = {
-  admin: 'Admin',
-  editor: 'Editor',
-  viewer: 'Viewer',
-};
+// ── Re-export constants from the client-safe module ───────────────────────
+export { FEATURE_KEYS, FEATURE_LABELS, GLOBAL_FEATURE_LABELS, ROLE_LABELS, TENANT_ROLE_LABELS } from '@/lib/constants';

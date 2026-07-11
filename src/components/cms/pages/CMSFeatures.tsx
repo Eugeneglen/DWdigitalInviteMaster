@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useCMSStore } from '@/store/useCMSStore';
-import { GLOBAL_FEATURE_LABELS, FEATURE_LABELS, FEATURE_KEYS } from '@/lib/auth';
+import { GLOBAL_FEATURE_LABELS, FEATURE_LABELS, FEATURE_KEYS } from '@/lib/constants';
 
 // --- Types ---
 

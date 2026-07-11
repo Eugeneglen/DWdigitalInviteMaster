@@ -53,7 +53,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useCMSStore } from '@/store/useCMSStore';
-import { ROLE_LABELS, TENANT_ROLE_LABELS } from '@/lib/auth';
+import { ROLE_LABELS, TENANT_ROLE_LABELS } from '@/lib/constants';
 
 // --- Types ---
 
