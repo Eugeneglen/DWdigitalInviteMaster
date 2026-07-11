@@ -65,10 +65,20 @@ export function LoginModal({ open, onOpenChange, variant = 'default', targetRole
       if (result?.error) {
         setError('Invalid email or password. Please try again.');
       } else {
-        // Close modal and force session refresh so page.tsx
-        // immediately re-renders with the CMS layout.
         useAuthModalStore.getState().closeModal();
-        await update();
+        // Hard redirect — fetch fresh session to determine role,
+        // then use window.location.href to bypass any JSON/SSE
+        // parsing that next-auth update() streams can trigger.
+        await update({ callbackUrl: '/' });
+        const fresh = await fetch('/api/auth/session').then((r) => r.json());
+        const role = (fresh as Record<string, unknown> & { user?: { role?: string } })?.user?.role;
+        if (role === 'SUPER_ADMIN' || role === 'ACCOUNT_MANAGER') {
+          window.location.href = '/admin';
+        } else if (role === 'COUPLE') {
+          window.location.href = '/workspace';
+        } else {
+          window.location.href = '/';
+        }
       }
     } catch {
       setError('An unexpected error occurred. Please try again.');
