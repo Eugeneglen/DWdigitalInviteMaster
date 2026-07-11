@@ -18,8 +18,8 @@ RUN bunx prisma generate
 
 RUN bun run build
 
-# Validate standalone output
-RUN test -f ".next/standalone/server.js" || (echo "ERROR: standalone server.js missing" && exit 1)
+# Validate standalone output exists in the builder
+RUN test -f ".next/standalone/server.js" || (echo "ERROR: .next/standalone/server.js not generated" && exit 1)
 
 # ── Production runner ────────────────────────────────────────────────────────
 FROM node:22-alpine AS runner
@@ -27,17 +27,24 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-# NOTE: NEXTAUTH_SECRET, NEXTAUTH_URL, DATABASE_URL must be injected
-# by the hosting environment (Railway). No fallback literals here.
+# NOTE: NEXTAUTH_SECRET, NEXTAUTH_URL, DATABASE_URL are injected
+# by the hosting platform (Railway). No hardcoded fallbacks.
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Preserve .next/standalone/ directory so CMD path resolves correctly
+# Preserve the .next/standalone/ directory tree intact.
+# server.js remains at /app/.next/standalone/server.js.
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./.next/standalone
 
-# Static assets — placed where the standalone server expects them
+# Verify the entrypoint resolved correctly before proceeding
+RUN test -f ".next/standalone/server.js" || (echo "FATAL: .next/standalone/server.js missing after COPY" && exit 1)
+
+# Static assets — the standalone server resolves these from
+# __dirname/.next/static  (i.e. .next/standalone/.next/static)
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/standalone/.next/static
+
+# Public directory — resolved from __dirname/public
 COPY --from=builder --chown=nextjs:nodejs /app/public ./.next/standalone/public
 
 # Prisma schema + CLI for runtime db push

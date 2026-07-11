@@ -1,21 +1,29 @@
-import { redirect } from 'next/navigation';
-import { getServerSession } from '@/lib/auth';
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import GuestSite from '@/components/wedding/GuestSite';
 
-export default async function Page() {
-  const session = await getServerSession();
+export default function Page() {
+  const router = useRouter();
+  const { data: session, status } = useSession();
 
-  if (session?.user) {
+  useEffect(() => {
+    if (status !== 'authenticated' || !session?.user) return;
+
     const role = session.user.role;
 
     if (role === 'SUPER_ADMIN' || role === 'ACCOUNT_MANAGER') {
-      redirect('/admin');
+      router.replace('/admin');
+      return;
     }
 
     if (role === 'COUPLE') {
-      redirect('/workspace');
+      router.replace('/workspace');
+      return;
     }
-  }
+  }, [session, status, router]);
 
   return <GuestSite showEditorButton />;
 }
