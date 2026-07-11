@@ -4,7 +4,7 @@ import { db } from '@/lib/db';
 import { authenticateRequest, requireMasterAdmin, createAuditLog } from '@/lib/auth-middleware';
 
 // ============================================
-// GET — Single tenant with users + features
+// GET — Single wedding account with features
 // ============================================
 
 export async function GET(
@@ -23,41 +23,43 @@ export async function GET(
     }
 
     const { id } = await params;
-    const tenant = await db.tenant.findUnique({
+    const account = await db.weddingAccount.findUnique({
       where: { id },
       include: {
-        users: {
-          include: {
-            user: {
-              select: { id: true, email: true, name: true, avatarUrl: true, createdAt: true, updatedAt: true },
-            },
+        owner: {
+          select: { id: true, email: true, name: true, avatarUrl: true, createdAt: true, updatedAt: true },
+        },
+        features: true,
+        _count: {
+          select: {
+            guests: true,
+            rsvps: true,
+            wishes: true,
+            media: true,
+            schedules: true,
+            faqs: true,
           },
         },
-        featureToggles: true,
       },
     });
 
-    if (!tenant) {
-      return Response.json({ success: false, error: 'Tenant not found' }, { status: 404 });
+    if (!account) {
+      return Response.json({ success: false, error: 'Wedding account not found' }, { status: 404 });
     }
 
     return Response.json({
       success: true,
       data: {
-        ...tenant,
-        eventDate: tenant.eventDate?.toISOString() ?? null,
-        createdAt: tenant.createdAt.toISOString(),
-        updatedAt: tenant.updatedAt.toISOString(),
-        users: tenant.users.map((tu) => ({
-          ...tu,
-          createdAt: tu.createdAt.toISOString(),
-          user: {
-            ...tu.user,
-            createdAt: tu.user.createdAt.toISOString(),
-            updatedAt: tu.user.updatedAt.toISOString(),
-          },
-        })),
-        featureToggles: tenant.featureToggles.map((ft) => ({
+        ...account,
+        weddingDate: account.weddingDate?.toISOString() ?? null,
+        createdAt: account.createdAt.toISOString(),
+        updatedAt: account.updatedAt.toISOString(),
+        owner: account.owner ? {
+          ...account.owner,
+          createdAt: account.owner.createdAt.toISOString(),
+          updatedAt: account.owner.updatedAt.toISOString(),
+        } : null,
+        features: account.features.map((ft) => ({
           ...ft,
           createdAt: ft.createdAt.toISOString(),
           updatedAt: ft.updatedAt.toISOString(),
@@ -71,23 +73,27 @@ export async function GET(
 }
 
 // ============================================
-// PATCH — Update tenant
+// PATCH — Update wedding account
 // ============================================
 
 const updateTenantSchema = z.object({
-  name: z.string().min(1).optional(),
+  coupleName: z.string().min(1).optional(),
   slug: z
     .string()
     .min(1)
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be lowercase alphanumeric with hyphens only')
     .optional(),
-  eventType: z.string().min(1).optional(),
   status: z.string().optional(),
-  coupleName1: z.string().nullable().optional(),
-  coupleName2: z.string().nullable().optional(),
-  eventDate: z.string().nullable().optional(),
+  brideName: z.string().nullable().optional(),
+  groomName: z.string().nullable().optional(),
+  weddingDate: z.string().nullable().optional(),
   venue: z.string().nullable().optional(),
-  settings: z.string().optional(),
+  venueAddress: z.string().nullable().optional(),
+  googleMapsUrl: z.string().nullable().optional(),
+  heroImageUrl: z.string().nullable().optional(),
+  heroVideoUrl: z.string().nullable().optional(),
+  bannerUrl: z.string().nullable().optional(),
+  plan: z.string().optional(),
 });
 
 export async function PATCH(
@@ -106,9 +112,9 @@ export async function PATCH(
     }
 
     const { id } = await params;
-    const existing = await db.tenant.findUnique({ where: { id } });
+    const existing = await db.weddingAccount.findUnique({ where: { id } });
     if (!existing) {
-      return Response.json({ success: false, error: 'Tenant not found' }, { status: 404 });
+      return Response.json({ success: false, error: 'Wedding account not found' }, { status: 404 });
     }
 
     const body = await request.json();
@@ -117,40 +123,39 @@ export async function PATCH(
       return Response.json({ success: false, error: parsed.error.issues[0].message }, { status: 400 });
     }
 
-    const data = { ...parsed.data };
-    if (data.eventDate !== undefined) {
-      (data as Record<string, unknown>).eventDate = data.eventDate ? new Date(data.eventDate) : null;
+    const data: Record<string, unknown> = { ...parsed.data };
+    if (data.weddingDate !== undefined) {
+      data.weddingDate = data.weddingDate ? new Date(data.weddingDate as string) : null;
     }
 
     // Check slug uniqueness if changing
     if (data.slug && data.slug !== existing.slug) {
-      const slugExists = await db.tenant.findUnique({ where: { slug: data.slug } });
+      const slugExists = await db.weddingAccount.findUnique({ where: { slug: data.slug as string } });
       if (slugExists) {
-        return Response.json({ success: false, error: 'A tenant with this slug already exists' }, { status: 400 });
+        return Response.json({ success: false, error: 'A wedding account with this slug already exists' }, { status: 400 });
       }
     }
 
-    const updated = await db.tenant.update({
+    const updated = await db.weddingAccount.update({
       where: { id },
-      data: data as Record<string, unknown>,
+      data,
     });
 
     await createAuditLog({
       userId: user.userId,
       action: 'tenant.update',
-      resource: 'Tenant',
+      resource: 'WeddingAccount',
       resourceId: id,
+      weddingId: id,
       details: {
         before: {
-          name: existing.name,
+          coupleName: existing.coupleName,
           slug: existing.slug,
-          eventType: existing.eventType,
           status: existing.status,
         },
         after: {
-          name: updated.name,
+          coupleName: updated.coupleName,
           slug: updated.slug,
-          eventType: updated.eventType,
           status: updated.status,
         },
       },
@@ -161,7 +166,7 @@ export async function PATCH(
       success: true,
       data: {
         ...updated,
-        eventDate: updated.eventDate?.toISOString() ?? null,
+        weddingDate: updated.weddingDate?.toISOString() ?? null,
         createdAt: updated.createdAt.toISOString(),
         updatedAt: updated.updatedAt.toISOString(),
       },
@@ -173,7 +178,7 @@ export async function PATCH(
 }
 
 // ============================================
-// DELETE — Remove tenant
+// DELETE — Remove wedding account
 // ============================================
 
 export async function DELETE(
@@ -192,19 +197,20 @@ export async function DELETE(
     }
 
     const { id } = await params;
-    const existing = await db.tenant.findUnique({ where: { id } });
+    const existing = await db.weddingAccount.findUnique({ where: { id } });
     if (!existing) {
-      return Response.json({ success: false, error: 'Tenant not found' }, { status: 404 });
+      return Response.json({ success: false, error: 'Wedding account not found' }, { status: 404 });
     }
 
-    await db.tenant.delete({ where: { id } });
+    await db.weddingAccount.delete({ where: { id } });
 
     await createAuditLog({
       userId: user.userId,
       action: 'tenant.delete',
-      resource: 'Tenant',
+      resource: 'WeddingAccount',
       resourceId: id,
-      details: { name: existing.name, slug: existing.slug },
+      weddingId: id,
+      details: { coupleName: existing.coupleName, slug: existing.slug },
       request,
     });
 

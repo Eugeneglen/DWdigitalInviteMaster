@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 
 interface Particle {
   id: number;
@@ -13,10 +13,8 @@ interface Particle {
 }
 
 export default function GoldenDustOverlay() {
-  const [particles, setParticles] = useState<Particle[]>([]);
-
-  useEffect(() => {
-    setParticles(
+  const particles = useMemo(
+    () =>
       Array.from({ length: 18 }, (_, i) => ({
         id: i,
         width: 3 + Math.random() * 4,
@@ -25,9 +23,9 @@ export default function GoldenDustOverlay() {
         top: Math.random() * 100,
         delay: Math.random() * 6,
         duration: 4 + Math.random() * 6,
-      }))
-    );
-  }, []);
+      })),
+    []
+  );
 
   if (particles.length === 0) return null;
 

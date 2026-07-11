@@ -7,13 +7,13 @@ import { authenticateRequest, requireTenantAccess, createAuditLog } from '@/lib/
 // ============================================
 
 const updateScheduleSchema = z.object({
-  time: z.string().min(1).optional(),
+  eventType: z.string().optional(),
+  startTime: z.string().min(1).optional(),
+  endTime: z.string().nullable().optional(),
   title: z.string().min(1).optional(),
   description: z.string().nullable().optional(),
   location: z.string().nullable().optional(),
-  tags: z.array(z.string()).optional(),
-  order: z.number().int().optional(),
-  enabled: z.boolean().optional(),
+  sortOrder: z.number().int().optional(),
 });
 
 export async function PATCH(
@@ -26,15 +26,15 @@ export async function PATCH(
       return Response.json({ success: false, error: error || 'Authentication required' }, { status: 401 });
     }
 
-    const { id: tenantId, itemId } = await params;
+    const { id: weddingId, itemId } = await params;
 
-    const accessError = await requireTenantAccess(user, tenantId, 'editor');
+    const accessError = await requireTenantAccess(user, weddingId, 'editor');
     if (accessError) {
       return Response.json({ success: false, error: accessError }, { status: 403 });
     }
 
-    const existing = await db.scheduleItem.findFirst({
-      where: { id: itemId, tenantId },
+    const existing = await db.eventSchedule.findFirst({
+      where: { id: itemId, weddingId },
     });
     if (!existing) {
       return Response.json({ success: false, error: 'Schedule item not found' }, { status: 404 });
@@ -46,25 +46,20 @@ export async function PATCH(
       return Response.json({ success: false, error: parsed.error.issues[0].message }, { status: 400 });
     }
 
-    const data: Record<string, unknown> = { ...parsed.data };
-    if (parsed.data.tags !== undefined) {
-      data.tags = JSON.stringify(parsed.data.tags);
-    }
-
-    const updated = await db.scheduleItem.update({
+    const updated = await db.eventSchedule.update({
       where: { id: itemId },
-      data,
+      data: parsed.data,
     });
 
     await createAuditLog({
       userId: user.userId,
       action: 'schedule.update',
-      resource: 'ScheduleItem',
+      resource: 'EventSchedule',
       resourceId: itemId,
-      tenantId,
+      weddingId,
       details: {
-        before: { title: existing.title, time: existing.time, order: existing.order, enabled: existing.enabled },
-        after: { title: updated.title, time: updated.time, order: updated.order, enabled: updated.enabled },
+        before: { title: existing.title, startTime: existing.startTime, sortOrder: existing.sortOrder },
+        after: { title: updated.title, startTime: updated.startTime, sortOrder: updated.sortOrder },
       },
       request,
     });
@@ -73,14 +68,14 @@ export async function PATCH(
       success: true,
       data: {
         id: updated.id,
-        tenantId: updated.tenantId,
-        time: updated.time,
+        weddingId: updated.weddingId,
+        eventType: updated.eventType,
+        startTime: updated.startTime,
+        endTime: updated.endTime,
         title: updated.title,
         description: updated.description,
         location: updated.location,
-        tags: JSON.parse(updated.tags || '[]'),
-        order: updated.order,
-        enabled: updated.enabled,
+        sortOrder: updated.sortOrder,
         createdAt: updated.createdAt.toISOString(),
         updatedAt: updated.updatedAt.toISOString(),
       },
@@ -105,29 +100,29 @@ export async function DELETE(
       return Response.json({ success: false, error: error || 'Authentication required' }, { status: 401 });
     }
 
-    const { id: tenantId, itemId } = await params;
+    const { id: weddingId, itemId } = await params;
 
-    const accessError = await requireTenantAccess(user, tenantId, 'editor');
+    const accessError = await requireTenantAccess(user, weddingId, 'editor');
     if (accessError) {
       return Response.json({ success: false, error: accessError }, { status: 403 });
     }
 
-    const existing = await db.scheduleItem.findFirst({
-      where: { id: itemId, tenantId },
+    const existing = await db.eventSchedule.findFirst({
+      where: { id: itemId, weddingId },
     });
     if (!existing) {
       return Response.json({ success: false, error: 'Schedule item not found' }, { status: 404 });
     }
 
-    await db.scheduleItem.delete({ where: { id: itemId } });
+    await db.eventSchedule.delete({ where: { id: itemId } });
 
     await createAuditLog({
       userId: user.userId,
       action: 'schedule.delete',
-      resource: 'ScheduleItem',
+      resource: 'EventSchedule',
       resourceId: itemId,
-      tenantId,
-      details: { title: existing.title, time: existing.time },
+      weddingId,
+      details: { title: existing.title, startTime: existing.startTime },
       request,
     });
 

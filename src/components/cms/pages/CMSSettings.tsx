@@ -193,7 +193,6 @@ export default function CMSSettings() {
   const countdownEnabled = watch('countdownEnabled');
 
   const authHeaders = {
-    Authorization: `Bearer ${authUser?.token}`,
     'Content-Type': 'application/json',
   };
 
@@ -203,9 +202,7 @@ export default function CMSSettings() {
     const fetchTenants = async () => {
       setTenantsLoading(true);
       try {
-        const res = await fetch('/api/cms/tenants?limit=100', {
-          headers: { Authorization: `Bearer ${authUser?.token}` },
-        });
+        const res = await fetch('/api/cms/tenants?limit=100');
         const data = await res.json();
         if (data.success) {
           setTenants(data.data.tenants || []);
@@ -217,7 +214,7 @@ export default function CMSSettings() {
       }
     };
     fetchTenants();
-  }, [selectedTenantId, authUser?.token]);
+  }, [selectedTenantId]);
 
   // Fetch settings
   const fetchSettings = useCallback(async () => {
@@ -227,9 +224,7 @@ export default function CMSSettings() {
     }
     setLoading(true);
     try {
-      const res = await fetch(`/api/cms/tenants/${selectedTenantId}/settings`, {
-        headers: { Authorization: `Bearer ${authUser?.token}` },
-      });
+      const res = await fetch(`/api/cms/tenants/${selectedTenantId}/settings`);
       const data = await res.json();
       if (data.success && data.data) {
         const s = data.data;
@@ -262,7 +257,7 @@ export default function CMSSettings() {
     } finally {
       setLoading(false);
     }
-  }, [selectedTenantId, authUser?.token, reset]);
+  }, [selectedTenantId, reset]);
 
   useEffect(() => {
     fetchSettings();

@@ -16,14 +16,14 @@ export async function GET(
       return Response.json({ success: false, error: authError || 'Authentication required' }, { status: 401 });
     }
 
-    const { id: tenantId, rsvpId } = await params;
-    const accessError = await requireTenantAccess(user, tenantId, 'viewer');
+    const { id: weddingId, rsvpId } = await params;
+    const accessError = await requireTenantAccess(user, weddingId, 'viewer');
     if (accessError) {
       return Response.json({ success: false, error: accessError }, { status: 403 });
     }
 
     const rsvp = await db.rSVPSubmission.findFirst({
-      where: { id: rsvpId, tenantId },
+      where: { id: rsvpId, weddingId },
       include: { guests: true },
     });
 
@@ -35,7 +35,7 @@ export async function GET(
       success: true,
       data: {
         id: rsvp.id,
-        tenantId: rsvp.tenantId,
+        weddingId: rsvp.weddingId,
         firstName: rsvp.firstName,
         lastName: rsvp.lastName,
         partySize: rsvp.partySize,
@@ -70,14 +70,14 @@ export async function DELETE(
       return Response.json({ success: false, error: authError || 'Authentication required' }, { status: 401 });
     }
 
-    const { id: tenantId, rsvpId } = await params;
-    const accessError = await requireTenantAccess(user, tenantId, 'editor');
+    const { id: weddingId, rsvpId } = await params;
+    const accessError = await requireTenantAccess(user, weddingId, 'editor');
     if (accessError) {
       return Response.json({ success: false, error: accessError }, { status: 403 });
     }
 
     const existing = await db.rSVPSubmission.findFirst({
-      where: { id: rsvpId, tenantId },
+      where: { id: rsvpId, weddingId },
     });
 
     if (!existing) {
@@ -91,7 +91,7 @@ export async function DELETE(
       action: 'rsvp.delete',
       resource: 'RSVPSubmission',
       resourceId: rsvpId,
-      tenantId,
+      weddingId,
       details: { name: `${existing.firstName} ${existing.lastName}` },
       request,
     });

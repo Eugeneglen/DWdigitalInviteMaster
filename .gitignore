@@ -36,6 +36,7 @@ yarn-error.log*
 # vercel
 .vercel
 
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
@@ -52,53 +53,12 @@ server.log
 # Skills directory
 /skills/
 
-# Agent artifacts
+# Local DB
+db/
+
+# Sandbox tooling
 tool-results/
 upload/
-
-# Sandbox-only
-src/app/tailwind-output.css
-dev.sh
-swapfile
-
-# Dead code (TanStack Router / Vite — not used in this Next.js project)
-src/routes/
-src/routeTree.gen.ts
-src/router.tsx
-src/server.ts
-src/start.ts
-src/styles.css
-vite.config.ts
-start-dev.sh
-bunfig.toml
-
-# Debug screenshots in repo root
-/*.png
-/*.jpg
-/*.jpeg
-/*.gif
-/*.webp
-
-# AI agent context (sandbox-generated)
-agent-ctx/
-
-# Sandbox scripts
-.zscripts/
-
-# Database file (regenerated locally)
-db/*.db
-
-# Backup files
-*.backup
-
-# Download archives
-download/*.tar.gz
-download/*.zip
-
-# HTML prototypes (reference only, not served by Next.js)
-public/*.html
-public/nav.js
-
-# IDE / editor
-.vscode/
-.idea/
+worklog.md
+ensure-server.sh
+mini-services/

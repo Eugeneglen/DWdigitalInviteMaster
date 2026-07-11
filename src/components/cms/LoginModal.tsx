@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { signIn, signOut, useSession } from 'next-auth/react';
+import { signIn, signOut, useSession, update } from 'next-auth/react';
 import {
   Dialog,
   DialogContent,
@@ -65,8 +65,10 @@ export function LoginModal({ open, onOpenChange, variant = 'default', targetRole
       if (result?.error) {
         setError('Invalid email or password. Please try again.');
       } else {
+        // Close modal and force session refresh so page.tsx
+        // immediately re-renders with the CMS layout.
         useAuthModalStore.getState().closeModal();
-        window.location.reload();
+        await update();
       }
     } catch {
       setError('An unexpected error occurred. Please try again.');

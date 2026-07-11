@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
     const where: Record<string, unknown> = {};
 
     if (userId) where.userId = userId;
-    if (tenantId) where.tenantId = tenantId;
+    if (tenantId) where.weddingId = tenantId;
     if (action) where.action = action;
 
     if (fromDate || toDate) {

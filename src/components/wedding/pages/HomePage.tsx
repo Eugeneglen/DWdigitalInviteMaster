@@ -209,7 +209,7 @@ export default function HomePage() {
               <span className="text-base">🎉</span>
               <span className="font-label-sm text-label-sm text-paper-cream/90 tracking-wide">
                 <span className="font-bold text-paper-cream">{displayRsvpCount}</span>{' '}
-                {displayRsvpCount === 1 ? 'guest has' : 'guests have'} RSVP&apos;d
+                {displayRsvpCount === 1 ? 'guest has' : 'guests have'} RSVP'd
               </span>
               <span className="relative flex h-2 w-2 ml-1">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />

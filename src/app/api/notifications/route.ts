@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { getServerSession } from '@/lib/auth';
 import { db } from '@/lib/db';
 
 // ---------------------------------------------------------------------------
@@ -10,7 +9,7 @@ import { db } from '@/lib/db';
 
 export async function GET(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession();
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -18,7 +17,7 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const unreadOnly = searchParams.get('unreadOnly') === 'true';
     const limit = Math.min(Number(searchParams.get('limit') || '50'), 100);
-    const role = (session.user as Record<string, string>).role;
+    const role = session.user.role;
 
     // Build the where clause — couples see wedding-linked notifications too
     let weddingIds: string[] = [];
@@ -75,14 +74,14 @@ export async function GET(req: Request) {
 
 export async function PUT(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession();
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await req.json();
     const { id, markAll } = body as { id?: string; markAll?: boolean };
-    const role = (session.user as Record<string, string>).role;
+    const role = session.user.role;
 
     // Build base where for user/wedding scoping
     let baseWhere: Record<string, unknown> = {};
@@ -135,7 +134,7 @@ export async function PUT(req: Request) {
 
 export async function DELETE(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession();
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -143,7 +142,7 @@ export async function DELETE(req: Request) {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
     const clearAll = searchParams.get('clearAll') === 'true';
-    const role = (session.user as Record<string, string>).role;
+    const role = session.user.role;
 
     let baseWhere: Record<string, unknown> = {};
     if (role === 'COUPLE') {

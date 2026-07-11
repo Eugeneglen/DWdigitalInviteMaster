@@ -65,7 +65,7 @@ interface RsvpSummary {
 
 interface CMSRsvpsProps {
   selectedTenantId: string | null;
-  authUser: { userId: string; email: string; name: string; role: string; tenantId?: string; tenantRole?: string; token: string } | null;
+  authUser: { userId: string; email: string; name: string; role: string; tenantId?: string; tenantRole?: string } | null;
 }
 
 // --- Helpers ---
@@ -90,7 +90,6 @@ function getAttendanceIcon(attendance: string) {
 
 export default function CMSRsvps({ selectedTenantId, authUser }: CMSRsvpsProps) {
   const tenantId = authUser?.tenantId || selectedTenantId;
-  const token = authUser?.token || '';
 
   // State
   const [rsvps, setRsvps] = useState<RsvpRecord[]>([]);
@@ -126,9 +125,7 @@ export default function CMSRsvps({ selectedTenantId, authUser }: CMSRsvpsProps) 
       if (fromDate) params.set('fromDate', fromDate);
       if (toDate) params.set('toDate', toDate);
 
-      const res = await fetch(`/api/cms/tenants/${tenantId}/rsvps?${params}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(`/api/cms/tenants/${tenantId}/rsvps?${params}`);
       const json = await res.json();
       if (json.success) {
         setRsvps(json.data.rsvps || []);
@@ -141,7 +138,7 @@ export default function CMSRsvps({ selectedTenantId, authUser }: CMSRsvpsProps) 
     } finally {
       setLoading(false);
     }
-  }, [tenantId, token, page, search, attendance, fromDate, toDate]);
+  }, [tenantId, page, search, attendance, fromDate, toDate]);
 
   useEffect(() => {
     fetchRsvps();
@@ -157,7 +154,6 @@ export default function CMSRsvps({ selectedTenantId, authUser }: CMSRsvpsProps) 
     try {
       const res = await fetch(`/api/cms/tenants/${tenantId}/rsvps/${deleteId}`, {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
       });
       const json = await res.json();
       if (json.success) {

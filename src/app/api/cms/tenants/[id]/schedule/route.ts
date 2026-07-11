@@ -3,7 +3,7 @@ import { db } from '@/lib/db';
 import { authenticateRequest, requireTenantAccess, createAuditLog } from '@/lib/auth-middleware';
 
 // ============================================
-// GET — List all schedule items for a tenant (including disabled)
+// GET — List all schedule items for a wedding
 // ============================================
 
 export async function GET(
@@ -16,36 +16,36 @@ export async function GET(
       return Response.json({ success: false, error: error || 'Authentication required' }, { status: 401 });
     }
 
-    const { id: tenantId } = await params;
+    const { id: weddingId } = await params;
 
-    const accessError = await requireTenantAccess(user, tenantId, 'viewer');
+    const accessError = await requireTenantAccess(user, weddingId, 'viewer');
     if (accessError) {
       return Response.json({ success: false, error: accessError }, { status: 403 });
     }
 
-    // Verify tenant exists
-    const tenant = await db.tenant.findUnique({ where: { id: tenantId } });
-    if (!tenant) {
-      return Response.json({ success: false, error: 'Tenant not found' }, { status: 404 });
+    // Verify wedding account exists
+    const account = await db.weddingAccount.findUnique({ where: { id: weddingId } });
+    if (!account) {
+      return Response.json({ success: false, error: 'Wedding account not found' }, { status: 404 });
     }
 
-    const items = await db.scheduleItem.findMany({
-      where: { tenantId },
-      orderBy: { order: 'asc' },
+    const items = await db.eventSchedule.findMany({
+      where: { weddingId },
+      orderBy: { sortOrder: 'asc' },
     });
 
     return Response.json({
       success: true,
       data: items.map((item) => ({
         id: item.id,
-        tenantId: item.tenantId,
-        time: item.time,
+        weddingId: item.weddingId,
+        eventType: item.eventType,
+        startTime: item.startTime,
+        endTime: item.endTime,
         title: item.title,
         description: item.description,
         location: item.location,
-        tags: JSON.parse(item.tags || '[]'),
-        order: item.order,
-        enabled: item.enabled,
+        sortOrder: item.sortOrder,
         createdAt: item.createdAt.toISOString(),
         updatedAt: item.updatedAt.toISOString(),
       })),
@@ -61,11 +61,12 @@ export async function GET(
 // ============================================
 
 const createScheduleSchema = z.object({
-  time: z.string().min(1, 'Time is required'),
+  eventType: z.string().default('CUSTOM'),
+  startTime: z.string().min(1, 'Start time is required'),
+  endTime: z.string().optional(),
   title: z.string().min(1, 'Title is required'),
   description: z.string().optional(),
   location: z.string().optional(),
-  tags: z.array(z.string()).optional(),
 });
 
 export async function POST(
@@ -78,17 +79,17 @@ export async function POST(
       return Response.json({ success: false, error: error || 'Authentication required' }, { status: 401 });
     }
 
-    const { id: tenantId } = await params;
+    const { id: weddingId } = await params;
 
-    const accessError = await requireTenantAccess(user, tenantId, 'editor');
+    const accessError = await requireTenantAccess(user, weddingId, 'editor');
     if (accessError) {
       return Response.json({ success: false, error: accessError }, { status: 403 });
     }
 
-    // Verify tenant exists
-    const tenant = await db.tenant.findUnique({ where: { id: tenantId } });
-    if (!tenant) {
-      return Response.json({ success: false, error: 'Tenant not found' }, { status: 404 });
+    // Verify wedding account exists
+    const account = await db.weddingAccount.findUnique({ where: { id: weddingId } });
+    if (!account) {
+      return Response.json({ success: false, error: 'Wedding account not found' }, { status: 404 });
     }
 
     const body = await request.json();
@@ -97,36 +98,37 @@ export async function POST(
       return Response.json({ success: false, error: parsed.error.issues[0].message }, { status: 400 });
     }
 
-    const { time, title, description, location, tags } = parsed.data;
+    const { eventType, startTime, endTime, title, description, location } = parsed.data;
 
-    // Auto-assign order = max existing order + 1
-    const maxOrder = await db.scheduleItem.findFirst({
-      where: { tenantId },
-      orderBy: { order: 'desc' },
-      select: { order: true },
+    // Auto-assign sortOrder = max existing sortOrder + 1
+    const maxSortOrder = await db.eventSchedule.findFirst({
+      where: { weddingId },
+      orderBy: { sortOrder: 'desc' },
+      select: { sortOrder: true },
     });
 
-    const order = (maxOrder?.order ?? -1) + 1;
+    const sortOrder = (maxSortOrder?.sortOrder ?? -1) + 1;
 
-    const item = await db.scheduleItem.create({
+    const item = await db.eventSchedule.create({
       data: {
-        tenantId,
-        time,
+        weddingId,
+        eventType,
+        startTime,
+        endTime: endTime ?? null,
         title,
         description: description ?? null,
         location: location ?? null,
-        tags: tags ? JSON.stringify(tags) : '[]',
-        order,
+        sortOrder,
       },
     });
 
     await createAuditLog({
       userId: user.userId,
       action: 'schedule.create',
-      resource: 'ScheduleItem',
+      resource: 'EventSchedule',
       resourceId: item.id,
-      tenantId,
-      details: { time, title, order },
+      weddingId,
+      details: { eventType, title, startTime, sortOrder },
       request,
     });
 
@@ -134,14 +136,14 @@ export async function POST(
       success: true,
       data: {
         id: item.id,
-        tenantId: item.tenantId,
-        time: item.time,
+        weddingId: item.weddingId,
+        eventType: item.eventType,
+        startTime: item.startTime,
+        endTime: item.endTime,
         title: item.title,
         description: item.description,
         location: item.location,
-        tags: JSON.parse(item.tags || '[]'),
-        order: item.order,
-        enabled: item.enabled,
+        sortOrder: item.sortOrder,
         createdAt: item.createdAt.toISOString(),
         updatedAt: item.updatedAt.toISOString(),
       },

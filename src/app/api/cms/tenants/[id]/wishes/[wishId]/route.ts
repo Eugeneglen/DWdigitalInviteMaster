@@ -3,13 +3,17 @@ import { z } from 'zod';
 import { db } from '@/lib/db';
 import { authenticateRequest, requireTenantAccess, createAuditLog } from '@/lib/auth-middleware';
 
-const moderateSchema = z.object({
-  status: z.enum(['approved', 'hidden', 'flagged']),
-});
+// ============================================
+// PATCH — Update a wish (message, name, etc.)
+// Note: Wish model has no status field; moderation is not supported.
+// ============================================
 
-// ============================================
-// PATCH — Moderate a wish (change status)
-// ============================================
+const updateWishSchema = z.object({
+  name: z.string().min(1).optional(),
+  relationship: z.string().nullable().optional(),
+  message: z.string().min(1).optional(),
+  imageUrl: z.string().nullable().optional(),
+});
 
 export async function PATCH(
   request: NextRequest,
@@ -21,14 +25,14 @@ export async function PATCH(
       return Response.json({ success: false, error: authError || 'Authentication required' }, { status: 401 });
     }
 
-    const { id: tenantId, wishId } = await params;
-    const accessError = await requireTenantAccess(user, tenantId, 'editor');
+    const { id: weddingId, wishId } = await params;
+    const accessError = await requireTenantAccess(user, weddingId, 'editor');
     if (accessError) {
       return Response.json({ success: false, error: accessError }, { status: 403 });
     }
 
     const existing = await db.wish.findFirst({
-      where: { id: wishId, tenantId },
+      where: { id: wishId, weddingId },
     });
 
     if (!existing) {
@@ -36,26 +40,25 @@ export async function PATCH(
     }
 
     const body = await request.json();
-    const parsed = moderateSchema.safeParse(body);
+    const parsed = updateWishSchema.safeParse(body);
     if (!parsed.success) {
-      return Response.json({ success: false, error: 'Invalid status. Use: approved, hidden, or flagged.' }, { status: 400 });
+      return Response.json({ success: false, error: parsed.error.issues[0].message }, { status: 400 });
     }
 
     const updated = await db.wish.update({
       where: { id: wishId },
-      data: { status: parsed.data.status },
+      data: parsed.data,
     });
 
     await createAuditLog({
       userId: user.userId,
-      action: 'wish.moderate',
+      action: 'wish.update',
       resource: 'Wish',
       resourceId: wishId,
-      tenantId,
+      weddingId,
       details: {
-        before: { status: existing.status },
-        after: { status: parsed.data.status },
-        name: existing.name,
+        before: { name: existing.name, message: existing.message },
+        after: { name: updated.name, message: updated.message },
       },
       request,
     });
@@ -64,12 +67,16 @@ export async function PATCH(
       success: true,
       data: {
         id: updated.id,
-        status: updated.status,
-        updatedAt: updated.createdAt.toISOString(),
+        weddingId: updated.weddingId,
+        name: updated.name,
+        relationship: updated.relationship,
+        message: updated.message,
+        imageUrl: updated.imageUrl,
+        createdAt: updated.createdAt.toISOString(),
       },
     });
   } catch (err) {
-    console.error('Moderate wish error:', err);
+    console.error('Update wish error:', err);
     return Response.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -88,14 +95,14 @@ export async function DELETE(
       return Response.json({ success: false, error: authError || 'Authentication required' }, { status: 401 });
     }
 
-    const { id: tenantId, wishId } = await params;
-    const accessError = await requireTenantAccess(user, tenantId, 'editor');
+    const { id: weddingId, wishId } = await params;
+    const accessError = await requireTenantAccess(user, weddingId, 'editor');
     if (accessError) {
       return Response.json({ success: false, error: accessError }, { status: 403 });
     }
 
     const existing = await db.wish.findFirst({
-      where: { id: wishId, tenantId },
+      where: { id: wishId, weddingId },
     });
 
     if (!existing) {
@@ -109,7 +116,7 @@ export async function DELETE(
       action: 'wish.delete',
       resource: 'Wish',
       resourceId: wishId,
-      tenantId,
+      weddingId,
       details: { name: existing.name },
       request,
     });

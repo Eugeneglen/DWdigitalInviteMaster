@@ -136,13 +136,11 @@ function MasterAdminView({ authUser }: { authUser: AuthUser }) {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const headers = { Authorization: `Bearer ${authUser.token}` };
-
       const [statsRes, logsRes, rsvpsRes, wishesRes] = await Promise.all([
-        fetch('/api/cms/stats', { headers }),
-        fetch('/api/cms/audit?limit=5', { headers }),
-        fetch('/api/cms/recent-submissions?limit=5&type=rsvp', { headers }).catch(() => null),
-        fetch('/api/cms/recent-submissions?limit=5&type=wish', { headers }).catch(() => null),
+        fetch('/api/cms/stats'),
+        fetch('/api/cms/audit?limit=5'),
+        fetch('/api/cms/recent-submissions?limit=5&type=rsvp').catch(() => null),
+        fetch('/api/cms/recent-submissions?limit=5&type=wish').catch(() => null),
       ]);
 
       if (statsRes.ok) {
@@ -391,14 +389,12 @@ function TenantDashboard({ tenantId, authUser }: { tenantId: string; authUser: A
     setLoading(true);
     setError(null);
     try {
-      const headers = { Authorization: `Bearer ${authUser.token}` };
-
       const [tenantRes, rsvpRes, wishesRes, activityRes, trendRes] = await Promise.all([
-        fetch(`/api/cms/tenants/${tenantId}`, { headers }),
-        fetch(`/api/cms/tenants/${tenantId}/rsvps?limit=1`, { headers }),
-        fetch(`/api/cms/tenants/${tenantId}/wishes?limit=1`, { headers }),
-        fetch(`/api/cms/tenants/${tenantId}/activity?limit=8`, { headers }).catch(() => null),
-        fetch(`/api/cms/tenants/${tenantId}/analytics?fromDate=&toDate=`, { headers }).catch(() => null),
+        fetch(`/api/cms/tenants/${tenantId}`),
+        fetch(`/api/cms/tenants/${tenantId}/rsvps?limit=1`),
+        fetch(`/api/cms/tenants/${tenantId}/wishes?limit=1`),
+        fetch(`/api/cms/tenants/${tenantId}/activity?limit=8`).catch(() => null),
+        fetch(`/api/cms/tenants/${tenantId}/analytics?fromDate=&toDate=`).catch(() => null),
       ]);
 
       if (!tenantRes.ok) throw new Error('Failed to load tenant');

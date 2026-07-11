@@ -23,11 +23,13 @@ import {
   Camera,
   FileText,
   LayoutDashboard,
+  MoreHorizontal,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { NotificationBell } from '@/components/cms/NotificationBell';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useCoupleCMSStore, type CoupleCMSPage } from '@/store/useCoupleCMSStore';
 import { useAuthModalStore } from '@/store/useAuthModalStore';
 
@@ -50,16 +52,19 @@ const NAV_ITEMS: { key: CoupleCMSPage; label: string; icon: React.ElementType }[
   { key: 'features', label: 'Features', icon: ToggleLeft },
 ];
 
+const VISIBLE_NAV_COUNT = 5;
+
 export default function CoupleCMSLayout({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession();
   const { currentPage, setPage, weddingId, setWeddingId, weddingData, setWeddingData, previewMode, togglePreview } = useCoupleCMSStore();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [moreOpen, setMoreOpen] = useState(false);
 
   useEffect(() => {
     async function fetchWedding() {
       try {
-        const res = await fetch('/api/cms/wedding?XTransformPort=3000');
+        const res = await fetch('/api/cms/wedding');
         if (!res.ok) {
           if (res.status === 401) {
             // Session is invalid or corrupted — sign out and let user re-login
@@ -145,6 +150,9 @@ export default function CoupleCMSLayout({ children }: { children: React.ReactNod
     );
   }
 
+  const visibleNavItems = NAV_ITEMS.slice(0, VISIBLE_NAV_COUNT);
+  const moreNavItems = NAV_ITEMS.slice(VISIBLE_NAV_COUNT);
+
   return (
     <div className="flex min-h-screen bg-paper-cream">
       {/* Left Sidebar */}
@@ -224,11 +232,6 @@ export default function CoupleCMSLayout({ children }: { children: React.ReactNod
         </div>
       </aside>
 
-      {/* Mobile sidebar overlay trigger + bottom nav for small screens */}
-      <div className="fixed inset-0 z-50 flex md:hidden">
-        {/* This is handled via a mobile bottom bar below the main content */}
-      </div>
-
       {/* Main Area */}
       <div className="flex flex-1 flex-col min-w-0">
         {/* Top Bar */}
@@ -285,7 +288,7 @@ export default function CoupleCMSLayout({ children }: { children: React.ReactNod
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-8">
+        <main className="flex-1 overflow-y-auto p-4 md:p-8 pb-20 md:pb-8">
           <div className="mx-auto max-w-4xl rounded-lg bg-white p-6 shadow-sm ring-1 ring-charcoal-ink/5">
             {children}
           </div>
@@ -293,7 +296,7 @@ export default function CoupleCMSLayout({ children }: { children: React.ReactNod
 
         {/* Mobile Bottom Navigation */}
         <nav className="fixed bottom-0 left-0 right-0 z-40 flex md:hidden items-center justify-around border-t border-champagne-silk bg-paper-cream/95 backdrop-blur-sm px-1 py-1.5 pb-[env(safe-area-inset-bottom)]">
-          {NAV_ITEMS.slice(0, 5).map((item) => {
+          {visibleNavItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentPage === item.key;
 
@@ -311,25 +314,49 @@ export default function CoupleCMSLayout({ children }: { children: React.ReactNod
               </button>
             );
           })}
-          {/* More button for remaining items — for now just repeat last two as compact icons */}
-          {NAV_ITEMS.slice(5).map((item) => {
-            const Icon = item.icon;
-            const isActive = currentPage === item.key;
-
-            return (
+          {/* More button for remaining items */}
+          <Sheet open={moreOpen} onOpenChange={setMoreOpen}>
+            <SheetTrigger asChild>
               <button
-                key={item.key}
-                onClick={() => setPage(item.key)}
                 className={`
                   flex flex-col items-center gap-0.5 rounded-md px-2 py-1.5 transition-colors duration-150
-                  ${isActive ? 'text-cinematic-gold' : 'text-charcoal-ink/40'}
+                  ${currentPage !== 'overview' && currentPage !== 'details' && currentPage !== 'content' && currentPage !== 'home' && currentPage !== 'schedule'
+                    ? 'text-cinematic-gold'
+                    : 'text-charcoal-ink/40'}
                 `}
               >
-                <Icon className="size-5" />
-                <span className="text-[10px] font-medium leading-tight">{item.label}</span>
+                <MoreHorizontal className="size-5" />
+                <span className="text-[10px] font-medium leading-tight">More</span>
               </button>
-            );
-          })}
+            </SheetTrigger>
+            <SheetContent side="bottom" className="rounded-t-2xl max-h-[60vh]">
+              <div className="py-4">
+                <h3 className="text-sm font-semibold text-charcoal-ink mb-3 px-2">More Pages</h3>
+                <div className="grid grid-cols-4 gap-1 px-1">
+                  {moreNavItems.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = currentPage === item.key;
+                    return (
+                      <button
+                        key={item.key}
+                        onClick={() => {
+                          setPage(item.key);
+                          setMoreOpen(false);
+                        }}
+                        className={`
+                          flex flex-col items-center gap-1.5 rounded-lg px-2 py-3 transition-colors duration-150
+                          ${isActive ? 'bg-cinematic-gold/10 text-cinematic-gold' : 'text-charcoal-ink/60 hover:bg-champagne-silk/40'}
+                        `}
+                      >
+                        <Icon className="size-5" />
+                        <span className="text-[11px] font-medium leading-tight text-center">{item.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
         </nav>
       </div>
     </div>

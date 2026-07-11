@@ -3,16 +3,14 @@ import { db } from '@/lib/db';
 import { authenticateRequest, requireTenantAccess, createAuditLog } from '@/lib/auth-middleware';
 
 // ============================================
-// PATCH — Update a content block
+// PATCH — Update a content entry
 // ============================================
 
-const updateBlockSchema = z.object({
-  sectionKey: z.string().min(1).optional(),
-  title: z.string().nullable().optional(),
-  content: z.string().nullable().optional(),
-  imageUrl: z.string().nullable().optional(),
-  order: z.number().int().optional(),
-  status: z.enum(['draft', 'published']).optional(),
+const updateContentSchema = z.object({
+  section: z.string().min(1).optional(),
+  fieldKey: z.string().min(1).optional(),
+  fieldValue: z.string().optional(),
+  fieldType: z.enum(['TEXT', 'RICHTEXT', 'IMAGE_URL', 'JSON', 'NUMBER', 'BOOLEAN']).optional(),
 });
 
 export async function PATCH(
@@ -25,40 +23,40 @@ export async function PATCH(
       return Response.json({ success: false, error: error || 'Authentication required' }, { status: 401 });
     }
 
-    const { id: tenantId, blockId } = await params;
+    const { id: weddingId, blockId } = await params;
 
-    const accessError = await requireTenantAccess(user, tenantId, 'editor');
+    const accessError = await requireTenantAccess(user, weddingId, 'editor');
     if (accessError) {
       return Response.json({ success: false, error: accessError }, { status: 403 });
     }
 
-    const existing = await db.contentBlock.findFirst({
-      where: { id: blockId, tenantId },
+    const existing = await db.weddingContent.findFirst({
+      where: { id: blockId, weddingId },
     });
     if (!existing) {
-      return Response.json({ success: false, error: 'Content block not found' }, { status: 404 });
+      return Response.json({ success: false, error: 'Content entry not found' }, { status: 404 });
     }
 
     const body = await request.json();
-    const parsed = updateBlockSchema.safeParse(body);
+    const parsed = updateContentSchema.safeParse(body);
     if (!parsed.success) {
       return Response.json({ success: false, error: parsed.error.issues[0].message }, { status: 400 });
     }
 
-    const updated = await db.contentBlock.update({
+    const updated = await db.weddingContent.update({
       where: { id: blockId },
       data: parsed.data,
     });
 
     await createAuditLog({
       userId: user.userId,
-      action: 'content_block.update',
-      resource: 'ContentBlock',
+      action: 'content.update',
+      resource: 'WeddingContent',
       resourceId: blockId,
-      tenantId,
+      weddingId,
       details: {
-        before: { sectionKey: existing.sectionKey, title: existing.title, status: existing.status, order: existing.order },
-        after: { sectionKey: updated.sectionKey, title: updated.title, status: updated.status, order: updated.order },
+        before: { section: existing.section, fieldKey: existing.fieldKey, fieldType: existing.fieldType },
+        after: { section: updated.section, fieldKey: updated.fieldKey, fieldType: updated.fieldType },
       },
       request,
     });
@@ -67,13 +65,11 @@ export async function PATCH(
       success: true,
       data: {
         id: updated.id,
-        tenantId: updated.tenantId,
-        sectionKey: updated.sectionKey,
-        title: updated.title,
-        content: updated.content,
-        imageUrl: updated.imageUrl,
-        order: updated.order,
-        status: updated.status,
+        weddingId: updated.weddingId,
+        section: updated.section,
+        fieldKey: updated.fieldKey,
+        fieldValue: updated.fieldValue,
+        fieldType: updated.fieldType,
         createdAt: updated.createdAt.toISOString(),
         updatedAt: updated.updatedAt.toISOString(),
       },
@@ -85,7 +81,7 @@ export async function PATCH(
 }
 
 // ============================================
-// DELETE — Delete a content block
+// DELETE — Delete a content entry
 // ============================================
 
 export async function DELETE(
@@ -98,29 +94,29 @@ export async function DELETE(
       return Response.json({ success: false, error: error || 'Authentication required' }, { status: 401 });
     }
 
-    const { id: tenantId, blockId } = await params;
+    const { id: weddingId, blockId } = await params;
 
-    const accessError = await requireTenantAccess(user, tenantId, 'editor');
+    const accessError = await requireTenantAccess(user, weddingId, 'editor');
     if (accessError) {
       return Response.json({ success: false, error: accessError }, { status: 403 });
     }
 
-    const existing = await db.contentBlock.findFirst({
-      where: { id: blockId, tenantId },
+    const existing = await db.weddingContent.findFirst({
+      where: { id: blockId, weddingId },
     });
     if (!existing) {
-      return Response.json({ success: false, error: 'Content block not found' }, { status: 404 });
+      return Response.json({ success: false, error: 'Content entry not found' }, { status: 404 });
     }
 
-    await db.contentBlock.delete({ where: { id: blockId } });
+    await db.weddingContent.delete({ where: { id: blockId } });
 
     await createAuditLog({
       userId: user.userId,
-      action: 'content_block.delete',
-      resource: 'ContentBlock',
+      action: 'content.delete',
+      resource: 'WeddingContent',
       resourceId: blockId,
-      tenantId,
-      details: { sectionKey: existing.sectionKey, title: existing.title },
+      weddingId,
+      details: { section: existing.section, fieldKey: existing.fieldKey },
       request,
     });
 

@@ -7,12 +7,13 @@ import { authenticateRequest, requireTenantAccess, createAuditLog } from '@/lib/
 // ============================================
 
 const updateMediaSchema = z.object({
-  url: z.string().url().optional(),
+  url: z.string().min(1).optional(),
+  thumbnailUrl: z.string().nullable().optional(),
+  fileName: z.string().min(1).optional(),
+  fileType: z.string().optional(),
+  fileSize: z.number().int().nullable().optional(),
   category: z.string().min(1).optional(),
-  caption: z.string().nullable().optional(),
-  alt: z.string().nullable().optional(),
-  order: z.number().int().optional(),
-  isCover: z.boolean().optional(),
+  sortOrder: z.number().int().optional(),
 });
 
 export async function PATCH(
@@ -25,15 +26,15 @@ export async function PATCH(
       return Response.json({ success: false, error: error || 'Authentication required' }, { status: 401 });
     }
 
-    const { id: tenantId, itemId } = await params;
+    const { id: weddingId, itemId } = await params;
 
-    const accessError = await requireTenantAccess(user, tenantId, 'editor');
+    const accessError = await requireTenantAccess(user, weddingId, 'editor');
     if (accessError) {
       return Response.json({ success: false, error: accessError }, { status: 403 });
     }
 
-    const existing = await db.mediaItem.findFirst({
-      where: { id: itemId, tenantId },
+    const existing = await db.weddingMedia.findFirst({
+      where: { id: itemId, weddingId },
     });
     if (!existing) {
       return Response.json({ success: false, error: 'Media item not found' }, { status: 404 });
@@ -45,7 +46,7 @@ export async function PATCH(
       return Response.json({ success: false, error: parsed.error.issues[0].message }, { status: 400 });
     }
 
-    const updated = await db.mediaItem.update({
+    const updated = await db.weddingMedia.update({
       where: { id: itemId },
       data: parsed.data,
     });
@@ -53,12 +54,12 @@ export async function PATCH(
     await createAuditLog({
       userId: user.userId,
       action: 'media.update',
-      resource: 'MediaItem',
+      resource: 'WeddingMedia',
       resourceId: itemId,
-      tenantId,
+      weddingId,
       details: {
-        before: { category: existing.category, url: existing.url, order: existing.order, isCover: existing.isCover },
-        after: { category: updated.category, url: updated.url, order: updated.order, isCover: updated.isCover },
+        before: { category: existing.category, fileName: existing.fileName, sortOrder: existing.sortOrder },
+        after: { category: updated.category, fileName: updated.fileName, sortOrder: updated.sortOrder },
       },
       request,
     });
@@ -67,15 +68,15 @@ export async function PATCH(
       success: true,
       data: {
         id: updated.id,
-        tenantId: updated.tenantId,
+        weddingId: updated.weddingId,
         category: updated.category,
         url: updated.url,
-        caption: updated.caption,
-        alt: updated.alt,
-        order: updated.order,
-        isCover: updated.isCover,
+        thumbnailUrl: updated.thumbnailUrl,
+        fileName: updated.fileName,
+        fileType: updated.fileType,
+        fileSize: updated.fileSize,
+        sortOrder: updated.sortOrder,
         createdAt: updated.createdAt.toISOString(),
-        updatedAt: updated.updatedAt.toISOString(),
       },
     });
   } catch (err) {
@@ -98,29 +99,29 @@ export async function DELETE(
       return Response.json({ success: false, error: error || 'Authentication required' }, { status: 401 });
     }
 
-    const { id: tenantId, itemId } = await params;
+    const { id: weddingId, itemId } = await params;
 
-    const accessError = await requireTenantAccess(user, tenantId, 'editor');
+    const accessError = await requireTenantAccess(user, weddingId, 'editor');
     if (accessError) {
       return Response.json({ success: false, error: accessError }, { status: 403 });
     }
 
-    const existing = await db.mediaItem.findFirst({
-      where: { id: itemId, tenantId },
+    const existing = await db.weddingMedia.findFirst({
+      where: { id: itemId, weddingId },
     });
     if (!existing) {
       return Response.json({ success: false, error: 'Media item not found' }, { status: 404 });
     }
 
-    await db.mediaItem.delete({ where: { id: itemId } });
+    await db.weddingMedia.delete({ where: { id: itemId } });
 
     await createAuditLog({
       userId: user.userId,
       action: 'media.delete',
-      resource: 'MediaItem',
+      resource: 'WeddingMedia',
       resourceId: itemId,
-      tenantId,
-      details: { category: existing.category, url: existing.url },
+      weddingId,
+      details: { category: existing.category, fileName: existing.fileName },
       request,
     });
 

@@ -16,7 +16,7 @@ model User {
   email        String   @unique
   passwordHash String
   name         String
-  role         String   @default("ADMIN_1") // SUPER_ADMIN | ADMIN_1 | ADMIN_2 | ADMIN_3
+  role         String   @default("ADMIN_1") // SUPER_ADMIN | ADMIN_1 | ADMIN_2 | ADMIN_3 | COUPLE | ACCOUNT_MANAGER
   avatarUrl         String?
   isActive          Boolean  @default(true)
   resetToken        String?

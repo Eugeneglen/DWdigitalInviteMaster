@@ -2,7 +2,7 @@ import { db } from '@/lib/db';
 import { authenticateRequest, requireTenantAccess } from '@/lib/auth-middleware';
 
 // ============================================
-// GET — List Contact Submissions for a tenant (paginated, searchable)
+// GET — List Contact Submissions for a wedding (paginated, searchable)
 // ============================================
 
 export async function GET(
@@ -15,17 +15,17 @@ export async function GET(
       return Response.json({ success: false, error: error || 'Authentication required' }, { status: 401 });
     }
 
-    const { id: tenantId } = await params;
+    const { id: weddingId } = await params;
 
-    const accessError = await requireTenantAccess(user, tenantId, 'viewer');
+    const accessError = await requireTenantAccess(user, weddingId, 'viewer');
     if (accessError) {
       return Response.json({ success: false, error: accessError }, { status: 403 });
     }
 
-    // Verify tenant exists
-    const tenant = await db.tenant.findUnique({ where: { id: tenantId } });
-    if (!tenant) {
-      return Response.json({ success: false, error: 'Tenant not found' }, { status: 404 });
+    // Verify wedding account exists
+    const account = await db.weddingAccount.findUnique({ where: { id: weddingId } });
+    if (!account) {
+      return Response.json({ success: false, error: 'Wedding account not found' }, { status: 404 });
     }
 
     const { searchParams } = new URL(request.url);
@@ -36,7 +36,7 @@ export async function GET(
     const toDate = searchParams.get('toDate') || '';
 
     // Build where clause
-    const where: Record<string, unknown> = { tenantId };
+    const where: Record<string, unknown> = { weddingId };
 
     if (search) {
       where.OR = [
@@ -75,7 +75,7 @@ export async function GET(
       data: {
         contacts: contacts.map((c) => ({
           id: c.id,
-          tenantId: c.tenantId,
+          weddingId: c.weddingId,
           name: c.name,
           email: c.email,
           contact: c.contact,

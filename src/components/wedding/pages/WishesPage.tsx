@@ -157,7 +157,7 @@ export default function WishesPage() {
                 {wish.type === 'dark-card' && (
                   <div className="bg-charcoal-ink text-paper-cream p-12">
                     <span className="text-7xl text-cinematic-gold/40 block mb-6" style={{ fontFamily: 'serif' }}>
-                      &ldquo;
+                      "
                     </span>
                     <p className="text-3xl leading-tight mb-12 italic">
                       {wish.quote}

@@ -1,9 +1,9 @@
 import { NextRequest } from 'next/server';
 import { db } from '@/lib/db';
-import { authenticateRequest, requireTenantAccess, createAuditLog } from '@/lib/auth-middleware';
+import { authenticateRequest, requireTenantAccess } from '@/lib/auth-middleware';
 
 // ============================================
-// GET — List wishes for a tenant (paginated, filterable, with stats)
+// GET — List wishes for a wedding (paginated, filterable, with stats)
 // ============================================
 
 export async function GET(
@@ -16,8 +16,8 @@ export async function GET(
       return Response.json({ success: false, error: authError || 'Authentication required' }, { status: 401 });
     }
 
-    const { id: tenantId } = await params;
-    const accessError = await requireTenantAccess(user, tenantId, 'viewer');
+    const { id: weddingId } = await params;
+    const accessError = await requireTenantAccess(user, weddingId, 'viewer');
     if (accessError) {
       return Response.json({ success: false, error: accessError }, { status: 403 });
     }
@@ -26,22 +26,17 @@ export async function GET(
     const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
     const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '12')));
     const search = searchParams.get('search') || '';
-    const status = searchParams.get('status') || '';
     const fromDate = searchParams.get('fromDate') || '';
     const toDate = searchParams.get('toDate') || '';
 
     // Build where clause
-    const where: Record<string, unknown> = { tenantId };
+    const where: Record<string, unknown> = { weddingId };
 
     if (search) {
       where.OR = [
         { name: { contains: search } },
         { message: { contains: search } },
       ];
-    }
-
-    if (status && status !== 'all') {
-      where.status = status;
     }
 
     if (fromDate || toDate) {
@@ -62,25 +57,19 @@ export async function GET(
 
     const totalPages = Math.ceil(total / limit);
 
-    // Always include stats
-    const [totalCount, approvedCount, hiddenCount, flaggedCount] = await Promise.all([
-      db.wish.count({ where: { tenantId } }),
-      db.wish.count({ where: { tenantId, status: 'approved' } }),
-      db.wish.count({ where: { tenantId, status: 'hidden' } }),
-      db.wish.count({ where: { tenantId, status: 'flagged' } }),
-    ]);
+    // Total count for stats
+    const totalCount = await db.wish.count({ where: { weddingId } });
 
     return Response.json({
       success: true,
       data: {
         wishes: wishes.map((w) => ({
           id: w.id,
-          tenantId: w.tenantId,
+          weddingId: w.weddingId,
           name: w.name,
           relationship: w.relationship,
           message: w.message,
           imageUrl: w.imageUrl,
-          status: w.status,
           createdAt: w.createdAt.toISOString(),
         })),
         total,
@@ -89,9 +78,6 @@ export async function GET(
         totalPages,
         stats: {
           total: totalCount,
-          approved: approvedCount,
-          hidden: hiddenCount,
-          flagged: flaggedCount,
         },
       },
     });

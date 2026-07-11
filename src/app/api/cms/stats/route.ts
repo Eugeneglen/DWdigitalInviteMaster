@@ -12,10 +12,10 @@ export async function GET(request: Request) {
       return Response.json({ success: false, error: error || 'Authentication required' }, { status: 401 });
     }
 
-    if (user.role === 'master_admin') {
+    if (user.role === 'SUPER_ADMIN' || user.role === 'ACCOUNT_MANAGER') {
       const [totalTenants, activeTenants, totalUsers, recentLogCount] = await Promise.all([
-        db.tenant.count(),
-        db.tenant.count({ where: { status: 'active' } }),
+        db.weddingAccount.count(),
+        db.weddingAccount.count({ where: { status: 'ACTIVE' } }),
         db.user.count(),
         db.auditLog.count({
           where: {
@@ -37,33 +37,33 @@ export async function GET(request: Request) {
       });
     }
 
-    // Tenant admin stats
+    // Couple/wedding-specific stats
     if (user.tenantId) {
-      const [totalGuests, totalWishes, totalContacts, featureToggles] = await Promise.all([
-        db.rSVPSubmission.count({ where: { tenantId: user.tenantId } }),
-        db.wish.count({ where: { tenantId: user.tenantId } }),
-        db.contactSubmission.count({ where: { tenantId: user.tenantId } }),
-        db.tenantFeatureToggle.findMany({
-          where: { tenantId: user.tenantId },
-          select: { featureKey: true, enabled: true },
+      const [totalRsvps, totalWishes, totalContacts, features] = await Promise.all([
+        db.rSVPSubmission.count({ where: { weddingId: user.tenantId } }),
+        db.wish.count({ where: { weddingId: user.tenantId } }),
+        db.contactSubmission.count({ where: { weddingId: user.tenantId } }),
+        db.weddingFeature.findMany({
+          where: { weddingId: user.tenantId },
+          select: { featureKey: true, isEnabled: true },
         }),
       ]);
 
       return Response.json({
         success: true,
         data: {
-          totalGuests,
+          totalRsvps,
           totalWishes,
           totalContacts,
-          featureToggles: featureToggles.map((ft) => ({
+          features: features.map((ft) => ({
             featureKey: ft.featureKey,
-            enabled: ft.enabled,
+            isEnabled: ft.isEnabled,
           })),
         },
       });
     }
 
-    // Fallback for users without tenant
+    // Fallback for users without wedding
     return Response.json({
       success: true,
       data: {},

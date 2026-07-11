@@ -1,0 +1,8 @@
+{
+  "name": "dev-wrapper",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "bun --hot index.ts"
+  }
+}

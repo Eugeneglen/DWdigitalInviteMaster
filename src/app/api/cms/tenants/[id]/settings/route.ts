@@ -3,7 +3,7 @@ import { db } from '@/lib/db';
 import { authenticateRequest, requireTenantAccess, createAuditLog } from '@/lib/auth-middleware';
 
 // ============================================
-// GET — Get tenant settings (parsed JSON)
+// GET — Get wedding content as settings (key-value via WeddingContent)
 // ============================================
 
 export async function GET(
@@ -16,27 +16,37 @@ export async function GET(
       return Response.json({ success: false, error: error || 'Authentication required' }, { status: 401 });
     }
 
-    const { id: tenantId } = await params;
+    const { id: weddingId } = await params;
 
-    const accessError = await requireTenantAccess(user, tenantId, 'viewer');
+    const accessError = await requireTenantAccess(user, weddingId, 'viewer');
     if (accessError) {
       return Response.json({ success: false, error: accessError }, { status: 403 });
     }
 
-    const tenant = await db.tenant.findUnique({
-      where: { id: tenantId },
-      select: { id: true, settings: true },
+    const account = await db.weddingAccount.findUnique({
+      where: { id: weddingId },
+      select: { id: true },
     });
 
-    if (!tenant) {
-      return Response.json({ success: false, error: 'Tenant not found' }, { status: 404 });
+    if (!account) {
+      return Response.json({ success: false, error: 'Wedding account not found' }, { status: 404 });
     }
 
-    let settings: Record<string, unknown> = {};
-    try {
-      settings = JSON.parse(tenant.settings);
-    } catch {
-      settings = {};
+    const contentEntries = await db.weddingContent.findMany({
+      where: { weddingId },
+    });
+
+    // Build a nested settings object: { section: { fieldKey: fieldValue } }
+    const settings: Record<string, Record<string, unknown>> = {};
+    for (const entry of contentEntries) {
+      if (!settings[entry.section]) {
+        settings[entry.section] = {};
+      }
+      try {
+        settings[entry.section][entry.fieldKey] = JSON.parse(entry.fieldValue);
+      } catch {
+        settings[entry.section][entry.fieldKey] = entry.fieldValue;
+      }
     }
 
     return Response.json({
@@ -50,11 +60,11 @@ export async function GET(
 }
 
 // ============================================
-// PUT — Replace entire settings object (merge with existing)
+// PUT — Replace settings (upsert WeddingContent entries)
 // ============================================
 
 const updateSettingsSchema = z.object({
-  settings: z.record(z.unknown()),
+  settings: z.record(z.string(), z.record(z.string(), z.unknown())),
 });
 
 export async function PUT(
@@ -67,20 +77,20 @@ export async function PUT(
       return Response.json({ success: false, error: error || 'Authentication required' }, { status: 401 });
     }
 
-    const { id: tenantId } = await params;
+    const { id: weddingId } = await params;
 
-    const accessError = await requireTenantAccess(user, tenantId, 'admin');
+    const accessError = await requireTenantAccess(user, weddingId, 'admin');
     if (accessError) {
       return Response.json({ success: false, error: accessError }, { status: 403 });
     }
 
-    const tenant = await db.tenant.findUnique({
-      where: { id: tenantId },
-      select: { id: true, settings: true },
+    const account = await db.weddingAccount.findUnique({
+      where: { id: weddingId },
+      select: { id: true },
     });
 
-    if (!tenant) {
-      return Response.json({ success: false, error: 'Tenant not found' }, { status: 404 });
+    if (!account) {
+      return Response.json({ success: false, error: 'Wedding account not found' }, { status: 404 });
     }
 
     const body = await request.json();
@@ -89,38 +99,45 @@ export async function PUT(
       return Response.json({ success: false, error: parsed.error.issues[0].message }, { status: 400 });
     }
 
-    // Merge with existing settings
-    let existingSettings: Record<string, unknown> = {};
-    try {
-      existingSettings = JSON.parse(tenant.settings);
-    } catch {
-      existingSettings = {};
-    }
+    const { settings } = parsed.data;
 
-    const mergedSettings = { ...existingSettings, ...parsed.data.settings };
-    const settingsString = JSON.stringify(mergedSettings);
+    // Upsert all content entries via transaction
+    const upserts = Object.entries(settings).flatMap(([section, fields]) =>
+      Object.entries(fields).map(([fieldKey, fieldValue]) =>
+        db.weddingContent.upsert({
+          where: {
+            weddingId_section_fieldKey: { weddingId, section, fieldKey },
+          },
+          create: {
+            weddingId,
+            section,
+            fieldKey,
+            fieldValue: JSON.stringify(fieldValue),
+          },
+          update: {
+            fieldValue: JSON.stringify(fieldValue),
+          },
+        })
+      )
+    );
 
-    const updated = await db.tenant.update({
-      where: { id: tenantId },
-      data: { settings: settingsString },
-    });
+    await db.$transaction(upserts);
 
     await createAuditLog({
       userId: user.userId,
       action: 'tenant.settings.update',
-      resource: 'Tenant',
-      resourceId: tenantId,
-      tenantId,
+      resource: 'WeddingAccount',
+      resourceId: weddingId,
+      weddingId,
       details: {
-        before: existingSettings,
-        after: mergedSettings,
+        after: settings,
       },
       request,
     });
 
     return Response.json({
       success: true,
-      data: mergedSettings,
+      data: settings,
     });
   } catch (err) {
     console.error('Update tenant settings error:', err);
