@@ -3,12 +3,29 @@
 import { Suspense, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import dynamic from 'next/dynamic';
 import GuestSite from '@/components/wedding/GuestSite';
 import { useAuthModalStore } from '@/store/useAuthModalStore';
-import MasterCMSLayout from '@/components/cms/MasterCMSLayout';
-import MasterCMSPageRouter from '@/components/cms/MasterCMSPageRouter';
-import CoupleCMSLayout from '@/components/cms/CoupleCMSLayout';
-import CoupleCMSPageRouter from '@/components/cms/CoupleCMSPageRouter';
+
+// Lazy-load CMS layouts + page routers so the initial / compilation
+// only processes the GuestSite.  The CMS bundles are loaded on demand
+// after the user authenticates.
+const MasterCMSLayout = dynamic(
+  () => import('@/components/cms/MasterCMSLayout'),
+  { ssr: false },
+);
+const MasterCMSPageRouter = dynamic(
+  () => import('@/components/cms/MasterCMSPageRouter'),
+  { ssr: false },
+);
+const CoupleCMSLayout = dynamic(
+  () => import('@/components/cms/CoupleCMSLayout'),
+  { ssr: false },
+);
+const CoupleCMSPageRouter = dynamic(
+  () => import('@/components/cms/CoupleCMSPageRouter'),
+  { ssr: false },
+);
 
 function ViewRouter() {
   const searchParams = useSearchParams();
@@ -22,9 +39,7 @@ function ViewRouter() {
   const isAuthenticated = status === 'authenticated' && !!session;
 
   // Open the login modal when the user is NOT authenticated and a CMS
-  // view was requested.  The modal's onSuccess now just closes — the
-  // session change propagates via next-auth/react and this component
-  // re-renders with the CMS layout.
+  // view was requested.
   useEffect(() => {
     if (!isAuthenticated) {
       if (view === 'cms') {
@@ -44,7 +59,6 @@ function ViewRouter() {
         </MasterCMSLayout>
       );
     }
-    // Wrong role but authenticated — show a helpful message
     if (isAuthenticated && !isAdmin) {
       return (
         <div className="min-h-screen flex items-center justify-center bg-paper-cream p-6">
@@ -57,7 +71,6 @@ function ViewRouter() {
         </div>
       );
     }
-    // Not authenticated — fall through to GuestSite with modal
   }
 
   // ── Couple CMS ──────────────────────────────────────────────────
@@ -69,7 +82,6 @@ function ViewRouter() {
         </CoupleCMSLayout>
       );
     }
-    // Wrong role but authenticated
     if (isAuthenticated && !isCouple) {
       return (
         <div className="min-h-screen flex items-center justify-center bg-paper-cream p-6">
@@ -82,7 +94,6 @@ function ViewRouter() {
         </div>
       );
     }
-    // Not authenticated — fall through to GuestSite with modal
   }
 
   // ── Guest site (default, or unauthenticated CMS/couple view) ────
