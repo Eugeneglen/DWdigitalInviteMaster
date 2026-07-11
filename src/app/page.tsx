@@ -1,23 +1,19 @@
 'use client';
-import { Suspense, useEffect } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import GuestSite from '@/components/wedding/GuestSite';
+import AdminLoginPage from '@/app/admin/login/page';
+import WorkspaceLoginPage from '@/app/workspace/login/page';
 
 function ViewRouter() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const view = searchParams.get('view');
 
-  useEffect(() => {
-    if (view === 'cms') {
-      router.replace('/admin/login');
-    } else if (view === 'couple') {
-      router.replace('/workspace/login');
-    }
-  }, [view, router]);
-
-  if (view === 'cms' || view === 'couple') {
-    return null;
+  if (view === 'cms') {
+    return <AdminLoginPage />;
+  }
+  if (view === 'couple') {
+    return <WorkspaceLoginPage />;
   }
 
   return <GuestSite showEditorButton />;
