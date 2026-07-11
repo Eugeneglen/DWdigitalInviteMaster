@@ -3,7 +3,7 @@ import { db } from '@/lib/db';
 import { authenticateRequest, requireTenantAccess, createAuditLog } from '@/lib/auth-middleware';
 
 // ============================================
-// GET — List media items for a tenant (with optional category filter)
+// GET — List media items for a wedding (with optional category filter)
 // ============================================
 
 export async function GET(
@@ -16,46 +16,46 @@ export async function GET(
       return Response.json({ success: false, error: error || 'Authentication required' }, { status: 401 });
     }
 
-    const { id: tenantId } = await params;
+    const { id: weddingId } = await params;
 
-    const accessError = await requireTenantAccess(user, tenantId, 'viewer');
+    const accessError = await requireTenantAccess(user, weddingId, 'viewer');
     if (accessError) {
       return Response.json({ success: false, error: accessError }, { status: 403 });
     }
 
-    // Verify tenant exists
-    const tenant = await db.tenant.findUnique({ where: { id: tenantId } });
-    if (!tenant) {
-      return Response.json({ success: false, error: 'Tenant not found' }, { status: 404 });
+    // Verify wedding account exists
+    const account = await db.weddingAccount.findUnique({ where: { id: weddingId } });
+    if (!account) {
+      return Response.json({ success: false, error: 'Wedding account not found' }, { status: 404 });
     }
 
     // Parse optional category query param
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
 
-    const where: Record<string, unknown> = { tenantId };
+    const where: Record<string, unknown> = { weddingId };
     if (category) {
       where.category = category;
     }
 
-    const items = await db.mediaItem.findMany({
+    const items = await db.weddingMedia.findMany({
       where,
-      orderBy: { order: 'asc' },
+      orderBy: { sortOrder: 'asc' },
     });
 
     return Response.json({
       success: true,
       data: items.map((item) => ({
         id: item.id,
-        tenantId: item.tenantId,
+        weddingId: item.weddingId,
         category: item.category,
         url: item.url,
-        caption: item.caption,
-        alt: item.alt,
-        order: item.order,
-        isCover: item.isCover,
+        thumbnailUrl: item.thumbnailUrl,
+        fileName: item.fileName,
+        fileType: item.fileType,
+        fileSize: item.fileSize,
+        sortOrder: item.sortOrder,
         createdAt: item.createdAt.toISOString(),
-        updatedAt: item.updatedAt.toISOString(),
       })),
     });
   } catch (err) {
@@ -69,10 +69,12 @@ export async function GET(
 // ============================================
 
 const createMediaSchema = z.object({
-  url: z.string().url('Must be a valid URL'),
-  category: z.string().min(1, 'Category is required'),
-  caption: z.string().optional(),
-  alt: z.string().optional(),
+  url: z.string().min(1, 'URL is required'),
+  thumbnailUrl: z.string().optional(),
+  fileName: z.string().min(1, 'File name is required'),
+  fileType: z.string().default('IMAGE'),
+  fileSize: z.number().int().optional(),
+  category: z.string().default('gallery'),
 });
 
 export async function POST(
@@ -85,17 +87,17 @@ export async function POST(
       return Response.json({ success: false, error: error || 'Authentication required' }, { status: 401 });
     }
 
-    const { id: tenantId } = await params;
+    const { id: weddingId } = await params;
 
-    const accessError = await requireTenantAccess(user, tenantId, 'editor');
+    const accessError = await requireTenantAccess(user, weddingId, 'editor');
     if (accessError) {
       return Response.json({ success: false, error: accessError }, { status: 403 });
     }
 
-    // Verify tenant exists
-    const tenant = await db.tenant.findUnique({ where: { id: tenantId } });
-    if (!tenant) {
-      return Response.json({ success: false, error: 'Tenant not found' }, { status: 404 });
+    // Verify wedding account exists
+    const account = await db.weddingAccount.findUnique({ where: { id: weddingId } });
+    if (!account) {
+      return Response.json({ success: false, error: 'Wedding account not found' }, { status: 404 });
     }
 
     const body = await request.json();
@@ -104,35 +106,37 @@ export async function POST(
       return Response.json({ success: false, error: parsed.error.issues[0].message }, { status: 400 });
     }
 
-    const { url, category, caption, alt } = parsed.data;
+    const { url, thumbnailUrl, fileName, fileType, fileSize, category } = parsed.data;
 
-    // Auto-assign order = max existing order + 1
-    const maxOrder = await db.mediaItem.findFirst({
-      where: { tenantId, category },
-      orderBy: { order: 'desc' },
-      select: { order: true },
+    // Auto-assign sortOrder = max existing sortOrder + 1
+    const maxSortOrder = await db.weddingMedia.findFirst({
+      where: { weddingId, category },
+      orderBy: { sortOrder: 'desc' },
+      select: { sortOrder: true },
     });
 
-    const order = (maxOrder?.order ?? -1) + 1;
+    const sortOrder = (maxSortOrder?.sortOrder ?? -1) + 1;
 
-    const item = await db.mediaItem.create({
+    const item = await db.weddingMedia.create({
       data: {
-        tenantId,
-        category,
+        weddingId,
         url,
-        caption: caption ?? null,
-        alt: alt ?? null,
-        order,
+        thumbnailUrl: thumbnailUrl ?? null,
+        fileName,
+        fileType,
+        fileSize: fileSize ?? null,
+        category,
+        sortOrder,
       },
     });
 
     await createAuditLog({
       userId: user.userId,
       action: 'media.create',
-      resource: 'MediaItem',
+      resource: 'WeddingMedia',
       resourceId: item.id,
-      tenantId,
-      details: { category, url, order },
+      weddingId,
+      details: { category, fileName, sortOrder },
       request,
     });
 
@@ -140,15 +144,15 @@ export async function POST(
       success: true,
       data: {
         id: item.id,
-        tenantId: item.tenantId,
+        weddingId: item.weddingId,
         category: item.category,
         url: item.url,
-        caption: item.caption,
-        alt: item.alt,
-        order: item.order,
-        isCover: item.isCover,
+        thumbnailUrl: item.thumbnailUrl,
+        fileName: item.fileName,
+        fileType: item.fileType,
+        fileSize: item.fileSize,
+        sortOrder: item.sortOrder,
         createdAt: item.createdAt.toISOString(),
-        updatedAt: item.updatedAt.toISOString(),
       },
     });
   } catch (err) {

@@ -1,25 +1,35 @@
-import { authenticateRequest } from '@/lib/auth-middleware';
+import { getServerSession } from '@/lib/auth';
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
-    const { user, error } = await authenticateRequest(request);
+    const session = await getServerSession();
 
-    if (error || !user) {
+    if (!session?.user) {
       return Response.json(
-        { success: false, error: error || 'Authentication required' },
+        { success: false, error: 'Authentication required. Please log in.' },
         { status: 401 }
       );
+    }
+
+    // Look up the wedding account owned by this user (for couple users)
+    let weddingId: string | undefined;
+    if (session.user.role === 'COUPLE') {
+      const { db } = await import('@/lib/db');
+      const wedding = await db.weddingAccount.findFirst({
+        where: { ownerId: session.user.id },
+        select: { id: true },
+      });
+      weddingId = wedding?.id;
     }
 
     return Response.json({
       success: true,
       user: {
-        userId: user.userId,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-        tenantId: user.tenantId,
-        tenantRole: user.tenantRole,
+        userId: session.user.id,
+        email: session.user.email,
+        name: session.user.name,
+        role: session.user.role,
+        tenantId: weddingId,
       },
     });
   } catch {

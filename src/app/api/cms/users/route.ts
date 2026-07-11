@@ -5,7 +5,7 @@ import { hashPassword } from '@/lib/auth';
 import { authenticateRequest, requireMasterAdmin, createAuditLog } from '@/lib/auth-middleware';
 
 // ============================================
-// GET — List all users with tenant relations
+// GET — List all users with owned weddings
 // ============================================
 
 export async function GET(request: NextRequest) {
@@ -36,12 +36,8 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: 'desc' },
       take: 100,
       include: {
-        tenantUsers: {
-          include: {
-            tenant: {
-              select: { id: true, name: true, slug: true },
-            },
-          },
+        ownedWeddings: {
+          select: { id: true, coupleName: true, slug: true },
         },
       },
     });
@@ -52,15 +48,16 @@ export async function GET(request: NextRequest) {
         id: u.id,
         email: u.email,
         name: u.name,
+        role: u.role,
         avatarUrl: u.avatarUrl,
+        isActive: u.isActive,
+        lastLoginAt: u.lastLoginAt?.toISOString() ?? null,
         createdAt: u.createdAt.toISOString(),
         updatedAt: u.updatedAt.toISOString(),
-        tenantUsers: u.tenantUsers.map((tu) => ({
-          id: tu.id,
-          role: tu.role,
-          tenantId: tu.tenantId,
-          tenant: tu.tenant,
-          createdAt: tu.createdAt.toISOString(),
+        ownedWeddings: u.ownedWeddings.map((w) => ({
+          id: w.id,
+          coupleName: w.coupleName,
+          slug: w.slug,
         })),
       })),
     });
@@ -71,7 +68,7 @@ export async function GET(request: NextRequest) {
 }
 
 // ============================================
-// POST — Create user + tenant association
+// POST — Create user
 // ============================================
 
 const createUserSchema = z.object({
@@ -82,8 +79,7 @@ const createUserSchema = z.object({
     .regex(/[a-zA-Z]/, 'Password must contain at least one letter')
     .regex(/[0-9]/, 'Password must contain at least one number'),
   name: z.string().min(1, 'Name is required'),
-  tenantId: z.string().min(1, 'Tenant ID is required'),
-  tenantRole: z.enum(['admin', 'editor', 'viewer']),
+  role: z.string().optional(),
 });
 
 export async function POST(request: NextRequest) {
@@ -104,13 +100,7 @@ export async function POST(request: NextRequest) {
       return Response.json({ success: false, error: parsed.error.issues[0].message }, { status: 400 });
     }
 
-    const { email, password, name, tenantId, tenantRole } = parsed.data;
-
-    // Verify tenant exists
-    const tenant = await db.tenant.findUnique({ where: { id: tenantId } });
-    if (!tenant) {
-      return Response.json({ success: false, error: 'Tenant not found' }, { status: 400 });
-    }
+    const { email, password, name, role } = parsed.data;
 
     // Check if email already exists
     const existingUser = await db.user.findUnique({ where: { email } });
@@ -123,22 +113,13 @@ export async function POST(request: NextRequest) {
     const newUser = await db.user.create({
       data: {
         email,
-        password: hashedPw,
+        passwordHash: hashedPw,
         name,
-        tenantUsers: {
-          create: {
-            tenantId,
-            role: tenantRole,
-          },
-        },
+        role: role || 'ADMIN_1',
       },
       include: {
-        tenantUsers: {
-          include: {
-            tenant: {
-              select: { id: true, name: true, slug: true },
-            },
-          },
+        ownedWeddings: {
+          select: { id: true, coupleName: true, slug: true },
         },
       },
     });
@@ -148,8 +129,7 @@ export async function POST(request: NextRequest) {
       action: 'user.create',
       resource: 'User',
       resourceId: newUser.id,
-      tenantId,
-      details: { email, name, tenantRole },
+      details: { email, name, role: role || 'ADMIN_1' },
       request,
     });
 
@@ -160,15 +140,15 @@ export async function POST(request: NextRequest) {
           id: newUser.id,
           email: newUser.email,
           name: newUser.name,
+          role: newUser.role,
           avatarUrl: newUser.avatarUrl,
+          isActive: newUser.isActive,
           createdAt: newUser.createdAt.toISOString(),
           updatedAt: newUser.updatedAt.toISOString(),
-          tenantUsers: newUser.tenantUsers.map((tu) => ({
-            id: tu.id,
-            role: tu.role,
-            tenantId: tu.tenantId,
-            tenant: tu.tenant,
-            createdAt: tu.createdAt.toISOString(),
+          ownedWeddings: newUser.ownedWeddings.map((w) => ({
+            id: w.id,
+            coupleName: w.coupleName,
+            slug: w.slug,
           })),
         },
       },

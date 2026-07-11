@@ -2,10 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
-  // Force logging to verify config is loaded
-  ...(console.log("[NEXT-CONFIG] Standalone output enabled at:", 
-    new Date().toISOString()), {}),
-  /* config options here */
+  experimental: {
+    esmExternals: true,
+  },
   typescript: {
     ignoreBuildErrors: true,
   },

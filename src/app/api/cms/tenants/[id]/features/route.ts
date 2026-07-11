@@ -4,7 +4,7 @@ import { db } from '@/lib/db';
 import { authenticateRequest, requireTenantAccess, createAuditLog } from '@/lib/auth-middleware';
 
 // ============================================
-// GET — List feature toggles for a tenant
+// GET — List feature toggles for a wedding
 // ============================================
 
 export async function GET(
@@ -17,16 +17,16 @@ export async function GET(
       return Response.json({ success: false, error: error || 'Authentication required' }, { status: 401 });
     }
 
-    const { id: tenantId } = await params;
+    const { id: weddingId } = await params;
 
-    // Verify tenant exists
-    const tenant = await db.tenant.findUnique({ where: { id: tenantId } });
-    if (!tenant) {
-      return Response.json({ success: false, error: 'Tenant not found' }, { status: 404 });
+    // Verify wedding account exists
+    const account = await db.weddingAccount.findUnique({ where: { id: weddingId } });
+    if (!account) {
+      return Response.json({ success: false, error: 'Wedding account not found' }, { status: 404 });
     }
 
-    const features = await db.tenantFeatureToggle.findMany({
-      where: { tenantId },
+    const features = await db.weddingFeature.findMany({
+      where: { weddingId },
       orderBy: { featureKey: 'asc' },
     });
 
@@ -50,8 +50,8 @@ export async function GET(
 
 const featureToggleSchema = z.object({
   featureKey: z.string().min(1, 'Feature key is required'),
-  enabled: z.boolean(),
-  config: z.record(z.unknown()).optional(),
+  isEnabled: z.boolean(),
+  config: z.record(z.string(), z.unknown()).optional(),
 });
 
 export async function PATCH(
@@ -64,9 +64,9 @@ export async function PATCH(
       return Response.json({ success: false, error: error || 'Authentication required' }, { status: 401 });
     }
 
-    const { id: tenantId } = await params;
+    const { id: weddingId } = await params;
 
-    const accessError = await requireTenantAccess(user, tenantId, 'admin');
+    const accessError = await requireTenantAccess(user, weddingId, 'admin');
     if (accessError) {
       return Response.json({ success: false, error: accessError }, { status: 403 });
     }
@@ -77,20 +77,20 @@ export async function PATCH(
       return Response.json({ success: false, error: parsed.error.issues[0].message }, { status: 400 });
     }
 
-    const { featureKey, enabled, config } = parsed.data;
+    const { featureKey, isEnabled, config } = parsed.data;
 
-    const toggle = await db.tenantFeatureToggle.upsert({
+    const toggle = await db.weddingFeature.upsert({
       where: {
-        tenantId_featureKey: { tenantId, featureKey },
+        weddingId_featureKey: { weddingId, featureKey },
       },
       create: {
-        tenantId,
+        weddingId,
         featureKey,
-        enabled,
+        isEnabled,
         config: config ? JSON.stringify(config) : undefined,
       },
       update: {
-        enabled,
+        isEnabled,
         ...(config !== undefined && { config: JSON.stringify(config) }),
       },
     });
@@ -98,10 +98,10 @@ export async function PATCH(
     await createAuditLog({
       userId: user.userId,
       action: 'feature.toggle',
-      resource: 'TenantFeatureToggle',
+      resource: 'WeddingFeature',
       resourceId: toggle.id,
-      tenantId,
-      details: { featureKey, enabled, config },
+      weddingId,
+      details: { featureKey, isEnabled, config },
       request,
     });
 
@@ -137,9 +137,9 @@ export async function PUT(
       return Response.json({ success: false, error: error || 'Authentication required' }, { status: 401 });
     }
 
-    const { id: tenantId } = await params;
+    const { id: weddingId } = await params;
 
-    const accessError = await requireTenantAccess(user, tenantId, 'admin');
+    const accessError = await requireTenantAccess(user, weddingId, 'admin');
     if (accessError) {
       return Response.json({ success: false, error: accessError }, { status: 403 });
     }
@@ -154,18 +154,18 @@ export async function PUT(
 
     const results = await db.$transaction(
       features.map((f) =>
-        db.tenantFeatureToggle.upsert({
+        db.weddingFeature.upsert({
           where: {
-            tenantId_featureKey: { tenantId, featureKey: f.featureKey },
+            weddingId_featureKey: { weddingId, featureKey: f.featureKey },
           },
           create: {
-            tenantId,
+            weddingId,
             featureKey: f.featureKey,
-            enabled: f.enabled,
+            isEnabled: f.isEnabled,
             config: f.config ? JSON.stringify(f.config) : undefined,
           },
           update: {
-            enabled: f.enabled,
+            isEnabled: f.isEnabled,
             ...(f.config !== undefined && { config: JSON.stringify(f.config) }),
           },
         })
@@ -175,9 +175,9 @@ export async function PUT(
     await createAuditLog({
       userId: user.userId,
       action: 'feature.bulk_toggle',
-      resource: 'TenantFeatureToggle',
-      tenantId,
-      details: { count: features.length, features: features.map((f) => ({ featureKey: f.featureKey, enabled: f.enabled })) },
+      resource: 'WeddingFeature',
+      weddingId,
+      details: { count: features.length, features: features.map((f) => ({ featureKey: f.featureKey, isEnabled: f.isEnabled })) },
       request,
     });
 

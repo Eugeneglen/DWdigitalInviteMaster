@@ -2,11 +2,10 @@
  * Tenant Resolution Utilities
  *
  * Resolves the active weddingId (tenant) from the incoming request.
- * Priority chain (path-based routing, no subdomain):
- *   1. NextAuth session — weddingId claim from authenticated CMS user
- *   2. Header x-wedding-id — for internal / programmatic API access
- *   3. URL path — /api/content/[weddingSlug]/... slug lookup
- *   4. DEV_ACCOUNT_ID fallback — single-tenant dev environment
+ * Priority chain:
+ *   1. URL path — /api/content/[weddingSlug]/... slug lookup
+ *   2. NextAuth session — weddingId from authenticated CMS user
+ *   3. DEV_ACCOUNT_ID fallback — single-tenant dev environment only
  */
 
 import { db } from '@/lib/db';
@@ -16,7 +15,7 @@ export const DEV_ACCOUNT_ID = process.env.NEXT_PUBLIC_DEV_ACCOUNT_ID ?? 'dev_acc
 
 /**
  * Resolve the actual accountId for workspace API routes.
- * In dev mode without auth, falls back to the first account in the database.
+ * Requires an authenticated user ID. Falls back to DEV_ACCOUNT_ID only in development.
  */
 export async function resolveWorkspaceAccountId(sessionUserId?: string): Promise<string | null> {
   // 1. If user is authenticated, look up their owned wedding
@@ -28,46 +27,41 @@ export async function resolveWorkspaceAccountId(sessionUserId?: string): Promise
     if (account) return account.id;
   }
 
-  // 2. Try the DEV_ACCOUNT_ID
-  try {
-    const account = await db.weddingAccount.findUnique({ where: { id: DEV_ACCOUNT_ID }, select: { id: true } });
-    if (account) return account.id;
-  } catch { /* may not exist */ }
+  // 2. Dev-only fallback: use DEV_ACCOUNT_ID or first account
+  if (process.env.NODE_ENV === 'development') {
+    try {
+      const account = await db.weddingAccount.findUnique({ where: { id: DEV_ACCOUNT_ID }, select: { id: true } });
+      if (account) return account.id;
+    } catch { /* may not exist */ }
 
-  // 3. Dev fallback: use the first account in the database
-  const firstAccount = await db.weddingAccount.findFirst({
-    orderBy: { createdAt: 'asc' },
-    select: { id: true },
-  });
+    const firstAccount = await db.weddingAccount.findFirst({
+      orderBy: { createdAt: 'asc' },
+      select: { id: true },
+    });
+    return firstAccount?.id ?? null;
+  }
 
-  return firstAccount?.id ?? null;
+  return null;
 }
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 export interface ResolvedAccount {
   id: string;
-  coupleName1: string;
-  coupleName2: string;
+  brideName: string;
+  groomName: string;
   status: string;
 }
 
 // ─── Core Resolution ─────────────────────────────────────────────────────────
 
 /**
- * Resolve the weddingId from an incoming request using the priority chain.
- * Returns `null` when no tenant can be determined.
+ * Resolve the weddingId from an incoming request.
+ * SECURITY: Only uses URL path-based resolution (slug lookup).
+ * Header-based resolution has been removed to prevent cross-tenant access.
  */
 export async function resolveWeddingId(request: Request): Promise<string | null> {
-  // 1. Check NextAuth session (for CMS admin requests)
-  const sessionHeader = request.headers.get('x-session-wedding-id');
-  if (sessionHeader) return sessionHeader;
-
-  // 2. Check x-wedding-id header (internal / programmatic API access)
-  const headerId = request.headers.get('x-wedding-id');
-  if (headerId) return headerId;
-
-  // 3. Check URL path for content API pattern: /api/content/[weddingSlug]/...
+  // Check URL path for content API pattern: /api/content/[weddingSlug]/...
   const url = new URL(request.url);
   const contentMatch = url.pathname.match(/^\/api\/content\/([^/]+)/);
   if (contentMatch?.[1]) {
@@ -80,7 +74,7 @@ export async function resolveWeddingId(request: Request): Promise<string | null>
 
 /**
  * Like `resolveWeddingId` but throws a descriptive error when no tenant
- * can be resolved. Use in API routes that require authentication.
+ * can be resolved. Use in API routes that require a wedding context.
  */
 export async function requireWeddingId(request: Request): Promise<string> {
   const weddingId = await resolveWeddingId(request);
@@ -92,7 +86,7 @@ export async function requireWeddingId(request: Request): Promise<string> {
   }
 
   throw new Error(
-    'Tenant resolution failed: no weddingId found in session, header, or URL path.'
+    'Tenant resolution failed: no weddingId found in URL path.'
   );
 }
 
@@ -119,8 +113,8 @@ export async function resolveAccountBySlug(
 
     return {
       id: account.id,
-      coupleName1: account.brideName ?? '',
-      coupleName2: account.groomName ?? '',
+      brideName: account.brideName ?? '',
+      groomName: account.groomName ?? '',
       status: account.status,
     };
   } catch {

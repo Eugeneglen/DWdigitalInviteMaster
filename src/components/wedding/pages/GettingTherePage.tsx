@@ -100,7 +100,7 @@ export default function GettingTherePage() {
                     </h3>
                     <div className="space-y-2">
                       <p className="text-charcoal-ink/80 leading-relaxed" style={{ fontSize: '16px', lineHeight: '24px' }}>
-                        Valet parking is available at the hotel entrance. Alternatively, guests may utilise the hotel&apos;s basement car park, subject to availability.
+                        Valet parking is available at the hotel entrance. Alternatively, guests may utilise the hotel's basement car park, subject to availability.
                       </p>
                       <p className="text-sm text-charcoal-ink/60 leading-relaxed">
                         Kindly inform the concierge that you are attending the Dreamweavers event.
@@ -155,7 +155,7 @@ export default function GettingTherePage() {
                           <span className="text-charcoal-ink/50 not-italic" style={{ fontSize: '16px' }}>(TE13)</span>
                         </p>
                         <p className="text-charcoal-ink/70 italic mt-1" style={{ fontSize: '16px', lineHeight: '24px' }}>
-                          Approximately 4–5 minutes&apos; walk to the venue.
+                          Approximately 4–5 minutes' walk to the venue.
                         </p>
                       </div>
                       <div>
@@ -164,7 +164,7 @@ export default function GettingTherePage() {
                           <span className="text-charcoal-ink/50 not-italic" style={{ fontSize: '16px' }}>(NS22/TE14)</span>
                         </p>
                         <p className="text-charcoal-ink/70 italic mt-1" style={{ fontSize: '16px', lineHeight: '24px' }}>
-                          Approximately 8–10 minutes&apos; walk to the venue.
+                          Approximately 8–10 minutes' walk to the venue.
                         </p>
                       </div>
                     </div>

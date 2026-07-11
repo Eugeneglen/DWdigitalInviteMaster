@@ -1,14 +1,19 @@
 import type { NextAuthOptions } from 'next-auth';
-import { getServerSession as _getServerSession } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import { getServerSession as nextAuthGetServerSession } from 'next-auth';
 import bcrypt from 'bcryptjs';
 import { readFileSync } from 'fs';
 import path from 'path';
 import jwt from 'jsonwebtoken';
 import { db } from '@/lib/db';
+import { cookies } from 'next/headers';
 
-// ── Re-export getServerSession with our authOptions ──────────────────────────
-export const getServerSession = () => _getServerSession(authOptions);
+// ── getServerSession wrapper ──────────────────────────────────────────────
+// Re-exports NextAuth's built-in getServerSession with authOptions pre-bound.
+// Used by auth-middleware.ts and other server-side route handlers.
+export async function getServerSession() {
+  return nextAuthGetServerSession(authOptions);
+}
 
 // ── JWT Payload type ────────────────────────────────────────────────────────
 export interface JWTPayload {
@@ -169,53 +174,5 @@ export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 12);
 }
 
-// ── Feature keys & labels ───────────────────────────────────────────────────
-export const FEATURE_KEYS = {
-  RSVP: 'rsvp',
-  WISHES: 'wishes',
-  STORY: 'story',
-  GALLERY: 'gallery',
-  SCHEDULE: 'schedule',
-  FAQ: 'faq',
-  MOMENTS: 'moments',
-  GETTING_THERE: 'getting-there',
-  COUNTDOWN: 'countdown',
-  MUSIC: 'music',
-  VIDEO: 'video',
-  QA: 'qa',
-} as const;
-
-export const FEATURE_LABELS: Record<string, string> = {
-  rsvp: 'RSVP',
-  wishes: 'Wishes',
-  story: 'Our Story',
-  gallery: 'Photo Gallery',
-  schedule: 'Event Schedule',
-  faq: 'FAQ',
-  moments: 'Moments',
-  'getting-there': 'Getting There',
-  countdown: 'Countdown',
-  music: 'Background Music',
-  video: 'Video',
-  qa: 'Q&A',
-};
-
-export const GLOBAL_FEATURE_LABELS: Record<string, string> = {
-  ...FEATURE_LABELS,
-};
-
-// ── Role labels ─────────────────────────────────────────────────────────────
-export const ROLE_LABELS: Record<string, string> = {
-  SUPER_ADMIN: 'Super Admin',
-  ACCOUNT_MANAGER: 'Account Manager',
-  COUPLE: 'Couple',
-  ADMIN_1: 'Admin 1',
-  ADMIN_2: 'Admin 2',
-  ADMIN_3: 'Admin 3',
-};
-
-export const TENANT_ROLE_LABELS: Record<string, string> = {
-  admin: 'Admin',
-  editor: 'Editor',
-  viewer: 'Viewer',
-};
+// ── Re-export constants from the client-safe module ───────────────────────
+export { FEATURE_KEYS, FEATURE_LABELS, GLOBAL_FEATURE_LABELS, ROLE_LABELS, TENANT_ROLE_LABELS } from '@/lib/constants';

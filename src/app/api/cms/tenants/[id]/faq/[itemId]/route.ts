@@ -9,8 +9,8 @@ import { authenticateRequest, requireTenantAccess, createAuditLog } from '@/lib/
 const updateFaqSchema = z.object({
   question: z.string().min(1).optional(),
   answer: z.string().min(1).optional(),
-  order: z.number().int().optional(),
-  enabled: z.boolean().optional(),
+  sortOrder: z.number().int().optional(),
+  isActive: z.boolean().optional(),
 });
 
 export async function PATCH(
@@ -23,15 +23,15 @@ export async function PATCH(
       return Response.json({ success: false, error: error || 'Authentication required' }, { status: 401 });
     }
 
-    const { id: tenantId, itemId } = await params;
+    const { id: weddingId, itemId } = await params;
 
-    const accessError = await requireTenantAccess(user, tenantId, 'editor');
+    const accessError = await requireTenantAccess(user, weddingId, 'editor');
     if (accessError) {
       return Response.json({ success: false, error: accessError }, { status: 403 });
     }
 
-    const existing = await db.fAQItem.findFirst({
-      where: { id: itemId, tenantId },
+    const existing = await db.fAQ.findFirst({
+      where: { id: itemId, weddingId },
     });
     if (!existing) {
       return Response.json({ success: false, error: 'FAQ item not found' }, { status: 404 });
@@ -43,7 +43,7 @@ export async function PATCH(
       return Response.json({ success: false, error: parsed.error.issues[0].message }, { status: 400 });
     }
 
-    const updated = await db.fAQItem.update({
+    const updated = await db.fAQ.update({
       where: { id: itemId },
       data: parsed.data,
     });
@@ -51,12 +51,12 @@ export async function PATCH(
     await createAuditLog({
       userId: user.userId,
       action: 'faq.update',
-      resource: 'FAQItem',
+      resource: 'FAQ',
       resourceId: itemId,
-      tenantId,
+      weddingId,
       details: {
-        before: { question: existing.question, order: existing.order, enabled: existing.enabled },
-        after: { question: updated.question, order: updated.order, enabled: updated.enabled },
+        before: { question: existing.question, sortOrder: existing.sortOrder, isActive: existing.isActive },
+        after: { question: updated.question, sortOrder: updated.sortOrder, isActive: updated.isActive },
       },
       request,
     });
@@ -65,11 +65,11 @@ export async function PATCH(
       success: true,
       data: {
         id: updated.id,
-        tenantId: updated.tenantId,
+        weddingId: updated.weddingId,
         question: updated.question,
         answer: updated.answer,
-        order: updated.order,
-        enabled: updated.enabled,
+        sortOrder: updated.sortOrder,
+        isActive: updated.isActive,
         createdAt: updated.createdAt.toISOString(),
         updatedAt: updated.updatedAt.toISOString(),
       },
@@ -94,28 +94,28 @@ export async function DELETE(
       return Response.json({ success: false, error: error || 'Authentication required' }, { status: 401 });
     }
 
-    const { id: tenantId, itemId } = await params;
+    const { id: weddingId, itemId } = await params;
 
-    const accessError = await requireTenantAccess(user, tenantId, 'editor');
+    const accessError = await requireTenantAccess(user, weddingId, 'editor');
     if (accessError) {
       return Response.json({ success: false, error: accessError }, { status: 403 });
     }
 
-    const existing = await db.fAQItem.findFirst({
-      where: { id: itemId, tenantId },
+    const existing = await db.fAQ.findFirst({
+      where: { id: itemId, weddingId },
     });
     if (!existing) {
       return Response.json({ success: false, error: 'FAQ item not found' }, { status: 404 });
     }
 
-    await db.fAQItem.delete({ where: { id: itemId } });
+    await db.fAQ.delete({ where: { id: itemId } });
 
     await createAuditLog({
       userId: user.userId,
       action: 'faq.delete',
-      resource: 'FAQItem',
+      resource: 'FAQ',
       resourceId: itemId,
-      tenantId,
+      weddingId,
       details: { question: existing.question },
       request,
     });
