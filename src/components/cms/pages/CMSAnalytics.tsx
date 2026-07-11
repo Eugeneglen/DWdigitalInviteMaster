@@ -174,9 +174,7 @@ export default function CMSAnalytics({ selectedTenantId, authUser }: PageProps) 
         ...(fromDate ? { fromDate } : {}),
         ...(toDate ? { toDate } : {}),
       });
-      const res = await fetch(`/api/cms/tenants/${tenantId}/analytics?${params}`, {
-        headers: { Authorization: `Bearer ${authUser?.token}` },
-      });
+      const res = await fetch(`/api/cms/tenants/${tenantId}/analytics?${params}`);
       const resData = await res.json();
       if (resData.success) {
         setData(resData.data);
@@ -188,7 +186,7 @@ export default function CMSAnalytics({ selectedTenantId, authUser }: PageProps) 
     } finally {
       setLoading(false);
     }
-  }, [tenantId, fromDate, toDate, authUser?.token]);
+  }, [tenantId, fromDate, toDate]);
 
   useEffect(() => {
     fetchAnalytics();

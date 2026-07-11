@@ -143,9 +143,7 @@ export default function CMSAuditLog() {
         ...(dateFrom ? { from: dateFrom } : {}),
         ...(dateTo ? { to: dateTo } : {}),
       });
-      const res = await fetch(`/api/cms/audit?${params}`, {
-        headers: { Authorization: `Bearer ${authUser?.token}` },
-      });
+      const res = await fetch(`/api/cms/audit?${params}`);
       const data = await res.json();
       if (data.success) {
         const resp: AuditResponse = data.data;
@@ -158,13 +156,11 @@ export default function CMSAuditLog() {
     } finally {
       setLoading(false);
     }
-  }, [page, filterUser, filterAction, dateFrom, dateTo, authUser?.token]);
+  }, [page, filterUser, filterAction, dateFrom, dateTo]);
 
   const fetchUserOptions = useCallback(async () => {
     try {
-      const res = await fetch('/api/cms/users', {
-        headers: { Authorization: `Bearer ${authUser?.token}` },
-      });
+      const res = await fetch('/api/cms/users');
       const data = await res.json();
       if (data.success) {
         setUserOptions(
@@ -178,7 +174,7 @@ export default function CMSAuditLog() {
     } catch {
       // silently handle
     }
-  }, [authUser?.token]);
+  }, []);
 
   useEffect(() => {
     fetchLogs();

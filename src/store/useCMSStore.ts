@@ -2,7 +2,7 @@ import { create } from 'zustand';
 
 export type CMSPage = 'dashboard' | 'weddings' | 'users' | 'templates' | 'analytics' | 'settings';
 
-/** Auth user context passed to CMS page components that need Bearer token auth */
+/** Auth user context passed to CMS page components */
 export interface AuthUser {
   userId: string;
   email: string;
@@ -10,7 +10,7 @@ export interface AuthUser {
   role: string;
   tenantId?: string;
   tenantRole?: string;
-  token: string;
+  token?: string;
 }
 
 interface CMSState {

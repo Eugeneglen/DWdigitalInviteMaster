@@ -35,10 +35,13 @@ export async function POST(request: Request) {
       // Ignore — DB may be read-only in some environments
     }
 
-    // Create a NextAuth-compatible JWT using its own encode function
+    // Create a NextAuth-compatible JWT using its own encode function.
+    // IMPORTANT: Include both `sub` (NextAuth standard) and `id` (used by
+    // the jwt callback in auth.ts to populate session.user.id).
     const token = await encode({
       token: {
         sub: user.id,
+        id: user.id,
         name: user.name,
         email: user.email,
         role: user.role,

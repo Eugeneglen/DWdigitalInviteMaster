@@ -5,7 +5,7 @@ import { authenticateRequest, requireMasterAdmin, createAuditLog } from '@/lib/a
 import { FEATURE_KEYS } from '@/lib/auth';
 
 // ============================================
-// GET — List tenants (paginated, searchable)
+// GET — List wedding accounts (paginated, searchable)
 // ============================================
 
 export async function GET(request: NextRequest) {
@@ -29,16 +29,18 @@ export async function GET(request: NextRequest) {
     const where: Record<string, unknown> = {};
     if (search) {
       where.OR = [
-        { name: { contains: search } },
+        { coupleName: { contains: search } },
         { slug: { contains: search } },
+        { brideName: { contains: search } },
+        { groomName: { contains: search } },
       ];
     }
     if (status) {
       where.status = status;
     }
 
-    const [tenants, total] = await Promise.all([
-      db.tenant.findMany({
+    const [accounts, total] = await Promise.all([
+      db.weddingAccount.findMany({
         where,
         skip: (page - 1) * limit,
         take: limit,
@@ -46,23 +48,28 @@ export async function GET(request: NextRequest) {
         include: {
           _count: {
             select: {
-              users: true,
-              featureToggles: true,
+              guests: true,
+              features: true,
+              rsvps: true,
+              wishes: true,
             },
+          },
+          owner: {
+            select: { id: true, name: true, email: true },
           },
         },
       }),
-      db.tenant.count({ where }),
+      db.weddingAccount.count({ where }),
     ]);
 
     return Response.json({
       success: true,
       data: {
-        tenants: tenants.map((t) => ({
+        tenants: accounts.map((t) => ({
           ...t,
           createdAt: t.createdAt.toISOString(),
           updatedAt: t.updatedAt.toISOString(),
-          eventDate: t.eventDate?.toISOString() ?? null,
+          weddingDate: t.weddingDate?.toISOString() ?? null,
         })),
         total,
         page,
@@ -77,19 +84,18 @@ export async function GET(request: NextRequest) {
 }
 
 // ============================================
-// POST — Create tenant
+// POST — Create wedding account
 // ============================================
 
 const createTenantSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
+  coupleName: z.string().min(1, 'Couple name is required'),
   slug: z
     .string()
     .min(1, 'Slug is required')
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be lowercase alphanumeric with hyphens only'),
-  eventType: z.string().min(1, 'Event type is required'),
-  coupleName1: z.string().optional(),
-  coupleName2: z.string().optional(),
-  eventDate: z.string().optional(),
+  brideName: z.string().optional(),
+  groomName: z.string().optional(),
+  weddingDate: z.string().optional(),
   venue: z.string().optional(),
 });
 
@@ -112,9 +118,9 @@ export async function POST(request: NextRequest) {
     }
 
     const { slug } = parsed.data;
-    const existing = await db.tenant.findUnique({ where: { slug } });
+    const existing = await db.weddingAccount.findUnique({ where: { slug } });
     if (existing) {
-      return Response.json({ success: false, error: 'A tenant with this slug already exists' }, { status: 400 });
+      return Response.json({ success: false, error: 'A wedding account with this slug already exists' }, { status: 400 });
     }
 
     const eventFeatures = [
@@ -127,28 +133,34 @@ export async function POST(request: NextRequest) {
       FEATURE_KEYS.GETTING_THERE,
     ];
 
-    const tenant = await db.tenant.create({
+    const account = await db.weddingAccount.create({
       data: {
-        ...parsed.data,
-        eventDate: parsed.data.eventDate ? new Date(parsed.data.eventDate) : null,
-        featureToggles: {
+        coupleName: parsed.data.coupleName,
+        slug: parsed.data.slug,
+        brideName: parsed.data.brideName ?? null,
+        groomName: parsed.data.groomName ?? null,
+        weddingDate: parsed.data.weddingDate ? new Date(parsed.data.weddingDate) : new Date(),
+        venue: parsed.data.venue ?? null,
+        ownerId: user.userId,
+        features: {
           create: eventFeatures.map((key) => ({
             featureKey: key,
-            enabled: true,
+            isEnabled: true,
           })),
         },
       },
       include: {
-        featureToggles: true,
+        features: true,
       },
     });
 
     await createAuditLog({
       userId: user.userId,
       action: 'tenant.create',
-      resource: 'Tenant',
-      resourceId: tenant.id,
-      details: { ...parsed.data, eventDate: parsed.data.eventDate },
+      resource: 'WeddingAccount',
+      resourceId: account.id,
+      weddingId: account.id,
+      details: { ...parsed.data, weddingDate: parsed.data.weddingDate },
       request,
     });
 
@@ -156,11 +168,11 @@ export async function POST(request: NextRequest) {
       {
         success: true,
         data: {
-          ...tenant,
-          createdAt: tenant.createdAt.toISOString(),
-          updatedAt: tenant.updatedAt.toISOString(),
-          eventDate: tenant.eventDate?.toISOString() ?? null,
-          featureToggles: tenant.featureToggles.map((ft) => ({
+          ...account,
+          createdAt: account.createdAt.toISOString(),
+          updatedAt: account.updatedAt.toISOString(),
+          weddingDate: account.weddingDate?.toISOString() ?? null,
+          features: account.features.map((ft) => ({
             ...ft,
             createdAt: ft.createdAt.toISOString(),
             updatedAt: ft.updatedAt.toISOString(),

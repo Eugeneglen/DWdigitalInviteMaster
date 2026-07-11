@@ -8,9 +8,11 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const slug = searchParams.get('slug');
 
-    const where = slug
-      ? { slug, status: 'ACTIVE' }
-      : { status: 'ACTIVE' as const };
+    if (!slug) {
+      return NextResponse.json({ error: 'Wedding slug is required' }, { status: 400 });
+    }
+
+    const where = { slug, status: 'ACTIVE' };
 
     const wedding = await db.weddingAccount.findFirst({
       where,

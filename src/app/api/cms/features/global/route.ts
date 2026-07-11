@@ -1,10 +1,11 @@
-import { NextRequest } from 'next/server';
-import { z } from 'zod';
 import { db } from '@/lib/db';
-import { authenticateRequest, requireMasterAdmin, createAuditLog } from '@/lib/auth-middleware';
+import { authenticateRequest, requireMasterAdmin } from '@/lib/auth-middleware';
 
 // ============================================
-// GET — All global feature toggles
+// GET — All wedding features across all weddings (global view)
+// Note: There is no GlobalFeatureToggle model.
+//       This returns a unique set of feature keys used across all weddings
+//       with a count of how many have them enabled.
 // ============================================
 
 export async function GET(request: Request) {
@@ -14,16 +15,26 @@ export async function GET(request: Request) {
       return Response.json({ success: false, error: error || 'Authentication required' }, { status: 401 });
     }
 
-    const toggles = await db.globalFeatureToggle.findMany({
-      orderBy: { featureKey: 'asc' },
+    // Aggregate feature keys across all weddings
+    const allFeatures = await db.weddingFeature.findMany({
+      select: { featureKey: true, isEnabled: true },
     });
+
+    // Group by featureKey
+    const grouped = new Map<string, { total: number; enabled: number }>();
+    for (const f of allFeatures) {
+      const entry = grouped.get(f.featureKey) ?? { total: 0, enabled: 0 };
+      entry.total += 1;
+      if (f.isEnabled) entry.enabled += 1;
+      grouped.set(f.featureKey, entry);
+    }
 
     return Response.json({
       success: true,
-      data: toggles.map((t) => ({
-        ...t,
-        createdAt: t.createdAt.toISOString(),
-        updatedAt: t.updatedAt.toISOString(),
+      data: Array.from(grouped.entries()).map(([featureKey, counts]) => ({
+        featureKey,
+        totalWeddings: counts.total,
+        enabledCount: counts.enabled,
       })),
     });
   } catch (err) {
@@ -33,16 +44,11 @@ export async function GET(request: Request) {
 }
 
 // ============================================
-// PATCH — Upsert a global feature toggle
+// PATCH — Not supported: per-wedding feature toggles
+//       exist at /api/cms/tenants/[id]/features
 // ============================================
 
-const globalToggleSchema = z.object({
-  featureKey: z.string().min(1, 'Feature key is required'),
-  enabled: z.boolean(),
-  description: z.string().optional(),
-});
-
-export async function PATCH(request: NextRequest) {
+export async function PATCH(request: Request) {
   try {
     const { user, error } = await authenticateRequest(request);
     if (error || !user) {
@@ -54,44 +60,15 @@ export async function PATCH(request: NextRequest) {
       return Response.json({ success: false, error: authError }, { status: 403 });
     }
 
-    const body = await request.json();
-    const parsed = globalToggleSchema.safeParse(body);
-    if (!parsed.success) {
-      return Response.json({ success: false, error: parsed.error.issues[0].message }, { status: 400 });
-    }
-
-    const { featureKey, enabled, description } = parsed.data;
-
-    const toggle = await db.globalFeatureToggle.upsert({
-      where: { featureKey },
-      create: {
-        featureKey,
-        enabled,
-        description: description || null,
+    // Global feature toggles are not supported.
+    // Use per-wedding feature management at /api/cms/tenants/[id]/features
+    return Response.json(
+      {
+        success: false,
+        error: 'Global feature toggles are not supported. Manage features per-wedding at /api/cms/tenants/[id]/features.',
       },
-      update: {
-        enabled,
-        ...(description !== undefined && { description }),
-      },
-    });
-
-    await createAuditLog({
-      userId: user.userId,
-      action: 'global_feature.toggle',
-      resource: 'GlobalFeatureToggle',
-      resourceId: toggle.id,
-      details: { featureKey, enabled, description },
-      request,
-    });
-
-    return Response.json({
-      success: true,
-      data: {
-        ...toggle,
-        createdAt: toggle.createdAt.toISOString(),
-        updatedAt: toggle.updatedAt.toISOString(),
-      },
-    });
+      { status: 400 }
+    );
   } catch (err) {
     console.error('Toggle global feature error:', err);
     return Response.json({ success: false, error: 'Internal server error' }, { status: 500 });

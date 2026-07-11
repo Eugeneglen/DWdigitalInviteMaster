@@ -3,7 +3,7 @@ import { db } from '@/lib/db';
 import { authenticateRequest, requireTenantAccess, createAuditLog } from '@/lib/auth-middleware';
 
 // ============================================
-// GET — List RSVPs for a tenant (paginated, filterable)
+// GET — List RSVPs for a wedding (paginated, filterable)
 // ============================================
 
 export async function GET(
@@ -16,8 +16,8 @@ export async function GET(
       return Response.json({ success: false, error: authError || 'Authentication required' }, { status: 401 });
     }
 
-    const { id: tenantId } = await params;
-    const accessError = await requireTenantAccess(user, tenantId, 'viewer');
+    const { id: weddingId } = await params;
+    const accessError = await requireTenantAccess(user, weddingId, 'viewer');
     if (accessError) {
       return Response.json({ success: false, error: accessError }, { status: 403 });
     }
@@ -31,7 +31,7 @@ export async function GET(
     const toDate = searchParams.get('toDate') || '';
 
     // Build where clause
-    const where: Record<string, unknown> = { tenantId };
+    const where: Record<string, unknown> = { weddingId };
 
     if (search) {
       where.OR = [
@@ -48,7 +48,7 @@ export async function GET(
 
     // Compute summary from ALL rsvps (not just current page/filter)
     const allRsvpsForSummary = await db.rSVPSubmission.findMany({
-      where: { tenantId },
+      where: { weddingId },
       include: { guests: true },
     });
     const allGuestsForSummary = allRsvpsForSummary.flatMap((r) => r.guests);
@@ -67,14 +67,12 @@ export async function GET(
 
     // Attendance filter — filter based on guest responses
     if (attendance) {
-      // Reuse the allRsvps we already loaded (apply where filters)
       const allRsvps = await db.rSVPSubmission.findMany({
         where,
         include: { guests: true },
         orderBy: { createdAt: 'desc' },
       });
 
-      // Filter by attendance status
       const filtered = allRsvps.filter((rsvp) => {
         if (!rsvp.guests || rsvp.guests.length === 0) return false;
         if (attendance === 'yes') return rsvp.guests.every((g) => g.attendance === 'yes');
@@ -92,7 +90,7 @@ export async function GET(
         data: {
           rsvps: rsvps.map((r) => ({
             id: r.id,
-            tenantId: r.tenantId,
+            weddingId: r.weddingId,
             firstName: r.firstName,
             lastName: r.lastName,
             partySize: r.partySize,
@@ -133,7 +131,7 @@ export async function GET(
       data: {
         rsvps: rsvpRecords.map((r) => ({
           id: r.id,
-          tenantId: r.tenantId,
+          weddingId: r.weddingId,
           firstName: r.firstName,
           lastName: r.lastName,
           partySize: r.partySize,

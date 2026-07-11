@@ -1,6 +1,6 @@
 import type { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { getToken } from 'next-auth/jwt';
+import { getServerSession as nextAuthGetServerSession } from 'next-auth';
 import bcrypt from 'bcryptjs';
 import { readFileSync } from 'fs';
 import path from 'path';
@@ -8,40 +8,11 @@ import jwt from 'jsonwebtoken';
 import { db } from '@/lib/db';
 import { cookies } from 'next/headers';
 
-// ── getServerSession replacement ───────────────────────────────────────────
-// NextAuth v4's built-in getServerSession is broken in Next.js 16 App Router
-// route handlers (Turbopack).  This wrapper reads the session cookie manually
-// and decrypts it with next-auth/jwt's getToken(), then runs the session
-// callback to produce a Session object.
+// ── getServerSession wrapper ──────────────────────────────────────────────
+// Re-exports NextAuth's built-in getServerSession with authOptions pre-bound.
+// Used by auth-middleware.ts and other server-side route handlers.
 export async function getServerSession() {
-  try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('next-auth.session-token')?.value;
-    if (!token) return null;
-
-    const jwtToken = await getToken({
-      req: { cookies: { get: (name: string) => ({ value: token }) } } as unknown as Request,
-      secret: resolveSecret(),
-      salt: undefined,
-      secureCookie: process.env.NODE_ENV === 'production',
-    });
-
-    if (!jwtToken) return null;
-
-    // Run the session callback from authOptions
-    const session = await authOptions.callbacks!.session!({
-      session: {
-        user: { id: '', email: '', name: '', role: '' },
-        expires: new Date((jwtToken.exp ?? 0) * 1000).toISOString(),
-      },
-      token: jwtToken,
-      user: undefined as never,
-    });
-
-    return session ?? null;
-  } catch {
-    return null;
-  }
+  return nextAuthGetServerSession(authOptions);
 }
 
 // ── JWT Payload type ────────────────────────────────────────────────────────

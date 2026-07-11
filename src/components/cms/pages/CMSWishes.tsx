@@ -104,9 +104,7 @@ export default function CMSWishes({ selectedTenantId, authUser }: PageProps) {
         ...(dateFrom ? { fromDate: dateFrom } : {}),
         ...(dateTo ? { toDate: dateTo } : {}),
       });
-      const res = await fetch(`/api/cms/tenants/${tenantId}/wishes?${params}`, {
-        headers: { Authorization: `Bearer ${authUser?.token}` },
-      });
+      const res = await fetch(`/api/cms/tenants/${tenantId}/wishes?${params}`);
       const data = await res.json();
       if (data.success) {
         const resp: WishesResponse = data.data;
@@ -129,15 +127,13 @@ export default function CMSWishes({ selectedTenantId, authUser }: PageProps) {
     } finally {
       setLoading(false);
     }
-  }, [tenantId, page, search, status, dateFrom, dateTo, authUser?.token]);
+  }, [tenantId, page, search, status, dateFrom, dateTo]);
 
   // Fetch stats separately to get accurate counts across all pages
   const fetchStats = useCallback(async () => {
     if (!tenantId) return;
     try {
-      const res = await fetch(`/api/cms/tenants/${tenantId}/wishes?limit=1`, {
-        headers: { Authorization: `Bearer ${authUser?.token}` },
-      });
+      const res = await fetch(`/api/cms/tenants/${tenantId}/wishes?limit=1`);
       const data = await res.json();
       if (data.success && data.data.stats) {
         setStats(data.data.stats);
@@ -145,7 +141,7 @@ export default function CMSWishes({ selectedTenantId, authUser }: PageProps) {
     } catch {
       // silently handle
     }
-  }, [tenantId, authUser?.token]);
+  }, [tenantId]);
 
   useEffect(() => {
     fetchWishes();
@@ -172,7 +168,6 @@ export default function CMSWishes({ selectedTenantId, authUser }: PageProps) {
       const res = await fetch(`/api/cms/tenants/${tenantId}/wishes/${wishId}`, {
         method: 'PATCH',
         headers: {
-          Authorization: `Bearer ${authUser?.token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ status: newStatus }),
@@ -198,7 +193,6 @@ export default function CMSWishes({ selectedTenantId, authUser }: PageProps) {
     try {
       const res = await fetch(`/api/cms/tenants/${tenantId}/wishes/${deleteTarget.id}`, {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${authUser?.token}` },
       });
       const data = await res.json();
       if (data.success) {

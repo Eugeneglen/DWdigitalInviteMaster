@@ -3,7 +3,7 @@ import { db } from '@/lib/db';
 import { authenticateRequest, requireTenantAccess, createAuditLog } from '@/lib/auth-middleware';
 
 // ============================================
-// GET — List content blocks for a tenant (with optional sectionKey filter, includes drafts)
+// GET — List content entries for a wedding (key-value WeddingContent model)
 // ============================================
 
 export async function GET(
@@ -16,44 +16,42 @@ export async function GET(
       return Response.json({ success: false, error: error || 'Authentication required' }, { status: 401 });
     }
 
-    const { id: tenantId } = await params;
+    const { id: weddingId } = await params;
 
-    const accessError = await requireTenantAccess(user, tenantId, 'viewer');
+    const accessError = await requireTenantAccess(user, weddingId, 'viewer');
     if (accessError) {
       return Response.json({ success: false, error: accessError }, { status: 403 });
     }
 
-    // Verify tenant exists
-    const tenant = await db.tenant.findUnique({ where: { id: tenantId } });
-    if (!tenant) {
-      return Response.json({ success: false, error: 'Tenant not found' }, { status: 404 });
+    // Verify wedding account exists
+    const account = await db.weddingAccount.findUnique({ where: { id: weddingId } });
+    if (!account) {
+      return Response.json({ success: false, error: 'Wedding account not found' }, { status: 404 });
     }
 
-    // Parse optional sectionKey query param
+    // Optional section filter
     const { searchParams } = new URL(request.url);
-    const sectionKey = searchParams.get('sectionKey');
+    const section = searchParams.get('section');
 
-    const where: Record<string, unknown> = { tenantId };
-    if (sectionKey) {
-      where.sectionKey = sectionKey;
+    const where: Record<string, unknown> = { weddingId };
+    if (section) {
+      where.section = section;
     }
 
-    const items = await db.contentBlock.findMany({
+    const items = await db.weddingContent.findMany({
       where,
-      orderBy: { order: 'asc' },
+      orderBy: [{ section: 'asc' }, { fieldKey: 'asc' }],
     });
 
     return Response.json({
       success: true,
       data: items.map((item) => ({
         id: item.id,
-        tenantId: item.tenantId,
-        sectionKey: item.sectionKey,
-        title: item.title,
-        content: item.content,
-        imageUrl: item.imageUrl,
-        order: item.order,
-        status: item.status,
+        weddingId: item.weddingId,
+        section: item.section,
+        fieldKey: item.fieldKey,
+        fieldValue: item.fieldValue,
+        fieldType: item.fieldType,
         createdAt: item.createdAt.toISOString(),
         updatedAt: item.updatedAt.toISOString(),
       })),
@@ -65,15 +63,14 @@ export async function GET(
 }
 
 // ============================================
-// POST — Create a new content block
+// POST — Create a new content entry
 // ============================================
 
-const createBlockSchema = z.object({
-  sectionKey: z.string().min(1, 'Section key is required'),
-  title: z.string().optional(),
-  content: z.string().optional(),
-  imageUrl: z.string().optional(),
-  status: z.enum(['draft', 'published']).optional(),
+const createContentSchema = z.object({
+  section: z.string().min(1, 'Section is required'),
+  fieldKey: z.string().min(1, 'Field key is required'),
+  fieldValue: z.string().min(1, 'Field value is required'),
+  fieldType: z.enum(['TEXT', 'RICHTEXT', 'IMAGE_URL', 'JSON', 'NUMBER', 'BOOLEAN']).optional(),
 });
 
 export async function POST(
@@ -86,55 +83,44 @@ export async function POST(
       return Response.json({ success: false, error: error || 'Authentication required' }, { status: 401 });
     }
 
-    const { id: tenantId } = await params;
+    const { id: weddingId } = await params;
 
-    const accessError = await requireTenantAccess(user, tenantId, 'editor');
+    const accessError = await requireTenantAccess(user, weddingId, 'editor');
     if (accessError) {
       return Response.json({ success: false, error: accessError }, { status: 403 });
     }
 
-    // Verify tenant exists
-    const tenant = await db.tenant.findUnique({ where: { id: tenantId } });
-    if (!tenant) {
-      return Response.json({ success: false, error: 'Tenant not found' }, { status: 404 });
+    // Verify wedding account exists
+    const account = await db.weddingAccount.findUnique({ where: { id: weddingId } });
+    if (!account) {
+      return Response.json({ success: false, error: 'Wedding account not found' }, { status: 404 });
     }
 
     const body = await request.json();
-    const parsed = createBlockSchema.safeParse(body);
+    const parsed = createContentSchema.safeParse(body);
     if (!parsed.success) {
       return Response.json({ success: false, error: parsed.error.issues[0].message }, { status: 400 });
     }
 
-    const { sectionKey, title, content, imageUrl, status } = parsed.data;
+    const { section, fieldKey, fieldValue, fieldType } = parsed.data;
 
-    // Auto-assign order = max existing order + 1 within same sectionKey
-    const maxOrder = await db.contentBlock.findFirst({
-      where: { tenantId, sectionKey },
-      orderBy: { order: 'desc' },
-      select: { order: true },
-    });
-
-    const order = (maxOrder?.order ?? -1) + 1;
-
-    const item = await db.contentBlock.create({
+    const item = await db.weddingContent.create({
       data: {
-        tenantId,
-        sectionKey,
-        title: title ?? null,
-        content: content ?? null,
-        imageUrl: imageUrl ?? null,
-        status: status ?? 'published',
-        order,
+        weddingId,
+        section,
+        fieldKey,
+        fieldValue,
+        fieldType: fieldType ?? 'TEXT',
       },
     });
 
     await createAuditLog({
       userId: user.userId,
-      action: 'content_block.create',
-      resource: 'ContentBlock',
+      action: 'content.create',
+      resource: 'WeddingContent',
       resourceId: item.id,
-      tenantId,
-      details: { sectionKey, title, status: item.status, order },
+      weddingId,
+      details: { section, fieldKey, fieldType: item.fieldType },
       request,
     });
 
@@ -142,13 +128,11 @@ export async function POST(
       success: true,
       data: {
         id: item.id,
-        tenantId: item.tenantId,
-        sectionKey: item.sectionKey,
-        title: item.title,
-        content: item.content,
-        imageUrl: item.imageUrl,
-        order: item.order,
-        status: item.status,
+        weddingId: item.weddingId,
+        section: item.section,
+        fieldKey: item.fieldKey,
+        fieldValue: item.fieldValue,
+        fieldType: item.fieldType,
         createdAt: item.createdAt.toISOString(),
         updatedAt: item.updatedAt.toISOString(),
       },

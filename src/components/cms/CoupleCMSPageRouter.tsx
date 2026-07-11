@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import dynamic from 'next/dynamic';
 import { useCoupleCMSStore, type CoupleCMSPage } from '@/store/useCoupleCMSStore';
@@ -32,17 +33,34 @@ const COMING_SOON: Record<string, { title: string; description: string }> = {
 /** Wrapper that provides couple auth context to pages that need it */
 function CoupleContextPage({ page }: { page: 'rsvps' | 'wishes' | 'analytics' }) {
   const { data: session } = useSession();
+  const [resolvedTenantId, setResolvedTenantId] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchMe() {
+      try {
+        const res = await fetch('/api/auth/me');
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.tenantId) {
+            setResolvedTenantId(data.tenantId);
+          }
+        }
+      } catch {
+        // silently handle — tenantId will remain null
+      }
+    }
+    fetchMe();
+  }, []);
 
   const coupleContext = {
-    selectedTenantId: null as string | null,
+    selectedTenantId: resolvedTenantId,
     authUser: session?.user
       ? {
           userId: session.user.id,
           email: session.user.email ?? '',
           name: session.user.name ?? '',
           role: session.user.role,
-          tenantId: session.user.id,
-          token: '',
+          tenantId: resolvedTenantId ?? session.user.id,
         }
       : null,
   };

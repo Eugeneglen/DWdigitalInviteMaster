@@ -3,7 +3,7 @@ import { db } from '@/lib/db';
 import { authenticateRequest, requireTenantAccess } from '@/lib/auth-middleware';
 
 // ============================================
-// GET — Full analytics data for a tenant
+// GET — Full analytics data for a wedding
 // ============================================
 
 export async function GET(
@@ -16,8 +16,8 @@ export async function GET(
       return Response.json({ success: false, error: authError || 'Authentication required' }, { status: 401 });
     }
 
-    const { id: tenantId } = await params;
-    const accessError = await requireTenantAccess(user, tenantId, 'viewer');
+    const { id: weddingId } = await params;
+    const accessError = await requireTenantAccess(user, weddingId, 'viewer');
     if (accessError) {
       return Response.json({ success: false, error: accessError }, { status: 403 });
     }
@@ -34,21 +34,18 @@ export async function GET(
     const dateWhere = hasDateFilter ? { createdAt: dateFilter } : {};
 
     // Fetch all needed data in parallel
-    const [rsvps, wishes, contacts, honeymoonVotes] = await Promise.all([
+    const [rsvps, wishes, contacts] = await Promise.all([
       db.rSVPSubmission.findMany({
-        where: { tenantId, ...dateWhere },
+        where: { weddingId, ...dateWhere },
         include: { guests: true },
         orderBy: { createdAt: 'asc' },
       }),
       db.wish.findMany({
-        where: { tenantId, ...dateWhere },
+        where: { weddingId, ...dateWhere },
         orderBy: { createdAt: 'asc' },
       }),
       db.contactSubmission.findMany({
-        where: { tenantId, ...dateWhere },
-      }),
-      db.honeymoonVote.findMany({
-        where: { tenantId },
+        where: { weddingId, ...dateWhere },
       }),
     ]);
 
@@ -66,7 +63,6 @@ export async function GET(
     let wishTrend: number | null = null;
 
     if (hasDateFilter && (fromDateStr || toDateStr)) {
-      // Calculate previous period of same length
       const from = fromDateStr ? new Date(fromDateStr) : new Date(0);
       const to = toDateStr ? new Date(toDateStr) : new Date();
       const periodDays = Math.max(1, Math.ceil((to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24)));
@@ -75,10 +71,10 @@ export async function GET(
 
       const [prevRsvpCount, prevWishCount] = await Promise.all([
         db.rSVPSubmission.count({
-          where: { tenantId, createdAt: { gte: prevFrom, lt: prevTo } },
+          where: { weddingId, createdAt: { gte: prevFrom, lt: prevTo } },
         }),
         db.wish.count({
-          where: { tenantId, createdAt: { gte: prevFrom, lt: prevTo } },
+          where: { weddingId, createdAt: { gte: prevFrom, lt: prevTo } },
         }),
       ]);
 
@@ -125,7 +121,6 @@ export async function GET(
       const key = r.partySize >= 5 ? '5+' : String(r.partySize);
       partySizeMap.set(key, (partySizeMap.get(key) || 0) + 1);
     });
-    // Sort: 1, 2, 3, 4, 5+
     const partyOrder = ['1', '2', '3', '4', '5+'];
     const partySizeDistribution = partyOrder
       .filter((k) => partySizeMap.has(k))
@@ -140,27 +135,6 @@ export async function GET(
         count: cumulativeCount,
       };
     });
-
-    // --- Honeymoon Destinations ---
-    const destMap = new Map<string, number>();
-    honeymoonVotes.forEach((v) => {
-      const d = v.destination.trim();
-      if (d) destMap.set(d, (destMap.get(d) || 0) + 1);
-    });
-    const honeymoonDestinations = Array.from(destMap.entries())
-      .map(([name, count]) => ({ name, count }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 10);
-
-    // --- Wish Status Breakdown ---
-    const wishStatusMap = new Map<string, number>();
-    wishes.forEach((w) => {
-      const s = w.status || 'approved';
-      wishStatusMap.set(s, (wishStatusMap.get(s) || 0) + 1);
-    });
-    const wishStatusBreakdown = Array.from(wishStatusMap.entries())
-      .map(([name, value]) => ({ name, value }))
-      .sort((a, b) => b.value - a.value);
 
     return Response.json({
       success: true,
@@ -178,8 +152,6 @@ export async function GET(
         dietaryRequirements,
         partySizeDistribution,
         wishesTimeline,
-        honeymoonDestinations,
-        wishStatusBreakdown,
       },
     });
   } catch (err) {

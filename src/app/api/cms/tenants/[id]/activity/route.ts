@@ -3,7 +3,7 @@ import { db } from '@/lib/db';
 import { authenticateRequest, requireTenantAccess } from '@/lib/auth-middleware';
 
 // ============================================
-// GET — Combined activity feed for a tenant
+// GET — Combined activity feed for a wedding
 // ============================================
 
 interface ActivityItem {
@@ -24,8 +24,8 @@ export async function GET(
       return Response.json({ success: false, error: authError || 'Authentication required' }, { status: 401 });
     }
 
-    const { id: tenantId } = await params;
-    const accessError = await requireTenantAccess(user, tenantId, 'viewer');
+    const { id: weddingId } = await params;
+    const accessError = await requireTenantAccess(user, weddingId, 'viewer');
     if (accessError) {
       return Response.json({ success: false, error: accessError }, { status: 403 });
     }
@@ -36,13 +36,13 @@ export async function GET(
     // Fetch recent RSVPs and Wishes in parallel
     const [recentRsvps, recentWishes] = await Promise.all([
       db.rSVPSubmission.findMany({
-        where: { tenantId },
+        where: { weddingId },
         include: { guests: true },
         orderBy: { createdAt: 'desc' },
         take: limit,
       }),
       db.wish.findMany({
-        where: { tenantId },
+        where: { weddingId },
         orderBy: { createdAt: 'desc' },
         take: limit,
       }),
