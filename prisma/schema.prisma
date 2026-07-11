@@ -1,0 +1,278 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// PLATFORM USERS & AUTH
+// ============================================================
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         String   @default("ADMIN_1") // SUPER_ADMIN | ADMIN_1 | ADMIN_2 | ADMIN_3 | COUPLE | ACCOUNT_MANAGER
+  avatarUrl         String?
+  isActive          Boolean  @default(true)
+  resetToken        String?
+  resetTokenExpiry  DateTime?
+  lastLoginAt       DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  ownedWeddings  WeddingAccount[]
+  auditLogs      AuditLog[]
+  notifications  Notification[]
+}
+
+// ============================================================
+// MULTI-TENANT WEDDING ACCOUNTS
+// ============================================================
+
+model WeddingAccount {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  coupleName    String   // "Eleanor & James"
+  brideName     String?
+  groomName     String?
+  weddingDate   DateTime
+  weddingTime   String?
+  venue         String?
+  venueAddress  String?
+  googleMapsUrl String?
+  status        String   @default("DRAFT") // DRAFT | ACTIVE | SUSPENDED | ARCHIVED | COMPLETED
+  plan          String   @default("FREE")   // FREE | PREMIUM | ENTERPRISE
+  heroImageUrl  String?
+  heroVideoUrl  String?
+  bannerUrl     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  ownerId   String?
+  owner     User?    @relation(fields: [ownerId], references: [id])
+  features  WeddingFeature[]
+  content   WeddingContent[]
+  media     WeddingMedia[]
+  schedules EventSchedule[]
+  faqs      FAQ[]
+  stories   StoryItem[]
+  guests    Guest[]
+  rsvps     RSVPSubmission[]
+  wishes    Wish[]
+  contacts      ContactSubmission[]
+  auditLogs     AuditLog[]
+  notifications Notification[]
+}
+
+model WeddingFeature {
+  id         String          @id @default(cuid())
+  weddingId  String
+  wedding    WeddingAccount  @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  featureKey String          // rsvp | wishes | story | gallery | schedule | faq | moments | getting-there | countdown | music | video
+  isEnabled  Boolean         @default(false)
+  config     String?         // JSON string for feature-specific settings
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+
+  @@unique([weddingId, featureKey])
+}
+
+model WeddingContent {
+  id         String          @id @default(cuid())
+  weddingId  String
+  wedding    WeddingAccount  @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  section    String          // hero | schedule | story | rsvp | getting-there | qa | wishes | moments | footer
+  fieldKey   String          // title | description | imageUrl | subtitle | address | etc.
+  fieldValue String
+  fieldType  String          @default("TEXT") // TEXT | RICHTEXT | IMAGE_URL | JSON | NUMBER | BOOLEAN
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+
+  @@unique([weddingId, section, fieldKey])
+}
+
+model WeddingMedia {
+  id           String          @id @default(cuid())
+  weddingId    String
+  wedding      WeddingAccount  @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  url          String
+  thumbnailUrl String?
+  fileName     String
+  fileType     String          @default("IMAGE") // IMAGE | VIDEO
+  fileSize     Int?
+  category     String          @default("gallery") // hero | banner | gallery | story | couple-photo
+  sortOrder    Int             @default(0)
+  createdAt    DateTime        @default(now())
+}
+
+model EventSchedule {
+  id          String          @id @default(cuid())
+  weddingId   String
+  wedding     WeddingAccount  @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  eventType   String          // CEREMONY | RECEPTION | DINNER | TEA_CEREMONY | CUSTOM
+  title       String
+  description String?
+  startTime   String          // ISO time string "16:00"
+  endTime     String?
+  location    String?
+  sortOrder   Int             @default(0)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+model FAQ {
+  id         String          @id @default(cuid())
+  weddingId  String
+  wedding    WeddingAccount  @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  question   String
+  answer     String
+  sortOrder  Int             @default(0)
+  isActive   Boolean         @default(true)
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+}
+
+model StoryItem {
+  id         String          @id @default(cuid())
+  weddingId  String
+  wedding    WeddingAccount  @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  title      String
+  content    String
+  date       String?         // display date like "March 2023"
+  imageUrl   String?
+  sortOrder  Int             @default(0)
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+}
+
+// ============================================================
+// GUEST MANAGEMENT
+// ============================================================
+
+model Guest {
+  id             String          @id @default(cuid())
+  weddingId      String
+  wedding        WeddingAccount  @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  name           String
+  email          String?
+  phone          String?
+  groupName      String?         // family/grouping
+  tableNumber    Int?
+  invitationCode String          @unique
+  rsvpStatus     String?         // PENDING | ATTENDING | DECLINED | PARTIAL
+  plusOne        Boolean         @default(false)
+  plusOneName    String?
+  dietaryNotes   String?
+  sentVia        String?         // EMAIL | SMS | WHATSAPP | QR | MANUAL
+  sentAt         DateTime?
+  openedAt       DateTime?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  rsvps RSVPSubmission[]
+}
+
+// ============================================================
+// GUEST-FACING SUBMISSIONS (existing, enhanced with weddingId)
+// ============================================================
+
+model RSVPSubmission {
+  id        String           @id @default(cuid())
+  firstName String
+  lastName  String
+  partySize Int
+  weddingId String?
+  wedding   WeddingAccount?  @relation(fields: [weddingId], references: [id])
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  guests    GuestResponse[]
+  // Guest table relation (if RSVP was from tracked guest)
+  guestId   String?
+  guest     Guest?           @relation(fields: [guestId], references: [id])
+}
+
+model GuestResponse {
+  id         String          @id @default(cuid())
+  name       String
+  attendance String           // "yes" | "no" | "partial"
+  dietary    String?
+  rsvpId     String
+  rsvp       RSVPSubmission  @relation(fields: [rsvpId], references: [id], onDelete: Cascade)
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+}
+
+model Wish {
+  id          String          @id @default(cuid())
+  name        String
+  relationship String?
+  message     String
+  imageUrl    String?
+  weddingId   String?
+  wedding     WeddingAccount? @relation(fields: [weddingId], references: [id])
+  createdAt   DateTime        @default(now())
+}
+
+model ContactSubmission {
+  id        String          @id @default(cuid())
+  name      String
+  email     String
+  contact   String?
+  reason    String
+  weddingId String?
+  wedding   WeddingAccount? @relation(fields: [weddingId], references: [id])
+  createdAt DateTime        @default(now())
+}
+
+// ============================================================
+// AUDIT LOGGING
+// ============================================================
+
+model AuditLog {
+  id        String          @id @default(cuid())
+  userId    String?
+  user      User?           @relation(fields: [userId], references: [id])
+  weddingId String?
+  wedding   WeddingAccount? @relation(fields: [weddingId], references: [id])
+  action    String          // CREATE | UPDATE | DELETE | LOGIN | LOGOUT | ACTIVATE | SUSPEND | EXPORT
+  entity    String          // User | WeddingAccount | Guest | WeddingFeature | etc.
+  entityId  String?
+  details   String?         // JSON string with change details
+  ipAddress String?
+  createdAt DateTime        @default(now())
+}
+
+// ============================================================
+// SYSTEM CONFIGURATION
+// ============================================================
+
+model SystemSetting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ============================================================
+// NOTIFICATIONS
+// ============================================================
+
+model Notification {
+  id        String          @id @default(cuid())
+  userId    String?
+  user      User?           @relation(fields: [userId], references: [id])
+  weddingId String?
+  wedding   WeddingAccount? @relation(fields: [weddingId], references: [id])
+  type      String          // RSVP_RECEIVED | WISH_RECEIVED | CONTACT_RECEIVED | GUEST_OPENED | SYSTEM
+  title     String
+  message   String
+  link      String?         // optional deep link within CMS
+  isRead    Boolean         @default(false)
+  createdAt DateTime        @default(now())
+}

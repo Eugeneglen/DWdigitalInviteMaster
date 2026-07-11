@@ -1,0 +1,83 @@
+'use client';
+
+import { useNavigationStore } from '@/store/useNavigationStore';
+
+interface HeaderProps {
+  /** CSS top value to push the fixed header below an overlay bar (e.g. "44px") */
+  topOffset?: string;
+  /** Override text colour for header — needed when header bg differs from page bg */
+  headerTextColor?: string;
+}
+
+export default function Header({ topOffset, headerTextColor }: HeaderProps) {
+  const { currentSection, setSection, drawerOpen, openDrawer, availableTabs } = useNavigationStore();
+  const tabs = availableTabs.length > 0 ? availableTabs : undefined;
+
+  return (
+    <header
+      data-wedding-header=""
+      className="fixed w-full z-50 backdrop-blur-md border-b border-champagne-silk/30"
+      style={{
+        backgroundColor: 'var(--wedding-header-bg, var(--wedding-bg, #FCF9F2))',
+        opacity: 0.97,
+        ...(topOffset ? { top: topOffset } : {}),
+        // CSS variable override for any raw-CSS references (e.g. globals.css).
+        // The <style> tag from generateThemeOverrideStyle handles Tailwind classes.
+        ...(headerTextColor ? { '--color-charcoal-ink': headerTextColor } : {}),
+      } as React.CSSProperties}
+    >
+      <div className="flex justify-between items-center px-4 md:px-6 py-3 w-full max-w-[1440px] mx-auto">
+        {/* Logo */}
+        <div
+          className="flex-shrink-0 cursor-pointer"
+          onClick={() => setSection('home')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSection('home'); } }}
+          aria-label="Go to Home"
+        >
+          <img
+            alt="Dreamweavers Logo"
+            className="h-4 md:h-5 w-auto object-contain"
+            src="/dreamweavers-logo.png"
+          />
+        </div>
+
+        {/* Desktop navigation (lg+) */}
+        <nav className="hidden lg:flex justify-center items-center gap-6 px-4 ml-auto" aria-label="Main navigation">
+          {(tabs ?? []).map((item) => {
+            const isActive = currentSection === item.section;
+            return (
+              <button
+                key={item.id}
+                onClick={() => setSection(item.section)}
+                aria-label={`Navigate to ${item.label}`}
+                aria-current={isActive ? 'page' : undefined}
+                className={`font-medium text-[11px] tracking-[0.2em] uppercase border-b-2 h-[26px] flex items-center transition-colors duration-300 ${
+                  isActive
+                    ? 'text-cinematic-gold border-cinematic-gold'
+                    : 'text-charcoal-ink/40 hover:text-cinematic-gold border-transparent'
+                }`}
+              >
+                {item.label}
+              </button>
+            );
+          })}
+        </nav>
+
+        {/* Mobile hamburger button */}
+        <div className="lg:hidden ml-auto">
+          <button
+            className="text-charcoal-ink p-2"
+            onClick={openDrawer}
+            aria-label="Open navigation menu"
+            aria-expanded={drawerOpen}
+            aria-controls="mobile-drawer"
+          >
+            <span className="material-symbols-outlined">menu</span>
+          </button>
+        </div>
+      </div>
+    </header>
+  );
+}
