@@ -1,63 +1,55 @@
 # DWdigitalInvite - Production Dockerfile
-# Enforces Bun as the build tool, validates standalone output
+# Build: oven/bun | Runner: node:22-alpine
 
-FROM node:20-alpine AS base
-RUN apk add --no-cache libc6-compat
+# ── Build stage ──────────────────────────────────────────────────────────────
+FROM oven/bun:1 AS builder
 WORKDIR /app
 
-# Install Bun
-RUN curl -fsSL https://bun.sh/install | bash
-ENV PATH="/root/.bun/bin:$PATH"
-
-# Install dependencies
-FROM base AS deps
 COPY package.json bun.lock* ./
 RUN bun install --frozen-lockfile
 
-# Build stage
-FROM base AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Generate Prisma client
+# Patch Prisma provider for Railway Postgres (local dev uses sqlite)
+RUN sed -i 's/provider = "sqlite"/provider = "postgresql"/' prisma/schema.prisma
+
+# Generate Prisma client (binaryTargets set in schema for cross-arch engines)
 RUN bunx prisma generate
 
-# Build the Next.js application
 RUN bun run build
 
-# CRITICAL: Validate standalone output exists
-RUN if [ ! -f ".next/standalone/server.js" ]; then \
-      echo "❌ ERROR: .next/standalone/server.js not generated - build failed"; \
-      exit 1; \
-    fi && echo "✅ Standalone build validated successfully"
+# Validate standalone output
+RUN test -f ".next/standalone/server.js" || (echo "ERROR: standalone server.js missing" && exit 1)
 
-# Production stage
-FROM node:20-alpine AS runner
+# ── Production runner ────────────────────────────────────────────────────────
+FROM node:22-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
 
+# NOTE: NEXTAUTH_SECRET, NEXTAUTH_URL, DATABASE_URL must be injected
+# by the hosting environment (Railway). No fallback literals here.
+
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Copy standalone output
-COPY --from=builder /app/.next/standalone ./
+# Preserve .next/standalone/ directory so CMD path resolves correctly
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./.next/standalone
 
-# Copy static assets
-COPY --from=builder /app/.next/static ./.next/static
+# Static assets — placed where the standalone server expects them
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/standalone/.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/public ./.next/standalone/public
 
-# Copy public directory
-COPY --from=builder /app/public ./public
-
-# Copy Prisma schema for potential runtime use
-COPY --from=builder /app/prisma ./prisma
+# Prisma schema + CLI for runtime db push
+COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
 
 USER nextjs
 
 EXPOSE 3000
-
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["node", ".next/standalone/server.js"]
+CMD ["sh", "-c", "npx prisma db push && node .next/standalone/server.js"]

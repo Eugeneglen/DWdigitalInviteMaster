@@ -6,11 +6,12 @@ import { readFileSync } from 'fs';
 import path from 'path';
 import jwt from 'jsonwebtoken';
 import { db } from '@/lib/db';
-import { cookies } from 'next/headers';
 
 // ── getServerSession wrapper ──────────────────────────────────────────────
 // Re-exports NextAuth's built-in getServerSession with authOptions pre-bound.
-// Used by auth-middleware.ts and other server-side route handlers.
+// SECURITY: No hardcoded secret literals. Secret is resolved exclusively
+// from process.env (NEXTAUTH_SECRET / JWT_SECRET) with a .env file fallback
+// for local Turbopack dev only.
 export async function getServerSession() {
   return nextAuthGetServerSession(authOptions);
 }
