@@ -83,6 +83,24 @@ function GuestSiteSkeleton() {
   );
 }
 
+/** Keeps all guest pages mounted but only shows the active one.
+ *  This avoids unmounting/remounting on every navigation, which previously
+ *  destroyed and recreated timers, sockets, observers, and canvases. */
+function PageRenderer({ section }: { section: Section }) {
+  return (
+    <>
+      {Object.entries(GUEST_PAGES).map(([key, Component]) => (
+        <div
+          key={key}
+          style={{ display: key === section ? 'block' : 'none' }}
+        >
+          <Component />
+        </div>
+      ))}
+    </>
+  );
+}
+
 interface GuestSiteProps {
   /** Wedding slug — when provided, fetches data for that specific wedding */
   slug?: string;
@@ -141,7 +159,6 @@ export default function GuestSite({ slug, topOffset, showEditorButton = false }:
 
   const isAdmin = session?.user?.role === 'SUPER_ADMIN' || session?.user?.role === 'ACCOUNT_MANAGER';
   const isCouple = session?.user?.role === 'COUPLE';
-  const GuestPageComponent = GUEST_PAGES[currentSection] || HomePage;
 
   // Generate dynamic <style> to override Tailwind's hardcoded colour values.
   // Tailwind 4 resolves @theme colours at build time, so CSS variable
@@ -168,7 +185,7 @@ export default function GuestSite({ slug, topOffset, showEditorButton = false }:
       <MobileDrawer />
 
       <div className="flex-1" style={topOffset ? { paddingTop: '44px' } : undefined}>
-        <GuestPageComponent key={currentSection} />
+        <PageRenderer section={currentSection} />
       </div>
 
       <Footer />

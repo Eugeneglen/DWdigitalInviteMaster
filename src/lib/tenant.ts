@@ -10,11 +10,8 @@
  */
 
 import { db } from '@/lib/db';
-import { headers } from 'next/headers';
 
 // ─── Dev Fallback ────────────────────────────────────────────────────────────
-// Used in single-tenant development so every query has a valid weddingId
-// even when no session or header is present.
 export const DEV_ACCOUNT_ID = process.env.NEXT_PUBLIC_DEV_ACCOUNT_ID ?? 'dev_account';
 
 /**
@@ -22,23 +19,23 @@ export const DEV_ACCOUNT_ID = process.env.NEXT_PUBLIC_DEV_ACCOUNT_ID ?? 'dev_acc
  * In dev mode without auth, falls back to the first account in the database.
  */
 export async function resolveWorkspaceAccountId(sessionUserId?: string): Promise<string | null> {
-  // 1. If user is authenticated, look up their account via membership
+  // 1. If user is authenticated, look up their owned wedding
   if (sessionUserId) {
-    const membership = await db.accountMember.findFirst({
-      where: { userId: sessionUserId },
-      select: { accountId: true },
+    const account = await db.weddingAccount.findFirst({
+      where: { ownerId: sessionUserId },
+      select: { id: true },
     });
-    if (membership) return membership.accountId;
+    if (account) return account.id;
   }
 
   // 2. Try the DEV_ACCOUNT_ID
   try {
-    const account = await db.account.findUnique({ where: { id: DEV_ACCOUNT_ID }, select: { id: true } });
+    const account = await db.weddingAccount.findUnique({ where: { id: DEV_ACCOUNT_ID }, select: { id: true } });
     if (account) return account.id;
-  } catch { /* table may not exist */ }
+  } catch { /* may not exist */ }
 
   // 3. Dev fallback: use the first account in the database
-  const firstAccount = await db.account.findFirst({
+  const firstAccount = await db.weddingAccount.findFirst({
     orderBy: { createdAt: 'asc' },
     select: { id: true },
   });
@@ -63,9 +60,6 @@ export interface ResolvedAccount {
  */
 export async function resolveWeddingId(request: Request): Promise<string | null> {
   // 1. Check NextAuth session (for CMS admin requests)
-  //    In a real implementation this would call `getServerSession(authOptions)`
-  //    and read `session.weddingId`. For now we read the header that the
-  //    auth layer is expected to forward.
   const sessionHeader = request.headers.get('x-session-wedding-id');
   if (sessionHeader) return sessionHeader;
 
@@ -89,14 +83,10 @@ export async function resolveWeddingId(request: Request): Promise<string | null>
  * can be resolved. Use in API routes that require authentication.
  */
 export async function requireWeddingId(request: Request): Promise<string> {
-  // Try the standard resolution chain first
   const weddingId = await resolveWeddingId(request);
 
   if (weddingId) return weddingId;
 
-  // Dev fallback — in development we return the dev account ID so that
-  // local development is frictionless. In production this would return null
-  // and we'd throw below.
   if (process.env.NODE_ENV === 'development') {
     return DEV_ACCOUNT_ID;
   }
@@ -109,19 +99,18 @@ export async function requireWeddingId(request: Request): Promise<string> {
 // ─── Account Lookup ──────────────────────────────────────────────────────────
 
 /**
- * Look up an Account by its public slug.
- * Returns null if not found or if the account is not in a viewable state.
+ * Look up a WeddingAccount by its public slug.
  */
 export async function resolveAccountBySlug(
   slug: string
 ): Promise<ResolvedAccount | null> {
   try {
-    const account = await db.account.findUnique({
+    const account = await db.weddingAccount.findUnique({
       where: { slug },
       select: {
         id: true,
-        coupleName1: true,
-        coupleName2: true,
+        brideName: true,
+        groomName: true,
         status: true,
       },
     });
@@ -130,12 +119,11 @@ export async function resolveAccountBySlug(
 
     return {
       id: account.id,
-      coupleName1: account.coupleName1 ?? '',
-      coupleName2: account.coupleName2 ?? '',
+      coupleName1: account.brideName ?? '',
+      coupleName2: account.groomName ?? '',
       status: account.status,
     };
   } catch {
-    // If the Account model doesn't exist yet (early dev), return null
     return null;
   }
 }

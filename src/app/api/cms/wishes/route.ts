@@ -31,6 +31,7 @@ export async function GET(req: NextRequest) {
     const wishes = await db.wish.findMany({
       where,
       orderBy: { createdAt: 'desc' },
+      take: 100,
     });
 
     return NextResponse.json({ wishes, total: wishes.length });

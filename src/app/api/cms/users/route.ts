@@ -34,6 +34,7 @@ export async function GET(request: NextRequest) {
     const users = await db.user.findMany({
       where,
       orderBy: { createdAt: 'desc' },
+      take: 100,
       include: {
         tenantUsers: {
           include: {

@@ -1,21 +1,14 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import SectionBanner from '../SectionBanner';
 import { usePublicWedding } from '@/hooks/usePublicWedding';
-import { io as socketIO, Socket } from 'socket.io-client';
-
-interface LocalWish {
-  id: string;
-  name: string;
-  relationship: string | null;
-  message: string;
-  imageUrl: string | null;
-  createdAt: string;
-}
+import { useLiveWeddingData, type LiveWish } from '@/hooks/useLiveWeddingData';
 
 export default function WishesPage() {
   const { data, getField } = usePublicWedding();
+  const weddingId = data?.wedding?.id;
+  const { liveWishes, addWish } = useLiveWeddingData({ weddingId });
 
   const sectionTitle = getField('wishes', 'title', 'Wishes & Blessings');
   const sectionSubtitle = getField('wishes', 'subtitle', 'A curated sanctuary of wisdom and love from those we cherish most.');
@@ -27,57 +20,11 @@ export default function WishesPage() {
   const formEyebrow = getField('wishes', 'formEyebrow', 'YOUR TURN');
   const formHeading = getField('wishes', 'formHeading', 'Contribute to the Heirloom');
 
-  const [localWishes, setLocalWishes] = useState<LocalWish[]>([]);
   const [name, setName] = useState('');
   const [relationship, setRelationship] = useState('');
   const [message, setMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-
-  const weddingId = data?.wedding?.id;
-  const socketRef = useRef<Socket | null>(null);
-
-  // Connect to real-time wish broadcast
-  useEffect(() => {
-    // Track IDs we already know about (from initial load + own submissions)
-    // to avoid duplicates from WebSocket
-    const socket = socketIO('/?XTransformPort=3004', {
-      transports: ['websocket', 'polling'],
-      reconnectionAttempts: 5,
-      reconnectionDelay: 2000,
-    });
-    socketRef.current = socket;
-
-    socket.on('connect', () => {
-      if (weddingId) {
-        socket.emit('join_wedding', weddingId);
-      }
-    });
-
-    socket.on('new_wish', (wish: LocalWish) => {
-      setLocalWishes((prev) => {
-        // Avoid duplicates
-        if (prev.some((w) => w.id === wish.id)) return prev;
-        return [wish, ...prev];
-      });
-    });
-
-    // Join wedding room when weddingId becomes available
-    if (weddingId && socket.connected) {
-      socket.emit('join_wedding', weddingId);
-    }
-
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
-
-  // Re-join room when weddingId loads
-  useEffect(() => {
-    if (weddingId && socketRef.current?.connected) {
-      socketRef.current.emit('join_wedding', weddingId);
-    }
-  }, [weddingId]);
 
   // Build the CMS wish cards from data.wishes
   const cmsWishCards = (data?.wishes ?? []).map((w, i) => ({
@@ -91,12 +38,12 @@ export default function WishesPage() {
   // Combine: CMS wishes + optimistic local wishes + hardcoded fallback
   const allCards: typeof cmsWishCards = [
     ...cmsWishCards,
-    ...localWishes.map((w, i) => ({
+    ...liveWishes.map((w: LiveWish, i) => ({
       type: w.imageUrl ? 'image' as const : (i % 2 === 0 ? 'text-card' as const : 'dark-card' as const),
       img: w.imageUrl ?? undefined,
       role: w.relationship ?? undefined,
-      quote: w.message,
-      author: w.name,
+      quote: w.message ?? '',
+      author: w.name ?? '',
     })),
     // No hardcoded fallback wishes
   ];
@@ -126,10 +73,7 @@ export default function WishesPage() {
       // Optimistically add the new wish to the top of the displayed list
       // (WebSocket will also broadcast, but dedup prevents double-display)
       if (result?.wish) {
-        setLocalWishes((prev) => {
-          if (prev.some((w) => w.id === result.wish.id)) return prev;
-          return [result.wish as LocalWish, ...prev];
-        });
+        addWish(result.wish as LiveWish);
       }
     } catch {
       setSubmitting(false);

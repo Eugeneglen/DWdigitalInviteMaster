@@ -160,13 +160,18 @@ export default function StoryPage() {
             {stories.map((story, idx) => {
               const isReversed = idx % 2 === 1;
               const dateLabel = formatStoryDate(story.date);
+              const hasImage = !!story.imageUrl;
               return (
                 <div key={story.id} className={`flex flex-col ${isReversed ? 'md:flex-row-reverse' : 'md:flex-row'} items-center justify-between w-full relative`}>
                   <div
                     className="absolute left-4 md:left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-cinematic-gold z-10"
                     style={{ boxShadow: '0 0 10px rgba(212,175,55,0.5)' }}
                   />
-                  <div className={`w-full pl-12 md:pl-0 md:w-5/12 text-left ${isReversed ? 'pl-0 md:pl-12' : 'md:text-right pr-0 md:pr-12'} mb-8 md:mb-0`}>
+                  <div className={[
+                    'w-full pl-12 md:pl-0 text-left',
+                    hasImage ? 'md:w-5/12' : 'md:w-8/12 md:px-16',
+                    isReversed ? (hasImage ? 'pl-0 md:pl-12' : 'pl-0 md:pl-16') : (hasImage ? 'md:text-right pr-0 md:pr-12' : 'md:text-center'),
+                  ].join(' ')}>
                     {dateLabel && (
                       <span
                         className="text-cinematic-gold block mb-2 uppercase tracking-[0.2em]"
@@ -182,13 +187,13 @@ export default function StoryPage() {
                       {story.content}
                     </p>
                   </div>
-                  <div className={`w-full pl-12 md:pl-0 md:w-5/12 flex ${isReversed ? 'justify-end' : 'justify-start'}`}>
-                    {story.imageUrl && (
+                  {hasImage && (
+                    <div className={`w-full pl-12 md:pl-0 md:w-5/12 flex ${isReversed ? 'justify-end' : 'justify-start'}`}>
                       <div className={`w-full inner-frame bg-surface-container overflow-hidden ${isReversed ? 'max-w-[350px] aspect-[3/4]' : 'max-w-[400px] aspect-square'}`}>
                         <img alt={story.title} className="w-full h-full object-cover" src={story.imageUrl} />
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
               );
             })}

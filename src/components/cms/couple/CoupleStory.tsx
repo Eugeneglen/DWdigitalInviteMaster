@@ -699,7 +699,7 @@ export default function CoupleStory() {
               </div>
 
               {/* Card */}
-              <Card className="flex-1 border-charcoal-ink/5 shadow-none hover:border-champagne-silk transition-colors duration-200">
+              <Card className="flex-1 border-charcoal-ink/5 shadow-none hover:border-champagne-silk transition-colors duration-200 overflow-hidden">
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">
@@ -719,10 +719,24 @@ export default function CoupleStory() {
                         </span>
                       )}
 
+                      {/* Thumbnail preview */}
                       {item.imageUrl && (
-                        <div className="flex items-center gap-1.5 text-xs text-charcoal-ink/40 mb-2">
-                          <svg className="size-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
-                          <span className="truncate max-w-[200px]">Photo attached</span>
+                        <div
+                          className="relative w-full max-w-[180px] aspect-[3/2] rounded-md overflow-hidden border border-charcoal-ink/8 mb-2 cursor-pointer group/thumb"
+                          onClick={() => openEditDialog(item)}
+                        >
+                          <img
+                            src={item.imageUrl}
+                            alt={item.title}
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover/thumb:scale-105"
+                            unoptimized
+                          />
+                          <div className="absolute inset-0 bg-black/0 group-hover/thumb:bg-black/10 transition-colors duration-200" />
+                          <div className="absolute bottom-1 right-1 opacity-0 group-hover/thumb:opacity-100 transition-opacity duration-200">
+                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-black/50 text-white text-[9px] font-medium backdrop-blur-sm">
+                              <Pencil className="size-2.5" /> Edit
+                            </span>
+                          </div>
                         </div>
                       )}
 

@@ -22,56 +22,59 @@ export default function MusicPlayer() {
   const [autoplayBlocked, setAutoplayBlocked] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const animFrameRef = useRef<number>(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Read config from wedding data
+  // Read config from wedding data — destructure to stable primitives to avoid
+  // effect re-triggering on every render due to new object references
   const musicEnabled = data?.featureFlags?.['music'] ?? false;
-  const config: MusicConfig = (data?.featureConfigs?.['music'] as MusicConfig) ?? {};
+  const rawConfig = data?.featureConfigs?.['music'] as MusicConfig | undefined;
+  const musicUrl = rawConfig?.url ?? '';
+  const musicLoop = rawConfig?.loop !== false;
+  const musicAutoplay = rawConfig?.autoplay !== false;
 
   // Initialize audio element
   useEffect(() => {
-    if (musicEnabled && config.url) {
-      const audio = new Audio(config.url);
-      audio.loop = config.loop !== false;
-      audio.preload = 'metadata';
-      audio.volume = 0.7;
+    if (!musicEnabled || !musicUrl) return;
 
-      audio.addEventListener('loadedmetadata', () => {
-        setDuration(audio.duration);
-      });
+    const audio = new Audio(musicUrl);
+    audio.loop = musicLoop;
+    audio.preload = 'metadata';
+    audio.volume = 0.7;
 
-      audio.addEventListener('timeupdate', () => {
-        if (audio.duration) {
-          setProgress(audio.currentTime / audio.duration);
-        }
-      });
-
-      audio.addEventListener('ended', () => {
-        if (!audio.loop) {
-          setPlaying(false);
-        }
-      });
-
-      audioRef.current = audio;
-
-      // Attempt autoplay
-      if (config.autoplay !== false) {
-        audio.play().then(() => {
-          setPlaying(true);
-        }).catch(() => {
-          // Browser blocked autoplay
-          setAutoplayBlocked(true);
-        });
+    const onLoadedMeta = () => setDuration(audio.duration);
+    const onTimeUpdate = () => {
+      if (audio.duration) {
+        setProgress(audio.currentTime / audio.duration);
       }
+    };
+    const onEnded = () => {
+      if (!audio.loop) setPlaying(false);
+    };
 
-      return () => {
-        audio.pause();
-        audio.src = '';
-        audioRef.current = null;
-      };
+    audio.addEventListener('loadedmetadata', onLoadedMeta);
+    audio.addEventListener('timeupdate', onTimeUpdate);
+    audio.addEventListener('ended', onEnded);
+
+    audioRef.current = audio;
+
+    // Attempt autoplay
+    if (musicAutoplay) {
+      audio.play().then(() => {
+        setPlaying(true);
+      }).catch(() => {
+        setAutoplayBlocked(true);
+      });
     }
-  }, [musicEnabled, config.url, config.loop, config.autoplay]);
+
+    return () => {
+      audio.pause();
+      audio.removeEventListener('loadedmetadata', onLoadedMeta);
+      audio.removeEventListener('timeupdate', onTimeUpdate);
+      audio.removeEventListener('ended', onEnded);
+      audio.src = '';
+      audioRef.current = null;
+    };
+  }, [musicEnabled, musicUrl, musicLoop, musicAutoplay]);
 
   // Update volume when muted changes
   useEffect(() => {
@@ -99,19 +102,10 @@ export default function MusicPlayer() {
     setMuted((prev) => !prev);
   }, []);
 
-  // Progress bar animation frame
-  useEffect(() => {
-    const update = () => {
-      if (audioRef.current && playing) {
-        if (audioRef.current.duration) {
-          setProgress(audioRef.current.currentTime / audioRef.current.duration);
-        }
-      }
-      animFrameRef.current = requestAnimationFrame(update);
-    };
-    animFrameRef.current = requestAnimationFrame(update);
-    return () => cancelAnimationFrame(animFrameRef.current);
-  }, [playing]);
+  // rAF removed — timeupdate event (above) already updates progress.
+  // The previous rAF loop ran at 60fps even when paused, causing ~64 setState/sec
+  // when combined with the timeupdate listener. The timeupdate event alone is
+  // sufficient for smooth progress bar updates.
 
   // Close on click outside
   useEffect(() => {
@@ -125,10 +119,10 @@ export default function MusicPlayer() {
     return () => document.removeEventListener('mousedown', handleClick);
   }, [expanded]);
 
-  if (!musicEnabled || !config.url) return null;
+  if (!musicEnabled || !musicUrl) return null;
 
-  const displayTitle = config.title || 'Background Music';
-  const displayArtist = config.artist || '';
+  const displayTitle = rawConfig?.title || 'Background Music';
+  const displayArtist = rawConfig?.artist || '';
 
   const progressPercent = duration > 0 ? (progress * 100) : 0;
 

@@ -55,14 +55,12 @@ export async function requireTenantAccess(
     return `Access denied. ${requiredRole} privileges required for this action.`;
   }
 
-  // Verify the user actually belongs to this tenant
-  const tenantUser = await db.tenantUser.findUnique({
-    where: {
-      userId_tenantId: { userId: user.userId, tenantId },
-    },
+  // Verify the user has access to this tenant's wedding
+  const wedding = await db.weddingAccount.findFirst({
+    where: { id: tenantId, ownerId: user.userId },
   });
 
-  if (!tenantUser) {
+  if (!wedding) {
     return 'Access denied. You do not have access to this tenant.';
   }
 
