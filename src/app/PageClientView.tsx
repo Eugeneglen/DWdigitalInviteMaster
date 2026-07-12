@@ -74,12 +74,31 @@ function PageContent() {
 /** Client-side entry point — wraps content in Suspense */
 export default function PageClientView() {
   const [mounted, setMounted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
 
-  return (
-    <Suspense fallback={<PageShellFallback />}>
-      <PageContent />
-    </Suspense>
-  );
+  try {
+    if (error) {
+      return (
+        <div style={{ padding: 24, color: 'red', whiteSpace: 'pre-wrap', fontFamily: 'monospace', fontSize: 14 }}>
+          <strong>CRASH:</strong> {error}
+        </div>
+      );
+    }
+
+    return (
+      <Suspense fallback={<PageShellFallback />}>
+        <PageContent />
+      </Suspense>
+    );
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error('CRASH:', e);
+    return (
+      <div style={{ padding: 24, color: 'red', whiteSpace: 'pre-wrap', fontFamily: 'monospace', fontSize: 14 }}>
+        <strong>CRASH:</strong> {msg}
+      </div>
+    );
+  }
 }
