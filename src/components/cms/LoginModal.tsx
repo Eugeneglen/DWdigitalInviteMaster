@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { signIn, signOut, useSession, update } from 'next-auth/react';
+import { signIn, signOut, useSession } from 'next-auth/react';
 import {
   Dialog,
   DialogContent,
@@ -66,10 +66,8 @@ export function LoginModal({ open, onOpenChange, variant = 'default', targetRole
         setError('Invalid email or password. Please try again.');
       } else {
         useAuthModalStore.getState().closeModal();
-        // Hard redirect — fetch fresh session to determine role,
-        // then use window.location.href to bypass any JSON/SSE
-        // parsing that next-auth update() streams can trigger.
-        await update({ callbackUrl: '/' });
+        // Fetch fresh session to determine role, then hard redirect.
+        // No update() call — it can race with window.location.href.
         const fresh = await fetch('/api/auth/session').then((r) => r.json());
         const role = (fresh as Record<string, unknown> & { user?: { role?: string } })?.user?.role;
         if (role === 'SUPER_ADMIN' || role === 'ACCOUNT_MANAGER') {

@@ -1,8 +1,9 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { signOut } from 'next-auth/react';
+import { useSession, signOut, SessionProvider } from 'next-auth/react';
 import { Separator } from '@/components/ui/separator';
 import {
   LayoutDashboard,
@@ -22,16 +23,34 @@ const navItems = [
   { label: 'Audit Logs', href: '/admin/audit-logs', icon: ScrollText },
 ];
 
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+function AdminLayoutInner({ children }: { children: React.ReactNode }) {
+  const { data: session, status } = useSession();
   const pathname = usePathname();
 
-  // Don't show the sidebar on the login page
-  if (pathname === '/admin/login') {
-    return <>{children}</>;
+  // Redirect to CMS login modal if unauthenticated
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      window.location.href = '/?view=cms';
+    }
+  }, [status]);
+
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen bg-paper-cream flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-cinematic-gold/15 flex items-center justify-center">
+            <Sparkles className="w-4 h-4 text-cinematic-gold animate-pulse" />
+          </div>
+          <span className="text-sm text-charcoal-ink/40 font-[family-name:var(--font-inter)]">
+            Loading admin...
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!session) {
+    return null;
   }
 
   return (
@@ -95,7 +114,7 @@ export default function AdminLayout({
         {/* Logout */}
         <div className="px-3 py-4">
           <button
-            onClick={() => signOut({ callbackUrl: '/admin/login' })}
+            onClick={() => signOut({ callbackUrl: '/?view=cms' })}
             className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm w-full
               text-charcoal-ink/50 hover:text-red-600 hover:bg-red-50
               transition-all duration-200 font-[family-name:var(--font-inter)] cursor-pointer"
@@ -111,5 +130,17 @@ export default function AdminLayout({
         <div className="p-6 lg:p-8 max-w-7xl">{children}</div>
       </main>
     </div>
+  );
+}
+
+export default function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <SessionProvider>
+      <AdminLayoutInner>{children}</AdminLayoutInner>
+    </SessionProvider>
   );
 }
