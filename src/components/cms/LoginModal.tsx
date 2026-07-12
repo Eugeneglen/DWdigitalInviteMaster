@@ -65,18 +65,12 @@ export function LoginModal({ open, onOpenChange, variant = 'default', targetRole
       if (result?.error) {
         setError('Invalid email or password. Please try again.');
       } else {
+        // Just close the modal. The parent component (CoupleCMSView / AdminCMSView)
+        // will detect the session change via useSession() and render the CMS.
+        // We do NOT navigate away — this preserves the ?view= parameter.
         useAuthModalStore.getState().closeModal();
-        // Fetch fresh session to determine role, then hard redirect.
-        // No update() call — it can race with window.location.href.
-        const fresh = await fetch('/api/auth/session').then((r) => r.json());
-        const role = (fresh as Record<string, unknown> & { user?: { role?: string } })?.user?.role;
-        if (role === 'SUPER_ADMIN' || role === 'ACCOUNT_MANAGER') {
-          window.location.href = '/admin';
-        } else if (role === 'COUPLE') {
-          window.location.href = '/workspace';
-        } else {
-          window.location.href = '/';
-        }
+        setEmail('');
+        setPassword('');
       }
     } catch {
       setError('An unexpected error occurred. Please try again.');
@@ -250,8 +244,8 @@ export function LoginModal({ open, onOpenChange, variant = 'default', targetRole
         onInteractOutside={(e) => e.preventDefault()}
         onPointerDownOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => {
+          e.preventDefault();
           if (isRecoveryView) {
-            e.preventDefault();
             switchView('login');
           }
         }}

@@ -223,7 +223,7 @@ export default function CoupleCMSLayout({ children }: { children: React.ReactNod
           </Button>
           <Button
             variant="ghost"
-            onClick={() => signOut({ callbackUrl: '/' })}
+            onClick={() => signOut({ callbackUrl: '/?view=couple' })}
             className="w-full justify-start gap-2 text-charcoal-ink/30 hover:text-charcoal-ink hover:bg-champagne-silk/40 px-3 text-xs font-medium"
           >
             <LogOut className="size-3.5" />
@@ -272,7 +272,7 @@ export default function CoupleCMSLayout({ children }: { children: React.ReactNod
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => signOut({ callbackUrl: '/' })}
+              onClick={() => signOut({ callbackUrl: '/?view=couple' })}
               className="hidden sm:flex items-center gap-2 text-charcoal-ink/60 hover:text-charcoal-ink px-2 h-auto py-1.5 text-sm font-medium"
             >
               <LogOut className="size-3.5" />

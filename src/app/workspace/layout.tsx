@@ -132,12 +132,12 @@ function WorkspaceLayoutInner({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [accountName, setAccountName] = useState('');
 
-  // Redirect to couple login modal if unauthenticated
+  // Redirect to login if unauthenticated
   useEffect(() => {
     if (status === 'unauthenticated') {
       window.location.href = '/?view=couple';
     }
-  }, [status]);
+  }, [status, router]);
 
   // Fetch account name for the sidebar — all hooks before early returns
   useEffect(() => {
@@ -154,6 +154,11 @@ function WorkspaceLayoutInner({ children }: { children: React.ReactNode }) {
         // silently fail — will show empty account name
       });
   }, [session?.user?.id]);
+
+  // Skip layout on login page
+  if (pathname === '/workspace/login') {
+    return <>{children}</>;
+  }
 
   if (status === 'loading') {
     return (

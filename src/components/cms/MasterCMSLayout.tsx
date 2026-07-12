@@ -258,7 +258,7 @@ function CMSHeader() {
               Switch Account
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => signOut({ callbackUrl: '/' })}
+              onClick={() => signOut({ callbackUrl: '/?view=cms' })}
               className="text-red-600 cursor-pointer"
             >
               <LogOut className="mr-2 size-4" />
