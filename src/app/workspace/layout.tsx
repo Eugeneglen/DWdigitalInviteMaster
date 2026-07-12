@@ -96,7 +96,7 @@ function WorkspaceSidebar({ accountName }: { accountName: string }) {
       {/* Logout */}
       <div className="px-3 py-4">
         <button
-          onClick={() => signOut({ callbackUrl: '/workspace/login' })}
+          onClick={() => signOut({ callbackUrl: '/?view=couple' })}
           className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm w-full
             text-charcoal-ink/50 hover:text-red-600 hover:bg-red-50
             transition-all duration-200 font-[family-name:var(--font-inter)] cursor-pointer"
@@ -132,12 +132,12 @@ function WorkspaceLayoutInner({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [accountName, setAccountName] = useState('');
 
-  // Redirect to login if unauthenticated
+  // Redirect to couple login modal if unauthenticated
   useEffect(() => {
     if (status === 'unauthenticated') {
-      router.replace('/workspace/login');
+      window.location.href = '/?view=couple';
     }
-  }, [status, router]);
+  }, [status]);
 
   // Fetch account name for the sidebar — all hooks before early returns
   useEffect(() => {
@@ -154,11 +154,6 @@ function WorkspaceLayoutInner({ children }: { children: React.ReactNode }) {
         // silently fail — will show empty account name
       });
   }, [session?.user?.id]);
-
-  // Skip layout on login page
-  if (pathname === '/workspace/login') {
-    return <>{children}</>;
-  }
 
   if (status === 'loading') {
     return (
