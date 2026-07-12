@@ -1,32 +1,58 @@
 'use client';
-import { useEffect } from 'react';
-import { useSession } from 'next-auth/react';
+
+import { useCallback, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { useAuthModalStore } from '@/store/useAuthModalStore';
 
+const GuestSite = dynamic(() => import('@/components/wedding/GuestSite'), {
+  ssr: false,
+  loading: () => <div className="loading-state">Loading...</div>,
+});
+
+const LoginModal = dynamic(
+  () => import('@/components/cms/LoginModal').then((m) => ({ default: m.LoginModal })),
+  { ssr: false },
+);
+
 export function PageContent() {
+  const params = useSearchParams();
   const { status } = useSession();
-  const searchParams = useSearchParams();
-  const view = searchParams.get('view');
+  const router = useRouter();
+  const view = params.get('view');
+  const { open: modalOpen, closeModal } = useAuthModalStore();
 
   useEffect(() => {
-    // 1. Wait until session status is determined
-    if (status === 'loading') return;
-
-    // 2. Only open the modal if the user is not logged in
-    // This stays on the current page instead of redirecting
-    if (status === 'unauthenticated') {
-      if (view === 'cms') {
-        useAuthModalStore.getState().openModal('cms');
-      } else if (view === 'couple') {
-        useAuthModalStore.getState().openModal('default');
-      }
+    if (status === 'unauthenticated' && (view === 'cms' || view === 'couple')) {
+      useAuthModalStore.getState().openModal(view === 'cms' ? 'cms' : 'default');
     }
-  }, [status, view]);
+    if (status === 'authenticated' && view === 'cms') router.replace('/admin');
+    if (status === 'authenticated' && view === 'couple') router.replace('/workspace');
+  }, [status, view, router]);
 
-  if (status === 'loading') {
-    return <div>Loading...</div>;
-  }
+  const handleModalClose = useCallback(
+    (open: boolean) => {
+      if (!open) {
+        closeModal();
+        router.replace('/');
+      }
+    },
+    [closeModal, router],
+  );
 
-  return null;
+  if (status === 'loading') return <div className="loading-state">Loading...</div>;
+
+  return (
+    <>
+      <GuestSite />
+      <LoginModal
+        open={modalOpen}
+        onOpenChange={handleModalClose}
+        variant={view === 'couple' ? 'default' : 'cms'}
+        targetRole={view === 'couple' ? 'couple' : 'admin'}
+      />
+    </>
+  );
 }
