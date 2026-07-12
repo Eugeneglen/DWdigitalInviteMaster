@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useCallback, useEffect } from 'react';
+import { Suspense, useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
@@ -73,6 +73,10 @@ function PageContent() {
 
 /** Client-side entry point — wraps content in Suspense */
 export default function PageClientView() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
+
   return (
     <Suspense fallback={<PageShellFallback />}>
       <PageContent />
