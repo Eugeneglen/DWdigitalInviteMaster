@@ -5,7 +5,6 @@ import { Loader2, Trash2, ImagePlus, Eye, X } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
   Dialog,
   DialogContent,
@@ -23,7 +22,6 @@ interface MediaItem {
   fileType: string;
   fileSize: number | null;
   category: string;
-  caption: string | null;
   sortOrder: number;
 }
 
@@ -167,28 +165,6 @@ export default function MirrorImageGallery({
     }
   };
 
-  // Save a caption for an image (debounced via blur — fires when the user
-  // clicks away from the caption input).
-  const [captionSavingId, setCaptionSavingId] = useState<string | null>(null);
-  const handleCaptionSave = async (id: string, caption: string) => {
-    try {
-      setCaptionSavingId(id);
-      const res = await fetch(MEDIA_API, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, caption }),
-      });
-      if (!res.ok) throw new Error('Failed to save caption');
-      invalidateWeddingCache();
-      // Update local state without a full refetch (avoids input losing focus)
-      setImages((prev) => prev.map((m) => (m.id === id ? { ...m, caption } : m)));
-    } catch {
-      toast({ title: 'Error', description: 'Failed to save caption', variant: 'destructive' });
-    } finally {
-      setCaptionSavingId(null);
-    }
-  };
-
   const canAddMore = images.length < maxImages;
 
   if (loading) {
@@ -270,18 +246,6 @@ export default function MirrorImageGallery({
               <p className="text-[11px] font-medium text-charcoal-ink/60 truncate" title={item.fileName}>
                 {item.fileName}
               </p>
-              <Input
-                type="text"
-                defaultValue={item.caption ?? ''}
-                placeholder="Add a caption…"
-                onBlur={(e) => {
-                  if (e.target.value !== (item.caption ?? '')) {
-                    handleCaptionSave(item.id, e.target.value);
-                  }
-                }}
-                disabled={captionSavingId === item.id}
-                className="h-7 text-[11px] border-charcoal-ink/10 focus:border-cinematic-gold focus:ring-cinematic-gold/20"
-              />
             </div>
           </Card>
         ))}

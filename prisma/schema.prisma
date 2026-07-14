@@ -121,7 +121,6 @@ model WeddingMedia {
   fileType     String          @default("IMAGE") // IMAGE | VIDEO
   fileSize     Int?
   category     String          @default("gallery") // hero | banner | gallery | story | couple-photo
-  caption      String?
   sortOrder    Int             @default(0)
   createdAt    DateTime        @default(now())
 }

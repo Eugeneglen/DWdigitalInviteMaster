@@ -44,14 +44,13 @@ export async function POST(req: NextRequest) {
     if (!weddingId) return NextResponse.json({ error: 'No wedding account' }, { status: 404 });
 
     const body = await req.json();
-    const { url, fileName, fileType, fileSize, category, thumbnailUrl, caption } = body as {
+    const { url, fileName, fileType, fileSize, category, thumbnailUrl } = body as {
       url: string;
       fileName: string;
       fileType?: string;
       fileSize?: number;
       category: string;
       thumbnailUrl?: string;
-      caption?: string;
     };
 
     if (!url || !fileName || !category) {
@@ -73,7 +72,6 @@ export async function POST(req: NextRequest) {
         fileSize: fileSize || null,
         category,
         thumbnailUrl: thumbnailUrl || null,
-        caption: caption || null,
         sortOrder: (maxSort?.sortOrder ?? -1) + 1,
       },
     });
@@ -105,12 +103,12 @@ export async function PUT(req: NextRequest) {
     if (!weddingId) return NextResponse.json({ error: 'No wedding account' }, { status: 404 });
 
     const body = await req.json();
-    const { id, category, sortOrder, fileName, caption, setAs } = body as {
+    const { id, category, sortOrder, fileName , setAs } = body as {
       id: string;
       category?: string;
       sortOrder?: number;
       fileName?: string;
-      caption?: string;
+      
       setAs?: 'hero' | 'banner';
     };
 
@@ -130,7 +128,6 @@ export async function PUT(req: NextRequest) {
     if (category !== undefined) updateData.category = category;
     if (sortOrder !== undefined) updateData.sortOrder = sortOrder;
     if (fileName !== undefined) updateData.fileName = fileName;
-    if (caption !== undefined) updateData.caption = caption;
 
     const updated = await db.weddingMedia.update({
       where: { id },
