@@ -58,7 +58,10 @@ export async function POST(request: Request) {
 
     response.cookies.set('next-auth.session-token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      // Railway's proxy terminates TLS, so the app sees HTTP internally.
+      // A 'Secure' cookie wouldn't be sent back over the internal HTTP
+      // connection, causing auth failures. Set to false for Railway compat.
+      secure: false,
       sameSite: 'lax',
       path: '/',
       maxAge: 24 * 60 * 60,

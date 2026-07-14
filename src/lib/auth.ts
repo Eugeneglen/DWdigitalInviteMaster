@@ -148,6 +148,20 @@ export const authOptions: NextAuthOptions = {
     strategy: 'jwt',
     maxAge: 24 * 60 * 60,
   },
+  // Railway's proxy terminates TLS, so the app sees HTTP internally.
+  // NextAuth sets 'Secure' cookies by default in production, which won't
+  // be sent back over the internal HTTP connection. Override to non-secure.
+  cookies: {
+    sessionToken: {
+      name: 'next-auth.session-token',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: false,
+      },
+    },
+  },
   pages: {
     signIn: '/',
   },
