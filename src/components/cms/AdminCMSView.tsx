@@ -122,7 +122,7 @@ function AdminLoginScreen({ onSignInClick }: { onSignInClick: () => void }) {
 // ── Main View Component ─────────────────────────────────────────────────────
 
 export default function AdminCMSView() {
-  const { status } = useSession();
+  const { data: session, status } = useSession();
   const { open: modalOpen, closeModal, openModal } = useAuthModalStore();
   const [cmsReady, setCmsReady] = useState(false);
   const cmsReadyTimerRef = useRef<ReturnType<typeof setTimeout>>();
