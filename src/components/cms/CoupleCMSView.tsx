@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 import { Sparkles, Heart, Calendar, BookOpen, HelpCircle, ToggleLeft, Users, Mail, MessageSquareHeart, ScrollText, QrCode, BarChart3, MapPin, Camera, FileText, LayoutDashboard, LogOut, Loader2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { useAuthModalStore } from '@/store/useAuthModalStore';
+import { useCoupleCMSStore } from '@/store/useCoupleCMSStore';
 
 const LoginModal = dynamic(
   () => import('@/components/cms/LoginModal').then((m) => ({ default: m.LoginModal })),
@@ -20,6 +21,16 @@ const CoupleCMSLayout = dynamic(
 const CoupleCMSPageRouter = dynamic(
   () => import('@/components/cms/CoupleCMSPageRouter'),
   { ssr: false },
+);
+
+// GuestSite is rendered when the couple toggles "Preview" — lets them see
+// their actual wedding invitation (hero image, schedule, story, etc.) exactly
+// as a guest would, so they can confirm content before generating the RSVP
+// link/QR. The floating "Open Editor" button inside GuestSite calls
+// togglePreview(false) to return to the CMS.
+const GuestSite = dynamic(
+  () => import('@/components/wedding/GuestSite'),
+  { ssr: false, loading: () => <div className="loading-state">Loading preview…</div> },
 );
 
 // ── Unauthenticated branded login screen ────────────────────────────────────
@@ -123,6 +134,7 @@ function CoupleLoginScreen({ onSignInClick }: { onSignInClick: () => void }) {
 export default function CoupleCMSView() {
   const { status } = useSession();
   const { open: modalOpen, closeModal, openModal } = useAuthModalStore();
+  const { previewMode, weddingData } = useCoupleCMSStore();
   const [cmsReady, setCmsReady] = useState(false);
   const cmsReadyTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
@@ -166,8 +178,25 @@ export default function CoupleCMSView() {
     );
   }
 
-  // Authenticated → render the real CMS
+  // Authenticated → render the real CMS (or the guest-site preview when toggled)
   if (status === 'authenticated' && cmsReady) {
+    // Preview mode → show the couple's wedding invitation as guests see it.
+    // showEditorButton reveals the floating "Open Editor" button that exits preview.
+    if (previewMode) {
+      const slug = (weddingData as Record<string, unknown> | null)?.slug as string | undefined;
+      return (
+        <>
+          <GuestSite slug={slug} showEditorButton />
+          <LoginModal
+            open={modalOpen}
+            onOpenChange={handleModalClose}
+            variant="default"
+            targetRole="couple"
+          />
+        </>
+      );
+    }
+
     return (
       <>
         <CoupleCMSLayout>

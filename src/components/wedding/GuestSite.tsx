@@ -121,22 +121,29 @@ export default function GuestSite({ slug, topOffset, showEditorButton = false }:
   const { navTabs, headerBgColor: platformHeaderBg, loaded: settingsLoaded } = useSiteSettings();
   const { setAvailableTabs } = useNavigationStore();
 
-  // Read the custom background colour (default: DW paper-cream)
+  // Read the couple's custom background colour (default: DW paper-cream).
+  // This ONLY affects the page body (content area). It does NOT affect the
+  // header, footer, mobile drawer, or bottom nav — those are platform-wide
+  // chrome controlled by the Master CMS (/?view=cms → Settings), defaulting
+  // to DW paper-cream (#FCF9F2) when the Master CMS hasn't set a value.
   const backgroundColor = getField('global', 'backgroundColor', '#FCF9F2');
 
-  // Header background — per-wedding > platform-wide (Master Admin) > page bg
-  const headerBgRaw = getField('global', 'headerBackgroundColor', '') || platformHeaderBg;
-  const headerBg = headerBgRaw || backgroundColor;
+  // Header & footer use the platform-wide colour from the Master CMS
+  // (site_header_bg_color). Falls back to DW paper-cream when not set.
+  // The couple's backgroundColor is intentionally NOT used here.
+  const headerBg = platformHeaderBg || '#FCF9F2';
+  const footerBg = platformHeaderBg || '#FCF9F2';
 
-  // Text & border colours — auto-detect from page bg unless manually overridden
+  // Text & border colours for the BODY — auto-detect from page bg unless
+  // manually overridden. These do NOT apply to the header/footer.
   const textColorOverride = getField('global', 'textColor', '');
   const borderColorOverride = getField('global', 'borderColor', '');
   const textColor = textColorOverride || getAutoTextColor(backgroundColor);
   const borderColor = borderColorOverride || getAutoBorderColor(backgroundColor);
 
-  // Header text — may differ if header bg contrasts differently from page bg
-  const headerTextOverride = getField('global', 'headerTextColor', '');
-  const headerTextColor = headerTextOverride || (headerBgRaw ? getAutoTextColor(headerBg) : textColor);
+  // Header text auto-contrasts with the header bg (from Master CMS), so it
+  // stays readable whether the Master CMS sets a light or dark header colour.
+  const headerTextColor = getAutoTextColor(headerBg);
 
   // Compute filtered tabs from global config + wedding feature flags
   // and push into the navigation store for Header/MobileDrawer/BottomNav
@@ -174,6 +181,8 @@ export default function GuestSite({ slug, topOffset, showEditorButton = false }:
         color: textColor,
         '--wedding-bg': backgroundColor,
         '--wedding-header-bg': headerBg,
+        '--wedding-footer-bg': footerBg,
+        '--wedding-chrome-text': headerTextColor,
         '--color-charcoal-ink': textColor,
         '--color-champagne-silk': borderColor,
       } as React.CSSProperties}

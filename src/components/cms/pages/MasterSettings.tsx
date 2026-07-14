@@ -417,8 +417,8 @@ export default function MasterSettings() {
             <CardContent className="space-y-5">
               {/* Header Background Colour */}
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-slate-700">Header Background Colour</Label>
-                <p className="text-xs text-slate-400">Sets the header bar background for ALL wedding sites. Leave empty to use each wedding's page background.</p>
+                <Label className="text-sm font-medium text-slate-700">Header &amp; Footer Background Colour</Label>
+                <p className="text-xs text-slate-400">Sets the header AND footer bar background for ALL wedding sites. Leave empty to use the default DW paper-cream (#FCF9F2). This is independent of each couple's page background colour.</p>
                 <div className="flex items-center gap-3 mt-1">
                   <div
                     className="relative h-10 w-20 rounded-lg border border-slate-200 overflow-hidden cursor-pointer transition-colors"

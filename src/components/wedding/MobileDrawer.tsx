@@ -34,7 +34,8 @@ export default function MobileDrawer() {
           drawerOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
         onClick={(e) => e.stopPropagation()}
-        style={{ backgroundColor: 'var(--wedding-bg, #FCF9F2)' }}
+        data-wedding-chrome=""
+        style={{ backgroundColor: 'var(--wedding-header-bg, #FCF9F2)', color: 'var(--wedding-chrome-text, #1A1A1A)' }}
       >
         {/* Top: Logo + Close */}
         <div className="flex justify-between items-center mb-8 border-b border-champagne-silk/30 pb-4">

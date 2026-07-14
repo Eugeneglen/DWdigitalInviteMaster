@@ -178,6 +178,21 @@ export function generateThemeOverrideStyle(
     for (const a of [3, 5, 10, 20, 30, 60, 90]) {
       rule(`.bg-charcoal-ink\\/${a}`, 'background-color', hr, hg, hb, a / 100, HSCOPE, true);
     }
+
+    // ── Chrome-specific overrides (footer, mobile drawer, bottom nav) ──
+    // These elements share the header's bg/text colour (the "platform chrome")
+    // and must NOT inherit the body text colour. They carry data-wedding-chrome.
+    // Use descendant selectors (no `self`) since the chrome text colour applies
+    // to inner links/labels, not the element carrying the attribute itself.
+    const CSCOPE = '[data-wedding-chrome]';
+    rule('.text-charcoal-ink', 'color', hr, hg, hb, undefined, CSCOPE);
+    for (const a of [20, 25, 30, 35, 40, 50, 60, 70, 75, 80]) {
+      rule(`.text-charcoal-ink\\/${a}`, 'color', hr, hg, hb, a / 100, CSCOPE);
+    }
+    rule('.border-champagne-silk', 'border-color', hbr, hbg, hbb, undefined, CSCOPE);
+    for (const a of [10, 20, 30, 40, 50, 60]) {
+      rule(`.border-champagne-silk\\/${a}`, 'border-color', hbr, hbg, hbb, a / 100, CSCOPE);
+    }
   }
 
   return lines.join('\n');
