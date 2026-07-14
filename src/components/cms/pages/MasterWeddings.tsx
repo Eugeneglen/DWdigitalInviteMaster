@@ -12,6 +12,8 @@ import {
   Archive,
   Heart,
   Loader2,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -67,6 +69,12 @@ interface Wedding {
   venueAddress: string | null;
   status: string;
   plan: string;
+  jobNumber: string | null;
+  coupleEmail: string | null;
+  couplePhone: string | null;
+  consultantId: string | null;
+  coordinatorId: string | null;
+  accountStatus: string;
   features?: { featureKey: string; isEnabled: boolean }[];
   _count?: {
     rsvps?: number;
@@ -190,6 +198,16 @@ export default function MasterWeddings() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
 
+  // Filter state
+  const [statusFilter, setStatusFilter] = useState<string>('');
+  const [planFilter, setPlanFilter] = useState<string>('');
+
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const limit = 20;
+  const totalPages = Math.ceil(total / limit);
+
   // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
   const [wizardOpen, setWizardOpen] = useState(false);
@@ -204,27 +222,32 @@ export default function MasterWeddings() {
       setLoading(true);
       const params = new URLSearchParams();
       if (search) params.set('search', search);
+      if (statusFilter) params.set('status', statusFilter);
+      if (planFilter) params.set('plan', planFilter);
+      params.set('page', String(page));
+      params.set('limit', String(limit));
       const res = await fetch(
         `/api/master/weddings?${params.toString()}&XTransformPort=3000`
       );
       if (!res.ok) throw new Error(`Failed to fetch weddings (${res.status})`);
       const json = await res.json();
       setWeddings(Array.isArray(json) ? json : json.weddings ?? []);
+      setTotal(json.total ?? weddings.length);
     } catch {
       setWeddings([]);
     } finally {
       setLoading(false);
     }
-  }, [search]);
+  }, [search, statusFilter, planFilter, page]);
 
-  // ── Search debounce ────────────────────────────────────────────────────
-  // Single debounced fetch — fires on mount AND when search changes (after 300ms)
+  // ── Search/filter debounce ─────────────────────────────────────────────
   useEffect(() => {
+    setPage(1); // reset to page 1 when filters change
     const timer = setTimeout(() => {
       fetchWeddings();
     }, 300);
     return () => clearTimeout(timer);
-  }, [search, fetchWeddings]);
+  }, [search, statusFilter, planFilter, fetchWeddings]);
 
   // ── Dialog handlers ────────────────────────────────────────────────────
 
@@ -360,33 +383,46 @@ export default function MasterWeddings() {
     }
   }
 
-  // ── Filtered list ──────────────────────────────────────────────────────
-
-  const query = search.toLowerCase();
-  const filtered = query
-    ? weddings.filter(
-        (w) =>
-          w.coupleName.toLowerCase().includes(query) ||
-          (w.brideName ?? '').toLowerCase().includes(query) ||
-          (w.groomName ?? '').toLowerCase().includes(query) ||
-          w.slug.toLowerCase().includes(query)
-      )
-    : weddings;
-
   // ── Render ─────────────────────────────────────────────────────────────
 
   return (
     <div className="space-y-4">
       {/* Header Row */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-          <Input
-            placeholder="Search by couple name, bride, groom, or slug..."
-            className="pl-9 border-slate-200 bg-white"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+        <div className="flex items-center gap-2 flex-1 flex-wrap">
+          <div className="relative flex-1 min-w-[200px] max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Input
+              placeholder="Search by couple name, bride, groom, or slug..."
+              className="pl-9 border-slate-200 bg-white"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          <Select value={statusFilter || 'all'} onValueChange={(v) => setStatusFilter(v === 'all' ? '' : v)}>
+            <SelectTrigger className="w-[140px] border-slate-200 bg-white">
+              <SelectValue placeholder="All Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="DRAFT">Draft</SelectItem>
+              <SelectItem value="ACTIVE">Active</SelectItem>
+              <SelectItem value="SUSPENDED">Suspended</SelectItem>
+              <SelectItem value="ARCHIVED">Archived</SelectItem>
+              <SelectItem value="COMPLETED">Completed</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={planFilter || 'all'} onValueChange={(v) => setPlanFilter(v === 'all' ? '' : v)}>
+            <SelectTrigger className="w-[130px] border-slate-200 bg-white">
+              <SelectValue placeholder="All Packages" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Packages</SelectItem>
+              <SelectItem value="GOLD">Gold</SelectItem>
+              <SelectItem value="PLATINUM">Platinum</SelectItem>
+              <SelectItem value="DIAMOND">Diamond</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         <Button onClick={() => setWizardOpen(true)} className="shrink-0">
           <Plus className="h-4 w-4" />
@@ -401,8 +437,8 @@ export default function MasterWeddings() {
             <div className="p-6">
               <TableSkeleton />
             </div>
-          ) : filtered.length === 0 ? (
-            <EmptyState hasSearch={query.length > 0} />
+          ) : weddings.length === 0 ? (
+            <EmptyState hasSearch={search.length > 0} />
           ) : (
             <Table>
               <TableHeader>
@@ -434,7 +470,7 @@ export default function MasterWeddings() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filtered.map((w) => (
+                {weddings.map((w) => (
                   <TableRow
                     key={w.id}
                     className="border-slate-100 cursor-pointer"
@@ -575,6 +611,40 @@ export default function MasterWeddings() {
           )}
         </div>
       </Card>
+
+      {/* Pagination */}
+      {total > limit && (
+        <div className="flex items-center justify-between px-1">
+          <p className="text-xs text-slate-500">
+            Showing {(page - 1) * limit + 1}–{Math.min(page * limit, total)} of {total}
+          </p>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page <= 1}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              className="h-8 text-xs"
+            >
+              <ChevronLeft className="size-3 mr-1" />
+              Prev
+            </Button>
+            <span className="text-xs text-slate-500">
+              Page {page} of {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page >= totalPages}
+              onClick={() => setPage((p) => p + 1)}
+              className="h-8 text-xs"
+            >
+              Next
+              <ChevronRight className="size-3 ml-1" />
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Create / Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
