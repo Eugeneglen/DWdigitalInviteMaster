@@ -101,6 +101,39 @@ export async function GET() {
           });
           notificationsCreated++;
         }
+
+        // Send expiry warning email to the couple
+        try {
+          const { sendEmail, renderExpiryWarningEmail } = await import('@/lib/email-service');
+          // Get couple's email from the wedding account
+          const weddingWithEmail = await db.weddingAccount.findUnique({
+            where: { id: w.id },
+            select: { coupleEmail: true, consultantId: true },
+          });
+          if (weddingWithEmail?.coupleEmail) {
+            let consultantName: string | undefined;
+            if (weddingWithEmail.consultantId) {
+              const consultant = await db.user.findUnique({
+                where: { id: weddingWithEmail.consultantId },
+                select: { name: true },
+              });
+              consultantName = consultant?.name;
+            }
+            const emailContent = renderExpiryWarningEmail({
+              coupleName: w.coupleName,
+              expiryDate: w.accessExpiryDate!.toISOString(),
+              consultantName,
+            });
+            await sendEmail({
+              to: weddingWithEmail.coupleEmail,
+              subject: emailContent.subject,
+              html: emailContent.html,
+              text: emailContent.text,
+            }, 'expiry_warning');
+          }
+        } catch (emailError) {
+          console.error('Expiry warning email failed (non-blocking):', emailError);
+        }
       }
     }
 

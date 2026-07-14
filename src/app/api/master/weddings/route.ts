@@ -218,6 +218,30 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Send onboarding email (queued if no email provider configured)
+    try {
+      const { sendEmail, renderOnboardingEmail } = await import('@/lib/email-service');
+      const consultant = data.consultantId
+        ? await db.user.findUnique({ where: { id: data.consultantId }, select: { name: true } })
+        : null;
+      const emailContent = renderOnboardingEmail({
+        coupleName: data.coupleName,
+        coupleCmsUrl: `/?view=couple`,
+        guestInvitationUrl: `/${slug}`,
+        loginId: data.coupleEmail.toLowerCase(),
+        password: defaultPassword,
+        consultantName: consultant?.name,
+      });
+      await sendEmail({
+        to: data.coupleEmail.toLowerCase(),
+        subject: emailContent.subject,
+        html: emailContent.html,
+        text: emailContent.text,
+      }, 'onboarding');
+    } catch (emailError) {
+      console.error('Onboarding email failed (non-blocking):', emailError);
+    }
+
     // Return wedding + generated credentials
     return NextResponse.json({
       wedding,
