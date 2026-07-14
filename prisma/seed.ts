@@ -10,7 +10,10 @@ async function seed() {
   const adminPassword = await bcrypt.hash('Admin@2024', 12);
   const admin = await db.user.upsert({
     where: { email: 'admin@dreamweavers.sg' },
-    update: { role: 'SUPER_ADMIN' },
+    // Include passwordHash in update so re-seeding an existing DB keeps the
+    // demo admin password in sync with this file (prevents drift like the
+    // @123 vs @2024 production issue).
+    update: { role: 'SUPER_ADMIN', passwordHash: adminPassword },
     create: {
       email: 'admin@dreamweavers.sg',
       passwordHash: adminPassword,
@@ -25,7 +28,8 @@ async function seed() {
   const couplePassword = await bcrypt.hash('Couple@2024', 12);
   const couple = await db.user.upsert({
     where: { email: 'eleanor@wedding.com' },
-    update: { role: 'COUPLE' },
+    // Include passwordHash in update — see admin upsert note above.
+    update: { role: 'COUPLE', passwordHash: couplePassword },
     create: {
       email: 'eleanor@wedding.com',
       passwordHash: couplePassword,
