@@ -73,7 +73,7 @@ export default function MomentsPage() {
 
   const photos = galleryMedia
     ? galleryMedia.map((m) => ({ alt: m.fileName || 'Gallery Photo', src: m.url, caption: (m as { caption?: string }).caption ?? '' }))
-    : FALLBACK_PHOTOS;
+    : [];
 
   return (
     <>
@@ -89,6 +89,11 @@ export default function MomentsPage() {
 
         {/* Masonry Photo Grid */}
         <section ref={ref} className="max-w-[1440px] mx-auto px-4 md:px-8">
+          {photos.length === 0 ? (
+            <div className="py-20 text-center">
+              <p className="text-charcoal-ink/30 text-sm italic">Photos coming soon.</p>
+            </div>
+          ) : (
           <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-6">
             {photos.map((photo, idx) => (
               <div
@@ -113,6 +118,7 @@ export default function MomentsPage() {
               </div>
             ))}
           </div>
+          )}
         </section>
       </main>
     </>

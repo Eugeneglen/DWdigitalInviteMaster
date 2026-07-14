@@ -29,27 +29,10 @@ interface SectionConfig {
 }
 
 const SECTIONS: SectionConfig[] = [
-  {
-    key: 'hero',
-    label: 'Hero Section',
-    description: 'Main title, subtitle, and call-to-action text on the home page',
-    fields: [
-      { key: 'title', label: 'Hero Title', type: 'text', placeholder: 'e.g. Together with their families' },
-      { key: 'subtitle', label: 'Hero Subtitle', type: 'text', placeholder: 'e.g. Eleanor & James request the pleasure of your company' },
-      { key: 'description', label: 'Hero Description', type: 'textarea', placeholder: 'Additional text below the title...' },
-      { key: 'dateDisplay', label: 'Date Display', type: 'text', placeholder: 'e.g. Saturday, 25th December 2027' },
-      { key: 'countdownDate', label: 'Countdown Target Date', type: 'text', placeholder: 'e.g. 2027-12-25T16:00:00+08:00' },
-    ],
-  },
-  {
-    key: 'schedule',
-    label: 'Schedule Section',
-    description: 'Headers and descriptions for the event schedule page',
-    fields: [
-      { key: 'title', label: 'Section Title', type: 'text', placeholder: 'e.g. The Day' },
-      { key: 'subtitle', label: 'Timeline Heading', type: 'text', placeholder: 'e.g. The Celebration' },
-    ],
-  },
+  // Note: Hero, Schedule, Story, Moments, and Getting There section text
+  // fields are edited directly in their respective CMS pages (CoupleHome,
+  // CoupleSchedule, CoupleStory, CoupleMoments, CoupleGettingThere) where
+  // they're contextual. This page manages the remaining text-only sections.
   {
     key: 'rsvp',
     label: 'RSVP Section',
@@ -72,29 +55,6 @@ const SECTIONS: SectionConfig[] = [
       { key: 'step2Subtext', label: 'Step 3 Subtitle', type: 'text', placeholder: 'e.g. Dietary selections are optional.' },
       { key: 'resultThankYou', label: 'Thank You Title', type: 'text', placeholder: 'e.g. Thank you' },
       { key: 'resultWeMissYou', label: 'Declined Title', type: 'text', placeholder: "e.g. We'll Miss You" },
-    ],
-  },
-  {
-    key: 'getting-there',
-    label: 'Getting There',
-    description: 'Directions, transport info, and venue details',
-    fields: [
-      { key: 'title', label: 'Section Title', type: 'text', placeholder: 'e.g. Getting There' },
-      { key: 'subtitle', label: 'Section Subtitle', type: 'text', placeholder: 'e.g. Find your way to our celebration' },
-      { key: 'carTitle', label: 'By Car Title', type: 'text', placeholder: 'e.g. By Car' },
-      { key: 'carContent', label: 'By Car Directions', type: 'textarea', placeholder: 'Driving directions and parking info...' },
-      { key: 'transitTitle', label: 'Public Transit Title', type: 'text', placeholder: 'e.g. Public Transit' },
-      { key: 'transitContent', label: 'Public Transit Directions', type: 'textarea', placeholder: 'MRT/bus directions...' },
-      { key: 'parkingNote', label: 'Parking Note', type: 'textarea', placeholder: 'Parking availability and rates...' },
-    ],
-  },
-  {
-    key: 'story',
-    label: 'Our Story',
-    description: 'Story section header and footer text',
-    fields: [
-      { key: 'title', label: 'Section Title', type: 'text', placeholder: 'e.g. Our Story' },
-      { key: 'subtitle', label: 'Section Subtitle', type: 'text', placeholder: 'e.g. A journey of love' },
     ],
   },
   {
@@ -125,15 +85,6 @@ const SECTIONS: SectionConfig[] = [
       { key: 'ctaEyebrow', label: 'CTA Eyebrow Text', type: 'text', placeholder: 'e.g. NEED MORE HELP?' },
       { key: 'ctaDescription', label: 'CTA Description', type: 'textarea', placeholder: 'Description text below the CTA heading...' },
       { key: 'ctaButtonLabel', label: 'CTA Button Label', type: 'text', placeholder: 'e.g. Message the Couple' },
-    ],
-  },
-  {
-    key: 'moments',
-    label: 'Moments',
-    description: 'Moments section header text',
-    fields: [
-      { key: 'title', label: 'Section Title', type: 'text', placeholder: 'e.g. Moments' },
-      { key: 'subtitle', label: 'Section Subtitle', type: 'text', placeholder: 'e.g. Captured memories along the way' },
     ],
   },
   {

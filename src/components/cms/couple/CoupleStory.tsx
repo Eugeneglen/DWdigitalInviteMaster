@@ -100,7 +100,6 @@ export default function CoupleStory() {
   const CONTENT_KEYS = [
     { key: 'title', label: 'Section Title', placeholder: 'e.g. Our Story', type: 'input' as const },
     { key: 'subtitle', label: 'Section Subtitle', placeholder: 'e.g. A journey of love', type: 'input' as const },
-    { key: 'recommendationPrompt', label: 'Recommendation Prompt', placeholder: '', type: 'input' as const },
   ];
 
   const fetchStories = useCallback(async () => {

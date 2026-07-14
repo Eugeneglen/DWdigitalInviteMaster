@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import MirrorImageUpload from './MirrorImageUpload';
 import { invalidateWeddingCache } from '@/hooks/usePublicWedding';
 
 const API_BASE = '/api/cms/content?XTransformPort=3000';
@@ -137,9 +136,7 @@ export default function CoupleGettingThere() {
   const hasChanges = Object.keys(editedFields).length > 0;
 
   // ── Venue image helpers ────────────────────────────────────────
-  const venueImageValue = getFieldValue('venueImage');
-  const handleVenueImageChange = (dataUrl: string) => setFieldValue('venueImage', dataUrl);
-  const handleVenueImageRemove = () => setFieldValue('venueImage', '');
+  // Venue image is managed in the Schedule CMS page (where it's displayed).
 
   if (loading) {
     return (
@@ -179,26 +176,8 @@ export default function CoupleGettingThere() {
         </Button>
       </div>
 
-      {/* Venue Image */}
-      <Card className="border-charcoal-ink/5 shadow-none">
-        <CardContent className="p-4 space-y-3">
-          <Label className="text-xs font-medium text-charcoal-ink/50 uppercase tracking-wider flex items-center gap-1.5">
-            Venue Image
-            {editedFields[`${SECTION}/venueImage`] !== undefined && (
-              <span className="inline-flex h-1.5 w-1.5 rounded-full bg-cinematic-gold" />
-            )}
-          </Label>
-          <p className="text-[11px] text-charcoal-ink/40">Displayed beside the venue description on the Schedule page.</p>
-          <MirrorImageUpload
-            value={venueImageValue}
-            onChange={handleVenueImageChange}
-            onRemove={handleVenueImageRemove}
-            label="Venue Image"
-            helperText="4:3 crop mirrors the guest-site schedule page"
-            aspectClass="aspect-[4/3]"
-          />
-        </CardContent>
-      </Card>
+      {/* Note: Venue image is managed in the Schedule CMS page, where it's
+          actually displayed on the guest site. */}
 
       {/* Content Fields */}
       <Card className="border-charcoal-ink/5 shadow-none">
