@@ -221,6 +221,7 @@ export default function WeddingCreationWizard({ open, onOpenChange, onCreated }:
     const c = result.credentials;
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
     return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-charcoal-ink">
@@ -315,11 +316,13 @@ export default function WeddingCreationWizard({ open, onOpenChange, onCreated }:
           </div>
         </div>
       </DialogContent>
+      </Dialog>
     );
   }
 
   // ── Wizard Steps ──────────────────────────────────────────────────────
   return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
     <DialogContent className="sm:max-w-[640px] max-h-[90vh] overflow-y-auto">
       <DialogHeader>
         <DialogTitle className="text-charcoal-ink">Create New Wedding</DialogTitle>
@@ -585,5 +588,6 @@ export default function WeddingCreationWizard({ open, onOpenChange, onCreated }:
         </div>
       )}
     </DialogContent>
+    </Dialog>
   );
 }

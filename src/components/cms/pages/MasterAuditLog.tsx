@@ -76,7 +76,8 @@ export default function MasterAuditLog() {
       const res = await fetch(`/api/cms/audit?${params.toString()}&XTransformPort=3000`);
       if (!res.ok) throw new Error('Failed to fetch audit logs');
       const data = await res.json();
-      setLogs(data.logs ?? data ?? []);
+      const logArray = data?.data?.logs ?? data?.logs ?? Array.isArray(data) ? data : [];
+      setLogs(Array.isArray(logArray) ? logArray : []);
     } catch {
       setLogs([]);
     } finally {
