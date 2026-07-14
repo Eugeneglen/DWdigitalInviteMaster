@@ -25,6 +25,45 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
     }
 
+    // Access expiry check — if the user is a COUPLE, check if their wedding
+    // account has expired. If so, block login with a clear message.
+    if (user.role === 'COUPLE') {
+      const wedding = await db.weddingAccount.findFirst({
+        where: { ownerId: user.id },
+        select: { accountStatus: true, accessExpiryDate: true },
+      });
+      if (wedding?.accountStatus === 'EXPIRED') {
+        return NextResponse.json(
+          { error: 'Your access has expired. Please contact DreamWeavers to extend your access.' },
+          { status: 403 },
+        );
+      }
+      // Auto-expire: if accessExpiryDate has passed, update status and block
+      if (wedding?.accessExpiryDate && new Date() > wedding.accessExpiryDate && wedding.accountStatus !== 'EXPIRED') {
+        await db.weddingAccount.updateMany({
+          where: { ownerId: user.id },
+          data: { accountStatus: 'EXPIRED' },
+        });
+        return NextResponse.json(
+          { error: 'Your access has expired. Please contact DreamWeavers to extend your access.' },
+          { status: 403 },
+        );
+      }
+      // Auto-complete: if wedding date has passed, update status
+      if (wedding && wedding.accountStatus === 'ACTIVE') {
+        const weddingAccount = await db.weddingAccount.findFirst({
+          where: { ownerId: user.id },
+          select: { weddingDate: true },
+        });
+        if (weddingAccount && new Date() > new Date(weddingAccount.weddingDate.getTime() + 24 * 60 * 60 * 1000)) {
+          await db.weddingAccount.updateMany({
+            where: { ownerId: user.id },
+            data: { accountStatus: 'COMPLETED' },
+          });
+        }
+      }
+    }
+
     // Update last login (non-critical — don't block login on write failure)
     try {
       await db.user.update({
