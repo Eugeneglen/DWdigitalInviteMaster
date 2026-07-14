@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import InlineImageUpload from './InlineImageUpload';
+import MirrorImageUpload from './MirrorImageUpload';
 import { invalidateWeddingCache } from '@/hooks/usePublicWedding';
 
 const API_BASE = '/api/cms/content?XTransformPort=3000';
@@ -189,11 +189,12 @@ export default function CoupleGettingThere() {
             )}
           </Label>
           <p className="text-[11px] text-charcoal-ink/40">Displayed beside the venue description on the Schedule page.</p>
-          <InlineImageUpload
+          <MirrorImageUpload
             value={venueImageValue}
             onChange={handleVenueImageChange}
             onRemove={handleVenueImageRemove}
-            label="Upload venue photo"
+            label="Venue Image"
+            helperText="4:3 crop mirrors the guest-site schedule page"
             aspectClass="aspect-[4/3]"
           />
         </CardContent>

@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dialog';
 import { useCoupleCMSStore } from '@/store/useCoupleCMSStore';
 import { invalidateWeddingCache } from '@/hooks/usePublicWedding';
+import MirrorImageUpload from './MirrorImageUpload';
 
 const WEDDING_API = '/api/cms/wedding?XTransformPort=3000';
 
@@ -76,6 +77,31 @@ export function HeroVisualSection({ weddingData }: { weddingData: Record<string,
     }
   };
 
+  // Upload a hero image from a base64 data URL (used by MirrorImageUpload,
+  // which already converts the file to a data URL for the thumbnail preview).
+  const handleHeroImageDataUrl = async (dataUrl: string) => {
+    setUploading(true);
+    try {
+      const res = await fetch(WEDDING_API, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ heroImageUrl: dataUrl, heroVideoUrl: '' }),
+      });
+      if (!res.ok) throw new Error('Failed to upload');
+      const weddingRes = await fetch(WEDDING_API);
+      if (weddingRes.ok) {
+        const data = await weddingRes.json();
+        useCoupleCMSStore.getState().setWeddingData(data.wedding ?? data);
+      }
+      invalidateWeddingCache();
+      toast({ title: 'Success', description: 'Image updated' });
+    } catch {
+      toast({ title: 'Error', description: 'Failed to upload', variant: 'destructive' });
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleRemove = async (type: 'image' | 'video') => {
     try {
       const res = await fetch(WEDDING_API, {
@@ -128,48 +154,15 @@ export function HeroVisualSection({ weddingData }: { weddingData: Record<string,
                 </span>
               </div>
             </div>
-          ) : heroImgUrl ? (
-            <div
-              className="relative aspect-video rounded-lg overflow-hidden border border-charcoal-ink/10 group cursor-pointer"
-              onClick={() => setPreviewUrl(heroImgUrl)}
-            >
-              <img src={heroImgUrl} alt="Hero" className="w-full h-full object-cover" unoptimized />
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
-              <button
-                type="button"
-                onClick={(e) => { e.stopPropagation(); handleRemove('image'); }}
-                className="absolute top-2 right-2 p-1.5 rounded-full bg-black/50 text-white hover:bg-red-500 transition-colors"
-                title="Remove image"
-              >
-                <X className="size-3.5" />
-              </button>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                  Click to preview · Drag to replace
-                </span>
-              </div>
-            </div>
           ) : (
-            <div
-              className="relative aspect-video rounded-lg border-2 border-dashed border-charcoal-ink/10 hover:border-cinematic-gold hover:bg-cinematic-gold/5 transition-colors duration-200 cursor-pointer flex flex-col items-center justify-center gap-2"
-              onClick={() => fileRef.current?.click()}
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={(e) => {
-                e.preventDefault();
-                const file = e.dataTransfer.files[0];
-                if (file) handleFile(file);
-              }}
-            >
-              {uploading ? (
-                <Loader2 className="size-6 animate-spin text-cinematic-gold" />
-              ) : (
-                <>
-                  <Upload className="size-6 text-charcoal-ink/25" />
-                  <p className="text-xs text-charcoal-ink/40 font-medium">Upload hero image or video</p>
-                  <p className="text-[10px] text-charcoal-ink/25">Image (max 10 MB) or Video (max 50 MB)</p>
-                </>
-              )}
-            </div>
+            <MirrorImageUpload
+              value={heroImgUrl}
+              onChange={handleHeroImageDataUrl}
+              onRemove={() => handleRemove('image')}
+              label="Hero Image"
+              helperText="Full-bleed hero on the home page · 16:9 crop mirrors the guest site"
+              aspectClass="aspect-[16/9]"
+            />
           )}
 
           <input

@@ -72,7 +72,7 @@ export default function MomentsPage() {
     : null;
 
   const photos = galleryMedia
-    ? galleryMedia.map((m) => ({ alt: m.fileName || 'Gallery Photo', src: m.url }))
+    ? galleryMedia.map((m) => ({ alt: m.fileName || 'Gallery Photo', src: m.url, caption: (m as { caption?: string }).caption ?? '' }))
     : FALLBACK_PHOTOS;
 
   return (
@@ -105,9 +105,11 @@ export default function MomentsPage() {
                   className="w-full h-auto object-cover transition-transform duration-700 ease-out mb-4 group-hover:scale-105"
                   src={photo.src}
                 />
-                <p className="text-center text-cinematic-gold italic" style={{ fontSize: '16px', lineHeight: '24px' }}>
-                  {photo.alt}
-                </p>
+                {'caption' in photo && photo.caption ? (
+                  <p className="text-center text-cinematic-gold italic" style={{ fontSize: '16px', lineHeight: '24px' }}>
+                    {photo.caption}
+                  </p>
+                ) : null}
               </div>
             ))}
           </div>

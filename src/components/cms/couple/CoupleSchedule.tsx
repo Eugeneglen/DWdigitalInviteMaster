@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { Loader2, Plus, Pencil, Trash2, Clock, MapPin, CalendarRange } from 'lucide-react';
-import SectionImageUpload from './SectionImageUpload';
+import MirrorImageGallery from './MirrorImageGallery';
+import MirrorImageUpload from './MirrorImageUpload';
 import { toast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -375,7 +376,7 @@ export default function CoupleSchedule() {
         </div>
       </div>
 
-      <SectionImageUpload category="schedule" label="Schedule Images" maxImages={3} />
+      <MirrorImageGallery category="schedule" label="Schedule Images" maxImages={3} aspectClass="aspect-[4/3]" helperText="4:3 crop mirrors the guest-site schedule images" />
 
       {/* Wedding Venue Card */}
       <Card className="border-charcoal-ink/5 shadow-none">
@@ -394,7 +395,31 @@ export default function CoupleSchedule() {
             )}
           </div>
           <div className="space-y-4">
-            {VENUE_KEYS.map(({ key, label, placeholder, type }) => (
+            {/* Venue Image — image upload (not a text URL input).
+                Stored in section 'getting-there', fieldKey 'venueImage'.
+                4:3 mirrors the guest-site Schedule page venue image. */}
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2">
+                <Label className="text-xs font-medium text-charcoal-ink/50 uppercase tracking-wider">
+                  Venue Image
+                </Label>
+                {venueEdited['venueImage'] && (
+                  <span className="bg-cinematic-gold w-1.5 h-1.5 rounded-full" />
+                )}
+              </div>
+              <MirrorImageUpload
+                value={venueFields['venueImage'] ?? ''}
+                onChange={(dataUrl) => handleVenueChange('venueImage', dataUrl)}
+                onRemove={() => handleVenueChange('venueImage', '')}
+                label="Venue Image"
+                helperText="4:3 · mirrors the guest-site schedule page"
+                aspectClass="aspect-[4/3]"
+                maxWidth="320px"
+              />
+            </div>
+
+            {/* Remaining venue fields (venueDescription, etc.) as text inputs */}
+            {VENUE_KEYS.filter(({ key }) => key !== 'venueImage').map(({ key, label, placeholder, type }) => (
               <div key={key} className="space-y-1.5">
                 <div className="flex items-center gap-2">
                   <Label className="text-xs font-medium text-charcoal-ink/50 uppercase tracking-wider">
