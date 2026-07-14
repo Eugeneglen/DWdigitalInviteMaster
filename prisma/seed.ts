@@ -44,7 +44,12 @@ async function seed() {
   const weddingDate = new Date('2027-12-25T16:00:00');
   const wedding = await db.weddingAccount.upsert({
     where: { slug: 'eleanor-james-2027' },
-    update: {},
+    // Re-link the wedding to the current couple user on re-seed. This fixes
+    // orphaned owner links (e.g. if the couple user was recreated with a new
+    // id, the wedding's ownerId would still point at the old id, causing the
+    // Couple CMS to show "No wedding account assigned"). Only ownerId is
+    // updated here so existing wedding customizations are preserved.
+    update: { ownerId: couple.id },
     create: {
       slug: 'eleanor-james-2027',
       coupleName: 'Eleanor & James',
