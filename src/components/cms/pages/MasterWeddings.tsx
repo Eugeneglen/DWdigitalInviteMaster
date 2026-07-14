@@ -53,6 +53,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useCMSStore } from '@/store/useCMSStore';
+import WeddingCreationWizard from './WeddingCreationWizard';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -191,6 +192,7 @@ export default function MasterWeddings() {
 
   // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [wizardOpen, setWizardOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<WeddingForm>(EMPTY_FORM);
   const [submitting, setSubmitting] = useState(false);
@@ -386,7 +388,7 @@ export default function MasterWeddings() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <Button onClick={openCreate} className="shrink-0">
+        <Button onClick={() => setWizardOpen(true)} className="shrink-0">
           <Plus className="h-4 w-4" />
           Create Wedding
         </Button>
@@ -732,6 +734,13 @@ export default function MasterWeddings() {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* Wedding Creation Wizard (4-step) */}
+      <WeddingCreationWizard
+        open={wizardOpen}
+        onOpenChange={setWizardOpen}
+        onCreated={fetchWeddings}
+      />
     </div>
   );
 }
