@@ -59,9 +59,9 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 const PLAN_COLORS: Record<string, string> = {
-  FREE: '#94a3b8',
-  PREMIUM: '#d4af37',
-  ENTERPRISE: '#8b5cf6',
+  GOLD: '#94a3b8',
+  PLATINUM: '#d4af37',
+  DIAMOND: '#8b5cf6',
 };
 
 // ── Sub-components ─────────────────────────────────────────────────────────

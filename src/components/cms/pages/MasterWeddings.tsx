@@ -98,7 +98,7 @@ const EMPTY_FORM: WeddingForm = {
   groomName: '',
   weddingDate: '',
   venueAddress: '',
-  plan: 'FREE',
+  plan: 'GOLD',
   sections: [],
 };
 
@@ -113,9 +113,9 @@ const statusVariant: Record<string, string> = {
 };
 
 const planVariant: Record<string, string> = {
-  PREMIUM: 'bg-yellow-50 text-yellow-700 border-yellow-200',
-  ENTERPRISE: 'bg-purple-50 text-purple-700 border-purple-200',
-  FREE: 'bg-slate-100 text-slate-500 border-slate-200',
+  PLATINUM: 'bg-yellow-50 text-yellow-700 border-yellow-200',
+  DIAMOND: 'bg-purple-50 text-purple-700 border-purple-200',
+  GOLD: 'bg-slate-100 text-slate-500 border-slate-200',
 };
 
 function formatWeddingDate(dateStr: string) {
@@ -215,12 +215,8 @@ export default function MasterWeddings() {
     }
   }, [search]);
 
-  useEffect(() => {
-    fetchWeddings();
-  }, [fetchWeddings]);
-
   // ── Search debounce ────────────────────────────────────────────────────
-
+  // Single debounced fetch — fires on mount AND when search changes (after 300ms)
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchWeddings();
@@ -461,7 +457,7 @@ export default function MasterWeddings() {
 
                     {/* Venue */}
                     <TableCell className="text-sm text-slate-600 max-w-[160px] truncate">
-                      {truncate(w.venue, 24)}
+                      {truncate(w.venueAddress, 24)}
                     </TableCell>
 
                     {/* Status */}
@@ -668,9 +664,9 @@ export default function MasterWeddings() {
                   <SelectValue placeholder="Select a plan" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="FREE">Free</SelectItem>
-                  <SelectItem value="PREMIUM">Premium</SelectItem>
-                  <SelectItem value="ENTERPRISE">Enterprise</SelectItem>
+                  <SelectItem value="GOLD">Gold</SelectItem>
+                  <SelectItem value="PLATINUM">Platinum</SelectItem>
+                  <SelectItem value="DIAMOND">Diamond</SelectItem>
                 </SelectContent>
               </Select>
             </div>

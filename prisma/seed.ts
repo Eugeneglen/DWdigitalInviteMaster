@@ -61,7 +61,7 @@ async function seed() {
       venueAddress: '38 Cuscaden Road, Singapore 249731',
       googleMapsUrl: 'https://maps.google.com/?q=1.3066+103.8290',
       status: 'ACTIVE',
-      plan: 'PREMIUM',
+      plan: 'PLATINUM',
       heroImageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBeAe38AA5-0h4B5MmgQCqv54oQXyPMGznDKaw2sJI_FnTbB_yXXWOpirFlFycj_2VI02IVLouUTt86Y1J7Ls-bRsMOHPAcfSqruVoh87sfhw3vi2Z6t1C7ogCLtkvF6QbJkwuV0av8pXTrUeAAi6ymnZpvyOr8qVjTNNorAOmqRrW_fohX_xlkscmBh39K4Wtvs6TH0Nvb_X3LQQRD9W_sySN_iWbWw9O0au8u1jO-hSekE9pSGNo5zsTz3o9PWy5xbzc6lq3knkIy',
       bannerUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA-OyKfcsxXAmZDArHbDXl1cVCgGUG5liFPzyHdVvMG6_4jN9pNTrN9GCrkdnegli9UPJUSPs39KJRsRP7AiLem4xYS-q1ZYq1T3DAIqyvn3wAvbdkoMVkufft0SpQw4gDTPSnIml6k62lRYobUrNu70UGIILiMZQ0fAydTXXwVZ1oswQZ-mjPT8H9mDDqfhxsMSI5zla8GKz_ILXbmdRjtRUk682dPEDBD6I81DzEx7dITgjb6vxQoee5599jkYf_vCYP7npydvxqx',
       ownerId: couple.id,
@@ -168,6 +168,64 @@ async function seed() {
     });
   }
   console.log(`✅ ${stories.length} story items seeded`);
+
+  // 9. Seed platform system settings
+  const platformSettings = [
+    { key: 'default_couple_password', value: 'Couple@123' },
+    { key: 'couple_access_expiry_days', value: '30' },
+    { key: 'expiry_notification_days', value: '7' },
+    { key: 'default_plan', value: 'GOLD' },
+    { key: 'default_wedding_status', value: 'DRAFT' },
+    {
+      key: 'package_templates',
+      value: JSON.stringify([
+        {
+          name: 'GOLD',
+          label: 'Gold',
+          features: ['countdown', 'schedule', 'rsvp', 'getting-there'],
+          maxGuests: 100,
+          maxMedia: 20,
+          sortOrder: 1,
+        },
+        {
+          name: 'PLATINUM',
+          label: 'Platinum',
+          features: ['countdown', 'schedule', 'rsvp', 'getting-there', 'story', 'wishes', 'qa'],
+          maxGuests: 200,
+          maxMedia: 50,
+          sortOrder: 2,
+        },
+        {
+          name: 'DIAMOND',
+          label: 'Diamond',
+          features: ['countdown', 'schedule', 'rsvp', 'getting-there', 'story', 'wishes', 'qa', 'moments', 'music', 'video'],
+          maxGuests: 500,
+          maxMedia: 100,
+          sortOrder: 3,
+        },
+      ]),
+    },
+  ];
+
+  for (const setting of platformSettings) {
+    await db.systemSetting.upsert({
+      where: { key: setting.key },
+      update: {},
+      create: setting,
+    });
+  }
+  console.log(`✅ ${platformSettings.length} platform settings seeded (package templates, couple password, expiry config)`);
+
+  // 10. Update existing wedding plan to PLATINUM (from old PREMIUM)
+  await db.weddingAccount.update({
+    where: { slug: 'eleanor-james-2027' },
+    data: {
+      plan: 'PLATINUM',
+      coupleEmail: 'eleanor@wedding.com',
+      accountStatus: 'ACTIVE',
+    },
+  });
+  console.log(`✅ Updated demo wedding plan to PLATINUM, accountStatus to ACTIVE`);
 
   console.log('\n🎉 Seed complete!');
   console.log('---');

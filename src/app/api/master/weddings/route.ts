@@ -10,7 +10,7 @@ const createWeddingSchema = z.object({
   groomName: z.string().nullable().optional(),
   weddingDate: z.string(),
   venueAddress: z.string().min(1),
-  plan: z.enum(['FREE', 'PREMIUM', 'ENTERPRISE']).default('FREE'),
+  plan: z.enum(['GOLD', 'PLATINUM', 'DIAMOND']).default('GOLD'),
   sections: z.array(z.string()).optional(),
 });
 
@@ -36,7 +36,6 @@ export async function GET(req: NextRequest) {
         { brideName: { contains: search } },
         { groomName: { contains: search } },
         { slug: { contains: search } },
-        { email: { contains: search } },
       ];
     }
     if (status) where.status = status;
@@ -109,7 +108,7 @@ export async function POST(req: NextRequest) {
     const requestedSections: string[] = data.sections ?? [];
     const defaultFeatures = [
       'countdown', 'schedule', 'rsvp', 'getting-there', 'music',
-      'story', 'wishes', 'qa', 'moments', 'gallery',
+      'story', 'wishes', 'qa', 'moments', 'gallery', 'video',
     ];
     const optionalFeatureKeys = ['story', 'wishes', 'qa', 'moments'];
     await db.weddingFeature.createMany({

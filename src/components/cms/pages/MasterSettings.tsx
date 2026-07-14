@@ -89,7 +89,7 @@ const SETTINGS_SECTIONS: { title: string; description: string; fields: SettingFi
     description: 'Default values for new wedding accounts',
     fields: [
       { key: 'default_wedding_status', label: 'Default Wedding Status', type: 'select', defaultValue: 'DRAFT', options: ['DRAFT', 'ACTIVE'] },
-      { key: 'default_plan', label: 'Default Plan', type: 'select', defaultValue: 'FREE', options: ['FREE', 'PREMIUM', 'ENTERPRISE'] },
+      { key: 'default_plan', label: 'Default Plan', type: 'select', defaultValue: 'GOLD', options: ['GOLD', 'PLATINUM', 'DIAMOND'] },
       { key: 'max_guests_per_wedding', label: 'Max Guests Per Wedding', type: 'number', defaultValue: '500', placeholder: '500' },
       { key: 'max_media_per_wedding', label: 'Max Media Per Wedding', type: 'number', defaultValue: '100', placeholder: '100' },
     ],

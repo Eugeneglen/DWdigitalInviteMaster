@@ -67,9 +67,9 @@ export async function GET() {
       _count: { plan: true },
     });
     const planBreakdown: Record<string, number> = {
-      FREE: 0,
-      PREMIUM: 0,
-      ENTERPRISE: 0,
+      GOLD: 0,
+      PLATINUM: 0,
+      DIAMOND: 0,
     };
     for (const row of planRows) {
       planBreakdown[row.plan] = row._count.plan;

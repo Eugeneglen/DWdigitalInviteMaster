@@ -1,9 +1,9 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import dynamic from 'next/dynamic';
-import { Sparkles, LayoutDashboard, Heart, Users, FileText, BarChart3, Settings, LogOut, Loader2 } from 'lucide-react';
+import { Sparkles, LayoutDashboard, Heart, Users, FileText, BarChart3, Settings, LogOut, Loader2, Lock } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { useAuthModalStore } from '@/store/useAuthModalStore';
 
@@ -166,8 +166,39 @@ export default function AdminCMSView() {
     );
   }
 
-  // Authenticated → render the real CMS
-  if (status === 'authenticated' && cmsReady) {
+  // Authenticated → check role before rendering
+  const userRole = session?.user?.role;
+  const isAdmin = userRole === 'SUPER_ADMIN' || userRole?.startsWith('ADMIN');
+
+  // Non-admin authenticated user → sign out + show access denied
+  if (status === 'authenticated' && cmsReady && !isAdmin) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-paper-cream">
+        <div className="flex flex-col items-center gap-4 text-center max-w-md px-6">
+          <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
+            <Lock className="w-8 h-8 text-red-400" />
+          </div>
+          <h2 className="text-xl font-semibold text-charcoal-ink" style={{ fontFamily: "'Playfair Display', serif" }}>
+            Access Denied
+          </h2>
+          <p className="text-sm text-charcoal-ink/50 leading-relaxed">
+            You need an administrator account to access the DreamWeavers console.
+            Please sign out and log in with an admin account.
+          </p>
+          <button
+            onClick={() => signOut({ callbackUrl: '/?view=cms' })}
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-sm text-[13px] font-medium uppercase tracking-[0.08em] bg-charcoal-ink text-paper-cream hover:bg-charcoal-ink/90 transition-colors"
+          >
+            <LogOut className="size-4" />
+            Sign Out
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Admin authenticated → render the real CMS
+  if (status === 'authenticated' && cmsReady && isAdmin) {
     return (
       <>
         <MasterCMSLayout>

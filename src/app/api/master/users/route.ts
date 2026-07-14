@@ -175,7 +175,14 @@ export async function PUT(req: NextRequest) {
     if (updates.password) {
       updateData.passwordHash = await bcrypt.hash(updates.password, 12);
     }
-    if (updates.role !== undefined) updateData.role = updates.role;
+    if (updates.role !== undefined) {
+      // Only SUPER_ADMIN can change roles. ADMIN_* users cannot escalate
+      // themselves or others to SUPER_ADMIN.
+      if (session.user.role !== 'SUPER_ADMIN') {
+        return NextResponse.json({ error: 'Only Super Admins can change user roles' }, { status: 403 });
+      }
+      updateData.role = updates.role;
+    }
     if (updates.isActive !== undefined) updateData.isActive = updates.isActive;
 
     const user = await db.user.update({
@@ -244,13 +251,13 @@ export async function DELETE(req: NextRequest) {
       await db.$transaction([
         // Null out ownership of any weddings they own
         db.weddingAccount.updateMany({ where: { ownerId: id }, data: { ownerId: null } }),
+        // Null out consultant/coordinator assignments
+        db.weddingAccount.updateMany({ where: { consultantId: id }, data: { consultantId: null } }),
+        db.weddingAccount.updateMany({ where: { coordinatorId: id }, data: { coordinatorId: null } }),
         // Remove their audit logs
         db.auditLog.deleteMany({ where: { userId: id } }),
         // Remove their notifications
         db.notification.deleteMany({ where: { userId: id } }),
-        // Remove any guest/wish submissions linked to them
-        db.rSVPSubmission.deleteMany({ where: { userId: id } }),
-        db.guestBookSubmission.deleteMany({ where: { userId: id } }),
         // Finally delete the user
         db.user.delete({ where: { id } }),
       ]);

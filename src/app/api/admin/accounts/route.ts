@@ -101,7 +101,7 @@ export async function POST(request: Request) {
         brideName: brideName || null,
         groomName: groomName || null,
         weddingDate: weddingDate ? new Date(weddingDate) : new Date(),
-        plan: plan || 'FREE',
+        plan: plan || 'GOLD',
         ownerId: ownerId || session.user.id,
       },
     });

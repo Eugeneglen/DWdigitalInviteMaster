@@ -35,9 +35,9 @@ const statusVariant: Record<string, string> = {
 };
 
 const planVariant: Record<string, string> = {
-  PREMIUM: 'bg-yellow-50 text-yellow-700 border-yellow-200',
-  ENTERPRISE: 'bg-purple-50 text-purple-700 border-purple-200',
-  FREE: 'bg-slate-100 text-slate-500 border-slate-200',
+  PLATINUM: 'bg-yellow-50 text-yellow-700 border-yellow-200',
+  DIAMOND: 'bg-purple-50 text-purple-700 border-purple-200',
+  GOLD: 'bg-slate-100 text-slate-500 border-slate-200',
 };
 
 function formatRelative(dateStr: string) {

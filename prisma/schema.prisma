@@ -26,7 +26,9 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  ownedWeddings  WeddingAccount[]
+  ownedWeddings     WeddingAccount[]
+  consultantWeddings WeddingAccount[] @relation("ConsultantWeddings")
+  coordinatorWeddings WeddingAccount[] @relation("CoordinatorWeddings")
   auditLogs      AuditLog[]
   notifications  Notification[]
 }
@@ -47,15 +49,27 @@ model WeddingAccount {
   venueAddress  String?
   googleMapsUrl String?
   status        String   @default("DRAFT") // DRAFT | ACTIVE | SUSPENDED | ARCHIVED | COMPLETED
-  plan          String   @default("FREE")   // FREE | PREMIUM | ENTERPRISE
+  plan          String   @default("GOLD")   // GOLD | PLATINUM | DIAMOND
   heroImageUrl  String?
   heroVideoUrl  String?
   bannerUrl     String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
+  // Operational fields (Admin CMS)
+  jobNumber        String?  @unique  // Internal tracking ID (e.g. DW-TDS-2026-000008)
+  coupleEmail      String?  // Couple's email (= login ID for auto-created account)
+  couplePhone      String?  // Couple's mobile number
+  consultantId     String?  // FK → User (ADMIN_1 / Consultant)
+  coordinatorId    String?  // FK → User (ADMIN_2 / Coordinator)
+  internalNotes    String?  // Admin-only notes (not visible to couple)
+  accessExpiryDate DateTime? // Auto-calculated: weddingDate + couple_access_expiry_days
+  accountStatus    String   @default("ONBOARDING") // ONBOARDING | ACTIVE | COMPLETED | EXPIRED | SUSPENDED
+
   ownerId   String?
   owner     User?    @relation(fields: [ownerId], references: [id])
+  consultant  User?  @relation("ConsultantWeddings", fields: [consultantId], references: [id])
+  coordinator User?  @relation("CoordinatorWeddings", fields: [coordinatorId], references: [id])
   features  WeddingFeature[]
   content   WeddingContent[]
   media     WeddingMedia[]
@@ -74,7 +88,7 @@ model WeddingFeature {
   id         String          @id @default(cuid())
   weddingId  String
   wedding    WeddingAccount  @relation(fields: [weddingId], references: [id], onDelete: Cascade)
-  featureKey String          // rsvp | wishes | story | gallery | schedule | faq | moments | getting-there | countdown | music | video
+  featureKey String          // rsvp | wishes | story | gallery | schedule | qa | moments | getting-there | countdown | music | video
   isEnabled  Boolean         @default(false)
   config     String?         // JSON string for feature-specific settings
   createdAt  DateTime        @default(now())
