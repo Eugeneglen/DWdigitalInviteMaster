@@ -9,6 +9,19 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { invalidateWeddingCache } from '@/hooks/usePublicWedding';
+import SectionContentFields, { type ContentField } from './SectionContentFields';
+
+const WISHES_CONTENT_FIELDS: ContentField[] = [
+  { key: 'title', label: 'Section Title', type: 'text', placeholder: 'e.g. Wishes & Blessings' },
+  { key: 'subtitle', label: 'Section Subtitle', type: 'text', placeholder: 'e.g. Leave your heartfelt message for the couple' },
+  { key: 'nameLabel', label: 'Name Field Label', type: 'text', placeholder: 'e.g. Your Name' },
+  { key: 'messageLabel', label: 'Message Field Label', type: 'text', placeholder: 'e.g. Your Message' },
+  { key: 'relationshipLabel', label: 'Relationship Field Label', type: 'text', placeholder: 'e.g. Your Relationship to the Couple' },
+  { key: 'submitLabel', label: 'Submit Button Label', type: 'text', placeholder: 'e.g. Weave into Archive' },
+  { key: 'heirloomLabel', label: 'Section Label (Eyebrow)', type: 'text', placeholder: 'e.g. The Living Heirloom' },
+  { key: 'formEyebrow', label: 'Form Section Eyebrow', type: 'text', placeholder: 'e.g. YOUR TURN' },
+  { key: 'formHeading', label: 'Form Section Heading', type: 'text', placeholder: 'e.g. Contribute to the Heirloom' },
+];
 
 const API_BASE = '/api/cms/wishes?XTransformPort=3000';
 
@@ -275,6 +288,14 @@ export default function CoupleWishes() {
           ))}
         </div>
       )}
+
+      {/* Wishes Section Text — moved from Content Editor */}
+      <SectionContentFields
+        section="wishes"
+        title="Wishes Section Text"
+        description="Customise the section header and form labels"
+        fields={WISHES_CONTENT_FIELDS}
+      />
     </div>
   );
 }

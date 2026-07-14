@@ -10,7 +10,6 @@ import { useCoupleCMSStore } from '@/store/useCoupleCMSStore';
 // only endpoints, which the previous shared pages/CMS*.tsx did.
 const CoupleOverview = dynamic(() => import('./couple/CoupleOverview'), { ssr: false });
 const CoupleDetails = dynamic(() => import('./couple/CoupleDetails'), { ssr: false });
-const CoupleContent = dynamic(() => import('./couple/CoupleContent'), { ssr: false });
 const CoupleHome = dynamic(() => import('./couple/CoupleHome'), { ssr: false });
 const CoupleSchedule = dynamic(() => import('./couple/CoupleSchedule'), { ssr: false });
 const CoupleRSVPs = dynamic(() => import('./couple/CoupleRSVPs'), { ssr: false });
@@ -33,8 +32,6 @@ export default function CoupleCMSPageRouter() {
       return <CoupleOverview />;
     case 'details':
       return <CoupleDetails />;
-    case 'content':
-      return <CoupleContent />;
     case 'home':
       return <CoupleHome />;
     case 'schedule':

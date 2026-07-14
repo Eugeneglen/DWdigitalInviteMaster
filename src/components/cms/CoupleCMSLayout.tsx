@@ -21,7 +21,6 @@ import {
   BarChart3,
   MapPin,
   Camera,
-  FileText,
   LayoutDashboard,
   MoreHorizontal,
 } from 'lucide-react';
@@ -36,7 +35,6 @@ import { useAuthModalStore } from '@/store/useAuthModalStore';
 const NAV_ITEMS: { key: CoupleCMSPage; label: string; icon: React.ElementType }[] = [
   { key: 'overview', label: 'Overview', icon: Home },
   { key: 'details', label: 'Your Details', icon: Heart },
-  { key: 'content', label: 'Content', icon: FileText },
   { key: 'home', label: 'Home', icon: LayoutDashboard },
   { key: 'schedule', label: 'Schedule', icon: Calendar },
   { key: 'rsvps', label: 'RSVPs', icon: Mail },

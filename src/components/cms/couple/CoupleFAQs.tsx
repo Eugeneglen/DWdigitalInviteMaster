@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
+import SectionContentFields, { type ContentField } from './SectionContentFields';
 import {
   Dialog,
   DialogContent,
@@ -21,6 +22,16 @@ import {
 import { invalidateWeddingCache } from '@/hooks/usePublicWedding';
 
 const API_BASE = '/api/cms/faqs?XTransformPort=3000';
+
+const QA_CONTENT_FIELDS: ContentField[] = [
+  { key: 'title', label: 'Section Title', type: 'text', placeholder: 'e.g. Questions & Answers' },
+  { key: 'subtitle', label: 'Section Subtitle', type: 'text', placeholder: 'e.g. Everything you need to know' },
+  { key: 'contactPrompt', label: 'Contact Prompt', type: 'text', placeholder: 'e.g. Still have questions? Message the couple' },
+  { key: 'contactEmail', label: 'Contact Email', type: 'text', placeholder: 'e.g. concierge@example.com' },
+  { key: 'ctaEyebrow', label: 'CTA Eyebrow Text', type: 'text', placeholder: 'e.g. NEED MORE HELP?' },
+  { key: 'ctaDescription', label: 'CTA Description', type: 'textarea', placeholder: 'Description text below the CTA heading...' },
+  { key: 'ctaButtonLabel', label: 'CTA Button Label', type: 'text', placeholder: 'e.g. Message the Couple' },
+];
 
 interface FAQItem {
   id: string;
@@ -388,6 +399,14 @@ export default function CoupleFAQs() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Q&A Section Text — moved from Content Editor */}
+      <SectionContentFields
+        section="qa"
+        title="Q&A Section Text"
+        description="Customise the section header and contact information"
+        fields={QA_CONTENT_FIELDS}
+      />
     </div>
   );
 }
