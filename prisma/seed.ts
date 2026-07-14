@@ -118,10 +118,6 @@ async function seed() {
   console.log(`✅ ${contentItems.length} content items seeded`);
 
   // 6. Seed sample schedule
-  // Delete existing schedule items for this wedding first to prevent
-  // duplicates on re-seed (previous versions used bare create() which
-  // appended a new set every run, causing 40+ duplicate rows).
-  await db.eventSchedule.deleteMany({ where: { weddingId: wedding.id } });
   const scheduleItems = [
     { eventType: 'TEA_CEREMONY', title: 'Tea Ceremony', description: 'Traditional tea ceremony with both families', startTime: '10:00', endTime: '12:00', location: 'Bride\'s Residence', sortOrder: 1 },
     { eventType: 'CEREMONY', title: 'Wedding Ceremony', description: 'Exchange of vows and rings', startTime: '16:00', endTime: '17:00', location: 'The Fullerton Hotel — Grand Ballroom', sortOrder: 2 },
@@ -136,8 +132,6 @@ async function seed() {
   console.log(`✅ ${scheduleItems.length} schedule items seeded`);
 
   // 7. Seed sample FAQs
-  // Delete existing FAQs for this wedding first to prevent duplicates on re-seed.
-  await db.fAQ.deleteMany({ where: { weddingId: wedding.id } });
   const faqs = [
     { question: 'What is the dress code?', answer: 'The dress code is formal / black tie. We kindly request guests to avoid wearing white.', sortOrder: 1 },
     { question: 'Can I bring a plus one?', answer: 'Your invitation will indicate whether a plus one is included. If you\'re unsure, please reach out to us.', sortOrder: 2 },
@@ -154,8 +148,6 @@ async function seed() {
   console.log(`✅ ${faqs.length} FAQs seeded`);
 
   // 8. Seed sample story items
-  // Delete existing story items for this wedding first to prevent duplicates on re-seed.
-  await db.storyItem.deleteMany({ where: { weddingId: wedding.id } });
   const stories = [
     { title: 'How We Met', content: 'It was a rainy Tuesday at a cozy bookstore in Chinatown. Both reaching for the same worn copy of "Love in the Time of Cholera," our hands touched, and the rest of the world faded away. We spent three hours talking over coffee that day, and neither of us wanted to leave.', date: 'March 2023', sortOrder: 1 },
     { title: 'The First Date', content: 'James planned an elaborate dinner at a hidden omakase bar. Eleanor showed up 20 minutes late (she\'ll deny it), but the sushi was worth the wait. By dessert, we both knew this was something special.', date: 'April 2023', sortOrder: 2 },
