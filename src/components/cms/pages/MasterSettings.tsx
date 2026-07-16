@@ -89,7 +89,7 @@ const SETTINGS_SECTIONS: { title: string; description: string; fields: SettingFi
     description: 'Default values for new wedding accounts',
     fields: [
       { key: 'default_wedding_status', label: 'Default Wedding Status', type: 'select', defaultValue: 'DRAFT', options: ['DRAFT', 'ACTIVE'] },
-      { key: 'default_plan', label: 'Default Plan', type: 'select', defaultValue: 'FREE', options: ['FREE', 'PREMIUM', 'ENTERPRISE'] },
+      { key: 'default_plan', label: 'Default Plan', type: 'select', defaultValue: 'GOLD', options: ['GOLD', 'PLATINUM', 'DIAMOND'] },
       { key: 'max_guests_per_wedding', label: 'Max Guests Per Wedding', type: 'number', defaultValue: '500', placeholder: '500' },
       { key: 'max_media_per_wedding', label: 'Max Media Per Wedding', type: 'number', defaultValue: '100', placeholder: '100' },
     ],
@@ -417,8 +417,8 @@ export default function MasterSettings() {
             <CardContent className="space-y-5">
               {/* Header Background Colour */}
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-slate-700">Header Background Colour</Label>
-                <p className="text-xs text-slate-400">Sets the header bar background for ALL wedding sites. Leave empty to use each wedding's page background.</p>
+                <Label className="text-sm font-medium text-slate-700">Header &amp; Footer Background Colour</Label>
+                <p className="text-xs text-slate-400">Sets the header AND footer bar background for ALL wedding sites. Leave empty to use the default DW paper-cream (#FCF9F2). This is independent of each couple's page background colour.</p>
                 <div className="flex items-center gap-3 mt-1">
                   <div
                     className="relative h-10 w-20 rounded-lg border border-slate-200 overflow-hidden cursor-pointer transition-colors"

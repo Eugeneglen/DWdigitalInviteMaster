@@ -299,7 +299,7 @@ function RSVPPageInner() {
     <main className="flex-1 w-full max-w-xl mx-auto px-6 pt-32 pb-20 flex flex-col">
       {/* Event header */}
       <div className="text-center mb-10">
-        <h1 className="font-serif italic text-[40px] md:text-[52px] leading-tight text-charcoal-ink">{coupleName}</h1>
+        <h1 className="italic text-[40px] md:text-[52px] leading-tight text-charcoal-ink" style={{ fontFamily: "'Playfair Display', serif" }}>{coupleName}</h1>
         <p className="mt-4 text-[15px] text-charcoal-ink/80">{venue}, {venueAddress}</p>
         {rsvpDeadline && (
           <p className="mt-3 text-[13px] text-cinematic-gold/80 italic">

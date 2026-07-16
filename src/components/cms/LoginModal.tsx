@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { signIn, signOut, useSession, update } from 'next-auth/react';
+import { signIn, signOut, useSession } from 'next-auth/react';
 import {
   Dialog,
   DialogContent,
@@ -65,10 +65,12 @@ export function LoginModal({ open, onOpenChange, variant = 'default', targetRole
       if (result?.error) {
         setError('Invalid email or password. Please try again.');
       } else {
-        // Close modal and force session refresh so page.tsx
-        // immediately re-renders with the CMS layout.
+        // Just close the modal. The parent component (CoupleCMSView / AdminCMSView)
+        // will detect the session change via useSession() and render the CMS.
+        // We do NOT navigate away — this preserves the ?view= parameter.
         useAuthModalStore.getState().closeModal();
-        await update();
+        setEmail('');
+        setPassword('');
       }
     } catch {
       setError('An unexpected error occurred. Please try again.');
@@ -242,8 +244,8 @@ export function LoginModal({ open, onOpenChange, variant = 'default', targetRole
         onInteractOutside={(e) => e.preventDefault()}
         onPointerDownOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => {
+          e.preventDefault();
           if (isRecoveryView) {
-            e.preventDefault();
             switchView('login');
           }
         }}

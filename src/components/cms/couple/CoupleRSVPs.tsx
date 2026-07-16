@@ -14,8 +14,29 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import SectionContentFields, { type ContentField } from './SectionContentFields';
 
 const API_BASE = '/api/cms/rsvps?XTransformPort=3000';
+
+const RSVP_CONTENT_FIELDS: ContentField[] = [
+  { key: 'title', label: 'Section Title', type: 'text', placeholder: 'e.g. RSVP' },
+  { key: 'subtitle', label: 'Section Subtitle', type: 'text', placeholder: 'e.g. Kindly respond by 1st November 2027' },
+  { key: 'deadline', label: 'RSVP Deadline', type: 'text', placeholder: 'e.g. 2027-11-01' },
+  { key: 'thankYouMessage', label: 'Thank You Message', type: 'textarea', placeholder: 'Message shown after RSVP submission...' },
+  { key: 'declinedMessage', label: 'Declined Message', type: 'textarea', placeholder: 'Message shown when guest declines...' },
+  { key: 'ceremonyName', label: 'Ceremony Name', type: 'text', placeholder: 'e.g. Wedding Solemnisation, Wedding Reception' },
+  { key: 'optYes', label: '"Yes" Option Label', type: 'text', placeholder: 'e.g. Yes!' },
+  { key: 'optPartial', label: '"Partial" Option Label', type: 'text', placeholder: "e.g. Yes, but I won't be staying for the reception" },
+  { key: 'optNo', label: '"No" Option Label', type: 'text', placeholder: "e.g. I'm sorry, I won't be able to make it" },
+  { key: 'dietaryOptions', label: 'Dietary Options', type: 'text', placeholder: 'Comma-separated: Halal, Vegetarian, No Seafood, Vegan' },
+  { key: 'step0Title', label: 'Step 1 Title', type: 'text', placeholder: 'e.g. Enter your name to RSVP' },
+  { key: 'step0Subtext', label: 'Step 1 Subtitle', type: 'text', placeholder: 'e.g. You can respond for more guests in the following steps.' },
+  { key: 'step1Title', label: 'Step 2 Title', type: 'text', placeholder: 'e.g. How many people are in your party?' },
+  { key: 'step2Title', label: 'Step 3 Title', type: 'text', placeholder: 'e.g. Confirm each guest and their dietary needs.' },
+  { key: 'step2Subtext', label: 'Step 3 Subtitle', type: 'text', placeholder: 'e.g. Dietary selections are optional.' },
+  { key: 'resultThankYou', label: 'Thank You Title', type: 'text', placeholder: 'e.g. Thank you' },
+  { key: 'resultWeMissYou', label: 'Declined Title', type: 'text', placeholder: "e.g. We'll Miss You" },
+];
 
 interface GuestResponse {
   id: string;
@@ -292,6 +313,14 @@ export default function CoupleRSVPs() {
           })}
         </div>
       )}
+
+      {/* RSVP Section Text — moved from Content Editor */}
+      <SectionContentFields
+        section="rsvp"
+        title="RSVP Section Text"
+        description="Customise the text displayed on your RSVP form"
+        fields={RSVP_CONTENT_FIELDS}
+      />
     </div>
   );
 }

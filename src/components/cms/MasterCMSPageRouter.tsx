@@ -9,18 +9,21 @@ const MasterUsers = dynamic(() => import('./pages/MasterUsers'), { ssr: false })
 const MasterTemplates = dynamic(() => import('./pages/MasterTemplates'), { ssr: false });
 const MasterAnalytics = dynamic(() => import('./pages/MasterAnalytics'), { ssr: false });
 const MasterSettings = dynamic(() => import('./pages/MasterSettings'), { ssr: false });
+const MasterAuditLog = dynamic(() => import('./pages/MasterAuditLog'), { ssr: false });
 
-const PAGE_MAP: Record<CMSPage, React.ComponentType> = {
+const PAGE_MAP: Partial<Record<CMSPage, React.ComponentType>> = {
   dashboard: MasterDashboard,
   weddings: MasterWeddings,
   users: MasterUsers,
   templates: MasterTemplates,
   analytics: MasterAnalytics,
   settings: MasterSettings,
+  audit: MasterAuditLog,
 };
 
 export default function MasterCMSPageRouter() {
   const { currentPage } = useCMSStore();
   const Page = PAGE_MAP[currentPage];
+  if (!Page) return <MasterDashboard />;
   return <Page />;
 }

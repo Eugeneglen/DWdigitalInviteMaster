@@ -1,14 +1,25 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import SectionBanner from '../SectionBanner';
 import { usePublicWedding } from '@/hooks/usePublicWedding';
 import { useLiveWeddingData, type LiveWish } from '@/hooks/useLiveWeddingData';
 
 export default function WishesPage() {
+  return (
+    <Suspense>
+      <WishesPageInner />
+    </Suspense>
+  );
+}
+
+function WishesPageInner() {
   const { data, getField } = usePublicWedding();
   const weddingId = data?.wedding?.id;
   const { liveWishes, addWish } = useLiveWeddingData({ weddingId });
+
+  const searchParams = useSearchParams();
 
   const sectionTitle = getField('wishes', 'title', 'Wishes & Blessings');
   const sectionSubtitle = getField('wishes', 'subtitle', 'A curated sanctuary of wisdom and love from those we cherish most.');
@@ -20,7 +31,24 @@ export default function WishesPage() {
   const formEyebrow = getField('wishes', 'formEyebrow', 'YOUR TURN');
   const formHeading = getField('wishes', 'formHeading', 'Contribute to the Heirloom');
 
-  const [name, setName] = useState('');
+  // Auto-fill the name from URL params (?name= or ?first=&last=).
+  // Matches the RSVP page pattern so a single shared invitation link
+  // (e.g. /?name=John+Doe or /?first=John&last=Doe) pre-populates both
+  // the RSVP form AND this wishes form. Guest can still edit the field.
+  const autoName = useMemo(() => {
+    const paramFirst = searchParams.get('first');
+    const paramLast = searchParams.get('last');
+    const paramName = searchParams.get('name');
+    if (paramFirst && paramLast) {
+      return `${paramFirst} ${paramLast}`.trim();
+    }
+    if (paramName) {
+      return paramName.trim();
+    }
+    return '';
+  }, [searchParams]);
+
+  const [name, setName] = useState(autoName);
   const [relationship, setRelationship] = useState('');
   const [message, setMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);

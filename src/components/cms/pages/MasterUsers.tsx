@@ -203,12 +203,8 @@ export default function MasterUsers() {
     }
   }, [search]);
 
-  useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
-
   // ── Search debounce ───────────────────────────────────────────────────
-
+  // Single debounced fetch — fires on mount AND when search changes (after 300ms)
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchUsers();

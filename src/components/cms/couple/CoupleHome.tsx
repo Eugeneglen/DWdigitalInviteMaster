@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { useCoupleCMSStore } from '@/store/useCoupleCMSStore';
 import { HeroVisualSection, BannerSection } from './CoupleHeroBanner';
-import InlineImageUpload from './InlineImageUpload';
+import MirrorImageUpload from './MirrorImageUpload';
 import FontPicker from './FontPicker';
 import BackgroundColorPicker from './BackgroundColorPicker';
 import { invalidateWeddingCache } from '@/hooks/usePublicWedding';
@@ -37,6 +37,7 @@ const HERO_FIELDS = [
 const TEA_CEREMONY_FIELDS = [
   { key: 'teaCeremonyLabel', label: 'Label', type: 'text' as const, placeholder: 'e.g. The Tradition' },
   { key: 'teaCeremonyTitle', label: 'Title', type: 'text' as const, placeholder: 'e.g. The Tea Ceremony' },
+  { key: 'teaCeremonyBody', label: 'Body Text', type: 'textarea' as const, placeholder: 'A short description of the tea ceremony…' },
 ];
 
 const NARRATIVE_FIELDS = [
@@ -273,63 +274,62 @@ export default function CoupleHome() {
 
       <Separator className="bg-champagne-silk" />
 
-      {/* 7. Tea Ceremony Section */}
+      {/* 7. Tea Ceremony Section — image beside text fields (compact) */}
       <div className="space-y-3">
         <Label className="text-xs font-medium text-charcoal-ink/50 uppercase tracking-wider">
           Tea Ceremony Section
         </Label>
         <Card className="border-charcoal-ink/5 shadow-none">
-          <CardContent className="p-4 space-y-4">
-            {/* Tea Ceremony Image — file upload instead of text URL */}
-            <div className="space-y-2">
-              <Label className="text-xs font-medium text-charcoal-ink/50 uppercase tracking-wider flex items-center gap-1.5">
-                Image
-                {editedFields[`hero/teaCeremonyImage`] !== undefined && (
-                  <span className="inline-flex h-1.5 w-1.5 rounded-full bg-cinematic-gold" />
-                )}
-              </Label>
-              <InlineImageUpload
+          <CardContent className="p-4">
+            <div className="flex flex-col md:flex-row gap-4 items-start">
+              {/* Tea Ceremony Image — constrained to 280px, 2:3 portrait */}
+              <MirrorImageUpload
                 value={getFieldValue('teaCeremonyImage')}
                 onChange={(dataUrl) => setFieldValue('teaCeremonyImage', dataUrl)}
                 onRemove={() => setFieldValue('teaCeremonyImage', '')}
-                label="Upload tea ceremony photo"
+                label="Image"
+                helperText="2:3 portrait · mirrors guest site"
                 aspectClass="aspect-[2/3]"
+                maxWidth="280px"
               />
+              {/* Text fields beside the image */}
+              <div className="space-y-4 flex-1 min-w-0">
+                {TEA_CEREMONY_FIELDS.map((field) => {
+                  const value = getFieldValue(field.key);
+                  const isChanged = editedFields[`hero/${field.key}`] !== undefined;
+                  return (
+                    <div key={field.key} className="space-y-1.5">
+                      <Label
+                        htmlFor={`hero-content-${field.key}`}
+                        className="text-xs font-medium text-charcoal-ink/50 uppercase tracking-wider flex items-center gap-1.5"
+                      >
+                        {field.label}
+                        {isChanged && <span className="inline-flex h-1.5 w-1.5 rounded-full bg-cinematic-gold" />}
+                      </Label>
+                      {field.type === 'textarea' ? (
+                        <Textarea
+                          id={`hero-content-${field.key}`}
+                          value={value}
+                          onChange={(e) => setFieldValue(field.key, e.target.value)}
+                          placeholder={field.placeholder}
+                          rows={3}
+                          className={`border-charcoal-ink/10 focus:border-cinematic-gold focus:ring-cinematic-gold/20 resize-none ${isChanged ? 'border-cinematic-gold/50' : ''}`}
+                        />
+                      ) : (
+                        <Input
+                          id={`hero-content-${field.key}`}
+                          type="text"
+                          value={value}
+                          onChange={(e) => setFieldValue(field.key, e.target.value)}
+                          placeholder={field.placeholder}
+                          className={`border-charcoal-ink/10 focus:border-cinematic-gold focus:ring-cinematic-gold/20 ${isChanged ? 'border-cinematic-gold/50' : ''}`}
+                        />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-            {TEA_CEREMONY_FIELDS.map((field) => {
-              const value = getFieldValue(field.key);
-              const isChanged = editedFields[`hero/${field.key}`] !== undefined;
-              return (
-                <div key={field.key} className="space-y-1.5">
-                  <Label
-                    htmlFor={`hero-content-${field.key}`}
-                    className="text-xs font-medium text-charcoal-ink/50 uppercase tracking-wider flex items-center gap-1.5"
-                  >
-                    {field.label}
-                    {isChanged && <span className="inline-flex h-1.5 w-1.5 rounded-full bg-cinematic-gold" />}
-                  </Label>
-                  {field.type === 'textarea' ? (
-                    <Textarea
-                      id={`hero-content-${field.key}`}
-                      value={value}
-                      onChange={(e) => setFieldValue(field.key, e.target.value)}
-                      placeholder={field.placeholder}
-                      rows={3}
-                      className={`border-charcoal-ink/10 focus:border-cinematic-gold focus:ring-cinematic-gold/20 resize-none ${isChanged ? 'border-cinematic-gold/50' : ''}`}
-                    />
-                  ) : (
-                    <Input
-                      id={`hero-content-${field.key}`}
-                      type="text"
-                      value={value}
-                      onChange={(e) => setFieldValue(field.key, e.target.value)}
-                      placeholder={field.placeholder}
-                      className={`border-charcoal-ink/10 focus:border-cinematic-gold focus:ring-cinematic-gold/20 ${isChanged ? 'border-cinematic-gold/50' : ''}`}
-                    />
-                  )}
-                </div>
-              );
-            })}
           </CardContent>
         </Card>
       </div>

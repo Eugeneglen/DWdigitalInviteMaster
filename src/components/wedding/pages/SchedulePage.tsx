@@ -124,9 +124,9 @@ export default function SchedulePage() {
   const schedules = (data?.schedules && data.schedules.length > 0) ? data.schedules : FALLBACK_SCHEDULE_ITEMS;
   const scheduleImages = data?.mediaByCategory?.schedule ?? [];
 
-  // Use CMS images if available, otherwise fallback to hardcoded
-  const ceremonyImg = scheduleImages[0]?.url || CEREMONY_IMG;
-  const celebrationImg = scheduleImages[1]?.url || CELEBRATION_IMG;
+  // Use CMS images if available, otherwise no image (empty state)
+  const ceremonyImg = scheduleImages[0]?.url || '';
+  const celebrationImg = scheduleImages[1]?.url || '';
 
   const handleAddToCalendar = useCallback(() => {
     const calendarDates = getCalendarDateStr(data?.wedding.weddingDate);
@@ -165,15 +165,21 @@ export default function SchedulePage() {
       </div>
 
       <main className="pb-section-gap px-4 md:px-canvas-margin max-w-[1440px] mx-auto min-h-screen pt-[20px] md:pt-[40px]">
-        {/* Intro Images */}
+        {/* Intro Images — only show if couple has uploaded them */}
+        {(ceremonyImg || celebrationImg) && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16 stagger-1">
-          <div className="aspect-[4/5] overflow-hidden rounded-lg">
-            <img alt="The Ceremony" className="w-full h-full object-cover" src={ceremonyImg} />
-          </div>
-          <div className="aspect-[4/5] overflow-hidden rounded-lg">
-            <img alt="The Celebration" className="w-full h-full object-cover" src={celebrationImg} />
-          </div>
+          {ceremonyImg ? (
+            <div className="aspect-[4/5] overflow-hidden rounded-lg">
+              <img alt="The Ceremony" className="w-full h-full object-cover" src={ceremonyImg} />
+            </div>
+          ) : <div className="aspect-[4/5] rounded-lg bg-champagne-silk/20 flex items-center justify-center"><p className="text-charcoal-ink/25 text-xs italic">Photo coming soon</p></div>}
+          {celebrationImg ? (
+            <div className="aspect-[4/5] overflow-hidden rounded-lg">
+              <img alt="The Celebration" className="w-full h-full object-cover" src={celebrationImg} />
+            </div>
+          ) : <div className="aspect-[4/5] rounded-lg bg-champagne-silk/20 flex items-center justify-center"><p className="text-charcoal-ink/25 text-xs italic">Photo coming soon</p></div>}
         </div>
+        )}
 
         {/* Date line */}
         <section className="mb-24 text-center stagger-1">

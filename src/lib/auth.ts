@@ -6,11 +6,12 @@ import { readFileSync } from 'fs';
 import path from 'path';
 import jwt from 'jsonwebtoken';
 import { db } from '@/lib/db';
-import { cookies } from 'next/headers';
 
 // ── getServerSession wrapper ──────────────────────────────────────────────
 // Re-exports NextAuth's built-in getServerSession with authOptions pre-bound.
-// Used by auth-middleware.ts and other server-side route handlers.
+// SECURITY: No hardcoded secret literals. Secret is resolved exclusively
+// from process.env (NEXTAUTH_SECRET / JWT_SECRET) with a .env file fallback
+// for local Turbopack dev only.
 export async function getServerSession() {
   return nextAuthGetServerSession(authOptions);
 }
@@ -146,6 +147,20 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: 'jwt',
     maxAge: 24 * 60 * 60,
+  },
+  // Railway's proxy terminates TLS, so the app sees HTTP internally.
+  // NextAuth sets 'Secure' cookies by default in production, which won't
+  // be sent back over the internal HTTP connection. Override to non-secure.
+  cookies: {
+    sessionToken: {
+      name: 'next-auth.session-token',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: false,
+      },
+    },
   },
   pages: {
     signIn: '/',

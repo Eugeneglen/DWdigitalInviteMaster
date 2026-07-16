@@ -1,11 +1,11 @@
 // ── Feature keys & labels (client-safe — no Node.js / NextAuth deps) ────
+// Canonical feature key for Q&A is 'qa' (NOT 'faq'). All code uses 'qa'.
 export const FEATURE_KEYS = {
   RSVP: 'rsvp',
   WISHES: 'wishes',
   STORY: 'story',
   GALLERY: 'gallery',
   SCHEDULE: 'schedule',
-  FAQ: 'faq',
   MOMENTS: 'moments',
   GETTING_THERE: 'getting-there',
   COUNTDOWN: 'countdown',
@@ -20,12 +20,11 @@ export const FEATURE_LABELS: Record<string, string> = {
   story: 'Our Story',
   gallery: 'Photo Gallery',
   schedule: 'Event Schedule',
-  faq: 'FAQ',
   moments: 'Moments',
   'getting-there': 'Getting There',
   countdown: 'Countdown',
   music: 'Background Music',
-  video: 'Video',
+  video: 'Wedding Video',
   qa: 'Q&A',
 };
 
@@ -35,16 +34,32 @@ export const GLOBAL_FEATURE_LABELS: Record<string, string> = {
 
 // ── Role labels ─────────────────────────────────────────────────────
 export const ROLE_LABELS: Record<string, string> = {
-  SUPER_ADMIN: 'Super Admin',
+  SUPER_ADMIN: 'Platform Admin',
   ACCOUNT_MANAGER: 'Account Manager',
   COUPLE: 'Couple',
-  ADMIN_1: 'Admin 1',
-  ADMIN_2: 'Admin 2',
-  ADMIN_3: 'Admin 3',
+  ADMIN_1: 'Consultant',
+  ADMIN_2: 'Coordinator',
+  ADMIN_3: 'Operations Staff',
 };
 
 export const TENANT_ROLE_LABELS: Record<string, string> = {
   admin: 'Admin',
   editor: 'Editor',
   viewer: 'Viewer',
+};
+
+// ── Package labels ──────────────────────────────────────────────────
+export const PACKAGE_LABELS: Record<string, string> = {
+  GOLD: 'Gold',
+  PLATINUM: 'Platinum',
+  DIAMOND: 'Diamond',
+};
+
+// ── Account status labels (lifecycle) ───────────────────────────────
+export const ACCOUNT_STATUS_LABELS: Record<string, string> = {
+  ONBOARDING: 'Onboarding',
+  ACTIVE: 'Active',
+  COMPLETED: 'Completed',
+  EXPIRED: 'Expired',
+  SUSPENDED: 'Suspended',
 };

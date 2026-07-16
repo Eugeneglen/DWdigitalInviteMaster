@@ -81,9 +81,9 @@ export default function StoryPage() {
   const { data, getField } = usePublicWedding();
 
   const subtitle = getField('story', 'subtitle', FALLBACK_SUBTITLE);
-  const stories = (data?.stories && data.stories.length > 0) ? data.stories : FALLBACK_STORIES;
+  const stories = (data?.stories && data.stories.length > 0) ? data.stories : [];
   const storyImages = data?.mediaByCategory?.story ?? [];
-  const heroImg = storyImages[0]?.url || HERO_IMG;
+  const heroImg = storyImages[0]?.url || '';
 
   // Tidbits — read from CMS content, fallback to defaults
   const tidbits = safeParseJSON<Tidbit[]>(getField('story', 'tidbits', ''), FALLBACK_TIDBITS);
@@ -148,13 +148,21 @@ export default function StoryPage() {
           <p className="text-charcoal-ink max-w-2xl mx-auto opacity-80 mb-12 italic" style={{ fontSize: '18px', lineHeight: '32px' }}>
             {subtitle}
           </p>
-          <div className="w-full max-w-4xl aspect-[16/9] inner-frame bg-surface-container-high overflow-hidden shadow-[0_20px_40px_rgba(26,26,26,0.08)]">
-            <img alt="Our Story Hero" className="w-full h-full object-cover object-center" src={heroImg} />
-          </div>
+          {heroImg ? (
+            <div className="w-full max-w-4xl aspect-[16/9] inner-frame bg-surface-container-high overflow-hidden shadow-[0_20px_40px_rgba(26,26,26,0.08)]">
+              <img alt="Our Story Hero" className="w-full h-full object-cover object-center" src={heroImg} />
+            </div>
+          ) : null}
         </section>
 
         {/* Timeline */}
         <section className="reveal py-section-gap relative">
+          {stories.length === 0 ? (
+            <div className="py-20 text-center">
+              <p className="text-charcoal-ink/30 text-sm italic">Our story coming soon.</p>
+            </div>
+          ) : (
+          <>
           <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-[1px] bg-champagne-silk/50 -translate-x-1/2" />
           <div className="flex flex-col gap-section-gap">
             {stories.map((story, idx) => {
@@ -198,6 +206,8 @@ export default function StoryPage() {
               );
             })}
           </div>
+          </>
+          )}
         </section>
 
         {/* Tidbits — only show if there are tidbits */}

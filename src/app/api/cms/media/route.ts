@@ -103,11 +103,12 @@ export async function PUT(req: NextRequest) {
     if (!weddingId) return NextResponse.json({ error: 'No wedding account' }, { status: 404 });
 
     const body = await req.json();
-    const { id, category, sortOrder, fileName, setAs } = body as {
+    const { id, category, sortOrder, fileName , setAs } = body as {
       id: string;
       category?: string;
       sortOrder?: number;
       fileName?: string;
+      
       setAs?: 'hero' | 'banner';
     };
 

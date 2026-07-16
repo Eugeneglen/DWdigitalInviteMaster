@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { invalidateWeddingCache } from '@/hooks/usePublicWedding';
-import SectionImageUpload from './SectionImageUpload';
+import MirrorImageGallery from './MirrorImageGallery';
 
 const API_BASE = '/api/cms/content?XTransformPort=3000';
 
@@ -171,10 +171,7 @@ export default function CoupleMoments() {
 
       <Separator className="bg-champagne-silk" />
 
-      {/* Section Image Upload */}
-      <SectionImageUpload category="moments" label="Moments Gallery" maxImages={20} />
-
-      {/* Content Fields */}
+      {/* Content Fields (Section Title + Subtitle) — moved above the gallery */}
       <Card className="border-charcoal-ink/5 shadow-none">
         <CardContent className="p-4 space-y-4">
           {FIELDS.map((field) => {
@@ -207,6 +204,9 @@ export default function CoupleMoments() {
           })}
         </CardContent>
       </Card>
+
+      {/* Section Image Upload */}
+      <MirrorImageGallery category="moments" label="Moments Gallery" maxImages={20} aspectClass="aspect-[3/4]" helperText="3:4 portrait crop mirrors the guest-site masonry gallery" />
     </div>
   );
 }

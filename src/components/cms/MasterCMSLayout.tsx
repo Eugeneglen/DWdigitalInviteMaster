@@ -12,6 +12,7 @@ import {
   LogOut,
   ChevronsUpDown,
   ArrowRightLeft,
+  ScrollText,
 } from 'lucide-react';
 import { useAuthModalStore } from '@/store/useAuthModalStore';
 import { NotificationBell } from '@/components/cms/NotificationBell';
@@ -51,16 +52,18 @@ const NAV_ITEMS: { key: CMSPage; label: string; icon: React.ElementType; tooltip
   { key: 'templates', label: 'Content Templates', icon: FileText, tooltip: 'Content Templates' },
   { key: 'analytics', label: 'Analytics', icon: BarChart3, tooltip: 'Analytics' },
   { key: 'settings', label: 'Settings', icon: Settings, tooltip: 'Settings' },
-  { key: 'users', label: 'Users', icon: Users, tooltip: 'Users' },
+  { key: 'users', label: 'Team', icon: Users, tooltip: 'Team' },
+  { key: 'audit', label: 'Audit Log', icon: ScrollText, tooltip: 'Audit Log' },
 ];
 
 const PAGE_TITLES: Record<CMSPage, string> = {
   dashboard: 'Dashboard',
   weddings: 'Wedding Accounts',
-  users: 'Users',
+  users: 'Team',
   templates: 'Content Templates',
   analytics: 'Analytics',
   settings: 'Settings',
+  audit: 'Audit Log',
 };
 
 function CMSLogo() {
@@ -258,7 +261,7 @@ function CMSHeader() {
               Switch Account
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => signOut({ callbackUrl: '/' })}
+              onClick={() => signOut({ callbackUrl: '/?view=cms' })}
               className="text-red-600 cursor-pointer"
             >
               <LogOut className="mr-2 size-4" />

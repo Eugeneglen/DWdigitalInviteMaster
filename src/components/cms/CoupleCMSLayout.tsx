@@ -21,9 +21,9 @@ import {
   BarChart3,
   MapPin,
   Camera,
-  FileText,
   LayoutDashboard,
   MoreHorizontal,
+  Lock,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { NotificationBell } from '@/components/cms/NotificationBell';
@@ -32,11 +32,11 @@ import { Separator } from '@/components/ui/separator';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useCoupleCMSStore, type CoupleCMSPage } from '@/store/useCoupleCMSStore';
 import { useAuthModalStore } from '@/store/useAuthModalStore';
+import { isPageEnabled, extractFeatureFlags } from '@/lib/feature-lock';
 
 const NAV_ITEMS: { key: CoupleCMSPage; label: string; icon: React.ElementType }[] = [
   { key: 'overview', label: 'Overview', icon: Home },
   { key: 'details', label: 'Your Details', icon: Heart },
-  { key: 'content', label: 'Content', icon: FileText },
   { key: 'home', label: 'Home', icon: LayoutDashboard },
   { key: 'schedule', label: 'Schedule', icon: Calendar },
   { key: 'rsvps', label: 'RSVPs', icon: Mail },
@@ -60,6 +60,9 @@ export default function CoupleCMSLayout({ children }: { children: React.ReactNod
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [moreOpen, setMoreOpen] = useState(false);
+
+  // Extract feature flags from wedding data
+  const featureFlags = extractFeatureFlags(weddingData as Record<string, unknown> | null);
 
   useEffect(() => {
     async function fetchWedding() {
@@ -174,23 +177,29 @@ export default function CoupleCMSLayout({ children }: { children: React.ReactNod
             {NAV_ITEMS.map((item) => {
               const Icon = item.icon;
               const isActive = currentPage === item.key;
+              const isEnabled = isPageEnabled(item.key, featureFlags);
 
               return (
                 <li key={item.key}>
                   <button
-                    onClick={() => setPage(item.key)}
+                    onClick={() => isEnabled && setPage(item.key)}
+                    disabled={!isEnabled}
+                    title={!isEnabled ? 'Not available in your package' : undefined}
                     className={`
                       relative flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium
                       transition-colors duration-150
                       ${
-                        isActive
-                          ? 'border-l-2 border-cinematic-gold bg-cinematic-gold/5 text-cinematic-gold'
-                          : 'text-charcoal-ink/60 hover:bg-champagne-silk/40 hover:text-charcoal-ink border-l-2 border-transparent'
+                        !isEnabled
+                          ? 'border-l-2 border-transparent text-charcoal-ink/20 cursor-not-allowed'
+                          : isActive
+                            ? 'border-l-2 border-cinematic-gold bg-cinematic-gold/5 text-cinematic-gold'
+                            : 'text-charcoal-ink/60 hover:bg-champagne-silk/40 hover:text-charcoal-ink border-l-2 border-transparent'
                       }
                     `}
                   >
                     <Icon className="size-4 shrink-0" />
-                    <span>{item.label}</span>
+                    <span className={isEnabled ? '' : 'line-through'}>{item.label}</span>
+                    {!isEnabled && <Lock className="size-3 shrink-0 ml-auto text-charcoal-ink/20" />}
                   </button>
                 </li>
               );
@@ -223,7 +232,7 @@ export default function CoupleCMSLayout({ children }: { children: React.ReactNod
           </Button>
           <Button
             variant="ghost"
-            onClick={() => signOut({ callbackUrl: '/' })}
+            onClick={() => signOut({ callbackUrl: '/?view=couple' })}
             className="w-full justify-start gap-2 text-charcoal-ink/30 hover:text-charcoal-ink hover:bg-champagne-silk/40 px-3 text-xs font-medium"
           >
             <LogOut className="size-3.5" />
@@ -272,7 +281,7 @@ export default function CoupleCMSLayout({ children }: { children: React.ReactNod
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => signOut({ callbackUrl: '/' })}
+              onClick={() => signOut({ callbackUrl: '/?view=couple' })}
               className="hidden sm:flex items-center gap-2 text-charcoal-ink/60 hover:text-charcoal-ink px-2 h-auto py-1.5 text-sm font-medium"
             >
               <LogOut className="size-3.5" />
@@ -299,17 +308,22 @@ export default function CoupleCMSLayout({ children }: { children: React.ReactNod
           {visibleNavItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentPage === item.key;
+            const isEnabled = isPageEnabled(item.key, featureFlags);
 
             return (
               <button
                 key={item.key}
-                onClick={() => setPage(item.key)}
+                onClick={() => isEnabled && setPage(item.key)}
+                disabled={!isEnabled}
                 className={`
                   flex flex-col items-center gap-0.5 rounded-md px-2 py-1.5 transition-colors duration-150
-                  ${isActive ? 'text-cinematic-gold' : 'text-charcoal-ink/40'}
+                  ${!isEnabled ? 'text-charcoal-ink/15' : isActive ? 'text-cinematic-gold' : 'text-charcoal-ink/40'}
                 `}
               >
-                <Icon className="size-5" />
+                <div className="relative">
+                  <Icon className="size-5" />
+                  {!isEnabled && <Lock className="size-2.5 absolute -top-0.5 -right-0.5 text-charcoal-ink/20" />}
+                </div>
                 <span className="text-[10px] font-medium leading-tight">{item.label}</span>
               </button>
             );
@@ -320,7 +334,7 @@ export default function CoupleCMSLayout({ children }: { children: React.ReactNod
               <button
                 className={`
                   flex flex-col items-center gap-0.5 rounded-md px-2 py-1.5 transition-colors duration-150
-                  ${currentPage !== 'overview' && currentPage !== 'details' && currentPage !== 'content' && currentPage !== 'home' && currentPage !== 'schedule'
+                  ${currentPage !== 'overview' && currentPage !== 'details' && currentPage !== 'home' && currentPage !== 'schedule'
                     ? 'text-cinematic-gold'
                     : 'text-charcoal-ink/40'}
                 `}
@@ -336,19 +350,26 @@ export default function CoupleCMSLayout({ children }: { children: React.ReactNod
                   {moreNavItems.map((item) => {
                     const Icon = item.icon;
                     const isActive = currentPage === item.key;
+                    const isEnabled = isPageEnabled(item.key, featureFlags);
                     return (
                       <button
                         key={item.key}
                         onClick={() => {
-                          setPage(item.key);
-                          setMoreOpen(false);
+                          if (isEnabled) {
+                            setPage(item.key);
+                            setMoreOpen(false);
+                          }
                         }}
+                        disabled={!isEnabled}
                         className={`
                           flex flex-col items-center gap-1.5 rounded-lg px-2 py-3 transition-colors duration-150
-                          ${isActive ? 'bg-cinematic-gold/10 text-cinematic-gold' : 'text-charcoal-ink/60 hover:bg-champagne-silk/40'}
+                          ${!isEnabled ? 'text-charcoal-ink/15 cursor-not-allowed' : isActive ? 'bg-cinematic-gold/10 text-cinematic-gold' : 'text-charcoal-ink/60 hover:bg-champagne-silk/40'}
                         `}
                       >
-                        <Icon className="size-5" />
+                        <div className="relative">
+                          <Icon className="size-5" />
+                          {!isEnabled && <Lock className="size-3 absolute -top-0.5 -right-0.5 text-charcoal-ink/20" />}
+                        </div>
                         <span className="text-[11px] font-medium leading-tight text-center">{item.label}</span>
                       </button>
                     );

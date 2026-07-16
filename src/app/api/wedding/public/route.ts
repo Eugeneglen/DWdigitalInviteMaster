@@ -8,14 +8,13 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const slug = searchParams.get('slug');
 
-    if (!slug) {
-      return NextResponse.json({ error: 'Wedding slug is required' }, { status: 400 });
-    }
-
-    const where = { slug, status: 'ACTIVE' };
+    // When no slug is provided (platform home page), fall back to the
+    // first active wedding so the landing page renders a real invitation.
+    const where = slug ? { slug, status: 'ACTIVE' as const } : { status: 'ACTIVE' as const };
 
     const wedding = await db.weddingAccount.findFirst({
       where,
+      orderBy: slug ? undefined : { createdAt: 'asc' },
       include: {
         content: true,
         schedules: { orderBy: { sortOrder: 'asc' } },

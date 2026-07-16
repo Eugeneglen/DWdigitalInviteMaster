@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { Loader2, Plus, Pencil, Trash2, BookOpen, Calendar, Lightbulb, Plane } from 'lucide-react';
-import SectionImageUpload from './SectionImageUpload';
-import InlineImageUpload from './InlineImageUpload';
+import MirrorImageGallery from './MirrorImageGallery';
+import MirrorImageUpload from './MirrorImageUpload';
 import { toast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -100,7 +100,6 @@ export default function CoupleStory() {
   const CONTENT_KEYS = [
     { key: 'title', label: 'Section Title', placeholder: 'e.g. Our Story', type: 'input' as const },
     { key: 'subtitle', label: 'Section Subtitle', placeholder: 'e.g. A journey of love', type: 'input' as const },
-    { key: 'recommendationPrompt', label: 'Recommendation Prompt', placeholder: '', type: 'input' as const },
   ];
 
   const fetchStories = useCallback(async () => {
@@ -391,6 +390,51 @@ export default function CoupleStory() {
     }
   };
 
+  // Inline image upload for a chapter — saves directly to StoryItem.imageUrl
+  // without opening the edit dialog. Lets couples add/replace a chapter's
+  // image right from the chapter card.
+  const [imageSavingId, setImageSavingId] = useState<string | null>(null);
+  const handleChapterImageChange = async (chapterId: string, dataUrl: string) => {
+    try {
+      setImageSavingId(chapterId);
+      const res = await fetch(API_BASE, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: chapterId, imageUrl: dataUrl }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Failed to update image');
+      }
+      invalidateWeddingCache();
+      toast({ title: 'Success', description: 'Chapter image updated' });
+      fetchStories();
+    } catch (err) {
+      toast({ title: 'Error', description: err instanceof Error ? err.message : 'Failed to update image', variant: 'destructive' });
+    } finally {
+      setImageSavingId(null);
+    }
+  };
+
+  const handleChapterImageRemove = async (chapterId: string) => {
+    try {
+      setImageSavingId(chapterId);
+      const res = await fetch(API_BASE, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: chapterId, imageUrl: '' }),
+      });
+      if (!res.ok) throw new Error('Failed to remove image');
+      invalidateWeddingCache();
+      toast({ title: 'Removed', description: 'Chapter image removed' });
+      fetchStories();
+    } catch (err) {
+      toast({ title: 'Error', description: err instanceof Error ? err.message : 'Failed to remove image', variant: 'destructive' });
+    } finally {
+      setImageSavingId(null);
+    }
+  };
+
   const hasContentChanges = Object.values(editedFields).some(Boolean) || tidbitsEdited || destinationsEdited;
 
   return (
@@ -423,7 +467,7 @@ export default function CoupleStory() {
         </div>
       </div>
 
-      <SectionImageUpload category="story" label="Story Images" maxImages={3} />
+      <MirrorImageGallery category="story" label="Story Hero Image" maxImages={3} aspectClass="aspect-[16/9]" helperText="16:9 · The big banner image at the top of the guest story page (first image is used as the hero)" />
 
       {/* Content Card */}
       <Card className="border-charcoal-ink/5 shadow-none">
@@ -464,7 +508,109 @@ export default function CoupleStory() {
 
       <Separator className="bg-champagne-silk" />
 
-      {/* ═══════════════ Tidbits Section ═══════════════ */}
+      {/* Timeline List */}
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-20 gap-4">
+          <Loader2 className="size-8 animate-spin text-cinematic-gold" />
+          <p className="text-sm text-charcoal-ink/50 font-medium">Loading your story…</p>
+        </div>
+      ) : stories.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 gap-3">
+          <BookOpen className="size-10 text-champagne-silk" />
+          <p className="text-sm text-charcoal-ink/40 font-medium">No chapters yet</p>
+          <p className="text-xs text-charcoal-ink/30">Click &quot;Add Chapter&quot; to start telling your story.</p>
+        </div>
+      ) : (
+        <div className="relative space-y-0">
+          {/* Timeline line */}
+          <div className="absolute left-[15px] top-4 bottom-4 w-px bg-champagne-silk hidden sm:block" />
+
+          {stories.map((item, index) => (
+            <div key={item.id} className="relative flex gap-4 pb-6 last:pb-0">
+              {/* Timeline dot */}
+              <div className="hidden sm:flex items-start pt-1.5 shrink-0">
+                <div className="relative z-10 flex h-[30px] w-[30px] items-center justify-center rounded-full border-2 border-cinematic-gold/30 bg-paper-cream">
+                  <div className="h-2 w-2 rounded-full bg-cinematic-gold" />
+                </div>
+              </div>
+
+              {/* Card */}
+              <Card className="flex-1 border-charcoal-ink/5 shadow-none hover:border-champagne-silk transition-colors duration-200 overflow-hidden">
+                <CardContent className="p-4">
+                  {/* Chapter header: number/title + edit/delete actions */}
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <div className="flex-1 min-w-0">
+                      <span className="sm:hidden inline-flex items-center justify-center h-5 w-5 rounded-full bg-cinematic-gold/10 text-cinematic-gold text-[10px] font-bold mb-2">
+                        {index + 1}
+                      </span>
+                      <h3 className="text-sm font-semibold text-charcoal-ink">
+                        {item.title}
+                      </h3>
+                      {item.date && (
+                        <span className="flex items-center gap-1 text-xs text-cinematic-gold/80 font-medium mt-0.5">
+                          <Calendar className="size-3" />
+                          {item.date}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => openEditDialog(item)}
+                        className="h-8 w-8 p-0 text-charcoal-ink/40 hover:text-cinematic-gold hover:bg-cinematic-gold/5"
+                        title="Edit chapter"
+                      >
+                        <Pencil className="size-3.5" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(item.id)}
+                        disabled={deleting === item.id}
+                        className="h-8 w-8 p-0 text-charcoal-ink/40 hover:text-red-500 hover:bg-red-50"
+                        title="Delete chapter"
+                      >
+                        {deleting === item.id ? (
+                          <Loader2 className="size-3.5 animate-spin" />
+                        ) : (
+                          <Trash2 className="size-3.5" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Image + text side-by-side (matches Tea Ceremony layout).
+                      Inline upload — no need to open the edit dialog just to
+                      add/replace an image. 16:9 mirrors the guest-site story
+                      chapter; constrained to 280px so it stays compact. */}
+                  <div className="flex flex-col md:flex-row gap-4 items-start">
+                    <MirrorImageUpload
+                      value={item.imageUrl ?? ''}
+                      onChange={(dataUrl) => handleChapterImageChange(item.id, dataUrl)}
+                      onRemove={() => handleChapterImageRemove(item.id)}
+                      disabled={imageSavingId === item.id}
+                      label="Image"
+                      helperText="16:9 · mirrors guest site"
+                      aspectClass="aspect-[16/9]"
+                      maxWidth="280px"
+                    />
+                    <div className="flex-1 min-w-0 space-y-1">
+                      <p className="text-xs text-charcoal-ink/50 line-clamp-4 leading-relaxed">
+                        {item.content}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <Separator className="bg-champagne-silk" />
+
+      {/* ═══════════════ Did You Know? (Tidbits) Section ═══════════════ */}
       <Card className="border-charcoal-ink/5 shadow-none">
         <CardContent className="p-6 space-y-5">
           <div className="flex items-center justify-between">
@@ -473,7 +619,7 @@ export default function CoupleStory() {
                 <Lightbulb className="size-4" />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-charcoal-ink">Tidbits</h3>
+                <h3 className="text-sm font-semibold text-charcoal-ink">Did You Know?</h3>
                 <p className="text-xs text-charcoal-ink/40">Fun Q&amp;A facts about the couple</p>
               </div>
             </div>
@@ -670,112 +816,6 @@ export default function CoupleStory() {
         </CardContent>
       </Card>
 
-      <Separator className="bg-champagne-silk" />
-
-      {/* Timeline List */}
-      {loading ? (
-        <div className="flex flex-col items-center justify-center py-20 gap-4">
-          <Loader2 className="size-8 animate-spin text-cinematic-gold" />
-          <p className="text-sm text-charcoal-ink/50 font-medium">Loading your story…</p>
-        </div>
-      ) : stories.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 gap-3">
-          <BookOpen className="size-10 text-champagne-silk" />
-          <p className="text-sm text-charcoal-ink/40 font-medium">No chapters yet</p>
-          <p className="text-xs text-charcoal-ink/30">Click &quot;Add Chapter&quot; to start telling your story.</p>
-        </div>
-      ) : (
-        <div className="relative space-y-0">
-          {/* Timeline line */}
-          <div className="absolute left-[15px] top-4 bottom-4 w-px bg-champagne-silk hidden sm:block" />
-
-          {stories.map((item, index) => (
-            <div key={item.id} className="relative flex gap-4 pb-6 last:pb-0">
-              {/* Timeline dot */}
-              <div className="hidden sm:flex items-start pt-1.5 shrink-0">
-                <div className="relative z-10 flex h-[30px] w-[30px] items-center justify-center rounded-full border-2 border-cinematic-gold/30 bg-paper-cream">
-                  <div className="h-2 w-2 rounded-full bg-cinematic-gold" />
-                </div>
-              </div>
-
-              {/* Card */}
-              <Card className="flex-1 border-charcoal-ink/5 shadow-none hover:border-champagne-silk transition-colors duration-200 overflow-hidden">
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1 min-w-0">
-                      {/* Mobile: chapter number */}
-                      <span className="sm:hidden inline-flex items-center justify-center h-5 w-5 rounded-full bg-cinematic-gold/10 text-cinematic-gold text-[10px] font-bold mb-2">
-                        {index + 1}
-                      </span>
-
-                      <h3 className="text-sm font-semibold text-charcoal-ink mb-1">
-                        {item.title}
-                      </h3>
-
-                      {item.date && (
-                        <span className="flex items-center gap-1 text-xs text-cinematic-gold/80 font-medium mb-2">
-                          <Calendar className="size-3" />
-                          {item.date}
-                        </span>
-                      )}
-
-                      {/* Thumbnail preview */}
-                      {item.imageUrl && (
-                        <div
-                          className="relative w-full max-w-[180px] aspect-[3/2] rounded-md overflow-hidden border border-charcoal-ink/8 mb-2 cursor-pointer group/thumb"
-                          onClick={() => openEditDialog(item)}
-                        >
-                          <img
-                            src={item.imageUrl}
-                            alt={item.title}
-                            className="w-full h-full object-cover transition-transform duration-300 group-hover/thumb:scale-105"
-                            unoptimized
-                          />
-                          <div className="absolute inset-0 bg-black/0 group-hover/thumb:bg-black/10 transition-colors duration-200" />
-                          <div className="absolute bottom-1 right-1 opacity-0 group-hover/thumb:opacity-100 transition-opacity duration-200">
-                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-black/50 text-white text-[9px] font-medium backdrop-blur-sm">
-                              <Pencil className="size-2.5" /> Edit
-                            </span>
-                          </div>
-                        </div>
-                      )}
-
-                      <p className="text-xs text-charcoal-ink/50 line-clamp-3 leading-relaxed">
-                        {item.content}
-                      </p>
-                    </div>
-
-                    <div className="flex items-center gap-1 shrink-0">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => openEditDialog(item)}
-                        className="h-8 w-8 p-0 text-charcoal-ink/40 hover:text-cinematic-gold hover:bg-cinematic-gold/5"
-                      >
-                        <Pencil className="size-3.5" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDelete(item.id)}
-                        disabled={deleting === item.id}
-                        className="h-8 w-8 p-0 text-charcoal-ink/40 hover:text-red-500 hover:bg-red-50"
-                      >
-                        {deleting === item.id ? (
-                          <Loader2 className="size-3.5 animate-spin" />
-                        ) : (
-                          <Trash2 className="size-3.5" />
-                        )}
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          ))}
-        </div>
-      )}
-
       {/* ═══════════════ Unified Dialog ═══════════════ */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="sm:max-w-md">
@@ -814,18 +854,8 @@ export default function CoupleStory() {
                     className="border-charcoal-ink/10 focus:border-cinematic-gold focus:ring-cinematic-gold/20"
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <Label className="text-sm font-medium text-charcoal-ink/70">
-                    Story Image
-                  </Label>
-                  <InlineImageUpload
-                    value={form.imageUrl}
-                    onChange={(dataUrl) => setForm({ ...form, imageUrl: dataUrl })}
-                    onRemove={() => setForm({ ...form, imageUrl: '' })}
-                    label="Upload story photo"
-                    aspectClass="aspect-[16/9]"
-                  />
-                </div>
+                {/* Note: chapter image is now uploaded inline on the chapter
+                    card (no need to open this dialog just to add an image). */}
                 <div className="space-y-1.5">
                   <Label htmlFor="story-content" className="text-sm font-medium text-charcoal-ink/70">
                     Content / Story <span className="text-red-400">*</span>

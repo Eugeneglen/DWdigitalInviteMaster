@@ -87,6 +87,7 @@ export default function HomePage() {
   const teaCeremonyImage = getField('hero', 'teaCeremonyImage', FALLBACK_TEA_IMG);
   const teaCeremonyLabel = getField('hero', 'teaCeremonyLabel', 'The Tradition');
   const teaCeremonyTitle = getField('hero', 'teaCeremonyTitle', 'The Tea Ceremony');
+  const teaCeremonyBody = getField('hero', 'teaCeremonyBody', '');
 
   // CMS font — applied ONLY to the master head copy (couple name)
   const heroFont = getField('hero', 'fontFamily', 'Playfair Display');
@@ -238,6 +239,9 @@ export default function HomePage() {
             <div className="text-center">
               <span className="font-label-sm text-label-sm leading-label-sm text-cinematic-gold tracking-[0.2em] uppercase block mb-2 font-semibold">{teaCeremonyLabel}</span>
               <h3 className="font-display-hero text-headline-lg-mobile leading-headline-lg-mobile md:text-headline-lg md:leading-headline-lg font-semibold text-charcoal-ink">{teaCeremonyTitle}</h3>
+              {teaCeremonyBody && (
+                <p className="font-body-md text-body-md text-charcoal-ink/80 leading-relaxed mt-4 max-w-2xl mx-auto">{teaCeremonyBody}</p>
+              )}
             </div>
           </div>
         </section>

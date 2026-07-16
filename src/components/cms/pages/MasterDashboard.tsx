@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Heart, CheckCircle, Mail, Users } from 'lucide-react';
+import { Heart, CheckCircle, Mail, Users, MessageSquareHeart, Phone } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -35,9 +35,9 @@ const statusVariant: Record<string, string> = {
 };
 
 const planVariant: Record<string, string> = {
-  PREMIUM: 'bg-yellow-50 text-yellow-700 border-yellow-200',
-  ENTERPRISE: 'bg-purple-50 text-purple-700 border-purple-200',
-  FREE: 'bg-slate-100 text-slate-500 border-slate-200',
+  PLATINUM: 'bg-yellow-50 text-yellow-700 border-yellow-200',
+  DIAMOND: 'bg-purple-50 text-purple-700 border-purple-200',
+  GOLD: 'bg-slate-100 text-slate-500 border-slate-200',
 };
 
 function formatRelative(dateStr: string) {
@@ -280,6 +280,69 @@ export default function MasterDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Recent Wishes & Contacts — 2 columns */}
+      {!loading && data && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card className="border-slate-200 bg-white shadow-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base font-semibold text-slate-900 flex items-center gap-2">
+                <MessageSquareHeart className="h-4 w-4 text-rose-400" />
+                Recent Wishes
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              {data.recentWishes.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-8 text-slate-400">
+                  <MessageSquareHeart className="h-6 w-6 mb-1" />
+                  <p className="text-xs">No wishes yet</p>
+                </div>
+              ) : (
+                <div className="divide-y divide-slate-100 max-h-64 overflow-y-auto">
+                  {data.recentWishes.map((w) => (
+                    <div key={w.id} className="px-3 py-2.5 hover:bg-slate-50 rounded-md transition-colors">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-medium text-slate-900 truncate">{w.name}</p>
+                        <p className="text-xs text-slate-400 shrink-0 ml-2">{formatRelative(w.createdAt)}</p>
+                      </div>
+                      <p className="text-xs text-slate-500 mt-0.5 line-clamp-2">{w.message}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className="border-slate-200 bg-white shadow-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base font-semibold text-slate-900 flex items-center gap-2">
+                <Phone className="h-4 w-4 text-blue-400" />
+                Recent Contact Messages
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              {data.recentContacts.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-8 text-slate-400">
+                  <Phone className="h-6 w-6 mb-1" />
+                  <p className="text-xs">No messages yet</p>
+                </div>
+              ) : (
+                <div className="divide-y divide-slate-100 max-h-64 overflow-y-auto">
+                  {data.recentContacts.map((c) => (
+                    <div key={c.id} className="px-3 py-2.5 hover:bg-slate-50 rounded-md transition-colors">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-medium text-slate-900">{c.name}</p>
+                        <p className="text-xs text-slate-400 shrink-0 ml-2">{formatRelative(c.createdAt)}</p>
+                      </div>
+                      <p className="text-xs text-slate-500 mt-0.5">{c.reason}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }
