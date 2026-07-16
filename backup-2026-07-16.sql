@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict 9h7O67VsSivgldgjrktmlQe4QV6MDL0aYQLWa8ZNQNhdthRJhl24ofdJfdkHYkU
+\restrict yvEuA6VZo79arLFZxsIwS6Rag20iReP7skZIU3SfYLAvvbiLT45HkqWpI4IuCTb
 
 -- Dumped from database version 18.4 (Debian 18.4-1.pgdg13+1)
 -- Dumped by pg_dump version 18.4 (Debian 18.4-1.pgdg12+1)
@@ -528,8 +528,8 @@ cmrkeg3nv000gnn0177lqb42n	site_nav_tabs	[{"id":"home","label":"Home","section":"
 --
 
 COPY public."User" (id, email, "passwordHash", name, role, "avatarUrl", "isActive", "resetToken", "resetTokenExpiry", "lastLoginAt", "createdAt", "updatedAt") FROM stdin;
-cmrbml1ph0000ckf44n6695wk	admin@dreamweavers.sg	$2b$12$YOgOKuys/86NckghaoQY3uSgGcVzuslcaO64tAsBjxxl3fDgkS8Xy	Dreamweavers Admin	SUPER_ADMIN	\N	t	\N	\N	2026-07-16 02:16:52.423	2026-07-08 05:16:34.642	2026-07-16 02:16:52.425
-cmrbml2bh0001ckf4vjkd3ynu	eleanor@wedding.com	$2b$12$BQIIf6158hhlHI0OABg/3OCX5budd/vUxDJ3H2XWRpxmRiEntFcO6	Eleanor	COUPLE	\N	t	\N	\N	2026-07-16 02:18:06.272	2026-07-08 05:16:35.453	2026-07-16 02:18:06.272
+cmrbml2bh0001ckf4vjkd3ynu	eleanor@wedding.com	$2b$12$BQIIf6158hhlHI0OABg/3OCX5budd/vUxDJ3H2XWRpxmRiEntFcO6	Eleanor	COUPLE	\N	t	\N	\N	2026-07-16 02:22:23.693	2026-07-08 05:16:35.453	2026-07-16 02:22:23.693
+cmrbml1ph0000ckf44n6695wk	admin@dreamweavers.sg	$2b$12$YOgOKuys/86NckghaoQY3uSgGcVzuslcaO64tAsBjxxl3fDgkS8Xy	Dreamweavers Admin	SUPER_ADMIN	\N	t	\N	\N	2026-07-16 02:22:39.08	2026-07-08 05:16:34.642	2026-07-16 02:22:39.081
 \.
 
 
@@ -978,5 +978,5 @@ ALTER TABLE ONLY public."Wish"
 -- PostgreSQL database dump complete
 --
 
-\unrestrict 9h7O67VsSivgldgjrktmlQe4QV6MDL0aYQLWa8ZNQNhdthRJhl24ofdJfdkHYkU
+\unrestrict yvEuA6VZo79arLFZxsIwS6Rag20iReP7skZIU3SfYLAvvbiLT45HkqWpI4IuCTb
 
